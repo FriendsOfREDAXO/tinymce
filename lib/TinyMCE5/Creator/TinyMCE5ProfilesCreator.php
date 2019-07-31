@@ -35,7 +35,7 @@ class TinyMCE5ProfilesCreator
                 }
 
                 $result = self::mapProfile($profile);
-                $jsonProfiles[$profile['name']] = $result['profile'];
+                $jsonProfiles[$profile['name']] = $result;
 
             }
 
@@ -59,16 +59,10 @@ const tiny5profiles = $profiles;
      */
     public static function mapProfile(array $profile)
     {
-        dump($profile);die;
-
-        $toolbar = self::toArray($profile['toolbar']);
-        $jsonProfile = ['toolbar' => $toolbar];
-
-        if (!empty($profile['image_toolbar'])) {
-            $imageKeys = self::toArray($profile['image_toolbar']);
-            $jsonProfile['image'] = ['toolbar' => self::getImageToolbar($imageKeys), 'styles' => self::getImageStyles($imageKeys)];
+        $jsonProfile = array();
+        if (!empty($profile['extra'])) {
+            return $profile['extra'];
         }
-
         return $jsonProfile;
     }
 
