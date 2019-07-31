@@ -1,0 +1,31 @@
+{
+    "name": "fixer",
+    "title": "jQuery Fixer",
+    "description": "Fix elements as `position:sticky` do.",
+    "keywords": [
+        "fix",
+        "fixed",
+        "fixer",
+        "stick",
+        "sticky",
+        "position",
+        "scroll"
+    ],
+    "version": "0.0.3",
+    "author": {
+        "name": "Yannick Albert",
+        "email": "mail@yckart.com",
+        "url": "https://github.com/yckart"
+    },
+    "licenses": [{
+        "type": "MIT",
+        "url": "http://yckart.com/mit/"
+    }],
+    "homepage": "http://yckart.github.com/jquery.fixer.js",
+    "demo": "http://yckart.github.com/jquery.fixer.js",
+    "docs": "https://github.com/yckart/jquery.fixer.js",
+    "bugs": "https://github.com/yckart/jquery.fixer.js/issues",
+    "dependencies": {
+        "jquery": ">=1.4"
+    }
+}

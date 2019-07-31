@@ -1,0 +1,13 @@
+# title
+tinymce5_title = TinyMCE 5
+
+# navigation
+tinymce5_main = Überblick & Demo
+tinymce5_demo = TinyMCE 5 Demo
+tinymce5_mblock_demo = MBlock Demo
+tinymce5_profiles = Editor Profile
+tinymce5_help = Hilfe
+
+# heading
+tinymce5_subnavigation_header_title = TinyMCE 5 für Redaxo 5
+tinymce5_subnavigation_header_photo = Foto von %s auf %s

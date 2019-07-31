@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:700&display=swap');
+
+
+body.tox-dialog__disable-scroll {
+    overflow: visible!important;
+}
+
+.tinymce5-help-page img {
+    max-width: 100%;
+    height: auto;
+}
+
+.tinymce5-icon-logo {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: -25px;
+    /*background: url(images/tinymce5.svg) no-repeat 0 0;*/
+    background-size: 18px 18px;
+    vertical-align: middle;
+}
+
+.active .tinymce5-icon-logo {
+    /*background-image: url(images/tinymce5_white.svg);*/
+}
+
+.page-header .tinymce5-icon-logo {
+    margin-left: 0;
+    width: 40px;
+    height: 40px;
+    background-size: 38px 38px;
+    /*background-image: url(images/tinymce5_black.svg);*/
+}
+
+/*#4ca6f2*/
+/*.tox .tox-fixer:not(.tox-blur) .tox-edit-area {*/
+/*    border: 1px solid #4ca6f2;*/
+/*}*/
+
+.tinymce5-header {
+    position: relative;
+    display: block;
+    background-size: cover;
+    background: #000 url(images/header-john-reed-qtRFE7MYnHo-unsplash.jpg) no-repeat center top;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+picture img {
+    max-width: 100%;
+    min-height: 260px;
+    max-height: 360px;
+    opacity: 0;
+}
+
+.panel-body > .tinymce5-header {
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-top: -15px;
+}
+
+.tinymce5-header .header-content {
+    width: 100%;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    transition: transform .2s ease-in-out;
+}
+
+.tinymce5-header h1 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    color: #fff;
+    line-height: 36px;
+    margin: 0;
+    transform: translate(0, -35px);
+}
+
+.tinymce5-header h1:before {
+    content: '';
+    display: inline-block;
+    width: 118px;
+    height: 100px;
+    margin-right: 20px;
+    transform: translate(0, 35px);
+    background: url(images/tinymce5_white.svg) no-repeat;
+    background-size: contain;
+}
+
+.tinymce5-header .photoinfo {
+    position: absolute;
+    z-index: 98;
+    bottom: 13px;
+    right: 17px;
+}
+
+.tinymce5-header .photoinfo a {
+    color: #fff;
+    border-bottom: 1px solid #fff;
+}
+
+.tox-menubar +
+.tox-toolbar {
+    margin-top: 38px;
+}
+
+.tox-fixer .tox-menubar {
+    /*border-bottom: 1px solid #ccc;*/
+}
+
+.tox-fixer .tox-menubar,
+.tox-fixer .tox-toolbar {
+    position: absolute;
+}
+
+.tox-blur .tox-menubar,
+.tox-blur .tox-toolbar {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    left: 0;
+}
+
+.tox-fullscreen .tox-menubar,
+.tox-fullscreen .tox-toolbar {
+    right: 0;
+    left: 0;
+    width: 100% !important;
+}
+
+.tox .tox-menubar,
+.tox .tox-toolbar {
+    z-index: 1;
+}
+
+.tox .tox-menubar,
+.tox .tox-toolbar {
+    background-color: #fafafa;
+}
+
+textarea + textarea {
+    margin-top: 20px;
+}
+
+.panel-tinymce5-mblockdemo .rex-form-group:not(.rex-form-group-vertical) > dd:first-child,
+.tinymce5-mblockdemo .rex-form-group:not(.rex-form-group-vertical) > dd:first-child {
+    padding-left: inherit !important;
+}
+
+.tinymce5-preview .tinymce5-preview-editor,
+.panel-tinymce5-mblockdemo .rex-form-group:not(.rex-form-group-vertical) > dd:first-child,
+.tinymce5-mblockdemo .rex-form-group:not(.rex-form-group-vertical) > dd:first-child {
+    margin: 0 auto;
+    max-width: 1030px;
+    display: block;
+}
+
+.tinymce5-preview,
+.panel-tinymce5-mblockdemo .tinymce5-demo-info {
+    max-width: 1330px;
+    margin: 0 auto;
+}
+
+.panel-tinymce5-mblockdemo .tinymce5-demo-info {
+    padding: 2em;
+}
+
+.panel-tinymce5-mblockdemo .sortitem {
+    background: #f7f7f7;
+}
+
+.panel-tinymce5-mblockdemo form {
+    max-width: 1330px;
+    margin: 0 auto;
+}
