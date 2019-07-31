@@ -111,7 +111,7 @@ if ($func == '') {
     $field = $form->addTextAreaField('extra');
     $field->setLabel(rex_i18n::msg('tinymce5_extra_definition'));
 
-    $content = '<div class="tinymce5_profile_edit" data-cktypes=\'["' . implode('","', TinyMCE5ProfilesCreator::EDITOR_SETTINGS['cktypes']) . '"]\' data-ckimgtypes=\'["' . implode('","', TinyMCE5ProfilesCreator::EDITOR_SETTINGS['ckimgtypes']) . '"]\'>' . $form->get() . '</div>';
+    $content = '<div class="tinymce5_profile_edit">' . $form->get() . '</div>';
 
     $fragment = new rex_fragment();
     $fragment->setVar('class', 'edit', false);
