@@ -13,6 +13,7 @@ use rex_file;
 
 class TinyMCE5ProfilesCreator
 {
+    const UPLOAD_URL = './index.php?tinymce5upload=1';
     const PROFILES_FILENAME = 'tinymce5_profiles.js';
 
     /**
