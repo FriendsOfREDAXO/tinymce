@@ -15,6 +15,9 @@ image_uploadtab: false,
 // paste_as_text: true,
 powerpaste_word_import: "clean",
 powerpaste_html_import: "merge",
+paste_data_images: true,
+images_upload_url: './index.php?tinymce5upload=1',
+images_upload_base_path: '/media',
 
 // height: 700,
 

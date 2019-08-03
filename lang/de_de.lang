@@ -11,3 +11,34 @@ tinymce5_help = Hilfe
 # heading
 tinymce5_subnavigation_header_title = TinyMCE 5 für Redaxo 5
 tinymce5_subnavigation_header_photo = Foto von %s auf %s
+
+# profiles list & form
+tinymce5_list_profiles = TinyMCE 5 Profile
+tinymce5_profile_edit = TinyMCE 5 Profile bearbeiten
+tinymce5_profile_add = Neues TinyMCE 5 Profile erstellen
+tinymce5_list_function = Funktion
+tinymce5_clone = duplizieren
+
+# profiles columns names
+tinymce5_name = Profile-Namen
+tinymce5_name_placeholder = profile_name
+tinymce5_description = Profile-Beschreibung
+tinymce5_description_placeholder = Einsatzzweck und Umfang des Profils
+tinymce5_extra_definition = Profile-Optionen
+tinymce5_toolbar = Toolbar-Elemente
+tinymce5_heading = Heading-Elemente
+tinymce5_alignment = Text Ausrichtung
+tinymce5_fontSize = Schriftgrößen
+tinymce5_link = Rexdaxo-Links
+tinymce5_lang = Sprache
+tinymce5_image_toolbar = Image-Plugin Toolbar
+tinymce5_table_toolbar = Tabellen-Plugin Toolbar
+tinymce5_height_default = TinyMCE 5 Default-Höhe
+tinymce5_height_default_description = Ohne Custom-min- und -max-Höhe, Höhe passt sich dem Textarea-Inhalt an
+tinymce5_min_height = Textarea Mindest-Höhe
+tinymce5_max_height = Textarea Maximal-Höhe
+tinymce5_highlight = Marker- und Schriftfarben
+tinymce5_media_manager_type = Media-Manager-Type
+tinymce5_media_category = Medienkagetorie
+tinymce5_upload_default = Image-Drag&Drop-Upload
+tinymce5_upload_default_description = Bilder können via drag+drop in das Textfeld gesetzt werden
