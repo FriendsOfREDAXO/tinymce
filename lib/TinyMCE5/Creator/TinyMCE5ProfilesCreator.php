@@ -25,9 +25,9 @@ class TinyMCE5ProfilesCreator
     {
         $profiles = TinyMCE5DatabaseHandler::getAllProfiles();
         $content = '';
-
         if (sizeof($profiles) > 0) {
             $jsonProfiles = [];
+            $extras = [];
 
             foreach ($profiles as $profile) {
 
@@ -36,11 +36,38 @@ class TinyMCE5ProfilesCreator
                 }
 
                 $result = self::mapProfile($profile);
-                $jsonProfiles[$profile['name']] = $result;
 
+                $picker_callback = 'rex5_picker_function(callback, value, meta);';
+                $instance_callback = 'rex5_init_callback(theEditor);';
+                $setup = 'rex5_setup_callback(theEditor);';
+
+                $extras[uniqid()] = $result;
+                $extras[uniqid()] = "
+                    file_picker_callback: function (callback, value, meta) {
+                        $picker_callback
+                    },
+                    init_instance_callback: function (theEditor) {
+                        $instance_callback
+                    },
+                    setup: function (theEditor) {
+                        $setup
+                    }
+                ";
+
+                foreach ($extras as $key => $extra) {
+                    $jsonProfiles[$profile['name']][$key] = $key;
+                }
+            }
+
+            $extraValues = array();
+            $extraKeys = array();
+            foreach ($extras as $key => $value) {
+                $extraKeys[$key] = "\"$key\":\"$key\"";
+                $extraValues[$key] = $value;
             }
 
             $profiles = json_encode($jsonProfiles);
+            $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
 
             $content =
                 "
