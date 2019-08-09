@@ -18,6 +18,7 @@ powerpaste_html_import: "merge",
 paste_data_images: true,
 images_upload_url: './index.php?tinymce5upload=1',
 images_upload_base_path: '/media',
+images_reuse_filename: true,
 
 // height: 700,
 
