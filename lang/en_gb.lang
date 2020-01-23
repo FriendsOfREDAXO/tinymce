@@ -1,0 +1,44 @@
+# title
+tinymce5_title = TinyMCE 5
+
+# navigation
+tinymce5_main = Overview & demo
+tinymce5_demo = TinyMCE 5 demo
+tinymce5_mblock_demo = MBlock demo
+tinymce5_profiles = Editor profile
+tinymce5_help = Help
+
+# heading
+tinymce5_subnavigation_header_title = TinyMCE 5 for Redaxo 5
+tinymce5_subnavigation_header_photo = Photo from %s to %s
+
+# profiles list & form
+tinymce5_list_profiles = TinyMCE 5 profile
+tinymce5_profile_edit = Edit TinyMCE 5 profile
+tinymce5_profile_add = Create new TinyMCE 5 profile
+tinymce5_list_function = Function
+tinymce5_clone = Duplicate
+
+# profiles columns names
+tinymce5_name = Profile name
+tinymce5_name_placeholder = profile_name
+tinymce5_description = Profile description
+tinymce5_description_placeholder = Intended use and scope of profile
+tinymce5_extra_definition = Profile options
+tinymce5_toolbar = Toolbar elements
+tinymce5_heading = Heading elements
+tinymce5_alignment = Text justification
+tinymce5_fontSize = Font size
+tinymce5_link = Redaxo links
+tinymce5_lang = Language
+tinymce5_image_toolbar = Image plugin toolbar
+tinymce5_table_toolbar = Table plugin toolbar
+tinymce5_height_default = TinyMCE 5 default height
+tinymce5_height_default_description = Height is adjusted according to textarea height automatically, if no custom minimum and maximum height is entered
+tinymce5_min_height = Textarea minimum height
+tinymce5_max_height = Textarea maximum height
+tinymce5_highlight = Marker and font colors
+tinymce5_media_manager_type = Media manager types
+tinymce5_media_category = Media category
+tinymce5_upload_default = Drag & drop image upload
+tinymce5_upload_default_description = Images can be placed in the editor using drag & drop
