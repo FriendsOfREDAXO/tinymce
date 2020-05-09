@@ -54,25 +54,45 @@ let rex5_picker_function = function (callback, value, meta) {
 let tiny5areas = '.tiny5-editor';
 
 $(document).on('rex:ready', function (e, container) {
-    container.find(tiny5areas).each(function () {
-        tiny5_init($(this));
-    });
+    console.log('ready');
+    if (container.find(tiny5areas).length) {
+        tiny5_init(container);
+    }
 });
 
-function tiny5_init(element) {
-    let options = {},
-        profile = element.data('profile');
+$(document).on('rex:change', function (e, container) {
+    console.log('change');
+    if (container.find(tiny5areas).length) {
+        tiny5_restart(container);
+    }
+});
 
-    if (typeof profile === 'undefined' || !profile) {
+function tiny5_init(container) {
+    let profiles = [];
 
-    } else {
+    container.find(tiny5areas).each(function(){
+        profiles.push($(this).data('profile'));
+    });
+    profiles = profiles.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+
+    profiles.forEach(function(profile) {
+        console.log(profile);
+
+        let options = {};
         if (profile in tiny5profiles) {
             options = tiny5profiles[profile];
         }
-        let unique = 'tiny5' + Math.floor(Math.random() * 26) + Date.now();
-        element.attr('id', unique);
-        options['selector'] = '#' + unique;
-    }
+        options['selector'] = tiny5areas + '[data-profile="' + profile + '"]:not(.mce-initialized)';
+        tinymce.init(options).then(function(editors) {
+            for(let i in editors) {
+                $(editors[i].targetElm).addClass('mce-initialized');
+            }
+        });
+    });
+}
 
-    tinymce.init(options);
+function tiny5_restart(container) {
+    container.parents('.mblock_wrapper').find('.mce-initialized').removeClass('mce-initialized').show();
+    container.parents('.mblock_wrapper').find('.tox.tox-tinymce').remove();
+    tiny5_init(container.parents('.mblock_wrapper'));
 }
