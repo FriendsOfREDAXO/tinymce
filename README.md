@@ -1,8 +1,10 @@
 # tinymce5 
 🐣 tinymce5 für REDAXO
 
-## Anwendung: 
 
+![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot.png?raw=true)
+
+## Anwendung: 
 
 **Moduleingabe**
 
