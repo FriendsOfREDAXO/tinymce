@@ -23,8 +23,8 @@ REX_VALUE[id=1 output=html]
 
 ## Licenses
 
-AddOn:[MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce5/blob/master/LICENSE.md)
-TinyMCE 5 [GPL LICENSE](https://github.com/tinymce/tinymce/blob/develop/LICENSE.TXT)
+- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce5/blob/master/LICENSE.md)
+- TinyMCE 5 [GPL LICENSE](https://github.com/tinymce/tinymce/blob/develop/LICENSE.TXT)
 
 
 ## Author
