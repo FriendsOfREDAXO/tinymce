@@ -37,7 +37,6 @@ class TinyMCE5AssetsProvider
         try {
             rex_view::addCssFile(self::getAddon()->getAssetsUrl('css/tinymce5_rex_skin.css'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/fixer/jquery.fixer.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce5_profiles.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('js/tinymce5_rex.js'));
         } catch (rex_exception $e) {
