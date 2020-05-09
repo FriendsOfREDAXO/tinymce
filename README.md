@@ -1,6 +1,6 @@
-# tinymce5 
-🐣 tinymce5 für REDAXO
+# tinymce5 beta 2
 
+tinymce5 für REDAXO
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot.png?raw=true)
 
@@ -20,3 +20,22 @@
 ```php
 REX_VALUE[id=1 output=html]
 ```
+
+## Licenses
+
+AddOn:[MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce5/blob/master/LICENSE.md)
+TinyMCE 5 [GPL LICENSE](https://github.com/tinymce/tinymce/blob/develop/LICENSE.TXT)
+
+
+## Author
+
+**Friends Of REDAXO**
+
+* http://www.redaxo.org
+* https://github.com/FriendsOfREDAXO
+
+**Projekt-Lead**
+
+[Joachim Dörr](https://github.com/joachimdoerr)
+
+
