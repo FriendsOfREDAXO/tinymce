@@ -6,11 +6,11 @@
  */
 
 /** @var rex_addon $this */
-$content = \TinyMCE5\Provider\TinyMCE5NavigationProvider::getSubNavigationHeader()
-           # \TinyMCE5\Provider\TinyMCE5NavigationProvider::getSubNavigation()
+$content = \TinyMCE5\Provider\TinyMCE5NavigationProvider::getSubNavigationHeader().
+           \TinyMCE5\Provider\TinyMCE5NavigationProvider::getSubNavigation()
     . '
 <div class="tinymce5-demo">
-    <div name="content" class="tiny5-editor" data-profile="default" data-lang="' . \TinyMCE5\Utils\TinyMCE5Lang::getUserLang() . '">
+    <div name="content" class="tiny5-editor" data-profile="full" data-lang="' . \TinyMCE5\Utils\TinyMCE5Lang::getUserLang() . '">
     
       <p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="' . rex_url::addonAssets('tinymce5', 'images/glyph-tinymce@2x.png') . '" alt="TinyMCE Logo" width="110" height="97" />
       </p>

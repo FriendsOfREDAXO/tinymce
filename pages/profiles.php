@@ -30,7 +30,6 @@ if ($func == 'delete') {
 }
 
 if ($func == '') {
-
     // instance list
     $list = rex_list::factory("SELECT id, name, description FROM $profileTable ORDER BY id");
     $list->addTableAttribute('class', 'table-striped');
@@ -101,6 +100,7 @@ if ($func == '') {
     // name
     $field = $form->addTextField('name');
     $field->setLabel(rex_i18n::msg('tinymce5_name'));
+    $field->setAttribute('id', 'tinymce5-name-input');
     $field->setAttribute('placeholder', rex_i18n::msg('tinymce5_name_placeholder'));
 
     // description
@@ -108,7 +108,33 @@ if ($func == '') {
     $field->setLabel(rex_i18n::msg('tinymce5_description'));
     $field->setAttribute('placeholder', rex_i18n::msg('tinymce5_description_placeholder'));
 
+    /*
+    // plugins
+    $af = \TinyMCE5\Creator\TinyMCE5ProfilesCreator::ALLOWED_FIELDS;
+
+    $field = $form->addTextField('plugins');
+    $field->setAttribute('id', 'tinymce5plugins-input');
+    $field->setAttribute('data-tag-init', 1);
+    $field->setAttribute('data-defaults', TinyMCE5ProfilesCreator::DEFAULTS['plugins']);
+    $field->setAttribute('data-intersect-tags', '["' . implode('","', array_intersect($af['plugins'], $af['toolbar'])) . '"]');
+    $field->setAttribute('data-tags', '["' . implode('","', $af['plugins']) . '"]');
+    $field->setLabel(rex_i18n::msg('tinymce5_plugins'));
+    if ($default_value) $field->setAttribute('data-default-tags', 1);
+
+    // toolbar
+    $field = $form->addTextField('toolbar');
+    $field->setAttribute('id', 'tinymce5toolbar-input');
+    $field->setAttribute('data-tag-init', 1);
+    $field->setAttribute('data-defaults', TinyMCE5ProfilesCreator::DEFAULTS['toolbar']);
+    $field->setAttribute('data-diff-tags', '["' . implode('","', array_diff($af['toolbar'], $af['plugins'])) . '"]');
+    // $field->setAttribute('data-tags', '["' . implode('","', array_diff($af['toolbar'], $af['plugins'])) . '"]');
+    $field->setAttribute('data-tags', '["' . implode('","', $af['toolbar']) . '"]');
+    $field->setLabel(rex_i18n::msg('tinymce5_toolbar'));
+    if ($default_value) $field->setAttribute('data-default-tags', 1);
+    */
+
     $field = $form->addTextAreaField('extra');
+    $field->setAttribute('style','height: 550px');
     $field->setLabel(rex_i18n::msg('tinymce5_extra_definition'));
 
     $content = '<div class="tinymce5_profile_edit">' . $form->get() . '</div>';
