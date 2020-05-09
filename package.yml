@@ -24,3 +24,4 @@ page:
 
 requires:
     redaxo: '^5.7'
+    php: '^7'
