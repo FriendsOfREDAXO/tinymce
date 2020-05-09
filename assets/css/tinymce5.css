@@ -15,13 +15,11 @@ body.tox-dialog__disable-scroll {
     width: 20px;
     height: 20px;
     margin-left: -25px;
-    /*background: url(images/tinymce5.svg) no-repeat 0 0;*/
     background-size: 18px 18px;
     vertical-align: middle;
 }
 
 .active .tinymce5-icon-logo {
-    /*background-image: url(images/tinymce5_white.svg);*/
 }
 
 .page-header .tinymce5-icon-logo {
@@ -29,19 +27,16 @@ body.tox-dialog__disable-scroll {
     width: 40px;
     height: 40px;
     background-size: 38px 38px;
-    /*background-image: url(images/tinymce5_black.svg);*/
 }
-
-/*#4ca6f2*/
-/*.tox .tox-fixer:not(.tox-blur) .tox-edit-area {*/
-/*    border: 1px solid #4ca6f2;*/
-/*}*/
 
 .tinymce5-header {
     position: relative;
     display: block;
     background-size: cover;
-    background: #000 url(images/header-john-reed-qtRFE7MYnHo-unsplash.jpg) no-repeat center top;
+    background-color: #000;
+    background-image: url(../images/header-john-reed-qtRFE7MYnHo-unsplash.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
     color: #fff;
     text-align: center;
     margin-bottom: 15px;
@@ -89,7 +84,7 @@ picture img {
     height: 100px;
     margin-right: 20px;
     transform: translate(0, 35px);
-    background: url(images/tinymce5_white.svg) no-repeat;
+    background: url(../images/tinymce5_white.svg) no-repeat;
     background-size: contain;
 }
 
@@ -103,45 +98,6 @@ picture img {
 .tinymce5-header .photoinfo a {
     color: #fff;
     border-bottom: 1px solid #fff;
-}
-
-.tox-menubar +
-.tox-toolbar {
-    margin-top: 38px;
-}
-
-.tox-fixer .tox-menubar {
-    /*border-bottom: 1px solid #ccc;*/
-}
-
-.tox-fixer .tox-menubar,
-.tox-fixer .tox-toolbar {
-    position: absolute;
-}
-
-.tox-blur .tox-menubar,
-.tox-blur .tox-toolbar {
-    position: absolute !important;
-    top: 0;
-    right: 0;
-    left: 0;
-}
-
-.tox-fullscreen .tox-menubar,
-.tox-fullscreen .tox-toolbar {
-    right: 0;
-    left: 0;
-    width: 100% !important;
-}
-
-.tox .tox-menubar,
-.tox .tox-toolbar {
-    z-index: 1;
-}
-
-.tox .tox-menubar,
-.tox .tox-toolbar {
-    background-color: #fafafa;
 }
 
 textarea + textarea {
@@ -179,3 +135,13 @@ textarea + textarea {
     max-width: 1330px;
     margin: 0 auto;
 }
+
+.tinymce5-demo {
+    margin: 0 auto;
+    max-width: 1030px;
+}
+
+.tinymce5-mainnav {
+    padding: 20px 0 25px 0;
+}
+

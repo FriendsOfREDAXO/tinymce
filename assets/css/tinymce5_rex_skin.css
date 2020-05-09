@@ -1,0 +1,5 @@
+.tox .tox-menubar,
+.tox .tox-toolbar, .tox .tox-toolbar__overflow, .tox .tox-toolbar__primary,
+.tox .tox-editor-header {
+    background-color: #fafafa !important;
+}
