@@ -57,7 +57,8 @@ class TinyMCE5ProfilesCreator
                 $key_defaults = uniqid();
                 $key_extras = uniqid();
                 $extras[$key_defaults] = $result;
-                $extras[$key_extras] = "file_picker_callback: function (callback, value, meta) { $picker_callback }";
+                $extras[$key_extras] = "
+file_picker_callback: function (callback, value, meta) { $picker_callback }";
 
                 $jsonProfiles[$profile['name']][$key_defaults] = $key_defaults;
                 $jsonProfiles[$profile['name']][$key_extras] = $key_extras;
