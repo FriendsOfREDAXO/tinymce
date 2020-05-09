@@ -8,19 +8,58 @@
 namespace TinyMCE5\Provider;
 
 
+use rex_be_controller;
 use rex_exception;
 use rex_logger;
 use rex_view;
 
 class TinyMCE5AssetsProvider
 {
+    /**
+     * @author Joachim Doerr
+     */
+    public static function provideViewAssets()
+    {
+        if (rex_be_controller::getCurrentPagePart(1) == 'tinymce5') {
+            try {
+                rex_view::addCssFile(self::getAddon()->getAssetsUrl('css/tinymce5.css'));
+            } catch (rex_exception $e) {
+                rex_logger::logException($e);
+            }
+        }
+    }
+
+    /**
+     * @author Joachim Doerr
+     */
     public static function provideBaseAssets()
     {
-        rex_view::addCssFile(self::getAddon()->getAssetsUrl('tinymce5.css'));
-        rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
-        rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/fixer/jquery.fixer.js'));
-        rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce5_profiles.js'));
-        rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce5.js'));
+        try {
+            rex_view::addCssFile(self::getAddon()->getAssetsUrl('css/tinymce5_rex_skin.css'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/fixer/jquery.fixer.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce5_profiles.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('js/tinymce5_rex.js'));
+        } catch (rex_exception $e) {
+            rex_logger::logException($e);
+        }
+    }
+
+    /**
+     * @author Joachim Doerr
+     */
+    public static function provideProfileEditData()
+    {
+        if (rex_be_controller::getCurrentPagePart(2) == 'profiles' && rex_be_controller::getCurrentPagePart(1) == 'tinymce5') {
+            // add js vendors
+            self::addJS([
+                'jquery.alphanum' => 'vendor/alphanum/jquery.alphanum.js',
+                'tinymce5profile_edit' => 'js/tinymce5_profile_edit.js',
+            ]);
+            // add css vendors
+            //self::addCss([
+            //]);
+        }
     }
 
     /**
@@ -72,7 +111,7 @@ class TinyMCE5AssetsProvider
     }
 
     /**
-     * @return \rex_addon
+     * @return \rex_addon_interface
      * @author Joachim Doerr
      */
     private static function getAddon()

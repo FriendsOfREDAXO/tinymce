@@ -40,11 +40,11 @@ class TinyMCE5UploadHandler
             }
 
             // $mediaType = \rex_request::get('media_type', 'string', '');
-            // $mediaSrcPath = '/' . \rex_request::get('media_path', 'string', self::MEDIA_PATH) . '/';
+             $mediaSrcPath = '/' . \rex_request::get('media_path', 'string', self::MEDIA_PATH) . '/';
 
-            // if (!empty($mediaType)) {
-            //     $mediaSrcPath = sprintf(self::MEDIA_TYPE_PATH, $mediaType);
-            // }
+             if (!empty($mediaType)) {
+                 $mediaSrcPath = sprintf(self::MEDIA_TYPE_PATH, $mediaType);
+             }
 
             $statusCode = 201;
             $response = [

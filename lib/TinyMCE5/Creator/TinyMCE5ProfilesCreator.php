@@ -16,6 +16,21 @@ class TinyMCE5ProfilesCreator
     const UPLOAD_URL = './index.php?tinymce5upload=1';
     const PROFILES_FILENAME = 'tinymce5_profiles.js';
 
+    const ALLOWED_FIELDS = [
+        'toolbar' => ['|', 'styleselect', 'undo', 'redo', 'save', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'forecolor', 'backcolor', 'ltr', 'rtl', 'table', 'visualblocks', 'visualchars', 'link', 'image', 'media', 'codesample', 'template', 'fontselect', 'align', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'numlist', 'bullist', 'outdent', 'indent', 'removeformat', 'code', 'hr', 'print', 'preview', 'media', 'fullscreen', 'searchreplace', 'emoticons', 'visualaid', 'cut', 'copy', 'paste', 'pastetext', 'selectall', 'wordcount', 'charmap', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime'],
+        'plugins' => ['autoresize', 'save', 'print', 'preview', 'searchreplace', 'autolink', 'directionality', 'visualblocks', 'visualchars', 'fullscreen', 'image', 'link', 'media', 'template', 'codesample', 'table', 'charmap', 'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime', 'advlist', 'lists', 'wordcount', 'imagetools', 'textpattern', 'help', 'emoticons', 'paste', 'code'],
+    ];
+
+    const DEFAULTS = [
+        'toolbar' => 'heading,|',
+        'plugins' => '',
+    ];
+
+    const EDITOR_SETTINGS = [
+        'cktypes' => ['fontColor'],
+        'ckimgtypes' => ['rexImage', 'imageUpload']
+    ];
+
     /**
      * @param null|array $profile
      * @throws \rex_functional_exception
@@ -38,25 +53,14 @@ class TinyMCE5ProfilesCreator
                 $result = self::mapProfile($profile);
 
                 $picker_callback = 'rex5_picker_function(callback, value, meta);';
-                $instance_callback = 'rex5_init_callback(theEditor);';
-                $setup = 'rex5_setup_callback(theEditor);';
 
-                $extras[uniqid()] = $result;
-                $extras[uniqid()] = "
-                    file_picker_callback: function (callback, value, meta) {
-                        $picker_callback
-                    },
-                    init_instance_callback: function (theEditor) {
-                        $instance_callback
-                    },
-                    setup: function (theEditor) {
-                        $setup
-                    }
-                ";
+                $key_defaults = uniqid();
+                $key_extras = uniqid();
+                $extras[$key_defaults] = $result;
+                $extras[$key_extras] = "file_picker_callback: function (callback, value, meta) { $picker_callback }";
 
-                foreach ($extras as $key => $extra) {
-                    $jsonProfiles[$profile['name']][$key] = $key;
-                }
+                $jsonProfiles[$profile['name']][$key_defaults] = $key_defaults;
+                $jsonProfiles[$profile['name']][$key_extras] = $key_extras;
             }
 
             $extraValues = array();
@@ -68,6 +72,7 @@ class TinyMCE5ProfilesCreator
 
             $profiles = json_encode($jsonProfiles);
             $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
+            $profiles = str_replace(',,', ',', $profiles);
 
             $content =
                 "
