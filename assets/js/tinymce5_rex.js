@@ -81,6 +81,11 @@ function tiny5_init(container) {
         let options = {};
         if (profile in tiny5profiles) {
             options = tiny5profiles[profile];
+        } else {
+            options = {
+                branding: false,
+                plugins: 'autoresize'
+            }
         }
         options['selector'] = tiny5areas + '[data-profile="' + profile + '"]:not(.mce-initialized)';
         tinymce.init(options).then(function(editors) {
