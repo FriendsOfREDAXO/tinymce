@@ -87,7 +87,15 @@ function tiny5_init(container) {
                 plugins: 'autoresize'
             }
         }
+
+        options['setup'] = function(editor) {
+            editor.on('change', function(e) {
+                $(editor.targetElm).html(editor.getContent());
+            })
+        };
+
         options['selector'] = tiny5areas + '[data-profile="' + profile + '"]:not(.mce-initialized)';
+
         tinymce.init(options).then(function(editors) {
             for(let i in editors) {
                 $(editors[i].targetElm).addClass('mce-initialized');
