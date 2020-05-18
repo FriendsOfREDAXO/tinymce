@@ -45,10 +45,21 @@ let rex5_picker_function = function (callback, value, meta) {
                 callback(mediaSrcPath + filename, {alt: ''});
             });
         }
+
         /* Provide alternative source and posted for the media dialog */
-        // if (meta.filetype === 'media') {
-        //     callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
-        // }
+        if (meta.filetype === 'media') {
+            // callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
+            let mediaPool = openREXMedia('tinymce5_medialink', '&args[types]=mp4%2Cmpeg'),
+                mediaPath = '/media/';//'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
+
+            const mediaSrcPath = (!typeof media_type === 'undefined') ? mediaManagerPath : mediaPath;
+
+            $(mediaPool).on('rex:selectMedia', function (event, filename) {
+                event.preventDefault();
+                mediaPool.close();
+                callback(mediaSrcPath + filename, {alt: ''});
+            });
+        }
     };
 
 let tiny5areas = '.tiny5-editor';
