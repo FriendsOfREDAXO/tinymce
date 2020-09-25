@@ -1,4 +1,4 @@
-# tinymce5 beta 2
+# tinymce5 
 
 tinymce5 für REDAXO
 
