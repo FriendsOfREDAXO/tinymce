@@ -1,5 +1,5 @@
 package: tinymce5
-version: '1.0.0-beta3'
+version: '1.0.0-beta4'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce5/issues
 
@@ -25,3 +25,6 @@ page:
 requires:
     redaxo: '^5.7'
     php: '^7'
+conflicts:
+    packages:
+        tinymce4: '>=0.0.0'
