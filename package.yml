@@ -24,7 +24,7 @@ page:
 
 requires:
     redaxo: '^5.7'
-    php: '^7'
+    php: '>=7'
 conflicts:
     packages:
         tinymce4: '>=0.0.0'
