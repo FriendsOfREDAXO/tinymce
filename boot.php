@@ -7,6 +7,8 @@
 
 /** @var rex_addon $this */
 
+$addon = rex_addon::get('tinymce5');
+
 // register permissions
 if (rex::isBackend() && is_object(rex::getUser())) {
     rex_perm::register('tinymce5_addon[]');

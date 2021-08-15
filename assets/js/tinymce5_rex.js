@@ -13,7 +13,7 @@ let rex5_picker_function = function (callback, value, meta) {
                 }
             }
 
-            let linkMap = openLinkMap('', '&clang=' + clang);
+            let linkMap = openMyLinkMap('', '&clang=' + clang);
 
             $(linkMap).on('rex:selectLink', function (event, linkurl, linktext) {
                 event.preventDefault();
@@ -119,4 +119,18 @@ function tiny5_restart(container) {
     container.parents('.mblock_wrapper').find('.mce-initialized').removeClass('mce-initialized').show();
     container.parents('.mblock_wrapper').find('.tox.tox-tinymce').remove();
     tiny5_init(container.parents('.mblock_wrapper'));
+}
+
+
+function openMyLinkMap(id, param)
+{
+    if (typeof(id) == 'undefined')
+    {
+        id = '';
+    }
+    if (typeof(param) == 'undefined')
+    {
+        param = '';
+    }
+    return newLinkMapWindow('index.php?page=insertlink&opener_input_field=' + id + param);
 }
