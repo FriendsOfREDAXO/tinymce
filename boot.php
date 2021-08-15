@@ -36,6 +36,7 @@ if (rex::isBackend() && rex::getUser()) {
         rex_extension::register('OUTPUT_FILTER',function($ep) {
             $subject = $ep->getSubject();
             $subject = str_replace('</form>','<input type="hidden" name="addon" value="tiny5"></form>',$subject);
+            $subject = str_replace('"#rex-js-page-main">','"#rex-js-page-main"><p><a href="/redaxo/index.php?page=insertlink&opener_input_field=&clang=1">Struktur</a></p>',$subject);
             return str_replace('selectMedia','selectLink',$subject);
         });
         rex_view::addJsFile($addon->getAssetsUrl('js/rex5tinymce.js'));
