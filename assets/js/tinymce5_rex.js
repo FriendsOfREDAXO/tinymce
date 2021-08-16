@@ -13,7 +13,7 @@ let rex5_picker_function = function (callback, value, meta) {
                 }
             }
 
-            let linkMap = openMyLinkMap('', '&clang=' + clang);
+            let linkMap = openMyLinkMap('', '&clang=' + clang, value);
 
             $(linkMap).on('rex:selectLink', function (event, linkurl, linktext) {
                 event.preventDefault();
@@ -122,7 +122,7 @@ function tiny5_restart(container) {
 }
 
 
-function openMyLinkMap(id, param)
+function openMyLinkMap(id, param,value)
 {
     if (typeof(id) == 'undefined')
     {
@@ -132,5 +132,9 @@ function openMyLinkMap(id, param)
     {
         param = '';
     }
-    return newLinkMapWindow('index.php?page=insertlink&opener_input_field=' + id + param);
+    if (typeof(value) != 'undefined' && value.indexOf('/media') > -1) {
+        return newLinkMapWindow('index.php?page=mediapool/media&addon=tiny5&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg&opener_input_field=REX_MEDIA_tinymce5_medialink');
+    } else {
+        return newLinkMapWindow('index.php?page=insertlink&opener_input_field=' + id + param);
+    }
 }
