@@ -22,6 +22,16 @@ page:
             title: 'translate:help'
             subPath: README.md
 
+pages:
+    insertlink:
+        title: translate:insertlink
+        main: true
+        block: system
+        popup: true
+        hidden: true
+        perm: structure/hasStructurePerm
+        pjax: true
+
 requires:
     redaxo: '^5.7'
     php: '>=7'

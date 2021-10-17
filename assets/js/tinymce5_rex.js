@@ -13,7 +13,7 @@ let rex5_picker_function = function (callback, value, meta) {
                 }
             }
 
-            let linkMap = openLinkMap('', '&clang=' + clang);
+            let linkMap = openMyLinkMap('', '&clang=' + clang, value);
 
             $(linkMap).on('rex:selectLink', function (event, linkurl, linktext) {
                 event.preventDefault();
@@ -119,4 +119,22 @@ function tiny5_restart(container) {
     container.parents('.mblock_wrapper').find('.mce-initialized').removeClass('mce-initialized').show();
     container.parents('.mblock_wrapper').find('.tox.tox-tinymce').remove();
     tiny5_init(container.parents('.mblock_wrapper'));
+}
+
+
+function openMyLinkMap(id, param,value)
+{
+    if (typeof(id) == 'undefined')
+    {
+        id = '';
+    }
+    if (typeof(param) == 'undefined')
+    {
+        param = '';
+    }
+    if (typeof(value) != 'undefined' && value.indexOf('/media') > -1) {
+        return newLinkMapWindow('index.php?page=mediapool/media&addon=tiny5&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg&opener_input_field=REX_MEDIA_tinymce5_medialink');
+    } else {
+        return newLinkMapWindow('index.php?page=insertlink&opener_input_field=' + id + param);
+    }
 }
