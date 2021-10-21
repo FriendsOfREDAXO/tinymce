@@ -7,6 +7,8 @@
 
 /** @var rex_addon $this */
 
+$addon = rex_addon::get('tinymce5');
+
 // register permissions
 if (rex::isBackend() && is_object(rex::getUser())) {
     rex_perm::register('tinymce5_addon[]');
@@ -30,4 +32,19 @@ if (rex::isBackend() && rex::getUser()) {
         rex_extension::register('REX_FORM_CONTROL_FIELDS', ['\TinyMCE5\Handler\TinyMCE5ExtensionHandler', 'removeDemoControlFields'], rex_extension::LATE);
         rex_extension::register(['REX_FORM_SAVED', 'REX_FORM_DELETED', 'TINY5_PROFILE_CLONE', 'TINY5_PROFILE_DELETE', 'TINY5_PROFILE_ADD', 'TINY5_PROFILE_UPDATED'], ['\TinyMCE5\Handler\TinyMCE5ExtensionHandler', 'createProfiles']);
     }
+    if (str_starts_with(rex_request('page'),'mediapool/') && (rex_request('addon') == 'tiny5' || rex_request('opener_input_field') == 'REX_MEDIA_tinymce5_medialink')) {
+        rex_extension::register('OUTPUT_FILTER',function($ep) {
+            $subject = $ep->getSubject();
+            $subject = str_replace('</form>','<input type="hidden" name="addon" value="tiny5"></form>',$subject);
+            $subject = str_replace('"#rex-js-page-main">','"#rex-js-page-main">
+        <ul class="nav nav-tabs tiny-nav">
+            <li><a href="/redaxo/index.php?page=insertlink&opener_input_field=&clang=1">Struktur</a></li>
+    <li class="active"><a href="#">Medienpool</a></li>
+        </ul>
+',$subject);
+            return str_replace('selectMedia','selectLink',$subject);
+        });
+        rex_view::addJsFile($addon->getAssetsUrl('js/rex5tinymce.js'));
+    }
+	
 }
