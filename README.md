@@ -48,9 +48,14 @@ Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [T
 **Credits**
 
 [Vendor: TinyMCE](https://www.tiny.cloud)
+
 [Development: Joachim Dörr](https://github.com/joachimdoerr)
-[Development: Woldfagnag Bund](https://github.com/dtpop)
+
+[Development: Woldfgang Bund](https://github.com/dtpop)
+
 [Development: Alex Wenz](https://github.com/alexwenz)
+
 [Testing & Release: Thomas Skerbis](https://github.com/skerbis)
+
 
 
