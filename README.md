@@ -26,7 +26,6 @@ REX_VALUE[id=1 output=html]
 ## ToDo:
 
 - mblock-Kompatibilität verbessern
-- Medienauswahl ermöglichen
 
 
 ## Licenses
