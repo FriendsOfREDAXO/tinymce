@@ -1,6 +1,6 @@
-# tinymce5 
+# TinyMCE5
 
-tinymce5 für REDAXO
+TinyMCE5 für REDAXO
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot.png?raw=true)
 
@@ -25,7 +25,7 @@ REX_VALUE[id=1 output=html]
 
 ## Konfiguration
 
-Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE5 Doku](https://www.tiny.cloud/docs/) beachten. 
+Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 5 Doku](https://www.tiny.cloud/docs/) beachten. 
 
 ## ToDo:
 
