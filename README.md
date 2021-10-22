@@ -23,6 +23,10 @@ tinymce5 für REDAXO
 REX_VALUE[id=1 output=html]
 ```
 
+## Konfiguration
+
+Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE5 Doku](https://www.tiny.cloud/docs/) beachten. 
+
 ## ToDo:
 
 - mblock-Kompatibilität verbessern
