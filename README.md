@@ -1,6 +1,6 @@
-# TinyMCE5
+# TinyMCE5 - REDAXO-AddOn 
 
-TinyMCE5 für REDAXO
+Stellt den TinyMCE im CMS REDAXO bereit. 
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot.png?raw=true)
 
