@@ -41,8 +41,12 @@ REX_VALUE[id=1 output=html]
 * http://www.redaxo.org
 * https://github.com/FriendsOfREDAXO
 
-**Projekt-Lead**
+**Credits**
 
-[Joachim Dörr](https://github.com/joachimdoerr)
+[Vendor: TinyMCE](https://www.tiny.cloud)
+[Development: Joachim Dörr](https://github.com/joachimdoerr)
+[Development: Woldfagnag Bund](https://github.com/dtpop)
+[Development: Alex Wenz](https://github.com/alexwenz)
+[Testing & Release: Thomas Skerbis](https://github.com/skerbis)
 
 
