@@ -1,5 +1,5 @@
 package: tinymce5
-version: '1.0.0-beta8'
+version: '1.0.0'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce5/issues
 
@@ -12,10 +12,6 @@ page:
             subpages:
                 demo:
                     title: 'translate:demo'
-#                mblock_demo:
-#                    title: 'translate:mblock_demo'
-#                    requires:
-#                        mblock: '^5.1.0'
         profiles:
             title: 'translate:profiles'
         help:
@@ -34,7 +30,7 @@ pages:
 
 requires:
     redaxo: '^5.7'
-    php: '>=7'
+    php: '>=7.3'
 conflicts:
     packages:
         tinymce4: '>=0.0.0'
