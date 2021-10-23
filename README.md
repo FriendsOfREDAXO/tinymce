@@ -51,7 +51,7 @@ Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [T
 
 [Development: Joachim Dörr](https://github.com/joachimdoerr)
 
-[Development: Woldfgang Bund](https://github.com/dtpop)
+[Development: Wolfgang Bund](https://github.com/dtpop)
 
 [Development: Alex Wenz](https://github.com/alexwenz)
 
