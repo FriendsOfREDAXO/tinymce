@@ -82,7 +82,13 @@ function tiny5_init(container) {
     let profiles = [];
 
     container.find(tiny5areas).each(function(){
-        profiles.push($(this).data('profile'));
+        let $this = $(this);
+        let e_id = $this.attr('id');
+        profiles.push($this.data('profile'));
+        if(tinymce.get(e_id)) {
+            $this.removeClass('mce-initialized');
+            tinymce.remove('#'+e_id);
+        }
     });
     profiles = profiles.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 
