@@ -55,7 +55,5 @@ Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [T
 
 [Development: Alex Wenz](https://github.com/alexwenz)
 
-[Testing & Release: Thomas Skerbis](https://github.com/skerbis)
-
 
 
