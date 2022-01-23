@@ -26,7 +26,7 @@ let rex5_picker_function = function (callback, value, meta) {
         /* Provide image and alt text for the image dialog */
         if (meta.filetype === 'image') {
             let media_type = '';
-            let mediaPool = openREXMedia('tinymce5_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg'),
+            let mediaPool = openREXMedia('tinymce5_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp'),
                 mediaPath = '/media/'; //'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
 
             if (typeof media_type === 'undefined') {
