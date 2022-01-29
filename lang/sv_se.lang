@@ -29,6 +29,7 @@ tinymce5_toolbar = Toolbar element
 tinymce5_heading = Heading element
 tinymce5_alignment = Textjustering
 tinymce5_fontSize = Teckenstorlekar
+tinymce5_insertlink = Välj länkdestination
 tinymce5_link = Redaxo länkar
 tinymce5_lang = Språk
 tinymce5_image_toolbar = Image-Plugin Toolbar
