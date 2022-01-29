@@ -29,6 +29,7 @@ tinymce5_toolbar = Toolbar-Elemente
 tinymce5_heading = Heading-Elemente
 tinymce5_alignment = Text Ausrichtung
 tinymce5_fontSize = Schriftgrößen
+tinymce5_insertlink = Linkziel auswählen
 tinymce5_link = Rexdaxo-Links
 tinymce5_lang = Sprache
 tinymce5_image_toolbar = Image-Plugin Toolbar
