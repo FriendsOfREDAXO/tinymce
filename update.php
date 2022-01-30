@@ -6,8 +6,5 @@ if (rex_version::compare($this->getVersion(), '1.2.5', '<')) {
 }
 
 // Recreate profiles
-try {
-    TinyMCE5\Creator\TinyMCE5ProfilesCreator::profilesCreate();
-}
-catch(\rex_functional_exception $e) {
-}
+$addon = rex_addon::get('tinymce5');
+$addon->setConfig('update_profiles', true);
