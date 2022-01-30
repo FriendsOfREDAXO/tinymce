@@ -46,5 +46,14 @@ if (rex::isBackend() && rex::getUser()) {
         });
         rex_view::addJsFile($addon->getAssetsUrl('js/rex5tinymce.js'));
     }
-	
+
+	// Recreate profiles after update
+    if ($addon->getConfig('update_profiles', false) == true ) {
+		try {
+			\TinyMCE5\Creator\TinyMCE5ProfilesCreator::profilesCreate();
+			$addon->setConfig('update_profiles', false);
+		}
+		catch(\rex_functional_exception $e) {
+		}
+    }
 }
