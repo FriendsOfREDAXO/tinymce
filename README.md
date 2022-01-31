@@ -27,6 +27,10 @@ REX_VALUE[id=1 output=html]
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 5 Doku](https://www.tiny.cloud/docs/) beachten. 
 
+## Demo
+
+![Demo](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/tinymce-demo-gif.gif?raw=true)
+
 ## ToDo:
 
 - mblock-Kompatibilität verbessern
