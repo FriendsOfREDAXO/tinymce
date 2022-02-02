@@ -30,6 +30,9 @@ try {
     if (sizeof($sql->getArray("SELECT id FROM " . rex::getTable('tinymce5_profiles') . " WHERE id=1")) <= 0) {
         rex_sql_util::importDump($this->getPath('data.sql'));
     }
+    // Recreate profiles
+    $addon = rex_addon::get('tinymce5');
+    $addon->setConfig('update_profiles', true);
 } catch (rex_sql_exception $e) {
     rex_logger::logException($e);
     print rex_view::error($e->getMessage());
