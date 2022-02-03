@@ -23,6 +23,24 @@ Stellt den TinyMCE im CMS REDAXO bereit.
 REX_VALUE[id=1 output=html]
 ```
 
+### Verwendung in YForm
+
+- Im individuellen Attribute-Feld: ``` {"class":"tiny5-editor","data-profile":"full"} ```
+- Weitere Attribute kommagetrennt möglich
+
+### Verwendung in MForm
+
+```php
+$mform = new MForm();
+$mform->addTextAreaField(1, 
+        array(
+        'label'=>'Text',
+        'class'=>'tiny5-editor', 
+        'data-profile'=>'full')
+        );
+echo $mform->show();
+```
+
 ## Konfiguration
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 5 Doku](https://www.tiny.cloud/docs/) beachten. 
