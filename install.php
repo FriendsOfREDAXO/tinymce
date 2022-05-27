@@ -22,6 +22,7 @@ rex_sql_table::get(rex::getTable('tinymce5_profiles'))
     ->ensureColumn(new rex_sql_column('updatedate', 'datetime', true))
     ->ensureColumn(new rex_sql_column('createuser', 'varchar(255)', true))
     ->ensureColumn(new rex_sql_column('updateuser', 'varchar(255)', true))
+    ->ensureIndex(new rex_sql_index('name', ['name'], rex_sql_index::UNIQUE))
     ->ensure();
 
 // install default demo profile and mblock demo data
