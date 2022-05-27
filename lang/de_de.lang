@@ -16,6 +16,7 @@ tinymce5_subnavigation_header_photo = Foto von %s auf %s
 tinymce5_list_profiles = TinyMCE 5 Profile
 tinymce5_profile_edit = TinyMCE 5 Profile bearbeiten
 tinymce5_profile_add = Neues TinyMCE 5 Profile erstellen
+tinymce5_profile_deleted = Profil wurde gelöscht
 tinymce5_list_function = Funktion
 tinymce5_clone = duplizieren
 
