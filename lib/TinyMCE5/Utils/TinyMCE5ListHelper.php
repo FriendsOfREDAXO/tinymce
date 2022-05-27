@@ -81,7 +81,7 @@ class TinyMCE5ListHelper
             \rex_logger::logException($e);
             return rex_view::error(rex_i18n::msg($table . '_delete_exception'));
         }
-        return rex_view::info(rex_i18n::msg($table . '_deleted'));
+        return rex_view::info(rex_i18n::msg('tinymce5_profile_deleted'));
     }
 
 }
