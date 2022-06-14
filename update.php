@@ -24,11 +24,14 @@ if (rex_version::compare($this->getVersion(), '1.2.12', '<')) {
 }
 
 if (rex_version::compare($this->getVersion(), '1.2.14', '<')) {
-    $result = rex_sql::factory();
+	$result = rex_sql::factory();
 	$result->setQuery('UPDATE `' . \rex::getTablePrefix() . 'tinymce5_profiles` SET extra = REPLACE(extra, "fullpage ", "") WHERE `name` = "light" OR `name` = "default" OR `name` = "full"');
 	$result->setQuery('UPDATE `' . \rex::getTablePrefix() . 'tinymce5_profiles` SET extra = REPLACE(extra, "autoresize ", "") WHERE `name` = "light" OR `name` = "default" OR `name` = "full"');
 	$result->setQuery('UPDATE `' . \rex::getTablePrefix() . 'tinymce5_profiles` SET extra = REPLACE(extra, "plugins:", "height: 400,\r\nplugins:") WHERE (`name` = "light" OR `name` = "default" OR `name` = "full") AND extra NOT LIKE "%height: 400,%"');
 	$result->setQuery('UPDATE `' . \rex::getTablePrefix() . 'tinymce5_profiles` SET extra = REPLACE(extra, "rel_list: [\r\n {title: \'Keine\', value: \'\'},\r\n {title: \'Nofollow\', value: \'nofollow\'}\r\n]", "rel_list: [\r\n   {title: \'Keine\', value: \'\'},\r\n   {title: \'Nofollow\', value: \'nofollow\'},\r\n   {title: \'Sponsored\', value: \'sponsored\'}\r\n]") WHERE `description`NOT LIKE "%Sponsored%"');
+}
+if (rex_version::compare($this->getVersion(), '1.2.15', '<')) {
+	$result = rex_sql::factory();
 	$result->setQuery('UPDATE `' . \rex::getTablePrefix() . 'tinymce5_profiles` SET extra = REPLACE(extra, "plugins:", "entity_encoding: \'raw\',\r\nplugins:") WHERE (`name` = "light" OR `name` = "default" OR `name` = "full") AND extra NOT LIKE "%entity_encoding%"');
 }
     
