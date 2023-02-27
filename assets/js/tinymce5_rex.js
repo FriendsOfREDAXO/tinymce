@@ -139,7 +139,7 @@ function openMyLinkMap(id, param,value)
         param = '';
     }
     if (typeof(value) != 'undefined' && value.indexOf('/media') > -1) {
-        return newLinkMapWindow('index.php?page=mediapool/media&addon=tiny5&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp&opener_input_field=REX_MEDIA_tinymce5_medialink');
+        return newLinkMapWindow('index.php?page=mediapool/media&addon=tiny5&opener_input_field=REX_MEDIA_tinymce5_medialink');
     } else {
         return newLinkMapWindow('index.php?page=insertlink&opener_input_field=' + id + param);
     }
