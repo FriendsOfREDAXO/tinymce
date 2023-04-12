@@ -1,8 +1,8 @@
-package: tinymce5
-version: '1.2.17'
-vendor: '5.10.2'
+package: tinymce
+version: '6.0.0.beta'
+vendor: '6.4.1'
 author: Friends Of REDAXO
-supportpage: https://github.com/FriendsOfREDAXO/tinymce5/issues
+supportpage: https://github.com/FriendsOfREDAXO/fortinymce/issues
 
 page:
     title: 'translate:title'
@@ -30,11 +30,12 @@ pages:
         pjax: true
 
 requires:
-    redaxo: '^5.10'
-    php: '>=7.3'
+    redaxo: '^5.13'
+    php: '>=7.4'
 conflicts:
     packages:
         tinymce4: '>=0.0.0'
+        tinymce5: '>=0.0.0'
 
 installer_ignore:
     - .github

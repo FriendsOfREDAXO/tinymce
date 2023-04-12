@@ -1,4 +1,4 @@
-# TinyMCE5 - REDAXO-AddOn 
+# TinyMCE - REDAXO-AddOn 
 
 Stellt den TinyMCE im CMS REDAXO bereit. 
 
@@ -9,7 +9,7 @@ Stellt den TinyMCE im CMS REDAXO bereit.
 **Moduleingabe**
 
 ```php
- <textarea class="tiny5-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>
+ <textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>
 ```
 
 - `data-profile="full"`definiert das gewünschte Profil 
@@ -25,7 +25,7 @@ REX_VALUE[id=1 output=html]
 
 ### Verwendung in YForm
 
-- Im individuellen Attribute-Feld: ``` {"class":"tiny5-editor","data-profile":"full"} ```
+- Im individuellen Attribute-Feld: ``` {"class":"tiny-editor","data-profile":"full"} ```
 - Weitere Attribute kommagetrennt möglich
 
 ### Verwendung in MForm
@@ -35,7 +35,7 @@ $mform = new MForm();
 $mform->addTextAreaField(1, 
         array(
         'label'=>'Text',
-        'class'=>'tiny5-editor', 
+        'class'=>'tiny-editor', 
         'data-profile'=>'full')
         );
 echo $mform->show();
@@ -43,21 +43,34 @@ echo $mform->show();
 
 ## Konfiguration
 
-Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 5 Doku](https://www.tiny.cloud/docs/) beachten. 
+Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE Doku](https://www.tiny.cloud/docs/) beachten.
 
 ## Demo
 
 ![Demo](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/tinymce-demo-gif.gif?raw=true)
 
+## Update von TinyMCE 5
+
+Bei der Installation können vorhandene Profile aus TinyMCE 5 migriert werden. Folgendes Vorgehen ist hierzu notwendig.
+
+1. TinyMCE 5 nicht deinstallieren oder löschen! TinyMCE5 darf nur deaktiviert werden, damit die Profile erhalten bleiben.
+
+2. TinyMCE installieren. Hierbei werden die vorhandenen Profile aus TinyMCE 5 nach TinyMCE kopiert.
+
+3. TinyMCE 5 deinstallieren und löschen.
+
+Die Klasse `tiny5-editor` wird weiterhin unterstützt. Wir empfehlen aber nur noch die Klasse `tiny-editor` für die Feldidentifikation zu verwenden. Eine Textarea mit tinyMCE hat dann beispielsweise folgenden Code: `<textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>`
+
 ## ToDo:
 
+- Screenshots aus R5 ersetzen
 - mblock-Kompatibilität verbessern
 
 
 ## Licenses
 
-- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce5/blob/master/LICENSE.md)
-- TinyMCE 5 [GPL LICENSE](https://github.com/tinymce/tinymce/blob/develop/LICENSE.TXT)
+- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md)
+- TinyMCE [MIT LICENSE](https://github.com/tinymce/tinymce/blob/develop/LICENSE.TXT)
 
 
 ## Author
@@ -76,6 +89,8 @@ Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [T
 [Development: Wolfgang Bund](https://github.com/dtpop)
 
 [Development: Alex Wenz](https://github.com/alexwenz)
+
+[REXFamilyWeek](https://ferien-am-tressower-see.de/rexfamilyweek-2023/)
 
 
 

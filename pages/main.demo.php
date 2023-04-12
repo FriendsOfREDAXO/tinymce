@@ -6,13 +6,13 @@
  */
 
 /** @var rex_addon $this */
-$content = \TinyMCE5\Provider\TinyMCE5NavigationProvider::getSubNavigationHeader().
-           \TinyMCE5\Provider\TinyMCE5NavigationProvider::getSubNavigation()
+$content = \TinyMCE\Provider\TinyMCENavigationProvider::getSubNavigationHeader().
+           \TinyMCE\Provider\TinyMCENavigationProvider::getSubNavigation()
     . '
-<div class="tinymce5-demo">
-    <div name="content" class="tiny5-editor" data-profile="full" data-lang="' . \TinyMCE5\Utils\TinyMCE5Lang::getUserLang() . '">
+<div class="tinymce-demo">
+    <div name="content" class="tiny-editor" data-profile="full" data-lang="' . \TinyMCE\Utils\TinyMCELang::getUserLang() . '">
     
-      <p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="' . rex_url::addonAssets('tinymce5', 'images/glyph-tinymce@2x.png') . '" alt="TinyMCE Logo" width="110" height="97" />
+      <p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="' . rex_url::addonAssets('tinymce', 'images/glyph-tinymce@2x.png') . '" alt="TinyMCE Logo" width="110" height="97" />
       </p>
       <h2 style="text-align: center;">Welcome to the TinyMCE Cloud demo!</h2>
       <h5 style="text-align: center;">Note, this includes some "enterprise/premium" features.<br>Visit the <a href="https://www.tiny.cloud/pricing/#demo-enterprise">pricing page</a> to learn more about our premium plugins.</h5>

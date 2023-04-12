@@ -1,0 +1,12 @@
+.tiny-nav {
+    margin-top: 20px;
+}
+html {
+	height: auto;
+	min-height: 100%;
+	overflow-y: inherit;
+}
+
+.tox .tox-promotion {
+    display: none;
+}

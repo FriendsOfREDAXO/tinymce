@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-use TinyMCE5\Creator\TinyMCE5ProfilesCreator;
+use TinyMCE\Creator\TinyMCEProfilesCreator;
 
 /** @var rex_addon $this */
 
@@ -14,18 +14,18 @@ $id = rex_request::request('id', 'int');
 $start = rex_request::request('start', 'int', NULL);
 $send = rex_request::request('send', 'boolean', false);
 
-$profileTable = rex::getTable(\TinyMCE5\Handler\TinyMCE5DatabaseHandler::TINY5_PROFILES);
+$profileTable = rex::getTable(\TinyMCE\Handler\TinyMCEDatabaseHandler::TINY_PROFILES);
 $message = '';
 
 if ($func == 'clone') {
-    $message = \TinyMCE5\Utils\TinyMCE5ListHelper::cloneData($profileTable, $id);
-    rex_extension::registerPoint(new rex_extension_point('TINY5_PROFILE_CLONE', $id));
+    $message = \TinyMCE\Utils\TinyMCEListHelper::cloneData($profileTable, $id);
+    rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
     $func = '';
 }
 
 if ($func == 'delete') {
-    $message = \TinyMCE5\Utils\TinyMCE5ListHelper::deleteData($profileTable, $id);
-    rex_extension::registerPoint(new rex_extension_point('TINY5_PROFILE_DELETE', $id));
+    $message = \TinyMCE\Utils\TinyMCEListHelper::deleteData($profileTable, $id);
+    rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
     $func = '';
 }
 
@@ -41,22 +41,22 @@ if ($func == '') {
     $list->removeColumn('id');
 
     // action add/edit
-    $thIcon = '<a href="' . $list->getUrl(['func' => 'add']) . '" title="' . rex_i18n::msg('tinymce5_add_profile') . '"><i class="rex-icon rex-icon-add-action"></i></a>';
+    $thIcon = '<a href="' . $list->getUrl(['func' => 'add']) . '" title="' . rex_i18n::msg('tinymce_add_profile') . '"><i class="rex-icon rex-icon-add-action"></i></a>';
     $tdIcon = '<i class="rex-icon fa-cube"></i>';
 
     $list->addColumn($thIcon, $tdIcon, 0, ['<th class="rex-table-icon">###VALUE###</th>', '<td class="rex-table-icon">###VALUE###</td>']);
     $list->setColumnParams($thIcon, ['func' => 'edit', 'id' => '###id###']);
 
     // name
-    $list->setColumnLabel('name', rex_i18n::msg('tinymce5_name'));
+    $list->setColumnLabel('name', rex_i18n::msg('tinymce_name'));
     $list->setColumnParams('name', ['func' => 'edit', 'id' => '###id###', 'start' => $start]);
 
     // description
-    $list->setColumnLabel('description', rex_i18n::msg('tinymce5_description'));
+    $list->setColumnLabel('description', rex_i18n::msg('tinymce_description'));
 
     // edit
     $list->addColumn('edit', '<i class="rex-icon fa-pencil-square-o"></i> ' . rex_i18n::msg('edit'), -1, ['', '<td>###VALUE###</td>']);
-    $list->setColumnLabel('edit', rex_i18n::msg('tinymce5_list_function'));
+    $list->setColumnLabel('edit', rex_i18n::msg('tinymce_list_function'));
     $list->setColumnLayout('edit', array('<th colspan="3">###VALUE###</th>', '<td>###VALUE###</td>'));
     $list->setColumnParams('edit', ['func' => 'edit', 'id' => '###id###', 'start' => $start]);
 
@@ -72,14 +72,14 @@ if ($func == '') {
     $list->addLinkAttribute('delete', 'data-confirm', rex_i18n::msg('delete') . ' ?');
 
     // clone
-    $list->addColumn('clone', '<i class="rex-icon fa-clone"></i> ' . rex_i18n::msg('tinymce5_clone'), -1, ['', '<td>###VALUE###</td>']);
+    $list->addColumn('clone', '<i class="rex-icon fa-clone"></i> ' . rex_i18n::msg('tinymce_clone'), -1, ['', '<td>###VALUE###</td>']);
     $list->setColumnParams('clone', ['func' => 'clone', 'id' => '###id###', 'start' => $start]);
-    $list->addLinkAttribute('clone', 'data-confirm', rex_i18n::msg('tinymce5_clone') . ' ?');
+    $list->addLinkAttribute('clone', 'data-confirm', rex_i18n::msg('tinymce_clone') . ' ?');
 
     // show
     $content = $list->get();
     $fragment = new rex_fragment();
-    $fragment->setVar('title', rex_i18n::msg('tinymce5_list_profiles'));
+    $fragment->setVar('title', rex_i18n::msg('tinymce_list_profiles'));
     $fragment->setVar('content', $message . $content, false);
     echo $fragment->parse('core/page/section.php');
 
@@ -99,49 +99,49 @@ if ($func == '') {
 
     // name
     $field = $form->addTextField('name');
-    $field->setLabel(rex_i18n::msg('tinymce5_name'));
-    $field->setAttribute('id', 'tinymce5-name-input');
-    $field->setAttribute('placeholder', rex_i18n::msg('tinymce5_name_placeholder'));
+    $field->setLabel(rex_i18n::msg('tinymce_name'));
+    $field->setAttribute('id', 'tinymce-name-input');
+    $field->setAttribute('placeholder', rex_i18n::msg('tinymce_name_placeholder'));
 
     // description
     $field = $form->addTextField('description');
-    $field->setLabel(rex_i18n::msg('tinymce5_description'));
-    $field->setAttribute('placeholder', rex_i18n::msg('tinymce5_description_placeholder'));
+    $field->setLabel(rex_i18n::msg('tinymce_description'));
+    $field->setAttribute('placeholder', rex_i18n::msg('tinymce_description_placeholder'));
 
     /*
     // plugins
-    $af = \TinyMCE5\Creator\TinyMCE5ProfilesCreator::ALLOWED_FIELDS;
+    $af = \TinyMCE\Creator\TinyMCEProfilesCreator::ALLOWED_FIELDS;
 
     $field = $form->addTextField('plugins');
-    $field->setAttribute('id', 'tinymce5plugins-input');
+    $field->setAttribute('id', 'tinymceplugins-input');
     $field->setAttribute('data-tag-init', 1);
-    $field->setAttribute('data-defaults', TinyMCE5ProfilesCreator::DEFAULTS['plugins']);
+    $field->setAttribute('data-defaults', TinyMCEProfilesCreator::DEFAULTS['plugins']);
     $field->setAttribute('data-intersect-tags', '["' . implode('","', array_intersect($af['plugins'], $af['toolbar'])) . '"]');
     $field->setAttribute('data-tags', '["' . implode('","', $af['plugins']) . '"]');
-    $field->setLabel(rex_i18n::msg('tinymce5_plugins'));
+    $field->setLabel(rex_i18n::msg('tinymce_plugins'));
     if ($default_value) $field->setAttribute('data-default-tags', 1);
 
     // toolbar
     $field = $form->addTextField('toolbar');
-    $field->setAttribute('id', 'tinymce5toolbar-input');
+    $field->setAttribute('id', 'tinymcetoolbar-input');
     $field->setAttribute('data-tag-init', 1);
-    $field->setAttribute('data-defaults', TinyMCE5ProfilesCreator::DEFAULTS['toolbar']);
+    $field->setAttribute('data-defaults', TinyMCEProfilesCreator::DEFAULTS['toolbar']);
     $field->setAttribute('data-diff-tags', '["' . implode('","', array_diff($af['toolbar'], $af['plugins'])) . '"]');
     // $field->setAttribute('data-tags', '["' . implode('","', array_diff($af['toolbar'], $af['plugins'])) . '"]');
     $field->setAttribute('data-tags', '["' . implode('","', $af['toolbar']) . '"]');
-    $field->setLabel(rex_i18n::msg('tinymce5_toolbar'));
+    $field->setLabel(rex_i18n::msg('tinymce_toolbar'));
     if ($default_value) $field->setAttribute('data-default-tags', 1);
     */
 
     $field = $form->addTextAreaField('extra');
     $field->setAttribute('style','height: 550px');
-    $field->setLabel(rex_i18n::msg('tinymce5_extra_definition'));
+    $field->setLabel(rex_i18n::msg('tinymce_extra_definition'));
 
-    $content = '<div class="tinymce5_profile_edit">' . $form->get() . '</div>';
+    $content = '<div class="tinymce_profile_edit">' . $form->get() . '</div>';
 
     $fragment = new rex_fragment();
     $fragment->setVar('class', 'edit', false);
-    $fragment->setVar('title', ($func == 'edit') ? rex_i18n::msg('tinymce5_profile_edit') : rex_i18n::msg('tinymce5_profile_add'));
+    $fragment->setVar('title', ($func == 'edit') ? rex_i18n::msg('tinymce_profile_edit') : rex_i18n::msg('tinymce_profile_add'));
     $fragment->setVar('body', $content, false);
     echo $fragment->parse('core/page/section.php');
 }

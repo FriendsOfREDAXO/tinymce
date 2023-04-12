@@ -1,45 +1,47 @@
 # title
-tinymce5_title = TinyMCE 5
+tinymce_title = TinyMCE
 
 # navigation
-tinymce5_main = Översikt & demonstration
-tinymce5_demo = TinyMCE 5 demo
-tinymce5_mblock_demo = MBlock demo
-tinymce5_profiles = Editor Profile
-tinymce5_help = Hjälp
+tinymce_main = Översikt & demonstration
+tinymce_demo = TinyMCE demo
+tinymce_mblock_demo = MBlock demo
+tinymce_profiles = Editor Profile
+tinymce_help = Hjälp
 
 # heading
-tinymce5_subnavigation_header_title = TinyMCE 5 till Redaxo 5
-tinymce5_subnavigation_header_photo = Foto av% s på% s
+tinymce_subnavigation_header_title = TinyMCE till Redaxo 5
+tinymce_subnavigation_header_photo = Foto av% s på% s
 
 # profiles list & form
-tinymce5_list_profiles = TinyMCE 5 profil
-tinymce5_profile_edit = TinyMCE 5 bearbeta profiler
-tinymce5_profile_add = Skapa ny TinyMCE 5 profil
-tinymce5_list_function = Funktion
-tinymce5_clone = Duplicera
+tinymce_list_profiles = TinyMCE profil
+tinymce_profile_edit = TinyMCE bearbeta profiler
+tinymce_profile_add = Skapa ny TinyMCE profil
+tinymce_list_function = Funktion
+tinymce_clone = Duplicera
+rex_tinymce_profiles_cloned = Profilen har duplicerats
+rex_tinymce_profiles_clone_exception = Ett fel inträffade under dupliceringen
 
 # profiles columns names
-tinymce5_name = Profil-namn
-tinymce5_name_placeholder = profile_name
-tinymce5_description = Profil beskrivning
-tinymce5_description_placeholder = Profilens syfte och omfattning
-tinymce5_extra_definition = Profil option
-tinymce5_toolbar = Toolbar element
-tinymce5_heading = Heading element
-tinymce5_alignment = Textjustering
-tinymce5_fontSize = Teckenstorlekar
-tinymce5_insertlink = Välj länkdestination
-tinymce5_link = Redaxo länkar
-tinymce5_lang = Språk
-tinymce5_image_toolbar = Image-Plugin Toolbar
-tinymce5_table_toolbar = Tabell-Plugin Toolbar
-tinymce5_height_default = TinyMCE 5 default-höjd
-tinymce5_height_default_description = Utan anpassad min och max höjd, höjden anpassas till textinnehåll
-tinymce5_min_height = Textarea min-höjd
-tinymce5_max_height = Textarea max-höjd
-tinymce5_highlight = Marker- och teckenfärg
-tinymce5_media_manager_type = Media-Manager-Type
-tinymce5_media_category = Mediakategori
-tinymce5_upload_default = Image-Drag&Drop-Upload
-tinymce5_upload_default_description = Bilder kan läggas i textfältet via drag + drop
+tinymce_name = Profil-namn
+tinymce_name_placeholder = profile_name
+tinymce_description = Profil beskrivning
+tinymce_description_placeholder = Profilens syfte och omfattning
+tinymce_extra_definition = Profil option
+tinymce_toolbar = Toolbar element
+tinymce_heading = Heading element
+tinymce_alignment = Textjustering
+tinymce_fontSize = Teckenstorlekar
+tinymce_insertlink = Välj länkdestination
+tinymce_link = Redaxo länkar
+tinymce_lang = Språk
+tinymce_image_toolbar = Image-Plugin Toolbar
+tinymce_table_toolbar = Tabell-Plugin Toolbar
+tinymce_height_default = TinyMCE default-höjd
+tinymce_height_default_description = Utan anpassad min och max höjd, höjden anpassas till textinnehåll
+tinymce_min_height = Textarea min-höjd
+tinymce_max_height = Textarea max-höjd
+tinymce_highlight = Marker- och teckenfärg
+tinymce_media_manager_type = Media-Manager-Type
+tinymce_media_category = Mediakategori
+tinymce_upload_default = Image-Drag&Drop-Upload
+tinymce_upload_default_description = Bilder kan läggas i textfältet via drag + drop

@@ -7,35 +7,35 @@
 
 /** @var rex_addon $this */
 
-$addon = rex_addon::get('tinymce5');
+$addon = rex_addon::get('tinymce');
 
 // register permissions
 if (rex::isBackend() && is_object(rex::getUser())) {
-    rex_perm::register('tinymce5_addon[]');
+    rex_perm::register('tinymce_addon[]');
 }
 
 // add assets to backend
 if (rex::isBackend() && rex::getUser()) {
     // load assets
-    \TinyMCE5\Provider\TinyMCE5AssetsProvider::provideViewAssets();
-    \TinyMCE5\Provider\TinyMCE5AssetsProvider::provideBaseAssets();
-    \TinyMCE5\Provider\TinyMCE5AssetsProvider::provideProfileEditData();
+    \TinyMCE\Provider\TinyMCEAssetsProvider::provideViewAssets();
+    \TinyMCE\Provider\TinyMCEAssetsProvider::provideBaseAssets();
+    \TinyMCE\Provider\TinyMCEAssetsProvider::provideProfileEditData();
 
     // upload image
-    if (rex_request::request('tinymce5upload') == 1) {
-        \TinyMCE5\Handler\TinyMCE5UploadHandler::uploadTinyMCE5Img();
+    if (rex_request::request('tinymceupload') == 1) {
+        \TinyMCE\Handler\TinyMCEUploadHandler::uploadTinyMCEImg();
     }
 
     // register extension point actions
-    if (rex_be_controller::getCurrentPagePart(1) == 'tinymce5') {
-        rex_extension::register('PAGES_PREPARED', ['\TinyMCE5\Handler\TinyMCE5ExtensionHandler', 'hiddenMain'], rex_extension::EARLY);
-        rex_extension::register('REX_FORM_CONTROL_FIELDS', ['\TinyMCE5\Handler\TinyMCE5ExtensionHandler', 'removeDemoControlFields'], rex_extension::LATE);
-        rex_extension::register(['REX_FORM_SAVED', 'REX_FORM_DELETED', 'TINY5_PROFILE_CLONE', 'TINY5_PROFILE_DELETE', 'TINY5_PROFILE_ADD', 'TINY5_PROFILE_UPDATED'], ['\TinyMCE5\Handler\TinyMCE5ExtensionHandler', 'createProfiles']);
+    if (rex_be_controller::getCurrentPagePart(1) == 'tinymce') {
+        rex_extension::register('PAGES_PREPARED', ['\TinyMCE\Handler\TinyMCEExtensionHandler', 'hiddenMain'], rex_extension::EARLY);
+        rex_extension::register('REX_FORM_CONTROL_FIELDS', ['\TinyMCE\Handler\TinyMCEExtensionHandler', 'removeDemoControlFields'], rex_extension::LATE);
+        rex_extension::register(['REX_FORM_SAVED', 'REX_FORM_DELETED', 'TINY_PROFILE_CLONE', 'TINY_PROFILE_DELETE', 'TINY_PROFILE_ADD', 'TINY_PROFILE_UPDATED'], ['\TinyMCE\Handler\TinyMCEExtensionHandler', 'createProfiles']);
     }
-    if (str_starts_with(rex_request('page'),'mediapool/') && (rex_request('addon') == 'tiny5' || rex_request('opener_input_field') == 'REX_MEDIA_tinymce5_filelink')) {
+    if (str_starts_with(rex_request('page'),'mediapool/') && (rex_request('addon') == 'tiny' || rex_request('opener_input_field') == 'REX_MEDIA_tinymce_filelink')) {
         rex_extension::register('OUTPUT_FILTER',function($ep) {
             $subject = $ep->getSubject();
-            $subject = str_replace('</form>','<input type="hidden" name="addon" value="tiny5"></form>',$subject);
+            $subject = str_replace('</form>','<input type="hidden" name="addon" value="tiny"></form>',$subject);
             $subject = str_replace('"#rex-js-page-main">','"#rex-js-page-main">
         <ul class="nav nav-tabs tiny-nav">
             <li><a href="/redaxo/index.php?page=insertlink&opener_input_field=&clang=1">Struktur</a></li>
@@ -44,13 +44,13 @@ if (rex::isBackend() && rex::getUser()) {
 ',$subject);
             return str_replace('selectMedia','selectLink',$subject);
         });
-        rex_view::addJsFile($addon->getAssetsUrl('js/rex5tinymce.js'));
+        rex_view::addJsFile($addon->getAssetsUrl('js/rextinymce.js'));
     }
 
     // Recreate profiles after update
     if ($addon->getConfig('update_profiles', false) == true ) {
         try {
-            \TinyMCE5\Creator\TinyMCE5ProfilesCreator::profilesCreate();
+            \TinyMCE\Creator\TinyMCEProfilesCreator::profilesCreate();
             $addon->setConfig('update_profiles', false);
         }
         catch(\rex_functional_exception $e) {
