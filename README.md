@@ -2,7 +2,7 @@
 
 Stellt den TinyMCE im CMS REDAXO bereit. 
 
-![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot.png?raw=true)
+![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot6.png?raw=true)
 
 ## Anwendung: 
 
@@ -45,9 +45,6 @@ echo $mform->show();
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE Doku](https://www.tiny.cloud/docs/) beachten.
 
-## Demo
-
-![Demo](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/tinymce-demo-gif.gif?raw=true)
 
 ## Update von TinyMCE 5
 
