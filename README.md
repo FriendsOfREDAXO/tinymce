@@ -53,13 +53,22 @@ Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [T
 
 Bei der Installation können vorhandene Profile aus TinyMCE 5 migriert werden. Folgendes Vorgehen ist hierzu notwendig.
 
-1. TinyMCE 5 nicht deinstallieren oder löschen! TinyMCE5 darf nur deaktiviert werden, damit die Profile erhalten bleiben.
+1. *TinyMCE 5 nicht deinstallieren oder löschen!* TinyMCE5 darf nur deaktiviert werden, damit die Profile erhalten bleiben.
 
 2. TinyMCE installieren. Hierbei werden die vorhandenen Profile aus TinyMCE 5 nach TinyMCE kopiert.
 
 3. TinyMCE 5 deinstallieren und löschen.
 
 Die Klasse `tiny5-editor` wird weiterhin unterstützt. Wir empfehlen aber nur noch die Klasse `tiny-editor` für die Feldidentifikation zu verwenden. Eine Textarea mit tinyMCE hat dann beispielsweise folgenden Code: `<textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>`
+
+### Dark-Mode in die mogrierten Profile übernehmen
+
+Folgenden Code in den Profilem ergänzen
+
+```
+skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
+content_css: redaxo.theme.current === "dark" ? "dark" : "light",
+```
 
 ## ToDo:
 
