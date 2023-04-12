@@ -62,11 +62,11 @@ let rex5_picker_function = function (callback, value, meta) {
         }
     };
 
-let tinyareas = '.tiny-editor';
+let tinyareas = '.tiny5-editor,.tiny-editor';
 
 $(document).on('rex:ready', function (e, container) {
-    console.log('ready');
     if (container.find(tinyareas).length) {
+        console.log('ready');
         tiny_init(container);
     }
 });
