@@ -1,5 +1,5 @@
 package: tinymce
-version: '6.0.0.beta'
+version: '6.0.0.beta1'
 vendor: '6.4.1'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/fortinymce/issues

@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version 1.0.0.beta – 08.04.2023
+Version 6.0.0.beta1 – 08.04.2023
 -------------------------------
 
 * Migration von TinyMCE5 (@dtpop, @alexwenz)
