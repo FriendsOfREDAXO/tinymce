@@ -69,7 +69,6 @@ content_css: redaxo.theme.current === "dark" ? "dark" : "light",
 
 ## ToDo:
 
-- Screenshots aus R5 ersetzen
 - mblock-Kompatibilität verbessern
 
 
