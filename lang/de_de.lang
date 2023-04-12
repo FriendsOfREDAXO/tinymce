@@ -47,3 +47,6 @@ tinymce_media_manager_type = Media-Manager-Type
 tinymce_media_category = Medienkagetorie
 tinymce_upload_default = Image-Drag&Drop-Upload
 tinymce_upload_default_description = Bilder können via drag+drop in das Textfeld gesetzt werden
+
+#migration
+tinymce_migration_message = Die Profile des TinyMCE5-AddOns wurden migriert. Sollte TinyMCE5 noch nicht deaktivert worden sein, ist nun der richtige Zeipunkt gekommen. Bitte die Readmme beachten. 
