@@ -15,6 +15,7 @@ $tiny5table = rex_sql::factory()->setQuery('SHOW TABLES LIKE "'.$old_table_name.
 $tinytable = rex_sql::factory()->setQuery('SHOW TABLES LIKE "'.$new_table_name.'"' )->getRows();
 if ($tiny5table && !$tinytable) {
     rex_sql::factory()->setQuery('CREATE TABLE '. $new_table_name .' LIKE '. $old_table_name);
+    rex_sql::factory()->setQuery('INSERT INTO `'.$new_table_name.'` SELECT * FROM `'.$old_table_name.'`');
 }
 
 
