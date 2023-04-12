@@ -61,7 +61,7 @@ Bei der Installation können vorhandene Profile aus TinyMCE 5 migriert werden. F
 
 Die Klasse `tiny5-editor` wird weiterhin unterstützt. Wir empfehlen aber nur noch die Klasse `tiny-editor` für die Feldidentifikation zu verwenden. Eine Textarea mit tinyMCE hat dann beispielsweise folgenden Code: `<textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>`
 
-### Dark-Mode in die mogrierten Profile übernehmen
+### Dark-Mode in die migrierten Profile übernehmen
 
 Folgenden Code in den Profilem ergänzen
 
