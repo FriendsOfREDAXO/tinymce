@@ -6,7 +6,7 @@
  */
 
 /** @var rex_addon $this */
-
+$addon = rex_addon::get("tinymce");
 $old_table_name = rex::getTable('tinymce5_profiles');
 $new_table_name = rex::getTable('tinymce_profiles');
 
@@ -16,6 +16,7 @@ $tinytable = rex_sql::factory()->setQuery('SHOW TABLES LIKE "'.$new_table_name.'
 if ($tiny5table && !$tinytable) {
     rex_sql::factory()->setQuery('CREATE TABLE '. $new_table_name .' LIKE '. $old_table_name);
     rex_sql::factory()->setQuery('INSERT INTO `'.$new_table_name.'` SELECT * FROM `'.$old_table_name.'`');
+    $addon->setProperty('successmsg', '<br><strong>' . rex_i18n::msg("tinymce_migration_message") . '</strong>');
 }
 
 
