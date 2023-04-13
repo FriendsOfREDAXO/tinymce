@@ -11,7 +11,7 @@ $addon = rex_addon::get("tinymce");
 
 $new_table_name = rex::getTable('tinymce_profiles'); 
 
-if (rex_addon::get('tinymce5')->isAvailable() && !$addon->hasConfig('migrated')) {
+if (rex_addon::get('tinymce5')->isAvailable()) {
     $old_table_name = rex::getTable('tinymce5_profiles');
     
     // deactivate tiny5 addon
