@@ -49,4 +49,4 @@ tinymce_upload_default = Image-Drag&Drop-Upload
 tinymce_upload_default_description = Bilder können via drag+drop in das Textfeld gesetzt werden
 
 #migration
-tinymce_migration_message = Die Profile des TinyMCE5-AddOns wurden migriert. Bitte die Readme beachten. 
+tinymce_migration_message = Die Profile des TinyMCE5-AddOns wurden migriert und TinyMCE5 deaktiviert. TinyMCE5 kann jetzt deinstalliert werden. Bitte die Readme beachten. 

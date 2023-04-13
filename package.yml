@@ -35,7 +35,6 @@ requires:
 conflicts:
     packages:
         tinymce4: '>=0.0.0'
-        tinymce5: '>=0.0.0'
 
 installer_ignore:
     - .github
