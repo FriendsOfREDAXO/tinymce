@@ -111,8 +111,7 @@ function tiny_init(container) {
             })
         };
 
-        options['selector'] = tinyareas + '[data-profile="' + profile + '"]:not(.mce-initialized)';
-
+       options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized), .tiny5-editor[data-profile="' + profile + '"]:not(.mce-initialized)';
         tinymce.init(options).then(function(editors) {
             for(let i in editors) {
                 $(editors[i].targetElm).addClass('mce-initialized');
