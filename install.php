@@ -9,10 +9,10 @@
 /** @var rex_addon $this */
 $addon = rex_addon::get("tinymce");
 
-$old_table_name = rex::getTable('tinymce5_profiles');
+$new_table_name = rex::getTable('tinymce_profiles'); 
 
 if (rex_addon::get('tinymce')->isAvailable() && !$addon->hasConfig('migrated')) {
-    $new_table_name = rex::getTable('tinymce_profiles'); 
+    $old_table_name = rex::getTable('tinymce5_profiles');
     
     // deactivate tiny5 addon
     $addon = rex_addon::get('tinymce5');
