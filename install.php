@@ -8,10 +8,12 @@
 
 /** @var rex_addon $this */
 $addon = rex_addon::get("tinymce");
-if (rex_addon::get('tinymce')->isAvailable() && !$addon->hasConfig('migrated')) {
-    $old_table_name = rex::getTable('tinymce5_profiles');
-    $new_table_name = rex::getTable('tinymce_profiles');
 
+$old_table_name = rex::getTable('tinymce5_profiles');
+
+if (rex_addon::get('tinymce')->isAvailable() && !$addon->hasConfig('migrated')) {
+    $new_table_name = rex::getTable('tinymce_profiles'); 
+    
     // deactivate tiny5 addon
     $addon = rex_addon::get('tinymce5');
     $package_manager = rex_package_manager::factory($addon);
