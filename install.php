@@ -15,8 +15,8 @@ if (rex_addon::get('tinymce5')->isAvailable()) {
     $old_table_name = rex::getTable('tinymce5_profiles');
     
     // deactivate tiny5 addon
-    $addon = rex_addon::get('tinymce5');
-    $package_manager = rex_package_manager::factory($addon);
+    $addon_old = rex_addon::get('tinymce5');
+    $package_manager = rex_package_manager::factory($addon_old );
     $package_manager->deactivate();
 
 
