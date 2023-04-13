@@ -48,13 +48,8 @@ Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [T
 
 ## Update von TinyMCE 5
 
-Bei der Installation können vorhandene Profile aus TinyMCE 5 migriert werden. Folgendes Vorgehen ist hierzu notwendig.
-
-1. *TinyMCE 5 nicht deinstallieren oder löschen!* TinyMCE5 darf nur deaktiviert werden, damit die Profile erhalten bleiben.
-
-2. TinyMCE installieren. Hierbei werden die vorhandenen Profile aus TinyMCE 5 nach TinyMCE kopiert.
-
-3. TinyMCE 5 deinstallieren und löschen.
+Bei der Installation werden vorhandene Profile aus TinyMCE 5 migriert. Nach der Migration wird TinyMCE5 deaktiviert. 
+Es empfiehlt sich die Funktionalität im neuen AddOn zu prüfen und erst im Anschluss TinyMCE5 zu löschhen. 
 
 Die Klasse `tiny5-editor` wird weiterhin unterstützt. Wir empfehlen aber nur noch die Klasse `tiny-editor` für die Feldidentifikation zu verwenden. Eine Textarea mit tinyMCE hat dann beispielsweise folgenden Code: `<textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>`
 
