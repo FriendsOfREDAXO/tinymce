@@ -59,7 +59,7 @@ Folgenden Code in den Profilem ergänzen
 
 ```
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
-content_css: redaxo.theme.current === "dark" ? "dark" : "light",
+content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 ```
 
 ## ToDo:
