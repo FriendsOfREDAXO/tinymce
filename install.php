@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
  * @package redaxo5
@@ -7,16 +8,26 @@
 
 /** @var rex_addon $this */
 $addon = rex_addon::get("tinymce");
-$old_table_name = rex::getTable('tinymce5_profiles');
-$new_table_name = rex::getTable('tinymce_profiles');
 
-// duplicate Table from tinymce5 to 6 if available
-$tiny5table = rex_sql::factory()->setQuery('SHOW TABLES LIKE "'.$old_table_name.'"' )->getRows();
-$tinytable = rex_sql::factory()->setQuery('SHOW TABLES LIKE "'.$new_table_name.'"' )->getRows();
-if ($tiny5table && !$tinytable) {
-    rex_sql::factory()->setQuery('CREATE TABLE '. $new_table_name .' LIKE '. $old_table_name);
-    rex_sql::factory()->setQuery('INSERT INTO `'.$new_table_name.'` SELECT * FROM `'.$old_table_name.'`');
-    $addon->setProperty('successmsg', '<br><strong>' . rex_i18n::msg("tinymce_migration_message") . '</strong>');
+$new_table_name = rex::getTable('tinymce_profiles'); 
+
+if (rex_addon::get('tinymce5')->isAvailable()) {
+    $old_table_name = rex::getTable('tinymce5_profiles');
+    
+    // deactivate tiny5 addon
+    $addon_old = rex_addon::get('tinymce5');
+    $package_manager = rex_package_manager::factory($addon_old );
+    $package_manager->deactivate();
+
+
+    // duplicate Table from tinymce5 to 6 if available
+    $tiny5table = rex_sql::factory()->setQuery('SHOW TABLES LIKE "' . $old_table_name . '"')->getRows();
+    $tinytable = rex_sql::factory()->setQuery('SHOW TABLES LIKE "' . $new_table_name . '"')->getRows();
+    if ($tiny5table && !$tinytable) {
+        rex_sql::factory()->setQuery('CREATE TABLE ' . $new_table_name . ' LIKE ' . $old_table_name);
+        rex_sql::factory()->setQuery('INSERT INTO `' . $new_table_name . '` SELECT * FROM `' . $old_table_name . '`');
+        $addon->setProperty('successmsg', '<br><strong>' . rex_i18n::msg("tinymce_migration_message") . '</strong>');
+    }
 }
 
 
