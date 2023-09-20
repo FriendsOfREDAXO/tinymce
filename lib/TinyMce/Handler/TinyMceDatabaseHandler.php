@@ -1,20 +1,13 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-namespace TinyMCE\Handler;
+namespace FriendsOfRedaxo\TinyMce\Handler;
 
-
-use TinyMCE\Creator\TinyMCEProfilesCreator;
 use rex;
 use rex_extension;
 use rex_extension_point;
 use rex_sql;
 
-class TinyMCEDatabaseHandler
+class TinyMceDatabaseHandler
 {
     const TINY_PROFILES = 'tinymce_profiles';
     const TINY_MBLOCK_DEMO = 'tinymce_mblock_demo';

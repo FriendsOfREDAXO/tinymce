@@ -1,19 +1,12 @@
 <?php
 
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
-
-/** @var rex_addon $this */
 $addon = rex_addon::get("tinymce");
 
-$new_table_name = rex::getTable('tinymce_profiles'); 
+$new_table_name = rex::getTable('tinymce_profiles');
 
 if (rex_addon::get('tinymce5')->isAvailable()) {
     $old_table_name = rex::getTable('tinymce5_profiles');
-    
+
     // deactivate tiny5 addon
     $addon_old = rex_addon::get('tinymce5');
     $package_manager = rex_package_manager::factory($addon_old );
@@ -54,7 +47,7 @@ rex_sql_table::get($new_table_name)
 try {
     $sql = rex_sql::factory();
     if (sizeof($sql->getArray("SELECT id FROM " . $new_table_name . " WHERE id=1")) <= 0) {
-        rex_sql_util::importDump($this->getPath('data.sql'));
+        rex_sql_util::importDump($addon->getPath('data.sql'));
     }
     // Recreate profiles
     $addon = rex_addon::get('tinymce');

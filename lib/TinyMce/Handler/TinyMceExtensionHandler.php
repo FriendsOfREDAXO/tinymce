@@ -1,19 +1,14 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-namespace TinyMCE\Handler;
+namespace FriendsOfRedaxo\TinyMce\Handler;
 
 
-use TinyMCE\Creator\TinyMCEProfilesCreator;
+use FriendsOfRedaxo\TinyMce\Creator\TinyMceProfilesCreator;
 use rex_be_controller;
 use rex_extension_point;
 use rex_view;
 
-class TinyMCEExtensionHandler
+class TinyMceExtensionHandler
 {
     /**
      * @param rex_extension_point $ep
@@ -79,13 +74,13 @@ class TinyMCEExtensionHandler
     {
         if (rex_be_controller::getCurrentPagePart(2) == 'profiles' or $ep->getName() == 'TINY_PROFILE_ADD') {
             try {
-                TinyMCEProfilesCreator::profilesCreate();
+                TinyMceProfilesCreator::profilesCreate();
             } catch (\rex_functional_exception $e) {
                 print rex_view::error($e->getMessage());
             }
         } else if ($ep->getName() == 'TINY_PROFILE_UPDATED') {
             try {
-                TinyMCEProfilesCreator::profilesCreate($ep->getParams());
+                TinyMceProfilesCreator::profilesCreate($ep->getParams());
             } catch (\rex_functional_exception $e) {
                 print rex_view::error($e->getMessage());
             }

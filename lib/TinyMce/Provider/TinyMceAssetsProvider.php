@@ -1,19 +1,13 @@
 <?php
-/**
- * User: joachimdoerr
- * Date: 2019-07-06
- * Time: 20:41
- */
 
-namespace TinyMCE\Provider;
-
+namespace FriendsOfRedaxo\TinyMce\Provider;
 
 use rex_be_controller;
 use rex_exception;
 use rex_logger;
 use rex_view;
 
-class TinyMCEAssetsProvider
+class TinyMceAssetsProvider
 {
     /**
      * @author Joachim Doerr

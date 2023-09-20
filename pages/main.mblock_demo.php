@@ -1,11 +1,7 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-/** @var rex_addon $this */
+use FriendsOfRedaxo\TinyMce\Handler\TinyMceDatabaseHandler;
+use FriendsOfRedaxo\TinyMce\Provider\TinyMceNavigationProvider;
 
 $content = '';
 
@@ -18,7 +14,7 @@ if (!rex_addon::exists('mblock') or (rex_addon::exists('mblock') && !rex_addon::
 
 if (rex_addon::exists('mblock') && rex_addon::get('mblock')->isAvailable()) {
 
-    $table = rex::getTable(\TinyMCE\Handler\TinyMCEDatabaseHandler::TINY_MBLOCK_DEMO);
+    $table = rex::getTable(TinyMceDatabaseHandler::TINY_MBLOCK_DEMO);
 
     $form = mblock_rex_form::factory($table, '', 'id=1');
     $form->addParam('id', 1);
@@ -38,8 +34,8 @@ if (rex_addon::exists('mblock') && rex_addon::get('mblock')->isAvailable()) {
     $content .= '<div class="tinymce-demo-info"><blockquote><p>Die Texte sind unter der Lizenz <a href="https://de.wikipedia.org/wiki/Wikipedia:Lizenzbestimmungen_Commons_Attribution-ShareAlike_3.0_Unported">„Creative Commons Attribution/Share Alike“</a> verfügbar</p></blockquote></div>';
 }
 
-$content = \TinyMCE\Provider\TinyMCENavigationProvider::getSubNavigationHeader() .
-           \TinyMCE\Provider\TinyMCENavigationProvider::getSubNavigation() .
+$content = TinyMceNavigationProvider::getSubNavigationHeader() .
+           TinyMceNavigationProvider::getSubNavigation() .
            $content;
 
 $fragment = new rex_fragment();
