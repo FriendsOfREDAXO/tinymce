@@ -1,30 +1,25 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-use TinyMCE\Creator\TinyMCEProfilesCreator;
-
-/** @var rex_addon $this */
+use FriendsOfRedaxo\TinyMce\Creator\TinyMceProfilesCreator;
+use FriendsOfRedaxo\TinyMce\Handler\TinyMceDatabaseHandler;
+use FriendsOfRedaxo\TinyMce\Utils\TinyMceListHelper;
 
 $func = rex_request::request('func', 'string');
 $id = rex_request::request('id', 'int');
 $start = rex_request::request('start', 'int', NULL);
 $send = rex_request::request('send', 'boolean', false);
 
-$profileTable = rex::getTable(\TinyMCE\Handler\TinyMCEDatabaseHandler::TINY_PROFILES);
+$profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
 $message = '';
 
 if ($func == 'clone') {
-    $message = \TinyMCE\Utils\TinyMCEListHelper::cloneData($profileTable, $id);
+    $message = TinyMceListHelper::cloneData($profileTable, $id);
     rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
     $func = '';
 }
 
 if ($func == 'delete') {
-    $message = \TinyMCE\Utils\TinyMCEListHelper::deleteData($profileTable, $id);
+    $message = TinyMceListHelper::deleteData($profileTable, $id);
     rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
     $func = '';
 }
@@ -110,12 +105,12 @@ if ($func == '') {
 
     /*
     // plugins
-    $af = \TinyMCE\Creator\TinyMCEProfilesCreator::ALLOWED_FIELDS;
+    $af = TinyMceProfilesCreator::ALLOWED_FIELDS;
 
     $field = $form->addTextField('plugins');
     $field->setAttribute('id', 'tinymceplugins-input');
     $field->setAttribute('data-tag-init', 1);
-    $field->setAttribute('data-defaults', TinyMCEProfilesCreator::DEFAULTS['plugins']);
+    $field->setAttribute('data-defaults', TinyMceProfilesCreator::DEFAULTS['plugins']);
     $field->setAttribute('data-intersect-tags', '["' . implode('","', array_intersect($af['plugins'], $af['toolbar'])) . '"]');
     $field->setAttribute('data-tags', '["' . implode('","', $af['plugins']) . '"]');
     $field->setLabel(rex_i18n::msg('tinymce_plugins'));
@@ -125,7 +120,7 @@ if ($func == '') {
     $field = $form->addTextField('toolbar');
     $field->setAttribute('id', 'tinymcetoolbar-input');
     $field->setAttribute('data-tag-init', 1);
-    $field->setAttribute('data-defaults', TinyMCEProfilesCreator::DEFAULTS['toolbar']);
+    $field->setAttribute('data-defaults', TinyMceProfilesCreator::DEFAULTS['toolbar']);
     $field->setAttribute('data-diff-tags', '["' . implode('","', array_diff($af['toolbar'], $af['plugins'])) . '"]');
     // $field->setAttribute('data-tags', '["' . implode('","', array_diff($af['toolbar'], $af['plugins'])) . '"]');
     $field->setAttribute('data-tags', '["' . implode('","', $af['toolbar']) . '"]');

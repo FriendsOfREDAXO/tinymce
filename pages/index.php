@@ -1,14 +1,6 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-/** @var rex_addon $this */
+$addon = rex_addon::get('tinymce');
 
-echo rex_view::title($this->i18n('title'));
+echo rex_view::title($addon->i18n('title'));
 rex_be_controller::includeCurrentPageSubPath();
-
-
-?>

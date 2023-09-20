@@ -1,12 +1,6 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-namespace TinyMCE\Handler;
-
+namespace FriendsOfRedaxo\TinyMce\Handler;
 
 use rex;
 use rex_addon;
@@ -14,7 +8,7 @@ use rex_extension;
 use rex_extension_point;
 use rex_response;
 
-class TinyMCEUploadHandler
+class TinyMceUploadHandler
 {
     const MEDIA_TYPE_PATH = '/index.php?rex_media_type=%s&rex_media_file=';
     const MEDIA_PATH = '/media/';
@@ -22,7 +16,7 @@ class TinyMCEUploadHandler
     /**
      * @author Joachim Doerr
      */
-    public static function uploadTinyMCEImg()
+    public static function uploadTinyMceImg()
     {
         if (!function_exists('rex_mediapool_saveMedia')) {
             if (rex_addon::exists('mediapool') && rex_addon::get('mediapool')->isAvailable()) {

@@ -1,18 +1,12 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-namespace TinyMCE\Provider;
-
+namespace FriendsOfRedaxo\TinyMce\Provider;
 
 use rex_be_controller;
 use rex_be_navigation;
 use rex_fragment;
 
-class TinyMCENavigationProvider
+class TinyMceNavigationProvider
 {
     /**
      * @return null|\rex_be_page

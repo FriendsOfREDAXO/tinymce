@@ -1,17 +1,11 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-namespace TinyMCE\Creator;
+namespace FriendsOfRedaxo\TinyMce\Creator;
 
-
-use TinyMCE\Handler\TinyMCEDatabaseHandler;
+use FriendsOfRedaxo\TinyMce\Handler\TinyMceDatabaseHandler;
 use rex_file;
 
-class TinyMCEProfilesCreator
+class TinyMceProfilesCreator
 {
     const UPLOAD_URL = './index.php?tinymceupload=1';
     const PROFILES_FILENAME = 'tinymce_profiles.js';
@@ -38,7 +32,7 @@ class TinyMCEProfilesCreator
      */
     public static function profilesCreate($getProfile = null)
     {
-        $profiles = TinyMCEDatabaseHandler::getAllProfiles();
+        $profiles = TinyMceDatabaseHandler::getAllProfiles();
         $content = '';
         if (sizeof($profiles) > 0) {
             $jsonProfiles = [];

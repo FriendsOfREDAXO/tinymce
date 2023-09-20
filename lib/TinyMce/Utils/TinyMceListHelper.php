@@ -1,18 +1,12 @@
 <?php
-/**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
- * @package redaxo5
- * @license MIT
- */
 
-namespace TinyMCE\Utils;
-
+namespace FriendsOfRedaxo\TinyMce\Utils;
 
 use rex_i18n;
 use rex_sql;
 use rex_view;
 
-class TinyMCEListHelper
+class TinyMceListHelper
 {
     /**
      * togglet bool data column
