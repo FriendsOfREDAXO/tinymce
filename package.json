@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "tinymce": "^6",
+    "tinymce-i18n": "^23.9.11"
+  },
+  "scripts": {
+    "postinstall": "cp -r node_modules/tinymce/ assets/vendor/tinymce/ && cp -r node_modules/tinymce-i18n/langs6/ assets/vendor/tinymce/langs/"
+  }
+}
