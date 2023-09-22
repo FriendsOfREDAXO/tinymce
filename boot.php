@@ -13,10 +13,16 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
 // add assets to backend
 if (rex::isBackend() && rex::getUser()) {
+    rex_dir::copy($addon->getPath('assets/plugins/link-yform/dist/link-yform'), $addon->getAssetsPath('vendor/tinymce/plugins/link-yform'));
+
     // load assets
     TinyMceAssetsProvider::provideViewAssets();
     TinyMceAssetsProvider::provideBaseAssets();
     TinyMceAssetsProvider::provideProfileEditData();
+
+    rex_view::addJsFile($addon->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('vendor/tinymce/plugins/link-yform/plugin.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('tinymce_profiles.js'));
 
     // upload image
     if (rex_request::request('tinymceupload') == 1) {
