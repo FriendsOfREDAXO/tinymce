@@ -4,8 +4,6 @@ tinymce_title = TinyMCE
 # navigation
 tinymce_main = Überblick & Demo
 tinymce_demo = TinyMCE Demo
-tinymce_mblock_demo = MBlock Demo
-tinymce_profiles = Editor Profile
 tinymce_help = Hilfe
 
 # heading
@@ -13,20 +11,25 @@ tinymce_subnavigation_header_title = TinyMCE für Redaxo 5
 tinymce_subnavigation_header_photo = Foto von %s auf %s
 
 # profiles list & form
-tinymce_list_profiles = TinyMCE Profile
 tinymce_profile_edit = TinyMCE Profile bearbeiten
 tinymce_profile_add = Neues TinyMCE Profile erstellen
+tinymce_profile_clone_exception = Beim Duplizieren ist ein Fehler aufgetreten
+tinymce_profile_cloned = Das Profil wurde dupliziert
+tinymce_profile_delete_exception = Beim Löschen ist ein Fehler aufgetreten
 tinymce_profile_deleted = Profil wurde gelöscht
-tinymce_list_function = Funktion
+tinymce_profiles = TinyMCE Profile
+tinymce_profiles_no_results = Keine Profile gefunden
+
+tinymce_function = Funktion
 tinymce_clone = duplizieren
-rex_tinymce_profiles_cloned = Das Profil wurde dupliziert
-rex_tinymce_profiles_clone_exception = Beim Duplizieren ist ein Fehler aufgetreten
+
+
 
 
 # profiles columns names
-tinymce_name = Profile-Namen
+tinymce_name = Name
 tinymce_name_placeholder = profile_name
-tinymce_description = Profile-Beschreibung
+tinymce_description = Beschreibung
 tinymce_description_placeholder = Einsatzzweck und Umfang des Profils
 tinymce_extra_definition = Profile-Optionen
 tinymce_toolbar = Toolbar-Elemente
@@ -49,4 +52,4 @@ tinymce_upload_default = Image-Drag&Drop-Upload
 tinymce_upload_default_description = Bilder können via drag+drop in das Textfeld gesetzt werden
 
 #migration
-tinymce_migration_message = Die Profile des TinyMCE5-AddOns wurden migriert und TinyMCE5 deaktiviert. TinyMCE5 kann jetzt deinstalliert werden. Bitte die Readme beachten. 
+tinymce_migration_message = Die Profile des TinyMCE5-AddOns wurden migriert und TinyMCE5 deaktiviert. TinyMCE5 kann jetzt deinstalliert werden. Bitte die Readme beachten.

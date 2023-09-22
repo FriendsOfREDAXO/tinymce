@@ -30,8 +30,8 @@ class TinyMceAssetsProvider
     {
         try {
             rex_view::addCssFile(self::getAddon()->getAssetsUrl('css/tinymce_rex_skin.css'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce_profiles.js'));
+            //rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
+            //rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce_profiles.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('js/tinymce_rex.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
