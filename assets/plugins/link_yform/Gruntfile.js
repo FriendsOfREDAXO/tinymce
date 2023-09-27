@@ -79,11 +79,11 @@ module.exports = (grunt) => {
         },
         // scratchPluginMinPath is used twice on purpose, all outputs will be minified for premium plugins
         files: {
-          'dist/link-yform/plugin.js': [
+          'dist/link_yform/plugin.js': [
             'src/text/license-header.js',
             scratchPluginMinPath
           ],
-          'dist/link-yform/plugin.min.js': [
+          'dist/link_yform/plugin.min.js': [
             'src/text/license-header.js',
             scratchPluginMinPath
           ]
@@ -94,7 +94,7 @@ module.exports = (grunt) => {
     copy: {
       css: {
         files: [
-          { src: [ 'CHANGELOG.txt', 'LICENSE.txt' ], dest: 'dist/link-yform', expand: true }
+          { src: [ 'CHANGELOG.txt', 'LICENSE.txt' ], dest: 'dist/link_yform', expand: true }
         ]
       }
     },
@@ -148,7 +148,7 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('@ephox/swag');
 
   grunt.registerTask('version', 'Creates a version file', () => {
-    grunt.file.write('dist/link-yform/version.txt', BUILD_VERSION);
+    grunt.file.write('dist/link_yform/version.txt', BUILD_VERSION);
   });
 
   grunt.registerTask('default', [
