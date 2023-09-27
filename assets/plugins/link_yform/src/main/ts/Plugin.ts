@@ -1,7 +1,7 @@
 import { Editor, TinyMCE } from 'tinymce';
 
 declare const tinymce: TinyMCE;
-declare function newPoolWindow(link: any): any;
+declare function newPoolWindow(link: string): Window;
 
 const hasProto = (v, constructor, predicate) => {
     let _a;
