@@ -26,8 +26,9 @@ const typeOf = x => {
 };
 
 const isType = type => value => typeOf(value) === type;
-const isObject = isType('object');
 const isNullable = a => a === null || a === undefined;
+const isObject = isType('object');
+const isString = isType('string');
 
 const setup = (editor: Editor): void => {
     editor.options.register('link_yform_tables', {
@@ -81,7 +82,7 @@ const setup = (editor: Editor): void => {
                 }
 
                 const linkAttributes = {
-                    href: yformTable.table.split('_').join('-') + '://' + id,
+                    href: ((!isNullable(yformTable.url) && isString(yformTable.url)) ? yformTable.url : yformTable.table.split('_').join('-') + '://') + id,
                     title: label
                 }
 
