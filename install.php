@@ -56,3 +56,6 @@ try {
     rex_logger::logException($e);
     print rex_view::error($e->getMessage());
 }
+
+// Eigene PlugIns TinyMCE zur Verfügung stellen
+rex_dir::copy($addon->getPath('assets/scripts/tinymce/plugins/link_yform'), $addon->getAssetsPath('vendor/tinymce/plugins/link_yform'));
