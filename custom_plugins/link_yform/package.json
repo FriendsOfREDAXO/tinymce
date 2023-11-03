@@ -5,7 +5,9 @@
   "scripts": {
     "prepublishOnly": "yarn lint && yarn build",
     "lint": "eslint src/**/*.ts",
-    "build": "grunt",
+    "build": "yarn build-grunt && yarn build-copy",
+    "build-grunt": "grunt --force --fix",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/link_yform/ ../../assets/scripts/tinymce/plugins/link_yform/",
     "test": "bedrock-auto -b chrome-headless -d src/test/ts/",
     "test-manual": "bedrock -d src/test/ts/",
     "start": "grunt webpack"

@@ -32,24 +32,30 @@ const isString = isType('string');
 
 const setup = (editor: Editor): void => {
     editor.options.register('link_yform_tables', {
-        processor: 'array',
-        default: []
+        processor: 'object',
+        default: {
+            title: 'YForm',
+            items: [],
+        }
     });
 
-    const yformTables = editor.options.get('link_yform_tables');
+    const config = editor.options.get('link_yform_tables');
+    const title = config.title;
+    const items = config.items;
+
     const menuItems = [];
-    for (let i = 0, len = yformTables.length; i < len; ++i) {
-        const yformTable = yformTables[i];
+    for (let i = 0, len = items.length; i < len; ++i) {
+        const item = items[i];
         const warn = [];
-        if (!isObject(yformTable)) {
+        if (!isObject(item)) {
             warn.push('Entry is not an object.');
         }
 
-        if (isNullable(yformTable.table)) {
+        if (isNullable(item.table)) {
             warn.push('Key "table" with table name as value is missing.');
         }
 
-        if (isNullable(yformTable.field)) {
+        if (isNullable(item.field)) {
             warn.push('Key "field" with field name as value is missing.');
         }
 
@@ -58,19 +64,19 @@ const setup = (editor: Editor): void => {
             continue;
         }
 
-        const menuText = isNullable(yformTable.menu) ? yformTable.table : yformTable.menu;
+        const menuTitle = isNullable(item.title) ? item.table : item.title;
 
         menuItems.push({
             type: 'menuitem',
-            text: menuText,
-            onAction: () => openDialog(yformTable)
+            text: menuTitle,
+            onAction: () => openDialog(item)
         });
     }
 
-    const openDialog = (yformTable) => {
+    const openDialog = (item) => {
         try {
             const dom = editor.dom;
-            const pool = newPoolWindow('index.php?page=yform/manager/data_edit&table_name=' + yformTable.table + '&rex_yform_manager_opener[id]=1&rex_yform_manager_opener[field]=' + yformTable.field + '&rex_yform_manager_opener[multiple]=0');
+            const pool = newPoolWindow('index.php?page=yform/manager/data_edit&table_name=' + item.table + '&rex_yform_manager_opener[id]=1&rex_yform_manager_opener[field]=' + item.field + '&rex_yform_manager_opener[multiple]=0');
             $(pool).on('rex:YForm_selectData', function (event, id, label) {
                 event.preventDefault();
                 pool.close();
@@ -82,10 +88,9 @@ const setup = (editor: Editor): void => {
                 }
 
                 const linkAttributes = {
-                    href: ((!isNullable(yformTable.url) && isString(yformTable.url)) ? yformTable.url : yformTable.table.split('_').join('-') + '://') + id,
+                    href: ((!isNullable(item.url) && isString(item.url)) ? item.url : item.table.split('_').join('-') + '://') + id,
                     title: label
                 }
-
                 editor.insertContent(dom.createHTML('a', linkAttributes, dom.encode(label)));
             });
         } catch (error) {
@@ -94,7 +99,7 @@ const setup = (editor: Editor): void => {
     }
 
     editor.ui.registry.addMenuButton('link_yform', {
-        text: 'YForm',
+        text: title,
         fetch: (callback) => {
             callback(menuItems);
         }

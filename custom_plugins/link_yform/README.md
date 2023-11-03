@@ -7,33 +7,48 @@ Das `href` beinhaltet dabei eine fiktive URL die via `OUTPUT_FILTER` noch ersetz
 
 Im TinyMCE Profil muss bei `plugins` das Plugin `link_yform` aktiviert werden.
 
-Beispiel
+**Beispiel**
+
 ```js
 plugins: 'link_yform preview code ...'
 ```
 
 Über die Option `link_yform_tables` werden die YForm-Tabellen notiert, die eine Verlinkung anbieten sollen.
 
-Beispiel
+**Beispiel**
+
 ```js
-link_yform_tables: [
-    {
-        "table": "rex_yf_project",
-        "field": "title",
-        "menu": "Projekt verlinken"
-    },
-    {
-        "table": "rex_yf_event",
-        "field": "name",
-    },
-]
+link_yform_tables: {
+    title: Yakamara,
+    items: [
+        {
+            title: 'Projekt verlinken',
+            table: 'rex_yf_project',
+            field: 'title',
+        },
+        {
+            title: 'Veranstaltung verlinken',
+            table: 'rex_yf_event',
+            field: 'name',
+            url: '/event:'
+        },
+    ]
+}
 ```
 
-| Key   | Erklärung                                                             |
-|-------|-----------------------------------------------------------------------|
-| table | Name der YForm-Tabelle                                                |
-| field | Name des Feldes, welches als Text für den Link übernommen werden soll |
-| menu  | Optionaler Text für das Menü. Ansonsten erscheint der Tabelllenname   |
+| Key   | Typ    | Beschreibung                              |
+|-------|--------|-------------------------------------------|
+| title | String | Name des Dropdown-Buttons                 |
+| items | Array  | Enthält die Elemente des Dropdown-Buttons |
+
+**Items**
+
+| Key   | Typ    | Beschreibung                                                                                                               |
+|-------|--------|----------------------------------------------------------------------------------------------------------------------------|
+| title | String | Optionaler Titel für das Menü, ansonsten erscheint der Tabellenname                                                        |
+| table | String | Name der YForm-Tabelle                                                                                                     |                                                                       |
+| field | String | Name des Feldes, welches als Text für den Link übernommen werden soll                                                      |                                                                       |
+| url   | String | Optionaler String für die fiktive Url, ansonsten Tabellenname + "://". Die Id des Datensatzes wird automatisch angehangen. |
 
 
 
