@@ -1,6 +1,6 @@
 package: tinymce
 version: '6.0.0.beta1'
-vendor: '6.7.0'
+vendor: '6.7.2'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce/issues
 
