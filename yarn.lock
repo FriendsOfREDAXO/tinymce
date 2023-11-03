@@ -3,11 +3,11 @@
 
 
 tinymce-i18n@^23.9.11:
-  version "23.9.11"
-  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-23.9.11.tgz#dd27814ab082e6d49822ff5900529eeef843f866"
-  integrity sha512-5FRACezw3X7tKTAo3mVqbAukjDuUn2NhYDzrsPCqeMjAgWXMctiLgKsrhTGc9thhnz3GHufqJyjZBv5b8mSsiQ==
+  version "23.10.9"
+  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-23.10.9.tgz#1b686f6235e7053d8bc235a1f5a74be7c4998a87"
+  integrity sha512-CwO5pbfhO+GzFXMkTxzV1G8JSSY9mu8lkXQ53nuGBB57m5YqN+jLDz2NZZiFIZ76OZauGf4hjrcIxyZlggpuZg==
 
 tinymce@^6:
-  version "6.7.1"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.7.1.tgz#62038eb298cfaeb4ffc7aae4d90401fc0bf9d7d7"
-  integrity sha512-SIGJgWk2d/X59VbO+i81QfNx2EP1P5t+sza2/1So3OLGtmMBhEJMag7sN/Mo8sq4s0niwb65Z51yLju32jP11g==
+  version "6.7.2"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.7.2.tgz#39b077d26c171cb41341b2eef126e7811bb78697"
+  integrity sha512-6h/02jHmXyghekFzmzccZxUUEFtlPEKHxOd+gd49bjno3ybavZInPIaDd/pp2GeEwsFm20oGgJCL7UiebXm9dw==
