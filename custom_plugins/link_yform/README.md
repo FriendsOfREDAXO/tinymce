@@ -19,7 +19,7 @@ plugins: 'link_yform preview code ...'
 
 ```js
 link_yform_tables: {
-    title: Yakamara,
+    title: 'YForm Datensätze',
     items: [
         {
             title: 'Projekt verlinken',
