@@ -12,11 +12,11 @@ class TinyMceAssetsProvider
     /**
      * @author Joachim Doerr
      */
-    public static function provideViewAssets()
+    public static function provideDemoAssets()
     {
         if (rex_be_controller::getCurrentPagePart(1) == 'tinymce') {
             try {
-                rex_view::addCssFile(self::getAddon()->getAssetsUrl('css/tinymce.css'));
+                rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/demo.css'));
             } catch (rex_exception $e) {
                 rex_logger::logException($e);
             }
@@ -29,10 +29,11 @@ class TinyMceAssetsProvider
     public static function provideBaseAssets()
     {
         try {
-            rex_view::addCssFile(self::getAddon()->getAssetsUrl('css/tinymce_rex_skin.css'));
+            rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/base.css'));
+
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('tinymce_profiles.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('js/tinymce_rex.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/base.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
@@ -47,11 +48,20 @@ class TinyMceAssetsProvider
             // add js vendors
             self::addJS([
                 'jquery.alphanum' => 'vendor/alphanum/jquery.alphanum.js',
-                'tinymceprofile_edit' => 'js/tinymce_profile_edit.js',
+                'profile' => 'scripts/profile.js',
             ]);
             // add css vendors
             //self::addCss([
             //]);
+        }
+    }
+
+    public static function providePopupAssets()
+    {
+        try {
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/linkmap.js'));
+        } catch (rex_exception $e) {
+            rex_logger::logException($e);
         }
     }
 

@@ -8,7 +8,7 @@ use rex_file;
 class TinyMceProfilesCreator
 {
     const UPLOAD_URL = './index.php?tinymceupload=1';
-    const PROFILES_FILENAME = 'tinymce_profiles.js';
+    const PROFILES_FILENAME = 'profiles.js';
 
     const ALLOWED_FIELDS = [
         'toolbar' => ['|', 'styleselect', 'undo', 'redo', 'save', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'forecolor', 'backcolor', 'ltr', 'rtl', 'table', 'visualblocks', 'visualchars', 'link', 'image', 'media', 'codesample', 'template', 'fontselect', 'align', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'numlist', 'bullist', 'outdent', 'indent', 'removeformat', 'code', 'hr', 'print', 'preview', 'media', 'fullscreen', 'searchreplace', 'emoticons', 'visualaid', 'cut', 'copy', 'paste', 'pastetext', 'selectall', 'wordcount', 'charmap', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime'],
@@ -75,7 +75,7 @@ const tinyprofiles = $profiles;
 ";
         }
 
-        if (!rex_file::put(self::getAddon()->getAssetsPath(self::PROFILES_FILENAME), $content)) {
+        if (!rex_file::put(self::getAddon()->getAssetsPath('generated/'.self::PROFILES_FILENAME), $content)) {
             throw new \rex_functional_exception(\rex_i18n::msg('tinymce_profiles_creation_exception'));
         }
     }
