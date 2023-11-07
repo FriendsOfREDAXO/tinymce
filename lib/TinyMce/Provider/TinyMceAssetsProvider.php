@@ -44,15 +44,9 @@ class TinyMceAssetsProvider
      */
     public static function provideProfileEditData()
     {
-        if (rex_be_controller::getCurrentPagePart(2) == 'profiles' && rex_be_controller::getCurrentPagePart(1) == 'tinymce') {
-            // add js vendors
-            self::addJS([
-                'jquery.alphanum' => 'vendor/alphanum/jquery.alphanum.js',
-                'profile' => 'scripts/profile.js',
-            ]);
-            // add css vendors
-            //self::addCss([
-            //]);
+        if (rex_be_controller::getCurrentPagePart(1) == 'tinymce' && rex_be_controller::getCurrentPagePart(2) == 'profiles') {
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/alphanum/jquery.alphanum.js'));
         }
     }
 

@@ -130,6 +130,7 @@ if ($func == '') {
 
     $field = $form->addTextAreaField('extra');
     $field->setAttribute('style','height: 550px');
+    $field->setAttribute('class','form-control tinymce-options');
     $field->setLabel(rex_i18n::msg('tinymce_extra_definition'));
 
     $content = '<div class="tinymce_profile_edit">' . $form->get() . '</div>';

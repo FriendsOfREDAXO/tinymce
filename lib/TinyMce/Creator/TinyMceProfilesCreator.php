@@ -36,43 +36,30 @@ class TinyMceProfilesCreator
         $content = '';
         if (sizeof($profiles) > 0) {
             $jsonProfiles = [];
-            $extras = [];
-
             foreach ($profiles as $profile) {
-
                 if (isset($getProfile['name']) && $profile['name'] == $getProfile['name']) {
                     $profile = $getProfile;
                 }
 
-                $result = self::mapProfile($profile);
+                $options = $profile['extra'] ?? '';
+                $options = json_decode($options, true);
 
-                $picker_callback = 'rex5_picker_function(callback, value, meta);';
+                if (null === $options) {
+                    continue;
+                }
 
-                $key_defaults = uniqid();
-                $key_extras = uniqid();
-                $extras[$key_defaults] = $result;
-                $extras[$key_extras] = "
-file_picker_callback: function (callback, value, meta) { $picker_callback }";
+                if (!isset($options['link_linkmap']) || (true === $options['link_linkmap'])) {
+                    $options['file_picker_callback'] = '<script>function (callback, value, meta) { rex5_picker_function(callback, value, meta); }</script>';
+                }
+                if (isset($options['link_linkmap'])) {
+                    unset($options['link_linkmap']);
+                }
 
-                $jsonProfiles[$profile['name']][$key_defaults] = $key_defaults;
-                $jsonProfiles[$profile['name']][$key_extras] = $key_extras;
+                $jsonProfiles[$profile['name']] = $options;
             }
 
-            $extraValues = array();
-            $extraKeys = array();
-            foreach ($extras as $key => $value) {
-                $extraKeys[$key] = "\"$key\":\"$key\"";
-                $extraValues[$key] = $value;
-            }
-
-            $profiles = json_encode($jsonProfiles);
-            $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
-            $profiles = str_replace(',,', ',', $profiles);
-
-            $content =
-                "
-const tinyprofiles = $profiles;
-";
+            $content = 'const tinyprofiles = '.json_encode($jsonProfiles).';';
+            $content = str_replace(['"<script>', '<\/script>"'], ['', ''], $content);
         }
 
         if (!rex_file::put(self::getAddon()->getAssetsPath('generated/'.self::PROFILES_FILENAME), $content)) {
