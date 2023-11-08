@@ -59,3 +59,4 @@ try {
 
 // Eigene PlugIns TinyMCE zur Verfügung stellen
 rex_dir::copy($addon->getPath('assets/scripts/tinymce/plugins/link_yform'), $addon->getAssetsPath('vendor/tinymce/plugins/link_yform'));
+rex_dir::copy($addon->getPath('assets/scripts/tinymce/plugins/quote'), $addon->getAssetsPath('vendor/tinymce/plugins/quote'));
