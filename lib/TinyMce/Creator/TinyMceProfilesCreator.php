@@ -57,9 +57,9 @@ class TinyMceProfilesCreator
 
                 $jsonProfiles[$profile['name']] = $options;
             }
-
-            $content = 'const tinyprofiles = '.json_encode($jsonProfiles).';';
-            $content = str_replace(['"<script>', '<\/script>"'], ['', ''], $content);
+            
+            $content = 'const tinyprofiles = '.json_encode($jsonProfiles, JSON_UNESCAPED_SLASHES).';';
+            $content = str_replace(['"<script>', '</script>"'], ['', ''], $content);
         }
 
         if (!rex_file::put(self::getAddon()->getAssetsPath('generated/'.self::PROFILES_FILENAME), $content)) {
