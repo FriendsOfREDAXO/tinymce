@@ -11,7 +11,7 @@ const setup = (editor: Editor, url: string): void => {
     const setContent = (editor, html) => {
         editor.focus();
         editor.undoManager.transact(() => {
-            editor.setContent(html);
+            editor.insertContent(html);
         });
         editor.selection.setCursorLocation();
         editor.nodeChanged();
