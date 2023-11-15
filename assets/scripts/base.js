@@ -61,11 +61,10 @@ let rex5_picker_function = function (callback, value, meta) {
     }
 };
 
-let tinyareas = '.tiny5-editor,.tiny-editor';
+let tinyareas = '.tiny-editor';
 
 $(document).on('rex:ready', function (e, container) {
     if (container.find(tinyareas).length) {
-        console.log('ready');
         tiny_init(container);
     }
 });
@@ -80,20 +79,23 @@ $(document).on('rex:change', function (e, container) {
 function tiny_init(container) {
     let profiles = [];
 
-    container.find(tinyareas).each(function(){
+    container.find(tinyareas).each(function() {
         let $this = $(this);
         let e_id = $this.attr('id');
+
         profiles.push($this.data('profile'));
+
         if(tinymce.get(e_id)) {
             $this.removeClass('mce-initialized');
             tinymce.remove('#'+e_id);
         }
     });
-    profiles = profiles.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+
+    profiles = profiles.filter(function(item, i, ar) {
+        return ar.indexOf(item) === i;
+    });
 
     profiles.forEach(function(profile) {
-        console.log(profile);
-
         let options = {};
         if (profile in tinyprofiles) {
             options = tinyprofiles[profile];
@@ -104,13 +106,18 @@ function tiny_init(container) {
             }
         }
 
-        options['setup'] = function(editor) {
-            editor.on('change', function(e) {
-                $(editor.targetElm).html(editor.getContent());
-            })
-        };
+        if (!options.hasOwnProperty('setup')) {
+            options['setup'] = function(editor) {
+                editor.on('change', function(e) {
+                    $(editor.targetElm).html(editor.getContent());
+                })
+            };
+        }
 
-       options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized), .tiny5-editor[data-profile="' + profile + '"]:not(.mce-initialized)';
+        if (!options.hasOwnProperty('selector')) {
+            options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized)';
+        }
+
         tinymce.init(options).then(function(editors) {
             for(let i in editors) {
                 $(editors[i].targetElm).addClass('mce-initialized');
