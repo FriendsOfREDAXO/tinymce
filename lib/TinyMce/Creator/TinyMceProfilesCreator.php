@@ -33,34 +33,47 @@ class TinyMceProfilesCreator
     public static function profilesCreate($getProfile = null)
     {
         $profiles = TinyMceDatabaseHandler::getAllProfiles();
+
         $content = '';
-        if (sizeof($profiles) > 0) {
-            $jsonProfiles = [];
-            foreach ($profiles as $profile) {
-                if (isset($getProfile['name']) && $profile['name'] == $getProfile['name']) {
-                    $profile = $getProfile;
-                }
+         if (sizeof($profiles) > 0) {
+             $jsonProfiles = [];
+             $extras = [];
 
-                $options = $profile['extra'] ?? '';
-                $options = json_decode($options, true);
+             foreach ($profiles as $profile) {
 
-                if (null === $options) {
-                    continue;
-                }
+                 if (isset($getProfile['name']) && $profile['name'] == $getProfile['name']) {
+                     $profile = $getProfile;
+                 }
 
-                if (!isset($options['link_linkmap']) || (true === $options['link_linkmap'])) {
-                    $options['file_picker_callback'] = '<script>function (callback, value, meta) { rex5_picker_function(callback, value, meta); }</script>';
-                }
-                if (isset($options['link_linkmap'])) {
-                    unset($options['link_linkmap']);
-                }
+                 $result = self::mapProfile($profile);
 
-                $jsonProfiles[$profile['name']] = $options;
-            }
-            
-            $content = 'const tinyprofiles = '.json_encode($jsonProfiles, JSON_UNESCAPED_SLASHES).';';
-            $content = str_replace(['"<script>', '</script>"'], ['', ''], $content);
-        }
+                 $picker_callback = 'rex5_picker_function(callback, value, meta);';
+
+                 $key_defaults = uniqid();
+                 $key_extras = uniqid();
+                 $extras[$key_defaults] = $result;
+                 //$extras[$key_extras] = "file_picker_callback: function (callback, value, meta) { $picker_callback }";
+
+                 $jsonProfiles[$profile['name']][$key_defaults] = $key_defaults;
+                 $jsonProfiles[$profile['name']][$key_extras] = $key_extras;
+             }
+
+             $extraValues = array();
+             $extraKeys = array();
+             foreach ($extras as $key => $value) {
+                 $extraKeys[$key] = "\"$key\":\"$key\"";
+                 $extraValues[$key] = $value;
+             }
+
+             $profiles = json_encode($jsonProfiles);
+             $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
+             $profiles = str_replace(',,', ',', $profiles);
+
+             $content =
+                 "
+ const tinyprofiles = $profiles;
+ ";
+         }
 
         if (!rex_file::put(self::getAddon()->getAssetsPath('generated/'.self::PROFILES_FILENAME), $content)) {
             throw new \rex_functional_exception(\rex_i18n::msg('tinymce_profiles_creation_exception'));
