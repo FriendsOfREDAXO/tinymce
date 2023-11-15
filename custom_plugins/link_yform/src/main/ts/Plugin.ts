@@ -1,4 +1,5 @@
-import { Editor, TinyMCE } from 'tinymce';
+import { Type } from '@ephox/katamari';
+import {DOMUtils, Editor, TinyMCE} from 'tinymce';
 
 declare const tinymce: TinyMCE;
 declare function newPoolWindow(link: string): Window;
@@ -73,6 +74,18 @@ const setup = (editor: Editor): void => {
         });
     }
 
+    const isImageFigure = (elm: Element | null): elm is HTMLElement =>
+        Type.isNonNullable(elm) && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className);
+
+    const linkImageFigure = (dom: DOMUtils, fig: Element, attrs: Record<string, string | null>) => {
+        const img = dom.select('img', fig)[0];
+        if (img) {
+            const a = dom.create('a', attrs);
+            img.parentNode?.insertBefore(a, img);
+            a.appendChild(img);
+        }
+    };
+
     const openDialog = (item) => {
         try {
             const dom = editor.dom;
@@ -81,17 +94,24 @@ const setup = (editor: Editor): void => {
                 event.preventDefault();
                 pool.close();
 
-                if (editor.selection.getContent()) {
-                    label = editor.selection.getContent();
-                } else {
-                    label = label.replace(new RegExp("(.*?)\\s\\[.*?\\]", 'gi'), "$1");
-                }
-
                 const linkAttributes = {
                     href: ((!isNullable(item.url) && isString(item.url)) ? item.url : item.table.split('_').join('-') + '://') + id,
                     title: label
                 }
-                editor.insertContent(dom.createHTML('a', linkAttributes, dom.encode(label)));
+
+                const selectedElement = editor.selection.getNode();
+
+                if (isImageFigure(selectedElement)) {
+                    linkImageFigure(dom, selectedElement, linkAttributes);
+                } else {
+                    if (editor.selection.getContent()) {
+                        label = editor.selection.getContent();
+                    } else {
+                        label = label.replace(new RegExp("(.*?)\\s\\[.*?\\]", 'gi'), "$1");
+                    }
+                    editor.insertContent(dom.createHTML('a', linkAttributes, dom.encode(label)));
+                }
+
             });
         } catch (error) {
             console.log(error)
