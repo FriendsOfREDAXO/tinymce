@@ -94,6 +94,9 @@ const setup = (editor: Editor): void => {
                 event.preventDefault();
                 pool.close();
 
+                // Remove [id=1]
+                label = label.replace(new RegExp("(.*?)\\s\\[.*?\\]", 'gi'), "$1");
+
                 const linkAttributes = {
                     href: ((!isNullable(item.url) && isString(item.url)) ? item.url : item.table.split('_').join('-') + '://') + id,
                     title: label
@@ -104,12 +107,12 @@ const setup = (editor: Editor): void => {
                 if (isImageFigure(selectedElement)) {
                     linkImageFigure(dom, selectedElement, linkAttributes);
                 } else {
+                    let text = dom.encode(label);
+
                     if (editor.selection.getContent()) {
-                        label = editor.selection.getContent();
-                    } else {
-                        label = label.replace(new RegExp("(.*?)\\s\\[.*?\\]", 'gi'), "$1");
+                        text = editor.selection.getContent();
                     }
-                    editor.insertContent(dom.createHTML('a', linkAttributes, dom.encode(label)));
+                    editor.insertContent(dom.createHTML('a', linkAttributes, text));
                 }
 
             });
