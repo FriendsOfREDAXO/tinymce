@@ -6649,9 +6649,9 @@ tiny-lr@^1.1.1:
     qs "^6.4.0"
 
 tinymce@latest:
-  version "6.7.2"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.7.2.tgz#39b077d26c171cb41341b2eef126e7811bb78697"
-  integrity sha512-6h/02jHmXyghekFzmzccZxUUEFtlPEKHxOd+gd49bjno3ybavZInPIaDd/pp2GeEwsFm20oGgJCL7UiebXm9dw==
+  version "6.7.3"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.7.3.tgz#6289c5c7ec7298a84a7890ab866d88a193fa549a"
+  integrity sha512-J7WmYIi/gt1RvZ6Ap2oQiUjzAoiS9pfV+d4GnKuZuPu8agmlAEAInNmMvMjfCNBzHv4JnZXY7qlHUAI0IuYQVA==
 
 to-arraybuffer@^1.0.0:
   version "1.0.1"
