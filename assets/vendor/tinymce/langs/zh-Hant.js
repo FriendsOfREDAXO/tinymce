@@ -1,5 +1,5 @@
 tinymce.addI18n("zh-Hant", {
-    "Redo": "\u91cd\u505a",
+    "Redo": "Test",
     "Undo": "\u5fa9\u539f",
     "Cut": "\u526a\u4e0b",
     "Copy": "\u8907\u88fd",

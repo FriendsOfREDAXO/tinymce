@@ -167,7 +167,7 @@ tinymce.addI18n("zh-Hans", {
     "Delete table": "\u5220\u9664\u8868\u683c",
     "Cell": "\u5355\u5143\u683c",
     "Row": "\u884c",
-    "Column": "\u680f\u76ee",
+    "Column": "\u5217",
     "Cell properties": "\u5355\u5143\u683c\u5c5e\u6027",
     "Merge cells": "\u5408\u5e76\u5355\u5143\u683c",
     "Split cell": "\u62c6\u5206\u5355\u5143\u683c",

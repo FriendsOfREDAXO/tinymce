@@ -1,5 +1,5 @@
 tinymce.addI18n("de", {
-    "Redo": "Redo",
+    "Redo": "Wiederholen",
     "Undo": "R\xfcckg\xe4ngig machen",
     "Cut": "Ausschneiden",
     "Copy": "Kopieren",
