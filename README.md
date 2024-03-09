@@ -45,14 +45,6 @@ echo $mform->show();
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE Doku](https://www.tiny.cloud/docs/) beachten.
 
-
-## Update von TinyMCE 5
-
-Bei der Installation werden vorhandene Profile aus TinyMCE 5 migriert. Nach der Migration wird TinyMCE5 deaktiviert. 
-Es empfiehlt sich die Funktionalität im neuen AddOn zu prüfen und erst im Anschluss TinyMCE5 zu löschhen. 
-
-Die Klasse `tiny5-editor` wird weiterhin unterstützt. Wir empfehlen aber nur noch die Klasse `tiny-editor` für die Feldidentifikation zu verwenden. Eine Textarea mit tinyMCE hat dann beispielsweise folgenden Code: `<textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>`
-
 ### Dark-Mode in die migrierten Profile übernehmen
 
 Folgenden Code in den Profilem ergänzen
@@ -61,11 +53,6 @@ Folgenden Code in den Profilem ergänzen
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
 content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 ```
-
-## ToDo:
-
-- mblock-Kompatibilität verbessern
-
 
 ## Licenses
 
@@ -79,18 +66,3 @@ content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 
 * http://www.redaxo.org
 * https://github.com/FriendsOfREDAXO
-
-**Credits**
-
-[Vendor: TinyMCE](https://www.tiny.cloud)
-
-[Development: Joachim Dörr](https://github.com/joachimdoerr)
-
-[Development: Wolfgang Bund](https://github.com/dtpop)
-
-[Development: Alex Wenz](https://github.com/alexwenz)
-
-[REXFamilyWeek](https://ferien-am-tressower-see.de/rexfamilyweek-2023/)
-
-
-

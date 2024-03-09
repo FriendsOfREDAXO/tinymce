@@ -1,6 +1,5 @@
 package: tinymce
 version: '6.1.0-dev'
-vendor: '6.7.2'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce/issues
 
@@ -10,9 +9,6 @@ page:
     subpages:
         main:
             title: 'translate:main'
-            subpages:
-                demo:
-                    title: 'translate:demo'
         profiles:
             title: 'translate:profiles'
         help:
@@ -31,10 +27,12 @@ pages:
 
 requires:
     redaxo: '^5.13'
-    php: '>=7.4'
+    php: '>=8.1'
+
 conflicts:
     packages:
         tinymce4: '>=0.0.0'
+        tinymce5: '>=0.0.0'
 
 installer_ignore:
     - .github

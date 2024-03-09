@@ -5,9 +5,9 @@ namespace FriendsOfRedaxo\TinyMce\Utils;
 use rex;
 use rex_i18n;
 
-class TinyMceLang
+class Lang
 {
-    public static function getUserLang()
+    public static function getUserLang(): string
     {
         if (!empty(rex::getUser()->getLanguage())) {
             $lang = rex::getUser()->getLanguage();
