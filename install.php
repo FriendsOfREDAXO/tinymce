@@ -22,16 +22,10 @@ rex_sql_table::get(rex::getTable('tinymce_profiles'))
 
 // install default demo profile and mblock demo data
 try {
-    $sql = rex_sql::factory();
-    if (sizeof($sql->getArray("SELECT id FROM " . $new_table_name . " WHERE id=1")) <= 0) {
-        rex_sql_util::importDump($addon->getPath('data.sql'));
-    }
-    // Recreate profiles
-    $addon = rex_addon::get('tinymce');
-    $addon->setConfig('update_profiles', true);
+    rex_sql_util::importDump($addon->getPath('data.sql'));
 } catch (rex_sql_exception $e) {
     rex_logger::logException($e);
-    print rex_view::error($e->getMessage());
+    echo rex_view::error($e->getMessage());
 }
 
 // Eigene PlugIns TinyMCE zur Verfügung stellen
