@@ -1,7 +1,6 @@
 <?php
 
 use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
-use FriendsOfRedaxo\TinyMce\Handler\Upload as TinyMceUploadHandler;
 use FriendsOfRedaxo\TinyMce\Provider\Assets as TinyMceAssetsProvider;
 
 $addon = rex_addon::get('tinymce');
@@ -10,19 +9,15 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     rex_perm::register('tinymce_addon[]');
 }
 
-if (rex::isBackend() && rex::getUser()) {
+if (rex::isBackend() && null !== rex::getUser()) {
     TinyMceAssetsProvider::provideBaseAssets();
     TinyMceAssetsProvider::provideDemoAssets();
     TinyMceAssetsProvider::provideProfileEditData();
 
-    if (1 == rex_request::request('tinymceupload')) {
-        TinyMceUploadHandler::uploadTinyMceImg();
-    }
-
-    if ('tinymce' == rex_be_controller::getCurrentPagePart(1)) {
+    if ('tinymce' === rex_be_controller::getCurrentPagePart(1)) {
         rex_extension::register(['REX_FORM_SAVED', 'REX_FORM_DELETED', 'TINY_PROFILE_CLONE', 'TINY_PROFILE_DELETE', 'TINY_PROFILE_ADD', 'TINY_PROFILE_UPDATED'], ['\FriendsOfRedaxo\TinyMce\Handler\Extension', 'createProfiles']);
     }
-    if (str_starts_with(rex_request('page'), 'mediapool/') && ('tiny' == rex_request('addon') || 'REX_MEDIA_tinymce_filelink' == rex_request('opener_input_field'))) {
+    if (str_starts_with(rex_request('page'), 'mediapool/') && ('tiny' === rex_request('addon', 'string', '') || 'REX_MEDIA_tinymce_filelink' === rex_request('opener_input_field', 'string', ''))) {
         rex_extension::register('OUTPUT_FILTER', static function ($ep) {
             $subject = $ep->getSubject();
             $subject = str_replace('</form>', '<input type="hidden" name="addon" value="tiny"></form>', $subject);
@@ -37,7 +32,7 @@ if (rex::isBackend() && rex::getUser()) {
         TinyMceAssetsProvider::providePopupAssets();
     }
 
-    if ($addon->getConfig('update_profiles', false)) {
+    if (null !== $addon->getConfig('update_profiles', false)) {
         try {
             TinyMceProfilesCreator::profilesCreate();
             $addon->setConfig('update_profiles', false);

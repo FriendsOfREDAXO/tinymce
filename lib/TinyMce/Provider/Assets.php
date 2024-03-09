@@ -13,7 +13,7 @@ class Assets
 {
     public static function provideDemoAssets(): void
     {
-        if ('tinymce' == rex_be_controller::getCurrentPagePart(1)) {
+        if ('tinymce' === rex_be_controller::getCurrentPagePart(1)) {
             try {
                 rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/demo.css'));
             } catch (rex_exception $e) {
@@ -37,7 +37,7 @@ class Assets
 
     public static function provideProfileEditData(): void
     {
-        if ('tinymce' == rex_be_controller::getCurrentPagePart(1) && 'profiles' == rex_be_controller::getCurrentPagePart(2)) {
+        if ('tinymce' === rex_be_controller::getCurrentPagePart(1) && 'profiles' === rex_be_controller::getCurrentPagePart(2)) {
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/alphanum/jquery.alphanum.js'));
         }

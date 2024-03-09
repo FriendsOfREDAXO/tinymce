@@ -9,7 +9,7 @@ class Lang
 {
     public static function getUserLang(): string
     {
-        if (!empty(rex::getUser()->getLanguage())) {
+        if ('' !== rex::getUser()->getLanguage()) {
             $lang = rex::getUser()->getLanguage();
         } else {
             $lang = rex_i18n::getLocale();

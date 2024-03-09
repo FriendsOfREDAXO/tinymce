@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @var rex_addon $this
+ * @psalm-scope-this rex_addon
+ */
+
 $this->includeFile(__DIR__ . '/update.php');
 
 try {
