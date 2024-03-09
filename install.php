@@ -22,7 +22,7 @@ rex_sql_table::get(rex::getTable('tinymce_profiles'))
 
 // install default demo profile and mblock demo data
 try {
-    rex_sql_util::importDump($addon->getPath('data.sql'));
+    rex_sql_util::importDump($addon->getPath('install/profiles.sql'));
 } catch (rex_sql_exception $e) {
     rex_logger::logException($e);
     echo rex_view::error($e->getMessage());
