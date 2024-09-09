@@ -22,7 +22,3 @@ rex_sql_table::get(rex::getTable('tinymce_profiles'))
     ->ensureColumn(new rex_sql_column('updateuser', 'varchar(255)', true))
     ->ensureIndex(new rex_sql_index('name', ['name'], rex_sql_index::UNIQUE))
     ->ensure();
-
-rex_dir::copy($this->getPath('assets/scripts/tinymce/plugins/link_yform'), $this->getAssetsPath('vendor/tinymce/plugins/link_yform'));
-rex_dir::copy($this->getPath('assets/scripts/tinymce/plugins/phonelink'), $this->getAssetsPath('vendor/tinymce/plugins/phonelink'));
-rex_dir::copy($this->getPath('assets/scripts/tinymce/plugins/quote'), $this->getAssetsPath('vendor/tinymce/plugins/quote'));
