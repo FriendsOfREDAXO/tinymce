@@ -36,12 +36,10 @@ let rex5_picker_function = function (callback, value, meta) {
             }
         }
 
-        const mediaSrcPath = (!typeof media_type === 'undefined') ? mediaManagerPath : mediaPath;
-
         $(mediaPool).on('rex:selectMedia', function (event, filename) {
             event.preventDefault();
             mediaPool.close();
-            callback(mediaSrcPath + filename, {alt: ''});
+            callback(mediaPath + filename, {alt: ''});
         });
     }
 
@@ -51,12 +49,10 @@ let rex5_picker_function = function (callback, value, meta) {
         let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg'),
             mediaPath = '/media/';//'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
 
-        const mediaSrcPath = (!typeof media_type === 'undefined') ? mediaManagerPath : mediaPath;
-
         $(mediaPool).on('rex:selectMedia', function (event, filename) {
             event.preventDefault();
             mediaPool.close();
-            callback(mediaSrcPath + filename, {alt: ''});
+            callback(mediaPath + filename, {alt: ''});
         });
     }
 };
