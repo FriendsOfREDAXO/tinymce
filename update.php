@@ -22,3 +22,11 @@ rex_sql_table::get(rex::getTable('tinymce_profiles'))
     ->ensureColumn(new rex_sql_column('updateuser', 'varchar(255)', true))
     ->ensureIndex(new rex_sql_index('name', ['name'], rex_sql_index::UNIQUE))
     ->ensure();
+
+// copy all custom plugins to assets folder
+$plugins_source = __DIR__ . DIRECTORY_SEPARATOR .'assets'. DIRECTORY_SEPARATOR . 'scripts'. DIRECTORY_SEPARATOR . 'tinymce'. DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
+$folders = glob($plugins_source .'*', GLOB_ONLYDIR);
+foreach ($folders as $folder) {
+    $plugins_target = $this->getAssetsPath('vendor' . DIRECTORY_SEPARATOR . 'tinymce' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . basename($folder));
+    rex_dir::copy($folder, $plugins_target);
+}
