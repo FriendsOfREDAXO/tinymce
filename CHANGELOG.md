@@ -1,10 +1,7 @@
 Changelog
 =========
 
-Version 6.0.0.beta1 – 08.04.2023
+Version 6.1.1
 -------------------------------
 
-* Migration von TinyMCE5 (@dtpop, @alexwenz)
-* Profilmigration bei der Installation von 5 nach 6 (@dtpop)
-* Duplizieren von Profilen funktionierte nicht (@dtpop)
-
+* remove TinyMCE 5 stuff from default profiles and subsitute with TinyMCE 6 buttons
