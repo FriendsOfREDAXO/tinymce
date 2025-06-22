@@ -82,6 +82,11 @@ function tiny_init(container) {
         profiles.push($this.data('profile'));
 
         if(tinymce.get(e_id)) {
+            // Save content before removing existing editor to prevent data loss
+            let existing_editor = tinymce.get(e_id);
+            if (existing_editor) {
+                existing_editor.save();
+            }
             $this.removeClass('mce-initialized');
             tinymce.remove('#'+e_id);
         }
@@ -123,6 +128,16 @@ function tiny_init(container) {
 }
 
 function tiny_restart(container) {
+    // Save content from all TinyMCE editors before destroying them to prevent data loss
+    container.parents('.mblock_wrapper').find('.mce-initialized').each(function() {
+        let editor_id = $(this).attr('id');
+        let editor = tinymce.get(editor_id);
+        if (editor) {
+            // Force save content back to textarea before removal
+            editor.save();
+        }
+    });
+    
     container.parents('.mblock_wrapper').find('.mce-initialized').removeClass('mce-initialized').show();
     container.parents('.mblock_wrapper').find('.tox.tox-tinymce').remove();
     tiny_init(container.parents('.mblock_wrapper'));
