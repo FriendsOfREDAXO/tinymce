@@ -77,6 +77,31 @@ skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
 content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 ```
 
+### Media Manager Integration (Bild-Skalierung)
+
+**Neu ab Version 8.0.0:** Raster-Bilder werden automatisch über den Media Manager eingebunden.
+
+Standardmäßig werden JPG, JPEG, PNG, GIF und WebP über den Media-Manager-Type `tiny` ausgeliefert:
+
+```
+/media/tiny/dateiname.jpg
+```
+
+**Welche Dateitypen nutzen den Media Manager?**
+- ✅ **Mit Media Manager:** JPG, JPEG, PNG, GIF, WebP
+- ❌ **Direkter Pfad:** SVG, TIFF, BMP, Videos, Audio-Dateien
+
+**Vorteile:**
+- Automatische Skalierung und Optimierung der Bilder
+- Funktioniert in Unterordner-Installationen (keine absoluten Pfade mehr)
+- Admin-Kontrolle über Bildeffekte (Größe, Kompression, etc.)
+
+**Media-Manager-Type einrichten:**
+
+Erstelle im REDAXO-Backend unter "Media Manager" einen neuen Type mit dem Namen `tiny` und füge die gewünschten Effekte hinzu (z. B. "Resize" mit max-width: 1200px).
+
+**Hinweis:** Existiert der Type nicht, liefert der Media Manager automatisch das Original aus (kein Fehler).
+
 ## Entwickler: Aufbau / Aktualisieren der Assets
 
 In diesem Addon befinden sich Custom‑Plugins in `custom_plugins/`.
