@@ -30,3 +30,21 @@ foreach ($folders as $folder) {
     $plugins_target = $this->getAssetsPath('vendor' . DIRECTORY_SEPARATOR . 'tinymce' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR . basename($folder));
     rex_dir::copy($folder, $plugins_target);
 }
+
+// Update existing profiles to add GPL license key for TinyMCE 8
+$sql = rex_sql::factory();
+$sql->setQuery('SELECT id, extra FROM ' . rex::getTable('tinymce_profiles'));
+$profiles = $sql->getArray();
+
+foreach ($profiles as $profile) {
+    $extra = $profile['extra'];
+    // Only add license_key if it doesn't already exist
+    if (!empty($extra) && strpos($extra, 'license_key:') === false) {
+        $extra = "license_key: 'gpl',\r\n" . $extra;
+        $update = rex_sql::factory();
+        $update->setTable(rex::getTable('tinymce_profiles'));
+        $update->setWhere(['id' => $profile['id']]);
+        $update->setValue('extra', $extra);
+        $update->update();
+    }
+}

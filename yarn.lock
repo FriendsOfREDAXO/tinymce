@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-tinymce-i18n@^23.9.11:
-  version "23.12.19"
-  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-23.12.19.tgz#223ccd54f71f8b857b92f30bb037607f565a5e55"
-  integrity sha512-z73zjNgzNRgiJsO1g6sBHnp5pqLquVhaK+7+9aeZR5w5/kV36YxJAFbaN6qo/8TXwygPctkMnJTxiRR8n+ZYIQ==
+tinymce-i18n@^25.11.17:
+  version "25.11.17"
+  resolved "https://registry.yarnpkg.com/tinymce-i18n/-/tinymce-i18n-25.11.17.tgz#4af30adf61e3cff6bed6f847d47aae0bbd10251c"
+  integrity sha512-Fi5hGRDL9o42VsdahgNgHRHO/4ClAAqIew45QMu8sa5LQT2wTaVPf/tAXnVDHxR7c6NWZQmZp/E18LosxLq42A==
 
-tinymce@^6:
-  version "6.8.3"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.8.3.tgz#0025a4aaa4c24dc2a3e32e83dfda705d196fd802"
-  integrity sha512-3fCHKAeqT+xNwBVESf6iDbDV0VNwZNmfrkx9c/6Gz5iB8piMfaO6s7FvoiTrj1hf1gVbfyLTnz1DooI6DhgINQ==
+tinymce@^8:
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-8.2.2.tgz#0eafd350759871067b2692cde4078d6b179af1fc"
+  integrity sha512-CFDSZwciMvFGW2czK/Xig1HcOGpXI0qcQMIqaIcG2F4RuuTdf+LQTreyEZunAJoFTQ9L0KAugOqL7OA5TJkoAA==
