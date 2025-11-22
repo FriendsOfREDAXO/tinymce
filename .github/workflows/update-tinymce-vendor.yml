@@ -95,7 +95,7 @@ jobs:
       
       - name: Create Pull Request
         if: steps.compare.outputs.needs_update == 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update TinyMCE vendor auf Version ${{ steps.latest-version.outputs.latest }}"
