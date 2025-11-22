@@ -44,9 +44,8 @@ let rex5_picker_function = function (callback, value, meta) {
             event.preventDefault();
             mediaPool.close();
             
-            // use media manager with 'tiny' type by default
-            var mediaPath = '/media/tiny/' + filename;
-            callback(mediaPath, {alt: ''});
+            // use direct media path for video/audio files
+            callback('/media/' + filename, {alt: ''});
         });
     }
 };
