@@ -30,8 +30,10 @@ let rex5_picker_function = function (callback, value, meta) {
             event.preventDefault();
             mediaPool.close();
             
-            // use media manager with 'tiny' type by default
-            var imagePath = '/media/tiny/' + filename;
+            // use media manager for raster images, direct path for SVG/TIFF/BMP
+            var extension = filename.split('.').pop().toLowerCase();
+            var useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
+            var imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
             callback(imagePath, {alt: ''});
         });
     }
