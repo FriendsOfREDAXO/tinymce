@@ -1,0 +1,11 @@
+# Dependabot deaktiviert
+# 
+# TinyMCE & tinymce-i18n Updates werden über eigene GitHub Action verwaltet:
+# .github/workflows/update-tinymce-vendor.yml
+#
+# Andere Dependencies werden manuell aktualisiert nach Bedarf.
+# 
+# Um Dependabot komplett zu deaktivieren, muss diese Datei leer bleiben
+# oder in den Repository-Einstellungen: Settings > Code security > Dependabot
+version: 2
+updates: []
