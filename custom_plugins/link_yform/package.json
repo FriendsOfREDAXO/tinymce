@@ -19,7 +19,7 @@
     "@ephox/bedrock-server": "latest",
     "@ephox/mcagar": "latest",
     "@ephox/swag": "latest",
-    "@types/jquery": "^3.5.19",
+    "@types/jquery": "^3.5.33",
     "@types/mocha": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
