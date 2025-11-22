@@ -24,9 +24,28 @@ let rex5_picker_function = function (callback, value, meta) {
 
     /* Provide image and alt text for the image dialog */
     if (meta.filetype === 'image') {
-        let media_type = '';
-        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp'),
-            mediaPath = '/media/'; //'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
+                let media_type = '';
+                let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
+
+                // determine media path — prefer editor-specific settings (per-profile) if available
+                var mediaPath = '/media/';
+                try {
+                    var ed = (window.tinymce && window.tinymce.activeEditor) ? window.tinymce.activeEditor : null;
+                    if (ed && ed.settings) {
+                        // allow profile authors to specify image.rexmedia_path or rexmedia_path in profile extra
+                        if (ed.settings.image && typeof ed.settings.image.rexmedia_path !== 'undefined') {
+                            mediaPath = ed.settings.image.rexmedia_path;
+                        } else if (typeof ed.settings.rexmedia_path !== 'undefined') {
+                            mediaPath = ed.settings.rexmedia_path;
+                        } else if (typeof media_path !== 'undefined') {
+                            mediaPath = media_path;
+                        }
+                    } else if (typeof media_path !== 'undefined') {
+                        mediaPath = media_path;
+                    }
+                } catch (e) {
+                    mediaPath = '/media/';
+                }
 
         if (typeof media_type === 'undefined') {
             if (typeof media_path === 'undefined') {
@@ -46,8 +65,24 @@ let rex5_picker_function = function (callback, value, meta) {
     /* Provide alternative source and posted for the media dialog */
     if (meta.filetype === 'media') {
         // callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
-        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg'),
-            mediaPath = '/media/';//'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
+                let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg');
+                var mediaPath = '/media/';
+                try {
+                    var ed2 = (window.tinymce && window.tinymce.activeEditor) ? window.tinymce.activeEditor : null;
+                    if (ed2 && ed2.settings) {
+                        if (ed2.settings.image && typeof ed2.settings.image.rexmedia_path !== 'undefined') {
+                            mediaPath = ed2.settings.image.rexmedia_path;
+                        } else if (typeof ed2.settings.rexmedia_path !== 'undefined') {
+                            mediaPath = ed2.settings.rexmedia_path;
+                        } else if (typeof media_path !== 'undefined') {
+                            mediaPath = media_path;
+                        }
+                    } else if (typeof media_path !== 'undefined') {
+                        mediaPath = media_path;
+                    }
+                } catch (e) {
+                    mediaPath = '/media/';
+                }
 
         $(mediaPool).on('rex:selectMedia', function (event, filename) {
             event.preventDefault();
