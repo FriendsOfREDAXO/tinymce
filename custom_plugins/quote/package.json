@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "prepublishOnly": "yarn lint && yarn build",
+    "prepublishOnly": "pnpm lint && pnpm build",
     "lint": "eslint src/**/*.ts",
-    "build": "yarn build-grunt && yarn build-copy",
+    "build": "pnpm build-grunt && pnpm build-copy",
     "build-grunt": "grunt --force --fix",
     "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r langs/ dist/quote/langs/ && cp -r dist/quote/ ../../assets/scripts/tinymce/plugins/quote/",
     "test": "bedrock-auto -b chrome-headless -d src/test/ts/",
