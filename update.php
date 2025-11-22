@@ -38,9 +38,33 @@ $profiles = $sql->getArray();
 
 foreach ($profiles as $profile) {
     $extra = $profile['extra'];
+    $modified = false;
+    
     // Only add license_key if it doesn't already exist
     if (!empty($extra) && strpos($extra, 'license_key:') === false) {
         $extra = "license_key: 'gpl',\r\n" . $extra;
+        $modified = true;
+    }
+    
+    // Remove deprecated template plugin (removed in TinyMCE 7+)
+    if (!empty($extra)) {
+        $patterns = [
+            '/media template codesample/' => 'media codesample',
+            '/link template codesample/' => 'link codesample',
+            '/codesample template fontsize/' => 'codesample fontsize',
+            '/, template,/' => ', ',
+            '/, template\'/' => '\'',
+            '/\'template, /' => '\'',
+        ];
+        foreach ($patterns as $pattern => $replacement) {
+            if (preg_match($pattern, $extra)) {
+                $extra = preg_replace($pattern, $replacement, $extra);
+                $modified = true;
+            }
+        }
+    }
+    
+    if ($modified) {
         $update = rex_sql::factory();
         $update->setTable(rex::getTable('tinymce_profiles'));
         $update->setWhere(['id' => $profile['id']]);

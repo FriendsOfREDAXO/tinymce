@@ -45,6 +45,16 @@ echo $mform->show();
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE Doku](https://www.tiny.cloud/docs/) beachten.
 
+### TinyMCE 8 License Key
+
+Ab TinyMCE 8 ist ein `license_key` in der Konfiguration erforderlich. Für Open-Source-Nutzung:
+
+```
+license_key: 'gpl',
+```
+
+Dieser Schlüssel ist in allen Standard-Profilen bereits enthalten. Für eigene Profile muss dieser manuell hinzugefügt werden.
+
 ### Dark-Mode in die migrierten Profile übernehmen
 
 Folgenden Code in den Profilem ergänzen
@@ -57,7 +67,7 @@ content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 ## Licenses
 
 - AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md)
-- TinyMCE [MIT LICENSE](https://github.com/tinymce/tinymce/blob/develop/LICENSE.TXT)
+- TinyMCE: [GPL v2+ LICENSE](https://github.com/tinymce/tinymce/blob/develop/license.md) (ab Version 8.0)
 
 
 ## Author

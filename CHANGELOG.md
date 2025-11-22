@@ -8,7 +8,9 @@ Version 8.0.0
 * Update tinymce-i18n from 23.12.19 to 25.11.17
 * Add GPL license key configuration for TinyMCE 8 compatibility
 * Update language files path from langs6/ to langs/
+* Remove deprecated template plugin (removed in TinyMCE 7+)
 * Automatically add GPL license key to existing profiles during update
+* Automatically remove template plugin from existing profiles during update
 
 Version 6.1.1
 -------------------------------
