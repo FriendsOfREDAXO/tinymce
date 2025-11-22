@@ -21,7 +21,7 @@
     "@ephox/swag": "latest",
     "@types/jquery": "^3.5.19",
     "@types/mocha": "^8.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^4.13.0",
     "awesome-typescript-loader": "^5.2.1",
     "chai": "^4.2.0",
