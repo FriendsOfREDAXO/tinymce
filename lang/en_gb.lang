@@ -9,7 +9,7 @@ tinymce_profiles = Editor profile
 tinymce_help = Help
 
 # heading
-tinymce_subnavigation_header_title = TinyMCE for Redaxo 5
+tinymce_subnavigation_header_title = TinyMCE 8 for REDAXO 5
 tinymce_subnavigation_header_photo = Photo from %s to %s
 
 # profiles list & form

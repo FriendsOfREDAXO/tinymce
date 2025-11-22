@@ -9,7 +9,7 @@ tinymce_profiles = Editor Profile
 tinymce_help = Hilfe
 
 # heading
-tinymce_subnavigation_header_title = TinyMCE für Redaxo 5
+tinymce_subnavigation_header_title = TinyMCE 8 für REDAXO 5
 tinymce_subnavigation_header_photo = Foto von %s auf %s
 
 # profiles list & form
@@ -49,4 +49,4 @@ tinymce_upload_default = Image-Drag&Drop-Upload
 tinymce_upload_default_description = Bilder können via drag+drop in das Textfeld gesetzt werden
 
 #migration
-tinymce_migration_message = Die Profile des TinyMCE5-AddOns wurden migriert und TinyMCE5 deaktiviert. TinyMCE5 kann jetzt deinstalliert werden. Bitte die Readme beachten.
+tinymce_migration_message = Die Profile wurden für TinyMCE 8 migriert. Alte TinyMCE-Versionen (4/5/6) können jetzt deinstalliert werden. Bitte die Readme und das Changelog beachten.

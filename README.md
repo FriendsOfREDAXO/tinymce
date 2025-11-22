@@ -1,8 +1,8 @@
-# TinyMCE - REDAXO-AddOn 
+# TinyMCE 8 - REDAXO-AddOn 
 
-Stellt den TinyMCE im CMS REDAXO bereit. 
+Stellt den TinyMCE 8 Editor im CMS REDAXO bereit. 
 
-![Screenshot](https://github.com/FriendsOfREDAXO/tinymce5/blob/assets/screenshot6.png?raw=true)
+![Screenshot](https://github.com/FriendsOfREDAXO/tinymce/blob/assets/screenshot.png?raw=true)
 
 ## Anwendung: 
 
@@ -43,23 +43,36 @@ echo $mform->show();
 
 ## Konfiguration
 
-Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE Doku](https://www.tiny.cloud/docs/) beachten.
+Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 8 Doku](https://www.tiny.cloud/docs/tinymce/latest/) beachten.
+
+### Migration von TinyMCE 5/6 zu TinyMCE 8
+
+Bei der Aktualisierung von älteren Versionen (tinymce4, tinymce5, tinymce6) werden bestehende Profile automatisch migriert:
+
+- Der GPL-Lizenzschlüssel wird automatisch hinzugefügt
+- Das veraltete Template-Plugin wird automatisch entfernt
+- Alle anderen Einstellungen bleiben erhalten
+
+**Wichtig für eigene/benutzerdefinierte Profile:**
+- Fügen Sie `license_key: 'gpl',` am Anfang der Konfiguration hinzu
+- Entfernen Sie das `template` Plugin aus der Plugin-Liste und Toolbar
+- Prüfen Sie die Dark-Mode Konfiguration (siehe unten)
 
 ### TinyMCE 8 License Key
 
 Ab TinyMCE 8 ist ein `license_key` in der Konfiguration erforderlich. Für Open-Source-Nutzung:
 
-```
+```javascript
 license_key: 'gpl',
 ```
 
 Dieser Schlüssel ist in allen Standard-Profilen bereits enthalten. Für eigene Profile muss dieser manuell hinzugefügt werden.
 
-### Dark-Mode in die migrierten Profile übernehmen
+### Dark-Mode in die Profile übernehmen
 
-Folgenden Code in den Profilem ergänzen
+Für Dark-Mode Unterstützung folgenden Code in den Profilen verwenden:
 
-```
+```javascript
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
 content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 ```
