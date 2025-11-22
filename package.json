@@ -1,9 +1,26 @@
 {
+  "name": "redaxo-tinymce-addon",
+  "private": true,
+  "workspaces": [
+    "custom_plugins/*"
+  ],
   "dependencies": {
-    "tinymce": "^6",
-    "tinymce-i18n": "^23.9.11"
+    "tinymce": "^8",
+    "tinymce-i18n": "^25.11.17"
+  },
+  "devDependencies": {
+    "esbuild": "^0.18.0",
+    "fast-glob": "^3.2.12"
   },
   "scripts": {
-    "postinstall": "cp -r node_modules/tinymce/ assets/vendor/tinymce/ && cp -r node_modules/tinymce-i18n/langs6/ assets/vendor/tinymce/langs/"
+    "postinstall": "pnpm run -s vendor:copy",
+    "vendor:copy": "node ./scripts/vendor-copy.js",
+    "vendor:build": "node ./scripts/vendor-copy.js --staging",
+    "plugins:build": "node ./scripts/build-plugins.js",
+    "build:staging": "pnpm run vendor:build && pnpm run plugins:build -- --staging",
+    "build:sync": "node ./scripts/sync-build-to-assets.js",
+    "build": "pnpm run build:staging && pnpm run build:sync",
+    "clean-plugins": "node ./scripts/build-plugins.js --clean",
+    "clean-build": "node ./scripts/clean-build.js"
   }
 }

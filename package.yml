@@ -1,5 +1,5 @@
 package: tinymce
-version: '6.1.1'
+version: '8.0.0'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce/issues
 
@@ -11,6 +11,8 @@ page:
             title: 'translate:main'
         profiles:
             title: 'translate:profiles'
+        migration:
+            title: 'translate:migration'
         help:
             title: 'translate:help'
             subPath: README.md

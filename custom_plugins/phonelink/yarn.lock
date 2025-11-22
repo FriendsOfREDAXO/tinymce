@@ -6650,10 +6650,10 @@ tiny-lr@^1.1.1:
     object-assign "^4.1.0"
     qs "^6.4.0"
 
-tinymce@latest:
-  version "6.7.3"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-6.7.3.tgz#6289c5c7ec7298a84a7890ab866d88a193fa549a"
-  integrity sha512-J7WmYIi/gt1RvZ6Ap2oQiUjzAoiS9pfV+d4GnKuZuPu8agmlAEAInNmMvMjfCNBzHv4JnZXY7qlHUAI0IuYQVA==
+tinymce@^8.2.2:
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-8.2.2.tgz#0eafd350759871067b2692cde4078d6b179af1fc"
+  integrity sha512-CFDSZwciMvFGW2czK/Xig1HcOGpXI0qcQMIqaIcG2F4RuuTdf+LQTreyEZunAJoFTQ9L0KAugOqL7OA5TJkoAA==
 
 to-arraybuffer@^1.0.0:
   version "1.0.1"

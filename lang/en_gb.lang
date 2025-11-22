@@ -9,7 +9,7 @@ tinymce_profiles = Editor profile
 tinymce_help = Help
 
 # heading
-tinymce_subnavigation_header_title = TinyMCE for Redaxo 5
+tinymce_subnavigation_header_title = TinyMCE 8 for REDAXO 5
 tinymce_subnavigation_header_photo = Photo from %s to %s
 
 # profiles list & form
@@ -47,3 +47,33 @@ tinymce_media_manager_type = Media manager types
 tinymce_media_category = Media category
 tinymce_upload_default = Drag & drop image upload
 tinymce_upload_default_description = Images can be placed in the editor using drag & drop
+
+tinymce_migration_title = Profile migration & repair
+tinymce_migration_description = Check profiles for compatibility issues with TinyMCE 8 and repair them manually.
+tinymce_migration_actions = Actions
+tinymce_migration_repair = Repair
+tinymce_migration_repaired = Profile %s was repaired.
+tinymce_migration_no_changes = Profile %s required no changes.
+tinymce_migration_repaired_count = Repaired %s profile(s).
+
+migration = Migration
+tinymce_profile_name = Profile name
+
+tinymce_migration_repair_all = Repair all
+tinymce_migration_repair_all_confirm = Repair all profiles? This cannot be undone.
+tinymce_migration_needs_fix = Needs repair
+tinymce_migration_ok = OK
+
+tinymce_profile_export = Export
+tinymce_profile_export_filename = tinymce-profile-%s.json
+tinymce_profile_export_all = Export all
+tinymce_profile_export_all_filename = tinymce-profiles.json
+tinymce_profile_import = Import profiles
+tinymce_profile_import_button = Import
+tinymce_profile_import_success = Imported %s profiles, overwritten %s profiles, skipped %s profiles.
+tinymce_profile_import_overwrite = Overwrite existing profiles
+tinymce_profile_import_invalid = Uploaded file is not valid JSON.
+tinymce_profile_import_error = Import failed.
+tinymce_profile_export_error = Profile not found.
+tinymce_preview = Preview
+tinymce_loading = loading...

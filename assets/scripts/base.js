@@ -24,35 +24,30 @@ let rex5_picker_function = function (callback, value, meta) {
 
     /* Provide image and alt text for the image dialog */
     if (meta.filetype === 'image') {
-        let media_type = '';
-        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp'),
-            mediaPath = '/media/'; //'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
-
-        if (typeof media_type === 'undefined') {
-            if (typeof media_path === 'undefined') {
-                mediaPath = '/media/';
-            } else {
-                mediaPath = media_path;
-            }
-        }
+        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
 
         $(mediaPool).on('rex:selectMedia', function (event, filename) {
             event.preventDefault();
             mediaPool.close();
-            callback(mediaPath + filename, {alt: ''});
+            
+            // use media manager for raster images, direct path for SVG/TIFF/BMP
+            var extension = filename.split('.').pop().toLowerCase();
+            var useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
+            var imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
+            callback(imagePath, {alt: ''});
         });
     }
 
     /* Provide alternative source and posted for the media dialog */
     if (meta.filetype === 'media') {
-        // callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
-        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg'),
-            mediaPath = '/media/';//'/index.php?rex_media_type=' + media_type + '&rex_media_file=';
+        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg');
 
         $(mediaPool).on('rex:selectMedia', function (event, filename) {
             event.preventDefault();
             mediaPool.close();
-            callback(mediaPath + filename, {alt: ''});
+            
+            // use direct media path for video/audio files
+            callback('/media/' + filename, {alt: ''});
         });
     }
 };

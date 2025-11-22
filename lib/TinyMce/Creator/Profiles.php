@@ -19,8 +19,8 @@ class Profiles
 
     /** @api */
     public const ALLOWED_FIELDS = [
-        'toolbar' => ['|', 'styleselect', 'undo', 'redo', 'save', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'forecolor', 'backcolor', 'ltr', 'rtl', 'table', 'visualblocks', 'visualchars', 'link', 'image', 'media', 'codesample', 'template', 'fontselect', 'align', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'numlist', 'bullist', 'outdent', 'indent', 'removeformat', 'code', 'hr', 'print', 'preview', 'media', 'fullscreen', 'searchreplace', 'emoticons', 'visualaid', 'cut', 'copy', 'paste', 'pastetext', 'selectall', 'wordcount', 'charmap', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime'],
-        'plugins' => ['autoresize', 'save', 'print', 'preview', 'searchreplace', 'autolink', 'directionality', 'visualblocks', 'visualchars', 'fullscreen', 'image', 'link', 'media', 'template', 'codesample', 'table', 'charmap', 'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime', 'advlist', 'lists', 'wordcount', 'imagetools', 'textpattern', 'help', 'emoticons', 'paste', 'code'],
+        'toolbar' => ['|', 'styleselect', 'undo', 'redo', 'save', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'forecolor', 'backcolor', 'ltr', 'rtl', 'table', 'visualblocks', 'visualchars', 'link', 'image', 'media', 'codesample', 'fontselect', 'align', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'numlist', 'bullist', 'outdent', 'indent', 'removeformat', 'code', 'hr', 'print', 'preview', 'media', 'fullscreen', 'searchreplace', 'emoticons', 'visualaid', 'cut', 'copy', 'paste', 'pastetext', 'selectall', 'wordcount', 'charmap', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime'],
+        'plugins' => ['autoresize', 'save', 'print', 'preview', 'searchreplace', 'autolink', 'directionality', 'visualblocks', 'visualchars', 'fullscreen', 'image', 'link', 'media', 'codesample', 'table', 'charmap', 'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime', 'advlist', 'lists', 'wordcount', 'imagetools', 'textpattern', 'help', 'emoticons', 'paste', 'code'],
     ];
 
     /**
