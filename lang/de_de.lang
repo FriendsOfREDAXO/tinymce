@@ -50,3 +50,33 @@ tinymce_upload_default_description = Bilder können via drag+drop in das Textfel
 
 #migration
 tinymce_migration_message = Die Profile wurden für TinyMCE 8 migriert. Alte TinyMCE-Versionen (4/5/6) können jetzt deinstalliert werden. Bitte die Readme und das Changelog beachten.
+
+tinymce_migration_title = Profil-Migration & Reparatur
+tinymce_migration_description = Prüft vorhandene Profile auf Inkompatibilitäten mit TinyMCE 8 und erlaubt manuelle Reparatur.
+tinymce_migration_actions = Aktionen
+tinymce_migration_repair = Reparieren
+tinymce_migration_repaired = Profil %s wurde repariert.
+tinymce_migration_no_changes = Profil %s benötigt keine Änderungen.
+tinymce_migration_repaired_count = %s Profile wurden repariert.
+
+migration = Migration
+tinymce_profile_name = Profilname
+
+tinymce_migration_repair_all = Alle reparieren
+tinymce_migration_repair_all_confirm = Alle Profile reparieren? Dies kann nicht rückgängig gemacht werden.
+tinymce_migration_needs_fix = Reparatur nötig
+tinymce_migration_ok = Keine Aktion nötig
+
+tinymce_profile_export = Exportieren
+tinymce_profile_export_filename = tinymce-profil-%s.json
+tinymce_profile_export_all = Alle exportieren
+tinymce_profile_export_all_filename = tinymce-profiles.json
+tinymce_profile_import = Profile importieren
+tinymce_profile_import_button = Importieren
+tinymce_profile_import_success = %s Profile importiert, %s Profile überschrieben, %s Profile übersprungen.
+tinymce_profile_import_overwrite = Vorhandene Profile überschreiben
+tinymce_profile_import_invalid = Die hochgeladene Datei ist kein gültiges JSON.
+tinymce_profile_import_error = Import fehlgeschlagen.
+tinymce_profile_export_error = Profil nicht gefunden.
+tinymce_preview = Vorschau
+tinymce_loading = Lädt…

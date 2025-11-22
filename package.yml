@@ -11,6 +11,8 @@ page:
             title: 'translate:main'
         profiles:
             title: 'translate:profiles'
+        migration:
+            title: 'translate:migration'
         help:
             title: 'translate:help'
             subPath: README.md

@@ -89,3 +89,63 @@ content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 
 * http://www.redaxo.org
 * https://github.com/FriendsOfREDAXO
+
+## Entwickler: Aufbau / Aktualisieren der Assets
+
+In diesem Addon befinden sich Custom‑Plugins in `custom_plugins/`.
+
+Neu: staging‑ordner `build/` (empfohlen für CI / review) – der Workflow ist jetzt in zwei Phasen aufgeteilt:
+
+- Staging: `build/vendor/tinymce` (TinyMCE vendor) und `build/plugins/<plugin>` (custom plugins)
+- Sync: die Inhalte aus `build/` werden nach `assets/vendor/tinymce` und `assets/scripts/tinymce/plugins` kopiert (runtime)
+
+Empfohlen: pnpm (keine Verwendung von yarn erforderlich).
+
+Schnellstart (im Addon‑Verzeichnis):
+
+```bash
+# Installiere Abhängigkeiten (root add-on)
+pnpm install
+
+# Optional: beim initialen Setup die Workspaces (custom_plugins) mitinstallieren
+pnpm -w -r install
+
+# Staging: kopiert tinymce vendor in build/vendor und baut custom_plugins in build/plugins
+pnpm run build:staging
+
+# Sync: kopiert die staging ergebnisse in die runtime assets (assets/vendor + assets/scripts)
+pnpm run build:sync
+
+# Alles in einem (staging + sync)
+pnpm run build
+
+# Build artefakte löschen
+pnpm run clean-build
+```
+
+Der `build:staging` Task (intern):
+- `pnpm run vendor:build` → kopiert TinyMCE vendor nach `build/vendor/tinymce`
+- `pnpm run plugins:build -- --staging` → baut/copyt custom_plugins nach `build/plugins/<plugin>` und schreibt notwendige plugin files ebenfalls nach `build/vendor/tinymce/plugins/<plugin>`
+
+`pnpm run build:sync` kopiert die staging‑artefakte in die jeweiligen `assets/` Ordner, damit der Addon‑Runtime Pfad unverändert bleibt.
+
+Weitere Details / zusätzliche Änderungen:
+
+- Die Build‑Pipeline kopiert den TinyMCE Vendor in `assets/vendor/tinymce` und danach werden die custom plugin Artefakte sowohl nach `assets/scripts/tinymce/plugins/<plugin>` als auch **kopiert** in `assets/vendor/tinymce/plugins/<plugin>` damit TinyMCE die Plugins direkt über die normalen `plugins`-Pfadnamen verwenden kann (keine `external_plugins` Konfiguration nötig).
+- `node_modules` ist in `.gitignore` aufgenommen (lokale Abhängigkeiten werden nicht committet).
+- `yarn.lock` entfernt: Wir benutzen `pnpm` als bevorzugten Paketmanager für deterministische Workspaces; entferne aus dem Repo bitte alte `yarn.lock` Dateien falls vorhanden.
+
+Entfernte / nicht mehr benötigte Dateien:
+- Visual Profile Builder (wurde auf Wunsch entfernt) — UI/Assets/Tests sind nicht mehr im Addon enthalten.
+- Alte Tests/Prototypen für den Builder wurden gelöscht.
+
+Empfohlene CI Integration:
+- In CI (GitHub Actions) `pnpm install && pnpm run build` ausführen und sicherstellen, dass `assets/scripts/tinymce/plugins` und `assets/vendor/tinymce/plugins` die erwarteten Artefakte enthalten. Ein schneller Node‑Smoke‑Check kann automatisiert werden, um die wichtigsten Dateien nach dem Build zu prüfen.
+- Versucht, fehlende Builds mit `esbuild` zu bündeln/minifizieren und in `assets/scripts/tinymce/plugins/<plugin>/<plugin>.min.js` zu schreiben.
+- Kopiert vorhandene Sprachdateien aus `langs/` mit.
+
+Wenn du weiterhin yarn benutzt, funktionieren die meisten plugin-Builds ebenfalls — empfohlen ist aber pnpm wegen deterministischer Workspaces und schnellem Install/CI-Verhalten.
+
+Wichtig: Custom‑Plugin‑Artefakte werden unter `assets/scripts/tinymce/plugins/<plugin>` erstellt und zusätzlich in `assets/vendor/tinymce/plugins/<plugin>` abgelegt.
+Das erlaubt, die Plugins direkt per `plugins` Konfiguration zu nutzen, ohne `external_plugins` anzugeben — weil die Build‑Pipeline die minifizierten Plugin‑Artefakte zusätzlich in `assets/vendor/tinymce/plugins/<plugin>` legt.
+
