@@ -77,19 +77,6 @@ skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
 content_css: redaxo.theme.current === "dark" ? "dark" : "default",
 ```
 
-## Licenses
-
-- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md)
-- TinyMCE: [GPL v2+ LICENSE](https://github.com/tinymce/tinymce/blob/develop/license.md) (ab Version 8.0)
-
-
-## Author
-
-**Friends Of REDAXO**
-
-* http://www.redaxo.org
-* https://github.com/FriendsOfREDAXO
-
 ## Entwickler: Aufbau / Aktualisieren der Assets
 
 In diesem Addon befinden sich Custom‑Plugins in `custom_plugins/`.
@@ -149,3 +136,15 @@ Wenn du weiterhin yarn benutzt, funktionieren die meisten plugin-Builds ebenfall
 Wichtig: Custom‑Plugin‑Artefakte werden unter `assets/scripts/tinymce/plugins/<plugin>` erstellt und zusätzlich in `assets/vendor/tinymce/plugins/<plugin>` abgelegt.
 Das erlaubt, die Plugins direkt per `plugins` Konfiguration zu nutzen, ohne `external_plugins` anzugeben — weil die Build‑Pipeline die minifizierten Plugin‑Artefakte zusätzlich in `assets/vendor/tinymce/plugins/<plugin>` legt.
 
+## Licenses
+
+- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md)
+- TinyMCE: [GPL v2+ LICENSE](https://github.com/tinymce/tinymce/blob/develop/license.md) (ab Version 8.0)
+
+
+## Author
+
+**Friends Of REDAXO**
+
+* http://www.redaxo.org
+* https://github.com/FriendsOfREDAXO
