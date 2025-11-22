@@ -1,0 +1,102 @@
+name: Update TinyMCE Vendor
+
+on:
+  workflow_dispatch: # Manuelle Ausführung
+  schedule:
+    - cron: '0 2 * * 1' # Jeden Montag um 2:00 Uhr UTC
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Get current TinyMCE version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(jq -r '.dependencies.tinymce' package.json)
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current TinyMCE version: $CURRENT_VERSION"
+      
+      - name: Check for latest TinyMCE version
+        id: latest-version
+        run: |
+          LATEST_VERSION=$(npm view tinymce version)
+          echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest TinyMCE version: $LATEST_VERSION"
+      
+      - name: Compare versions
+        id: compare
+        run: |
+          CURRENT="${{ steps.current-version.outputs.current }}"
+          LATEST="${{ steps.latest-version.outputs.latest }}"
+          
+          # Entferne ^ oder ~ aus der aktuellen Version
+          CURRENT_CLEAN=$(echo "$CURRENT" | sed 's/[\^~]//g')
+          
+          if [ "$CURRENT_CLEAN" != "$LATEST" ]; then
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            echo "Update verfügbar: $CURRENT_CLEAN -> $LATEST"
+          else
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+            echo "TinyMCE ist bereits auf der neuesten Version"
+          fi
+      
+      - name: Update TinyMCE version
+        if: steps.compare.outputs.needs_update == 'true'
+        run: |
+          LATEST="${{ steps.latest-version.outputs.latest }}"
+          pnpm add tinymce@$LATEST
+      
+      - name: Install dependencies
+        if: steps.compare.outputs.needs_update == 'true'
+        run: pnpm install
+      
+      - name: Build assets
+        if: steps.compare.outputs.needs_update == 'true'
+        run: pnpm run build
+      
+      - name: Create Pull Request
+        if: steps.compare.outputs.needs_update == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update TinyMCE vendor zu Version ${{ steps.latest-version.outputs.latest }}"
+          branch: update/tinymce-${{ steps.latest-version.outputs.latest }}
+          delete-branch: true
+          title: "🔄 Update TinyMCE auf Version ${{ steps.latest-version.outputs.latest }}"
+          body: |
+            ## TinyMCE Vendor Update
+            
+            Dieses Update wurde automatisch durch die GitHub Action erstellt.
+            
+            **Änderungen:**
+            - TinyMCE Vendor: `${{ steps.current-version.outputs.current }}` → `${{ steps.latest-version.outputs.latest }}`
+            - Neue Assets wurden gebaut und committet
+            
+            **Bitte prüfen:**
+            - [ ] Changelog von TinyMCE durchlesen: https://www.tiny.cloud/docs/tinymce/latest/changelog/
+            - [ ] Breaking Changes prüfen
+            - [ ] Tests durchführen
+            - [ ] CHANGELOG.md aktualisieren
+            
+            ---
+            *Erstellt durch GitHub Action am ${{ github.run_id }}*
+          labels: |
+            dependencies
+            tinymce-update
+            automated
