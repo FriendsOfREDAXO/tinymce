@@ -36,8 +36,11 @@ jobs:
         id: latest-version
         run: |
           LATEST_VERSION=$(npm view tinymce version)
+          LATEST_I18N_VERSION=$(npm view tinymce-i18n version)
           echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "latest_i18n=$LATEST_I18N_VERSION" >> $GITHUB_OUTPUT
           echo "Latest TinyMCE version: $LATEST_VERSION"
+          echo "Latest TinyMCE i18n version: $LATEST_I18N_VERSION"
       
       - name: Compare versions
         id: compare
@@ -60,7 +63,8 @@ jobs:
         if: steps.compare.outputs.needs_update == 'true'
         run: |
           LATEST="${{ steps.latest-version.outputs.latest }}"
-          pnpm add tinymce@$LATEST
+          LATEST_I18N="${{ steps.latest-version.outputs.latest_i18n }}"
+          pnpm add tinymce@$LATEST tinymce-i18n@$LATEST_I18N
       
       - name: Install dependencies
         if: steps.compare.outputs.needs_update == 'true'
@@ -85,7 +89,10 @@ jobs:
             Dieses Update wurde automatisch durch die GitHub Action erstellt.
             
             **Änderungen:**
-            - TinyMCE Vendor: `${{ steps.current-version.outputs.current }}` → `${{ steps.latest-version.outputs.latest }}`
+            - TinyMCE: `${{ steps.current-version.outputs.current }}` → `${{ steps.latest-version.outputs.latest }}`
+            - TinyMCE i18n: → `${{ steps.latest-version.outputs.latest_i18n }}`
+            - `package.json` aktualisiert
+            - `pnpm-lock.yaml` aktualisiert
             - Neue Assets wurden gebaut und committet
             
             **Bitte prüfen:**
