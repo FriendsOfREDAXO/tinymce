@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,14 +29,23 @@ jobs:
         id: current-version
         run: |
           CURRENT_VERSION=$(jq -r '.dependencies.tinymce' package.json)
+          CURRENT_I18N_VERSION=$(jq -r '.dependencies."tinymce-i18n"' package.json)
           echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "current_i18n=$CURRENT_I18N_VERSION" >> $GITHUB_OUTPUT
           echo "Current TinyMCE version: $CURRENT_VERSION"
+          echo "Current TinyMCE i18n version: $CURRENT_I18N_VERSION"
       
       - name: Check for latest TinyMCE version
         id: latest-version
         run: |
-          LATEST_VERSION=$(npm view tinymce version)
-          LATEST_I18N_VERSION=$(npm view tinymce-i18n version)
+          LATEST_VERSION=$(npm view tinymce version || echo "ERROR")
+          LATEST_I18N_VERSION=$(npm view tinymce-i18n version || echo "ERROR")
+          
+          if [ "$LATEST_VERSION" = "ERROR" ] || [ "$LATEST_I18N_VERSION" = "ERROR" ]; then
+            echo "Error: Konnte Versionen nicht vom npm Registry abrufen"
+            exit 1
+          fi
+          
           echo "latest=$LATEST_VERSION" >> $GITHUB_OUTPUT
           echo "latest_i18n=$LATEST_I18N_VERSION" >> $GITHUB_OUTPUT
           echo "Latest TinyMCE version: $LATEST_VERSION"
@@ -46,17 +55,31 @@ jobs:
         id: compare
         run: |
           CURRENT="${{ steps.current-version.outputs.current }}"
+          CURRENT_I18N="${{ steps.current-version.outputs.current_i18n }}"
           LATEST="${{ steps.latest-version.outputs.latest }}"
+          LATEST_I18N="${{ steps.latest-version.outputs.latest_i18n }}"
           
-          # Entferne ^ oder ~ aus der aktuellen Version
+          # Entferne ^ oder ~ aus den aktuellen Versionen
           CURRENT_CLEAN=$(echo "$CURRENT" | sed 's/[\^~]//g')
+          CURRENT_I18N_CLEAN=$(echo "$CURRENT_I18N" | sed 's/[\^~]//g')
+          
+          NEEDS_UPDATE=false
           
           if [ "$CURRENT_CLEAN" != "$LATEST" ]; then
+            echo "TinyMCE Update verfügbar: $CURRENT_CLEAN -> $LATEST"
+            NEEDS_UPDATE=true
+          fi
+          
+          if [ "$CURRENT_I18N_CLEAN" != "$LATEST_I18N" ]; then
+            echo "TinyMCE i18n Update verfügbar: $CURRENT_I18N_CLEAN -> $LATEST_I18N"
+            NEEDS_UPDATE=true
+          fi
+          
+          if [ "$NEEDS_UPDATE" = true ]; then
             echo "needs_update=true" >> $GITHUB_OUTPUT
-            echo "Update verfügbar: $CURRENT_CLEAN -> $LATEST"
           else
             echo "needs_update=false" >> $GITHUB_OUTPUT
-            echo "TinyMCE ist bereits auf der neuesten Version"
+            echo "Alle Pakete sind bereits auf der neuesten Version"
           fi
       
       - name: Update TinyMCE version
@@ -65,10 +88,6 @@ jobs:
           LATEST="${{ steps.latest-version.outputs.latest }}"
           LATEST_I18N="${{ steps.latest-version.outputs.latest_i18n }}"
           pnpm add tinymce@$LATEST tinymce-i18n@$LATEST_I18N
-      
-      - name: Install dependencies
-        if: steps.compare.outputs.needs_update == 'true'
-        run: pnpm install
       
       - name: Build assets
         if: steps.compare.outputs.needs_update == 'true'
@@ -79,7 +98,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update TinyMCE vendor zu Version ${{ steps.latest-version.outputs.latest }}"
+          commit-message: "Update TinyMCE vendor auf Version ${{ steps.latest-version.outputs.latest }}"
           branch: update/tinymce-${{ steps.latest-version.outputs.latest }}
           delete-branch: true
           title: "🔄 Update TinyMCE auf Version ${{ steps.latest-version.outputs.latest }}"
@@ -90,7 +109,7 @@ jobs:
             
             **Änderungen:**
             - TinyMCE: `${{ steps.current-version.outputs.current }}` → `${{ steps.latest-version.outputs.latest }}`
-            - TinyMCE i18n: → `${{ steps.latest-version.outputs.latest_i18n }}`
+            - TinyMCE i18n: `${{ steps.current-version.outputs.current_i18n }}` → `${{ steps.latest-version.outputs.latest_i18n }}`
             - `package.json` aktualisiert
             - `pnpm-lock.yaml` aktualisiert
             - Neue Assets wurden gebaut und committet
