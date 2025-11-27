@@ -205,11 +205,6 @@ function initTinyMceProfileAssistant() {
         updateInput();
     }
 
-    function clearContextItems() {
-        $contextSelectedList.empty();
-        updateContextInput();
-    }
-
     // Initialize Context Items from default value
     const defaultContextItems = $contextInput.val().split(' ');
     defaultContextItems.forEach(addContextItem);
@@ -302,6 +297,8 @@ function initTinyMceProfileAssistant() {
         if (dragSrcEl !== this) {
             // Check if we are dropping in the same list
             if (dragSrcEl.parentNode !== this.parentNode) {
+                e.preventDefault();
+                e.stopPropagation();
                 return false;
             }
 
@@ -343,10 +340,10 @@ function initTinyMceProfileAssistant() {
     
     function addYFormRow(title = '', table = '', field = '', url = '') {
         const row = `<tr>
-            <td><input type="text" class="form-control input-sm yform-title" value="${title}" placeholder="Projekt verlinken"></td>
-            <td><input type="text" class="form-control input-sm yform-table" value="${table}" placeholder="rex_yf_project"></td>
-            <td><input type="text" class="form-control input-sm yform-field" value="${field}" placeholder="title"></td>
-            <td><input type="text" class="form-control input-sm yform-url" value="${url}" placeholder="/event:"></td>
+            <td><input type="text" class="form-control input-sm yform-title" value="${title}" placeholder="${i18n.yform_title_placeholder || 'Projekt verlinken'}"></td>
+            <td><input type="text" class="form-control input-sm yform-table" value="${table}" placeholder="${i18n.yform_table_placeholder || 'rex_yf_project'}"></td>
+            <td><input type="text" class="form-control input-sm yform-field" value="${field}" placeholder="${i18n.yform_field_placeholder || 'title'}"></td>
+            <td><input type="text" class="form-control input-sm yform-url" value="${url}" placeholder="${i18n.yform_url_placeholder || '/event:'}"></td>
             <td><button type="button" class="btn btn-danger btn-xs yform-remove"><i class="rex-icon fa-times"></i></button></td>
         </tr>`;
         $yformTable.append(row);
@@ -476,8 +473,9 @@ function generateConfig($textarea, $builderBody) {
         if (externalPlugins[p]) {
             // Fix for relative paths starting with ..
             let pluginUrl = externalPlugins[p];
-            if (pluginUrl.startsWith('..')) {
-                pluginUrl = pluginUrl.replace(/^\.\./, '');
+            // Remove all leading ../ segments from pluginUrl
+            while (pluginUrl.startsWith('../')) {
+                pluginUrl = pluginUrl.substring(3);
             }
             activeExternalPlugins[p] = pluginUrl;
         }

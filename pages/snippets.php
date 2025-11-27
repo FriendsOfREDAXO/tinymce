@@ -4,11 +4,15 @@ $func = rex_request('func', 'string');
 $id = rex_request('id', 'int');
 
 if ($func == 'delete' && $id > 0) {
-    $sql = rex_sql::factory();
-    $sql->setTable(rex::getTable('tinymce_snippets'));
-    $sql->setWhere(['id' => $id]);
-    $sql->delete();
-    echo rex_view::success(rex_i18n::msg('tinymce_snippets_deleted'));
+    if (!rex_csrf_token::factory('tinymce_snippets')->isValid()) {
+        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
+        $sql = rex_sql::factory();
+        $sql->setTable(rex::getTable('tinymce_snippets'));
+        $sql->setWhere(['id' => $id]);
+        $sql->delete();
+        echo rex_view::success(rex_i18n::msg('tinymce_snippets_deleted'));
+    }
     $func = '';
 }
 
@@ -45,7 +49,7 @@ if ($func == 'add' || $func == 'edit') {
     echo $fragment->parse('core/page/section.php');
 
 } else {
-    $list = rex_list::factory('SELECT id, name, content FROM ' . rex::getTable('tinymce_snippets') . ' ORDER BY name ASC');
+    $list = rex_list::factory(sprintf('SELECT id, name, content FROM %s ORDER BY name ASC', rex::getTable('tinymce_snippets')));
     $list->addTableAttribute('class', 'table-striped');
 
     $thIcon = '<a href="' . $list->getUrl(['func' => 'add']) . '" title="' . rex_i18n::msg('tinymce_snippets_add') . '"><i class="rex-icon rex-icon-add-action"></i></a>';
@@ -66,7 +70,7 @@ if ($func == 'add' || $func == 'edit') {
     });
 
     $list->addColumn(rex_i18n::msg('delete'), rex_i18n::msg('delete'));
-    $list->setColumnParams(rex_i18n::msg('delete'), ['func' => 'delete', 'id' => '###id###']);
+    $list->setColumnParams(rex_i18n::msg('delete'), ['func' => 'delete', 'id' => '###id###'] + rex_csrf_token::factory('tinymce_snippets')->getUrlParams());
     $list->addLinkAttribute(rex_i18n::msg('delete'), 'onclick', 'return confirm(\'' . rex_i18n::msg('delete') . ' ?\')');
 
     $content = $list->get();

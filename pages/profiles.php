@@ -14,7 +14,9 @@ $message = '';
 // Export single profile or all profiles as JSON
     if ('export' === $func && $id > 0) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, description, extra FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('id, name, description, extra');
     $row = $sql->getArray();
     if (empty($row)) {
         echo rex_view::error(rex_i18n::msg('tinymce_profile_export_error'));
@@ -31,7 +33,8 @@ $message = '';
 
 if ('export_all' === $func) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, description, extra FROM ' . $profileTable);
+    $sql->setTable($profileTable);
+    $sql->select('id, name, description, extra');
     $rows = $sql->getArray();
     $payload = json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     rex_response::cleanOutputBuffers();
@@ -44,7 +47,9 @@ if ('export_all' === $func) {
 // Return profile JSON for preview via XHR
 if ('preview' === $func && $id > 0) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, description, extra FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('id, name, description, extra');
     $row = $sql->getArray();
     if (empty($row)) {
         rex_response::cleanOutputBuffers();
@@ -196,9 +201,11 @@ if ('clone' === $func) {
 
 if ('delete' === $func) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT name FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('name');
     if ($sql->getRows() > 0 && $sql->getValue('name') === 'full') {
-        echo rex_view::error('Das Profil "full" darf nicht gelöscht werden.');
+        echo rex_view::error(rex_i18n::msg('tinymce_profile_full_delete_error'));
     } else {
         $message = TinyMceListHelper::deleteData($profileTable, $id);
         rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));

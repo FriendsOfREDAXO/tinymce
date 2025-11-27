@@ -47,4 +47,3 @@ const setup = (editor: any, url: string): void => {
 
 tinymce.PluginManager.add('snippets', setup);
 
-export default () => {};
