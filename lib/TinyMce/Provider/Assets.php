@@ -53,8 +53,12 @@ class Assets
                 'toolbar_result' => \rex_i18n::msg('tinymce_toolbar_result'),
                 'common_settings' => \rex_i18n::msg('tinymce_common_settings'),
                 'height' => \rex_i18n::msg('tinymce_height'),
+                'menubar' => \rex_i18n::msg('tinymce_menubar'),
                 'language' => \rex_i18n::msg('tinymce_language'),
                 'advanced_settings' => \rex_i18n::msg('tinymce_advanced_settings'),
+                'context_toolbar' => \rex_i18n::msg('tinymce_context_toolbar'),
+                'context_toolbar_help' => \rex_i18n::msg('tinymce_context_toolbar_help'),
+                'auto_hide_toolbar' => \rex_i18n::msg('tinymce_auto_hide_toolbar'),
                 'image_caption' => \rex_i18n::msg('tinymce_image_caption'),
                 'image_uploadtab' => \rex_i18n::msg('tinymce_image_uploadtab'),
                 'media_manager_type' => \rex_i18n::msg('tinymce_media_manager_type'),
@@ -77,6 +81,27 @@ class Assets
             ];
             
             \rex_view::setJsProperty('tinymceProfileI18n', $i18n);
+
+            $options = [
+                'plugins' => [
+                    'preview', 'searchreplace', 'autolink', 'directionality', 'visualblocks', 'visualchars', 'fullscreen',
+                    'image', 'link', 'media', 'codesample', 'table', 'charmap', 'pagebreak', 'nonbreaking', 'anchor',
+                    'insertdatetime', 'advlist', 'lists', 'wordcount', 'help', 'emoticons', 'code', 'save',
+                    'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars', 'snippets'
+                ],
+                'toolbar' => [
+                    'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
+                    'forecolor', 'backcolor', 'removeformat', 'blocks', 'fontfamily', 'fontsize',
+                    'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
+                    'table', 'link', 'image', 'media', 'codesample', 'fullscreen', 'preview', 'code', 'help',
+                    'accordion', 'restoredraft', 'snippets'
+                ],
+                'external_plugins' => []
+            ];
+
+            $options = \rex_extension::registerPoint(new \rex_extension_point('TINYMCE_PROFILE_OPTIONS', $options));
+
+            \rex_view::setJsProperty('tinymceProfileOptions', $options);
 
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile_builder.js'));

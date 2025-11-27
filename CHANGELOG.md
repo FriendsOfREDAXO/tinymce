@@ -4,6 +4,19 @@ Changelog
 Version 8.0.0
 -------------------------------
 
+### Neue Features
+* **Snippets (Textbausteine):** Neues Plugin zur Verwaltung und Nutzung von HTML-Snippets.
+    * Eigene Backend-Seite zur Verwaltung der Snippets.
+    * Dynamisches Nachladen der Snippets im Editor via API (`rex_api_tinymce_get_snippets`).
+    * Integration in den Profil-Assistenten.
+* **Link YForm Plugin:**
+    * Konfigurations-Assistent im Profil-Builder hinzugefügt.
+    * Dokumentation für Output-Filter und Konfiguration erweitert.
+* **Entwickler-Tools:**
+    * Neue `PluginRegistry` Klasse zur einfachen Registrierung externer Plugins.
+    * Eigener "Entwickler"-Reiter im Backend mit Dokumentation.
+    * `DEVS.md` hinzugefügt.
+
 ### TinyMCE 8.2.2 Update
 * Upgrade auf TinyMCE 8.2.2
 * TinyMCE i18n auf 25.11.17 aktualisiert
@@ -15,6 +28,7 @@ Version 8.0.0
 * **pnpm statt yarn** - Modernes Package-Management mit Workspaces
 * Neue einfache build.js Scripts für custom_plugins
 * Deutlich schnellere Build-Zeiten (< 1 Sekunde pro Plugin)
+* Fix: Plugins werden nun korrekt sowohl nach `assets/scripts` als auch `assets/vendor` kopiert, um "Dynamic require" Fehler zu vermeiden.
 
 ### Media Manager Integration
 * Automatische Media Manager Integration für Bildtypen (JPG, PNG, GIF, WebP)
@@ -33,6 +47,7 @@ Version 8.0.0
 * Profile-Preview direkt in der Übersicht
 * Verbesserte UI und Fehlervermeidungen
 * Profile-JavaScript wird dynamisch generiert
+* Profil "full" ist nun vor versehentlichem Löschen geschützt.
 
 ### Custom Plugins
 * link_yform, phonelink, quote auf esbuild migriert

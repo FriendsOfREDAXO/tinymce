@@ -13,7 +13,10 @@ $content = '
             <a href="https://www.tiny.cloud/docs/tinymce/latest/" target="_blank" rel="noreferrer noopener">' . rex_i18n::msg('tinymce_links_documentation') . '</a> |
             <a href="https://github.com/FriendsOfREDAXO/tinymce" target="_blank" rel="noreferrer noopener">' . rex_i18n::msg('tinymce_links_github') . '</a>
        </p>
+    </div>
+</div>
 ';
+
 
 $fragment = new rex_fragment();
 $fragment->setVar('body', $content, false);

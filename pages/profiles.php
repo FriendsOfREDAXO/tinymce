@@ -195,8 +195,14 @@ if ('clone' === $func) {
 }
 
 if ('delete' === $func) {
-    $message = TinyMceListHelper::deleteData($profileTable, $id);
-    rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
+    $sql = rex_sql::factory();
+    $sql->setQuery('SELECT name FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    if ($sql->getRows() > 0 && $sql->getValue('name') === 'full') {
+        echo rex_view::error('Das Profil "full" darf nicht gelöscht werden.');
+    } else {
+        $message = TinyMceListHelper::deleteData($profileTable, $id);
+        rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
+    }
     $func = '';
 }
 
@@ -255,9 +261,13 @@ if ('' === $func) {
             . '<li><a href="#" class="tinymce-preview" data-url="' . $list->getUrl(['func' => 'preview', 'id' => $id]) . '">' . rex_i18n::msg('tinymce_preview') . '</a></li>'
             . '<li class="dropdown-divider"></li>'
             . '<li><a href="' . $exportUrl . '">' . rex_i18n::msg('tinymce_profile_export') . '</a></li>'
-            . '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>'
-            . '<li><a href="' . $deleteUrl . '" data-confirm="' . rex_i18n::msg('delete') . ' ?">' . rex_i18n::msg('delete') . '</a></li>'
-            . '</ul></div>';
+            . '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>';
+
+        if ($list->getValue('name') !== 'full') {
+            $dropdown .= '<li><a href="' . $deleteUrl . '" data-confirm="' . rex_i18n::msg('delete') . ' ?">' . rex_i18n::msg('delete') . '</a></li>';
+        }
+
+        $dropdown .= '</ul></div>';
 
         $btnGroup .= $dropdown . '</div>';
         return $btnGroup;

@@ -8,7 +8,7 @@ $(document).on('rex:ready', function (event, container) {
 
         setTimeout(function() {
             let editor = document.querySelector('textarea.form-control.tinymce-options');
-            if (editor.nextElementSibling.classList.contains('CodeMirror')) {
+            if (editor && editor.nextElementSibling && editor.nextElementSibling.classList.contains('CodeMirror')) {
                 cm = editor.nextElementSibling.CodeMirror;
                 cm.on('change', (args) => {
                     tinymceValidateJson(editor, cm.getValue());

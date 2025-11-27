@@ -1,4 +1,3 @@
-import { Type } from '@ephox/katamari';
 import {DOMUtils, Editor, TinyMCE} from 'tinymce';
 
 declare const tinymce: TinyMCE;
@@ -75,7 +74,7 @@ const setup = (editor: Editor): void => {
     }
 
     const isImageFigure = (elm: Element | null): elm is HTMLElement =>
-        Type.isNonNullable(elm) && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className);
+        elm !== null && elm !== undefined && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className);
 
     const linkImageFigure = (dom: DOMUtils, fig: Element, attrs: Record<string, string | null>) => {
         const img = dom.select('img', fig)[0];
