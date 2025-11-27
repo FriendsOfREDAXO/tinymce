@@ -31,14 +31,17 @@ function initTinyMceProfileAssistant() {
     const pluginsList = [
         'preview', 'searchreplace', 'autolink', 'directionality', 'visualblocks', 'visualchars', 'fullscreen', 
         'image', 'link', 'media', 'codesample', 'table', 'charmap', 'pagebreak', 'nonbreaking', 'anchor', 
-        'insertdatetime', 'advlist', 'lists', 'wordcount', 'help', 'emoticons', 'code', 'save'
+        'insertdatetime', 'advlist', 'lists', 'wordcount', 'help', 'emoticons', 'code', 'save',
+        'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars',
+        'link_yform', 'phonelink', 'quote'
     ];
 
     const toolbarButtons = [
         'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 
         'forecolor', 'backcolor', 'removeformat', 'blocks', 'fontfamily', 'fontsize', 
         'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist', 
-        'table', 'link', 'image', 'media', 'codesample', 'fullscreen', 'preview', 'code', 'help'
+        'table', 'link', 'image', 'media', 'codesample', 'fullscreen', 'preview', 'code', 'help',
+        'accordion', 'restoredraft', 'link_yform', 'phonelink', 'quote'
     ];
 
     // Plugins Section
@@ -174,7 +177,7 @@ function initTinyMceProfileAssistant() {
     $builderBody.find('.builder-preset-full').on('click', function() {
         setPlugins(pluginsList);
         clearItems();
-        ['undo', 'redo', '|', 'blocks', 'fontsize', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'forecolor', 'backcolor', '|', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', '|', 'bullist', 'numlist', 'outdent', 'indent', '|', 'link', 'image', 'media', 'table', 'codesample', '|', 'removeformat', 'code', 'fullscreen'].forEach(addItem);
+        ['undo', 'redo', '|', 'blocks', 'fontsize', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'forecolor', 'backcolor', '|', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', '|', 'bullist', 'numlist', 'outdent', 'indent', '|', 'link', 'link_yform', 'phonelink', 'quote', 'image', 'media', 'table', 'codesample', 'accordion', '|', 'removeformat', 'code', 'fullscreen'].forEach(addItem);
     });
 
     // Add Item Click
