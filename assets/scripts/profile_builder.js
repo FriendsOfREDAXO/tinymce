@@ -7,8 +7,10 @@ $(document).on('rex:ready', function (event, container) {
 
 function initTinyMceProfileAssistant() {
     const $textarea = $('textarea.tinymce-options');
-    const $builderContainer = $('<div id="tinymce-profile-assistant" class="panel panel-default" style="display:none; margin-bottom: 20px;"></div>');
+    const $builderContainer = $('<div id="tinymce-profile-assistant" class="panel panel-info" style="display:none; margin-bottom: 20px;"></div>');
+    const $builderHeader = $('<div class="panel-heading"><h3 class="panel-title"><i class="rex-icon fa-magic"></i> Profile Assistant</h3></div>');
     const $builderBody = $('<div class="panel-body"></div>');
+    $builderContainer.append($builderHeader);
     $builderContainer.append($builderBody);
     
     // Toggle Button
@@ -21,11 +23,11 @@ function initTinyMceProfileAssistant() {
     $textarea.before($builderContainer);
 
     // Presets
-    let presetsHtml = '<h4>Presets</h4><div class="btn-group">';
-    presetsHtml += '<button type="button" class="btn btn-default builder-preset-simple">Simple</button>';
-    presetsHtml += '<button type="button" class="btn btn-default builder-preset-standard">Standard</button>';
-    presetsHtml += '<button type="button" class="btn btn-default builder-preset-full">Full</button>';
-    presetsHtml += '</div><hr>';
+    let presetsHtml = '<legend>Presets</legend><div class="btn-group btn-group-justified">';
+    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-simple"><i class="rex-icon fa-minus"></i> Simple</button></div>';
+    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-standard"><i class="rex-icon fa-bars"></i> Standard</button></div>';
+    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-full"><i class="rex-icon fa-th"></i> Full</button></div>';
+    presetsHtml += '</div><br>';
 
     // Builder UI
     const pluginsList = [
@@ -45,38 +47,38 @@ function initTinyMceProfileAssistant() {
     ];
 
     // Plugins Section
-    let pluginsHtml = '<h4>Plugins</h4><div class="row">';
+    let pluginsHtml = '<legend>Plugins</legend><div class="row">';
     pluginsList.forEach(plugin => {
-        pluginsHtml += `<div class="col-md-3"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${plugin}</label></div>`;
+        pluginsHtml += `<div class="col-md-3 col-sm-4"><div class="checkbox"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${plugin}</label></div></div>`;
     });
-    pluginsHtml += '</div><hr>';
+    pluginsHtml += '</div><br>';
 
     // Toolbar Section
-    let toolbarHtml = '<h4>Toolbar</h4><p class="help-block">Click to add items. Drag and drop selected items to reorder.</p>';
+    let toolbarHtml = '<legend>Toolbar</legend><p class="help-block">Click to add items. Drag and drop selected items to reorder.</p>';
     
     // Available Buttons
     toolbarHtml += '<div class="panel panel-default"><div class="panel-heading">Available Items</div><div class="panel-body" id="builder-available-items">';
     toolbarButtons.forEach(btn => {
-        toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="${btn}">${btn}</button> `;
+        toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="${btn}" style="margin-bottom: 4px;">${btn}</button> `;
     });
     // Add Separator Button
-    toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="|"><strong>| (Separator)</strong></button> `;
+    toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (Separator)</strong></button> `;
     toolbarHtml += '</div></div>';
 
     // Selected Items (Sortable)
-    toolbarHtml += '<div class="panel panel-default"><div class="panel-heading">Selected Toolbar (Drag to reorder)</div><div class="panel-body"><ul id="builder-selected-items" class="list-inline"></ul></div></div>';
+    toolbarHtml += '<div class="panel panel-primary"><div class="panel-heading">Selected Toolbar (Drag to reorder)</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
     
     // Toolbar Input (Result)
     toolbarHtml += '<div class="form-group"><label>Toolbar String (Result)</label><input type="text" class="form-control builder-toolbar-input" readonly></div>';
 
     // Common Settings
-    let settingsHtml = '<hr><h4>Common Settings</h4><div class="row">';
+    let settingsHtml = '<br><legend>Common Settings</legend><div class="row">';
     settingsHtml += '<div class="col-md-6"><div class="form-group"><label>Height</label><input type="number" class="form-control builder-height" value="400"></div></div>';
     settingsHtml += '<div class="col-md-6"><div class="form-group"><label>Language</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
     settingsHtml += '</div>';
 
     // Advanced Settings
-    settingsHtml += '<hr><h4>Advanced Settings</h4><div class="row">';
+    settingsHtml += '<br><legend>Advanced Settings</legend><div class="row">';
     
     // Image Options
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-caption" checked> Image Caption</label></div></div>';
@@ -102,7 +104,7 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '</div>';
 
     // Extras (Codesample, RelList, TOC)
-    settingsHtml += '<hr><h4>Extras (Defaults)</h4><div class="row">';
+    settingsHtml += '<br><legend>Extras (Defaults)</legend><div class="row">';
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-codesample" checked> Default Codesample Languages</label></div></div>';
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-rellist" checked> Default Rel List</label></div></div>';
     settingsHtml += '</div>';
@@ -115,14 +117,14 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '</div>';
 
     // Apply Button
-    let actionsHtml = '<hr><button type="button" class="btn btn-primary builder-apply">Generate JSON</button> <span class="text-muted">Overwrites existing JSON!</span>';
+    let actionsHtml = '<hr><button type="button" class="btn btn-save builder-apply"><i class="rex-icon fa-check"></i> Generate JSON</button> <span class="text-muted">Overwrites existing JSON!</span>';
 
     $builderBody.html(presetsHtml + pluginsHtml + toolbarHtml + settingsHtml + actionsHtml);
 
     // Styles for Sortable
     const style = document.createElement('style');
     style.innerHTML = `
-        #builder-selected-items { min-height: 40px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; }
+        #builder-selected-items { min-height: 40px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; background: #fff; }
         #builder-selected-items li { cursor: move; margin-bottom: 5px; background: #324050; color: #fff; border: 1px solid #202b35; padding: 5px 10px; border-radius: 3px; display: inline-block; }
         #builder-selected-items li:hover { background: #283340; border-color: #000; }
         #builder-selected-items li .remove-item { margin-left: 8px; color: #ff9999; cursor: pointer; font-weight: bold; }
