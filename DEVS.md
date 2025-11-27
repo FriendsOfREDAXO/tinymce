@@ -106,3 +106,37 @@ Das `link_yform` Plugin speichert Links zu YForm-Datensätzen als interne Platzh
 1.  **Namensräume:** Verwenden Sie für Ihre Plugin-Namen einen Präfix (z.B. `addonname_pluginname`), um Konflikte mit anderen Plugins zu vermeiden.
 2.  **Assets:** Legen Sie Ihre Plugin-Dateien im `assets`-Ordner Ihres Addons ab und nutzen Sie `rex_url::addonAssets()`, um die URL zu generieren.
 3.  **Abhängigkeiten:** Prüfen Sie mit `rex_addon::get('tinymce')->isAvailable()`, ob das TinyMCE-Addon installiert und aktiviert ist, bevor Sie Code ausführen, der darauf zugreift.
+
+## Profile programmatisch erstellen
+
+Sie können TinyMCE-Profile programmatisch erstellen oder aktualisieren, z.B. während der Installation Ihres Addons. Nutzen Sie dazu die Klasse `FriendsOfRedaxo\TinyMce\Utils\ProfileHelper`.
+
+### Beispiel: Profil in `install.php` anlegen
+
+```php
+use FriendsOfRedaxo\TinyMce\Utils\ProfileHelper;
+
+if (rex_addon::get('tinymce')->isAvailable()) {
+    ProfileHelper::ensureProfile(
+        'mein_profil',
+        'Beschreibung meines Profils',
+        [
+            'plugins' => 'autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table wordcount',
+            'toolbar' => 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            'extra' => '{"height": 500}',
+            'mediatype' => '',
+            'mediapath' => '',
+            'mediacategory' => 0,
+            'upload_default' => '',
+        ],
+        false // Setzen Sie dies auf true, um ein existierendes Profil zu überschreiben
+    );
+}
+```
+
+### Parameter von `ensureProfile`
+
+*   **`$name`** (string): Der eindeutige Name des Profils (Schlüssel).
+*   **`$description`** (string): Eine Beschreibung für das Profil.
+*   **`$data`** (array): Ein assoziatives Array mit den Konfigurationsdaten. Fehlende Schlüssel werden mit Standardwerten aufgefüllt.
+*   **`$forceUpdate`** (bool): Wenn `true`, werden die Daten eines existierenden Profils überschrieben. Wenn `false` (Standard), wird nichts getan, wenn das Profil bereits existiert.
