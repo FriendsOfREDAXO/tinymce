@@ -6,15 +6,16 @@ $(document).on('rex:ready', function (event, container) {
 });
 
 function initTinyMceProfileAssistant() {
+    const i18n = rex.tinymceProfileI18n || {};
     const $textarea = $('textarea.tinymce-options');
     const $builderContainer = $('<div id="tinymce-profile-assistant" class="panel panel-info" style="display:none; margin-bottom: 20px;"></div>');
-    const $builderHeader = $('<div class="panel-heading"><h3 class="panel-title"><i class="rex-icon fa-magic"></i> Profile Assistant</h3></div>');
+    const $builderHeader = $('<div class="panel-heading"><h3 class="panel-title"><i class="rex-icon fa-magic"></i> ' + (i18n.profile_assistant || 'Profile Assistant') + '</h3></div>');
     const $builderBody = $('<div class="panel-body"></div>');
     $builderContainer.append($builderHeader);
     $builderContainer.append($builderBody);
     
     // Toggle Button
-    const $toggleBtn = $('<button type="button" class="btn btn-info" style="margin-bottom: 10px;"><i class="rex-icon fa-magic"></i> Profile Assistant</button>');
+    const $toggleBtn = $('<button type="button" class="btn btn-info" style="margin-bottom: 10px;"><i class="rex-icon fa-magic"></i> ' + (i18n.profile_assistant || 'Profile Assistant') + '</button>');
     $toggleBtn.on('click', function() {
         $builderContainer.slideToggle();
     });
@@ -23,10 +24,10 @@ function initTinyMceProfileAssistant() {
     $textarea.before($builderContainer);
 
     // Presets
-    let presetsHtml = '<legend>Presets</legend><div class="btn-group btn-group-justified">';
-    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-simple"><i class="rex-icon fa-minus"></i> Simple</button></div>';
-    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-standard"><i class="rex-icon fa-bars"></i> Standard</button></div>';
-    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-full"><i class="rex-icon fa-th"></i> Full</button></div>';
+    let presetsHtml = '<legend>' + (i18n.presets || 'Presets') + '</legend><div class="btn-group btn-group-justified">';
+    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-simple"><i class="rex-icon fa-minus"></i> ' + (i18n.simple || 'Simple') + '</button></div>';
+    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-standard"><i class="rex-icon fa-bars"></i> ' + (i18n.standard || 'Standard') + '</button></div>';
+    presetsHtml += '<div class="btn-group"><button type="button" class="btn btn-default builder-preset-full"><i class="rex-icon fa-th"></i> ' + (i18n.full || 'Full') + '</button></div>';
     presetsHtml += '</div><br>';
 
     // Builder UI
@@ -47,77 +48,77 @@ function initTinyMceProfileAssistant() {
     ];
 
     // Plugins Section
-    let pluginsHtml = '<legend>Plugins</legend><div class="row">';
+    let pluginsHtml = '<legend>' + (i18n.plugins || 'Plugins') + '</legend><div class="row">';
     pluginsList.forEach(plugin => {
         pluginsHtml += `<div class="col-md-3 col-sm-4"><div class="checkbox"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${plugin}</label></div></div>`;
     });
     pluginsHtml += '</div><br>';
 
     // Toolbar Section
-    let toolbarHtml = '<legend>Toolbar</legend><p class="help-block">Click to add items. Drag and drop selected items to reorder.</p>';
+    let toolbarHtml = '<legend>' + (i18n.toolbar || 'Toolbar') + '</legend><p class="help-block">' + (i18n.toolbar_help || 'Click to add items. Drag and drop selected items to reorder.') + '</p>';
     
     // Available Buttons
-    toolbarHtml += '<div class="panel panel-default"><div class="panel-heading">Available Items</div><div class="panel-body" id="builder-available-items">';
+    toolbarHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.available_items || 'Available Items') + '</div><div class="panel-body" id="builder-available-items">';
     toolbarButtons.forEach(btn => {
         toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="${btn}" style="margin-bottom: 4px;">${btn}</button> `;
     });
     // Add Separator Button
-    toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (Separator)</strong></button> `;
+    toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (${i18n.separator || 'Separator'})</strong></button> `;
     toolbarHtml += '</div></div>';
 
     // Selected Items (Sortable)
-    toolbarHtml += '<div class="panel panel-primary"><div class="panel-heading">Selected Toolbar (Drag to reorder)</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
+    toolbarHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected Toolbar (Drag to reorder)') + '</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
     
     // Toolbar Input (Result)
-    toolbarHtml += '<div class="form-group"><label>Toolbar String (Result)</label><input type="text" class="form-control builder-toolbar-input" readonly></div>';
+    toolbarHtml += '<div class="form-group"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><input type="text" class="form-control builder-toolbar-input" readonly></div>';
 
     // Common Settings
-    let settingsHtml = '<br><legend>Common Settings</legend><div class="row">';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>Height</label><input type="number" class="form-control builder-height" value="400"></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>Language</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
+    let settingsHtml = '<br><legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="number" class="form-control builder-height" value="400"></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.language || 'Language') + '</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
     settingsHtml += '</div>';
 
     // Advanced Settings
-    settingsHtml += '<br><legend>Advanced Settings</legend><div class="row">';
+    settingsHtml += '<br><legend>' + (i18n.advanced_settings || 'Advanced Settings') + '</legend><div class="row">';
     
     // Image Options
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-caption" checked> Image Caption</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-uploadtab"> Image Upload Tab</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Media Manager Type</label><input type="text" class="form-control builder-media-type" placeholder="tiny"></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-caption" checked> ' + (i18n.image_caption || 'Image Caption') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-uploadtab"> ' + (i18n.image_uploadtab || 'Image Upload Tab') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.media_manager_type || 'Media Manager Type') + '</label><input type="text" class="form-control builder-media-type" placeholder="tiny"></div></div>';
     
     // URL Options
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-relative-urls"> Relative URLs</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-remove-script-host" checked> Remove Script Host</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls" checked> Convert URLs</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-relative-urls"> ' + (i18n.relative_urls || 'Relative URLs') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-remove-script-host" checked> ' + (i18n.remove_script_host || 'Remove Script Host') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls" checked> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
     
     settingsHtml += '</div><div class="row" style="margin-top:10px;">';
     
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>Document Base URL</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>Entity Encoding</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.document_base_url || 'Document Base URL') + '</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.entity_encoding || 'Entity Encoding') + '</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
     
     settingsHtml += '</div><div class="row">';
     
     // PowerPaste
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>PowerPaste Word Import</label><select class="form-control builder-pp-word"><option value="clean" selected>clean</option><option value="merge">merge</option><option value="prompt">prompt</option></select></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>PowerPaste HTML Import</label><select class="form-control builder-pp-html"><option value="merge" selected>merge</option><option value="clean">clean</option><option value="prompt">prompt</option></select></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.powerpaste_word_import || 'PowerPaste Word Import') + '</label><select class="form-control builder-pp-word"><option value="clean" selected>clean</option><option value="merge">merge</option><option value="prompt">prompt</option></select></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.powerpaste_html_import || 'PowerPaste HTML Import') + '</label><select class="form-control builder-pp-html"><option value="merge" selected>merge</option><option value="clean">clean</option><option value="prompt">prompt</option></select></div></div>';
 
     settingsHtml += '</div>';
 
     // Extras (Codesample, RelList, TOC)
-    settingsHtml += '<br><legend>Extras (Defaults)</legend><div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-codesample" checked> Default Codesample Languages</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-rellist" checked> Default Rel List</label></div></div>';
+    settingsHtml += '<br><legend>' + (i18n.extras_defaults || 'Extras (Defaults)') + '</legend><div class="row">';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-codesample" checked> ' + (i18n.default_codesample_languages || 'Default Codesample Languages') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-rellist" checked> ' + (i18n.default_rellist || 'Default Rel List') + '</label></div></div>';
     settingsHtml += '</div>';
 
     // TOC Settings
     settingsHtml += '<div class="row" style="margin-top:10px;">';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>TOC Depth</label><input type="number" class="form-control builder-toc-depth" value="3"></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>TOC Header Tag</label><input type="text" class="form-control builder-toc-header" value="div"></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>TOC Class</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_depth || 'TOC Depth') + '</label><input type="number" class="form-control builder-toc-depth" value="3"></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_header_tag || 'TOC Header Tag') + '</label><input type="text" class="form-control builder-toc-header" value="div"></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_class || 'TOC Class') + '</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
     settingsHtml += '</div>';
 
     // Apply Button
-    let actionsHtml = '<hr><button type="button" class="btn btn-save builder-apply"><i class="rex-icon fa-check"></i> Generate JSON</button> <span class="text-muted">Overwrites existing JSON!</span>';
+    let actionsHtml = '<hr><button type="button" class="btn btn-save builder-apply"><i class="rex-icon fa-check"></i> ' + (i18n.generate_config || 'Generate Configuration') + '</button> <span class="text-muted">' + (i18n.overwrites_existing_config || 'Overwrites existing configuration!') + '</span>';
 
     $builderBody.html(presetsHtml + pluginsHtml + toolbarHtml + settingsHtml + actionsHtml);
 
@@ -257,36 +258,42 @@ function initTinyMceProfileAssistant() {
     }
 
     $builderBody.find('.builder-apply').on('click', function() {
-        generateJson($textarea, $builderBody);
+        generateConfig($textarea, $builderBody);
     });
 }
 
-function generateJson($textarea, $builderBody) {
+function escapeString(str) {
+    if (!str) return '';
+    return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function generateConfig($textarea, $builderBody) {
+    const i18n = rex.tinymceProfileI18n || {};
     const plugins = [];
     $builderBody.find('.builder-plugin:checked').each(function() {
         plugins.push($(this).val());
     });
 
-    const toolbar = $builderBody.find('.builder-toolbar-input').val();
+    const toolbar = escapeString($builderBody.find('.builder-toolbar-input').val());
     const height = parseInt($builderBody.find('.builder-height').val()) || 400;
-    const lang = $builderBody.find('.builder-lang').val() || 'de';
+    const lang = escapeString($builderBody.find('.builder-lang').val() || 'de');
 
     // Advanced Values
     const imageCaption = $builderBody.find('.builder-image-caption').is(':checked');
     const imageUploadTab = $builderBody.find('.builder-image-uploadtab').is(':checked');
-    const mediaType = $builderBody.find('.builder-media-type').val();
+    const mediaType = escapeString($builderBody.find('.builder-media-type').val());
     const relativeUrls = $builderBody.find('.builder-relative-urls').is(':checked');
     const removeScriptHost = $builderBody.find('.builder-remove-script-host').is(':checked');
     const convertUrls = $builderBody.find('.builder-convert-urls').is(':checked');
     
-    const baseUrl = $builderBody.find('.builder-base-url').val();
-    const entityEncoding = $builderBody.find('.builder-entity-encoding').val();
-    const ppWord = $builderBody.find('.builder-pp-word').val();
-    const ppHtml = $builderBody.find('.builder-pp-html').val();
+    const baseUrl = escapeString($builderBody.find('.builder-base-url').val());
+    const entityEncoding = escapeString($builderBody.find('.builder-entity-encoding').val());
+    const ppWord = escapeString($builderBody.find('.builder-pp-word').val());
+    const ppHtml = escapeString($builderBody.find('.builder-pp-html').val());
     
     const tocDepth = parseInt($builderBody.find('.builder-toc-depth').val()) || 3;
-    const tocHeader = $builderBody.find('.builder-toc-header').val() || 'div';
-    const tocClass = $builderBody.find('.builder-toc-class').val() || 'our-toc';
+    const tocHeader = escapeString($builderBody.find('.builder-toc-header').val() || 'div');
+    const tocClass = escapeString($builderBody.find('.builder-toc-class').val() || 'our-toc');
 
     const defaultCodesample = $builderBody.find('.builder-default-codesample').is(':checked');
     const defaultRelList = $builderBody.find('.builder-default-rellist').is(':checked');
@@ -342,7 +349,7 @@ function generateJson($textarea, $builderBody) {
 
     if (defaultRelList) {
         configStr += `rel_list: [
- {title: 'Keine', value: ''},
+ {title: '${i18n.none || 'Keine'}', value: ''},
  {title: 'Nofollow', value: 'nofollow'}
 ],\n`;
     }
