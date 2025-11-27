@@ -80,3 +80,11 @@ tinymce_profile_import_error = Import fehlgeschlagen.
 tinymce_profile_export_error = Profil nicht gefunden.
 tinymce_preview = Vorschau
 tinymce_loading = Lädt…
+
+tinymce_demo_title = REDAXO TinyMCE-AddOn Demo
+tinymce_demo_content = Hier können alle Funktionen des AddOns getestet werden. Die Eingaben werden nicht gespeichert.
+tinymce_demo_description = TinyMCE ist ein Rich-Text-Editor, der es Benutzern ermöglicht, formatierte Inhalte innerhalb einer benutzerfreundlichen Oberfläche zu erstellen.
+tinymce_links_documentation = TinyMCE 8 Dokumentation
+tinymce_links_redaxo_addon = REDAXO AddOn Seite
+tinymce_links_github = GitHub Repository
+close = Schließen

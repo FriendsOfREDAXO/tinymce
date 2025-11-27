@@ -39,6 +39,7 @@ class Assets
     {
         if ('tinymce' === rex_be_controller::getCurrentPagePart(1) && 'profiles' === rex_be_controller::getCurrentPagePart(2)) {
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile_builder.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profiles-list.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/alphanum/jquery.alphanum.js'));
         }
