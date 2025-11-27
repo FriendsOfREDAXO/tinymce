@@ -11,11 +11,16 @@ page:
             title: 'translate:main'
         profiles:
             title: 'translate:profiles'
+        snippets:
+            title: 'translate:snippets'
         migration:
             title: 'translate:migration'
         help:
             title: 'translate:help'
             subPath: README.md
+        devs:
+            title: 'translate:devs'
+            subPath: DEVS.md
 
 pages:
     insertlink:

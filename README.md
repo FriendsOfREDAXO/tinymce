@@ -102,7 +102,87 @@ Erstelle im REDAXO-Backend unter "Media Manager" einen neuen Type mit dem Namen 
 
 **Hinweis:** Existiert der Type nicht, liefert der Media Manager automatisch das Original aus (kein Fehler).
 
-## Entwickler: Aufbau / Aktualisieren der Assets
+## Snippets (Textbausteine)
+
+Das Addon enthält ein Plugin zur Verwaltung und Nutzung von Textbausteinen (Snippets).
+
+### Verwaltung
+Unter "TinyMCE" -> "Snippets" können Sie beliebige HTML-Schnipsel anlegen, bearbeiten und löschen.
+
+### Nutzung im Editor
+1. Aktivieren Sie das Plugin `snippets` in Ihrem Profil (im Standard-Profil "full" bereits enthalten).
+2. Fügen Sie den Button `snippets` zur Toolbar hinzu.
+3. Im Editor erscheint nun ein Dropdown-Menü, über das Sie die angelegten Snippets in den Text einfügen können.
+
+## Link YForm Plugin
+
+Das `link_yform` Plugin ermöglicht es, Datensätze aus YForm-Tabellen direkt im Editor zu verlinken.
+
+### Konfiguration im Profil
+
+Fügen Sie `link_yform` zu den `plugins` und der `toolbar` hinzu. Definieren Sie dann die Tabellen über `link_yform_tables`:
+
+```javascript
+link_yform_tables: {
+    title: 'YForm Datensätze',
+    items: [
+        {
+            title: 'Projekt verlinken',
+            table: 'rex_yf_project',
+            field: 'title',
+        },
+        {
+            title: 'Veranstaltung verlinken',
+            table: 'rex_yf_event',
+            field: 'name',
+            url: '/event:'
+        },
+    ]
+}
+```
+
+| Key | Typ | Beschreibung |
+|---|---|---|
+| title | String | Name des Dropdown-Buttons |
+| items | Array | Liste der verlinkbaren Tabellen |
+
+**Item-Konfiguration:**
+
+| Key | Typ | Beschreibung |
+|---|---|---|
+| title | String | Titel im Menü (optional, sonst Tabellenname) |
+| table | String | Name der YForm-Tabelle |
+| field | String | Feldname, dessen Inhalt als Linktext übernommen wird |
+| url | String | Optional: Schema für den internen Platzhalter-Link. Standard ist `tabellenname://`. <br>Beispiel: Ist `url` nicht gesetzt, wird `rex_yf_project://123` gespeichert. Ist `url: '/event:'` gesetzt, wird `/event:123` gespeichert. <br>Dieser Wert dient nur als interner Platzhalter und muss via Output-Filter (siehe unten) ersetzt werden. |
+
+### URL-Ersetzung (Output Filter)
+
+Die generierten Links (z.B. `rex_yf_project://123`) müssen im Frontend durch echte URLs ersetzt werden. Dazu dient ein Output-Filter in der `boot.php` Ihres Projekt-Addons:
+
+```php
+rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
+    return preg_replace_callback(
+        '@(rex_yf_project|rex_yf_event)://(\d+)@',
+        function ($matches) {
+            $table = $matches[1];
+            $id = $matches[2];
+            
+            // Beispiel für URL-Generierung
+            if ($table === 'rex_yf_project') {
+                return rex_getUrl('', '', ['project_id' => $id]);
+            }
+            return '/index.php?id='.$id;
+        },
+        $ep->getSubject()
+    );
+});
+```
+
+## Entwickler
+
+Informationen zur Erweiterung des Addons und zur Registrierung eigener Plugins finden Sie in der [Entwickler-Dokumentation](DEVS.md) oder im Backend unter dem Reiter "Entwickler".
+
+### Aufbau / Aktualisieren der Assets
 
 In diesem Addon befinden sich Custom‑Plugins in `custom_plugins/`.
 

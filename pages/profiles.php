@@ -14,7 +14,9 @@ $message = '';
 // Export single profile or all profiles as JSON
     if ('export' === $func && $id > 0) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, description, extra FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('id, name, description, extra');
     $row = $sql->getArray();
     if (empty($row)) {
         echo rex_view::error(rex_i18n::msg('tinymce_profile_export_error'));
@@ -31,7 +33,8 @@ $message = '';
 
 if ('export_all' === $func) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, description, extra FROM ' . $profileTable);
+    $sql->setTable($profileTable);
+    $sql->select('id, name, description, extra');
     $rows = $sql->getArray();
     $payload = json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     rex_response::cleanOutputBuffers();
@@ -44,7 +47,9 @@ if ('export_all' === $func) {
 // Return profile JSON for preview via XHR
 if ('preview' === $func && $id > 0) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, description, extra FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('id, name, description, extra');
     $row = $sql->getArray();
     if (empty($row)) {
         rex_response::cleanOutputBuffers();
@@ -195,8 +200,16 @@ if ('clone' === $func) {
 }
 
 if ('delete' === $func) {
-    $message = TinyMceListHelper::deleteData($profileTable, $id);
-    rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
+    $sql = rex_sql::factory();
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('name');
+    if ($sql->getRows() > 0 && $sql->getValue('name') === 'full') {
+        echo rex_view::error(rex_i18n::msg('tinymce_profile_full_delete_error'));
+    } else {
+        $message = TinyMceListHelper::deleteData($profileTable, $id);
+        rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
+    }
     $func = '';
 }
 
@@ -255,9 +268,13 @@ if ('' === $func) {
             . '<li><a href="#" class="tinymce-preview" data-url="' . $list->getUrl(['func' => 'preview', 'id' => $id]) . '">' . rex_i18n::msg('tinymce_preview') . '</a></li>'
             . '<li class="dropdown-divider"></li>'
             . '<li><a href="' . $exportUrl . '">' . rex_i18n::msg('tinymce_profile_export') . '</a></li>'
-            . '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>'
-            . '<li><a href="' . $deleteUrl . '" data-confirm="' . rex_i18n::msg('delete') . ' ?">' . rex_i18n::msg('delete') . '</a></li>'
-            . '</ul></div>';
+            . '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>';
+
+        if ($list->getValue('name') !== 'full') {
+            $dropdown .= '<li><a href="' . $deleteUrl . '" data-confirm="' . rex_i18n::msg('delete') . ' ?">' . rex_i18n::msg('delete') . '</a></li>';
+        }
+
+        $dropdown .= '</ul></div>';
 
         $btnGroup .= $dropdown . '</div>';
         return $btnGroup;

@@ -7,12 +7,20 @@ $addon = rex_addon::get('tinymce');
 
 if (rex::isBackend() && is_object(rex::getUser())) {
     rex_perm::register('tinymce_addon[]');
+
+    // Register custom plugins
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('link_yform', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/link_yform/plugin.min.js'), 'link_yform');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('phonelink', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/phonelink/plugin.min.js'), 'phonelink');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('quote', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/quote/plugin.min.js'), 'quote');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('snippets', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/snippets/plugin.min.js'), 'snippets');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {
-    TinyMceAssetsProvider::provideBaseAssets();
-    TinyMceAssetsProvider::provideDemoAssets();
-    TinyMceAssetsProvider::provideProfileEditData();
+    rex_extension::register('PACKAGES_INCLUDED', static function () {
+        TinyMceAssetsProvider::provideBaseAssets();
+        TinyMceAssetsProvider::provideDemoAssets();
+        TinyMceAssetsProvider::provideProfileEditData();
+    });
 
     if ('tinymce' === rex_be_controller::getCurrentPagePart(1)) {
         rex_extension::register(['REX_FORM_SAVED', 'REX_FORM_DELETED', 'TINY_PROFILE_CLONE', 'TINY_PROFILE_DELETE', 'TINY_PROFILE_ADD', 'TINY_PROFILE_UPDATED'], ['\FriendsOfRedaxo\TinyMce\Handler\Extension', 'createProfiles']);

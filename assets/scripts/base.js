@@ -92,6 +92,7 @@ function tiny_init(container) {
             options = tinyprofiles[profile];
         } else {
             options = {
+                license_key: 'gpl',
                 branding: false,
                 plugins: 'autoresize'
             }

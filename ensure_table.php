@@ -21,3 +21,13 @@
     ->ensureColumn(new \rex_sql_column('updateuser', 'varchar(255)', true))
     ->ensureIndex(new \rex_sql_index('name', ['name'], \rex_sql_index::UNIQUE))
     ->ensure();
+
+\rex_sql_table::get(\rex::getTable('tinymce_snippets'))
+    ->ensurePrimaryIdColumn()
+    ->ensureColumn(new \rex_sql_column('name', 'varchar(255)', false))
+    ->ensureColumn(new \rex_sql_column('content', 'longtext', false))
+    ->ensureColumn(new \rex_sql_column('createdate', 'datetime', true))
+    ->ensureColumn(new \rex_sql_column('updatedate', 'datetime', true))
+    ->ensureColumn(new \rex_sql_column('createuser', 'varchar(255)', true))
+    ->ensureColumn(new \rex_sql_column('updateuser', 'varchar(255)', true))
+    ->ensure();
