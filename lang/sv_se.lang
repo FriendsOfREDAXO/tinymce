@@ -45,3 +45,4 @@ tinymce_media_manager_type = Media-Manager-Type
 tinymce_media_category = Mediakategori
 tinymce_upload_default = Image-Drag&Drop-Upload
 tinymce_upload_default_description = Bilder kan läggas i textfältet via drag + drop
+close = Stäng
