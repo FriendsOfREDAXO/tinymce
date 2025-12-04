@@ -135,8 +135,9 @@ tinymce/
    // Plugins MÜSSEN als IIFE gebaut werden
    // build.js verwendet esbuild mit format: 'iife'
    
-   // External dependencies markieren
-   external: ['tinymce', '@ephox/*']
+   // NUR tinymce als external markieren
+   // @ephox/* muss gebundelt werden (nicht zur Laufzeit verfügbar)
+   external: ['tinymce']
    ```
 
 ### Build-System

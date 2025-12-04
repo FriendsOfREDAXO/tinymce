@@ -33,7 +33,7 @@ async function build() {
       target: ['es2017'],
       outfile: path.join(distDir, 'plugin.min.js'),
       banner: licenseHeader ? { js: licenseHeader } : {},
-      external: ['tinymce', '@ephox/*']
+      external: ['tinymce']
     });
 
     // Copy plugin.min.js to plugin.js (beide minified für Premium-Plugins)
