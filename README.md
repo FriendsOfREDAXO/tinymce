@@ -227,9 +227,6 @@ Weitere Details / zusätzliche Änderungen:
 - `node_modules` ist in `.gitignore` aufgenommen (lokale Abhängigkeiten werden nicht committet).
 - `yarn.lock` entfernt: Wir benutzen `pnpm` als bevorzugten Paketmanager für deterministische Workspaces; entferne aus dem Repo bitte alte `yarn.lock` Dateien falls vorhanden.
 
-Entfernte / nicht mehr benötigte Dateien:
-- Visual Profile Builder (wurde auf Wunsch entfernt) — UI/Assets/Tests sind nicht mehr im Addon enthalten.
-- Alte Tests/Prototypen für den Builder wurden gelöscht.
 
 Empfohlene CI Integration:
 - In CI (GitHub Actions) `pnpm install && pnpm run build` ausführen und sicherstellen, dass `assets/scripts/tinymce/plugins` und `assets/vendor/tinymce/plugins` die erwarteten Artefakte enthalten. Ein schneller Node‑Smoke‑Check kann automatisiert werden, um die wichtigsten Dateien nach dem Build zu prüfen.
