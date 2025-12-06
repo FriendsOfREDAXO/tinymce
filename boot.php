@@ -8,11 +8,11 @@ $addon = rex_addon::get('tinymce');
 if (rex::isBackend() && is_object(rex::getUser())) {
     rex_perm::register('tinymce_addon[]');
 
-    // Register custom plugins
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('link_yform', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/link_yform/plugin.min.js'), 'link_yform');
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('phonelink', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/phonelink/plugin.min.js'), 'phonelink');
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('quote', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/quote/plugin.min.js'), 'quote');
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('snippets', rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins/snippets/plugin.min.js'), 'snippets');
+    // Register custom plugins - use rex_url::base() for absolute paths that TinyMCE external_plugins requires
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('link_yform', rex_url::base('assets/addons/tinymce/scripts/tinymce/plugins/link_yform/plugin.min.js'), 'link_yform');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('phonelink', rex_url::base('assets/addons/tinymce/scripts/tinymce/plugins/phonelink/plugin.min.js'), 'phonelink');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('quote', rex_url::base('assets/addons/tinymce/scripts/tinymce/plugins/quote/plugin.min.js'), 'quote');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('snippets', rex_url::base('assets/addons/tinymce/scripts/tinymce/plugins/snippets/plugin.min.js'), 'snippets');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

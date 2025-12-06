@@ -471,11 +471,15 @@ function generateConfig($textarea, $builderBody) {
     let activeExternalPlugins = {};
     plugins.forEach(p => {
         if (externalPlugins[p]) {
-            // Fix for relative paths starting with ..
+            // Ensure absolute path for TinyMCE external_plugins
             let pluginUrl = externalPlugins[p];
             // Remove all leading ../ segments from pluginUrl
             while (pluginUrl.startsWith('../')) {
                 pluginUrl = pluginUrl.substring(3);
+            }
+            // Ensure path starts with / for absolute URL
+            if (!pluginUrl.startsWith('/')) {
+                pluginUrl = '/' + pluginUrl;
             }
             activeExternalPlugins[p] = pluginUrl;
         }

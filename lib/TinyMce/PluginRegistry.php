@@ -8,6 +8,12 @@ use rex_extension_point;
 class PluginRegistry
 {
     /**
+     * Static storage for registered external plugins.
+     * @var array<string, array{url: string, toolbar: string|null}>
+     */
+    private static array $plugins = [];
+
+    /**
      * Registers a custom TinyMCE plugin from another addon.
      *
      * @param string $pluginName The internal name of the plugin (e.g. 'forcal_event')
@@ -16,6 +22,12 @@ class PluginRegistry
      */
     public static function addPlugin(string $pluginName, string $pluginUrl, ?string $toolbarButton = null): void
     {
+        // Store plugin statically for profiles.js generation
+        self::$plugins[$pluginName] = [
+            'url' => $pluginUrl,
+            'toolbar' => $toolbarButton,
+        ];
+
         rex_extension::register('TINYMCE_PROFILE_OPTIONS', function (rex_extension_point $ep) use ($pluginName, $pluginUrl, $toolbarButton) {
             $options = $ep->getSubject();
 
@@ -34,5 +46,30 @@ class PluginRegistry
 
             return $options;
         });
+    }
+
+    /**
+     * Returns all registered external plugins as an associative array.
+     * Format: ['plugin_name' => 'plugin_url', ...]
+     *
+     * @return array<string, string>
+     */
+    public static function getExternalPlugins(): array
+    {
+        $externalPlugins = [];
+        foreach (self::$plugins as $name => $data) {
+            $externalPlugins[$name] = $data['url'];
+        }
+        return $externalPlugins;
+    }
+
+    /**
+     * Returns all registered plugins with full data.
+     *
+     * @return array<string, array{url: string, toolbar: string|null}>
+     */
+    public static function getPlugins(): array
+    {
+        return self::$plugins;
     }
 }

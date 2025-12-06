@@ -2,6 +2,7 @@
 
 namespace FriendsOfRedaxo\TinyMce\Provider;
 
+use FriendsOfRedaxo\TinyMce\PluginRegistry;
 use rex_addon;
 use rex_addon_interface;
 use rex_be_controller;
@@ -26,6 +27,11 @@ class Assets
     {
         try {
             rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/base.css'));
+
+            // Provide external plugins from PluginRegistry as JS property
+            // This ensures correct URLs at runtime with rex_url::base()
+            $externalPlugins = PluginRegistry::getExternalPlugins();
+            \rex_view::setJsProperty('tinyExternalPlugins', $externalPlugins);
 
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));

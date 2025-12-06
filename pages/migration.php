@@ -1,6 +1,7 @@
 <?php
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
+use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
 
 /**
  * Inline migration logic (avoid adding new classes required by updates/install).
@@ -38,6 +39,31 @@ function tinymce_migrate_extra(string $extra): array
         }
     }
 
+    // Fix external_plugins paths - ensure absolute paths (starting with /)
+    if ('' !== $result && preg_match('/external_plugins:\s*\{/', $result)) {
+        // Fix relative paths like "assets/addons/..." to "/assets/addons/..."
+        $result = preg_replace(
+            '/"(assets\/addons\/)/',
+            '"/assets/addons/',
+            $result
+        );
+        // Fix escaped relative paths like "..\/assets\/addons\/..." to "/assets/addons/..."
+        $result = preg_replace(
+            '/"(?:\.\.\\\\\/)+assets\\\\\/addons\\\\\//',
+            '"/assets/addons/',
+            $result
+        );
+        // Fix unescaped relative paths like "../assets/addons/..." to "/assets/addons/..."
+        $result = preg_replace(
+            '/"(?:\.\.\/)+assets\/addons\//',
+            '"/assets/addons/',
+            $result
+        );
+        if ($result !== $extra && !in_array('Fixed external_plugins paths', $changes, true)) {
+            $changes[] = 'Fixed external_plugins paths to absolute URLs';
+        }
+    }
+
     // Fix content_css for proper dark mode support if needed
     if ('' !== $result && preg_match('/content_css:\s*redaxo\.theme\.current\s*===\s"dark"\s*\?\s*"[^\"]+"\s*:\s*"light"/', $result)) {
         $result = preg_replace(
@@ -70,6 +96,12 @@ if ('repair' === $func && $id > 0) {
             $update->setWhere(['id' => $id]);
             $update->setValue('extra', $result['extra']);
             $update->update();
+            // Regenerate profiles.js
+            try {
+                TinyMceProfilesCreator::profilesCreate();
+            } catch (rex_functional_exception $e) {
+                // ignore
+            }
             rex_logger::factory()->log('info', 'TinyMCE: Repaired profile "'.$profile['name'].'" via migration page.');
             echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired', $profile['name']));
         } else {
@@ -92,6 +124,14 @@ if ('repair_all' === $func) {
             $update->setValue('extra', $result['extra']);
             $update->update();
             $count++;
+        }
+    }
+    // Regenerate profiles.js after all repairs
+    if ($count > 0) {
+        try {
+            TinyMceProfilesCreator::profilesCreate();
+        } catch (rex_functional_exception $e) {
+            // ignore
         }
     }
     echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired_count', $count));

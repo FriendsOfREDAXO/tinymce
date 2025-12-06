@@ -98,6 +98,19 @@ function tiny_init(container) {
             }
         }
 
+        // Merge external plugins from PluginRegistry into profile options
+        // First try rex.tinyExternalPlugins (set via PHP at runtime), fallback to global tinyExternalPlugins from profiles.js
+        let externalPluginsSource = (typeof rex !== 'undefined' && rex.tinyExternalPlugins) ? rex.tinyExternalPlugins : 
+                                    (typeof tinyExternalPlugins !== 'undefined' ? tinyExternalPlugins : {});
+        
+        if (Object.keys(externalPluginsSource).length > 0) {
+            if (!options.hasOwnProperty('external_plugins')) {
+                options['external_plugins'] = {};
+            }
+            // Merge registered external plugins (profile-specific ones take precedence)
+            options['external_plugins'] = Object.assign({}, externalPluginsSource, options['external_plugins']);
+        }
+
         if (!options.hasOwnProperty('setup')) {
             options['setup'] = function(editor) {
                 editor.on('change', function(e) {

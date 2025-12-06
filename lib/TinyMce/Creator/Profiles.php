@@ -3,6 +3,7 @@
 namespace FriendsOfRedaxo\TinyMce\Creator;
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
+use FriendsOfRedaxo\TinyMce\PluginRegistry;
 use rex_addon;
 use rex_addon_interface;
 use rex_file;
@@ -62,10 +63,15 @@ class Profiles
             $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
             $profiles = str_replace(',,', ',', $profiles);
 
+            // Get external plugins from PluginRegistry
+            $externalPlugins = PluginRegistry::getExternalPlugins();
+            $externalPluginsJs = json_encode($externalPlugins, JSON_UNESCAPED_SLASHES);
+
             $content =
                 "
- const tinyprofiles = $profiles;
- ";
+const tinyExternalPlugins = $externalPluginsJs;
+const tinyprofiles = $profiles;
+";
         }
 
         if (!rex_file::put(self::getAddon()->getAssetsPath('generated/' . self::PROFILES_FILENAME), $content)) {
