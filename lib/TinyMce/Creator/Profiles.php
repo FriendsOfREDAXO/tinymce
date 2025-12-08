@@ -63,9 +63,10 @@ class Profiles
             $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
             $profiles = str_replace(',,', ',', $profiles);
 
-            // Get external plugins from PluginRegistry
-            $externalPlugins = PluginRegistry::getExternalPlugins();
-            $externalPluginsJs = json_encode($externalPlugins, JSON_UNESCAPED_SLASHES);
+            // External plugins are provided at runtime via rex_view::setJsProperty() in Assets::provideBaseAssets()
+            // This ensures correct absolute URLs. The empty object here serves only as a fallback.
+            // See base.js: rex.tinyExternalPlugins (runtime) takes precedence over tinyExternalPlugins (static).
+            $externalPluginsJs = '{}';
 
             $content =
                 "

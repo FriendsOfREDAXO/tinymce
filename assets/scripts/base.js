@@ -103,12 +103,28 @@ function tiny_init(container) {
         let externalPluginsSource = (typeof rex !== 'undefined' && rex.tinyExternalPlugins) ? rex.tinyExternalPlugins : 
                                     (typeof tinyExternalPlugins !== 'undefined' ? tinyExternalPlugins : {});
         
+        // Fix relative paths: replace ../assets/ with /assets/ for absolute paths
+        for (let pluginName in externalPluginsSource) {
+            if (typeof externalPluginsSource[pluginName] === 'string') {
+                externalPluginsSource[pluginName] = externalPluginsSource[pluginName].replace(/^\.\.\/assets\//, '/assets/');
+            }
+        }
+        
         if (Object.keys(externalPluginsSource).length > 0) {
             if (!options.hasOwnProperty('external_plugins')) {
                 options['external_plugins'] = {};
             }
             // Merge registered external plugins (profile-specific ones take precedence)
             options['external_plugins'] = Object.assign({}, externalPluginsSource, options['external_plugins']);
+        }
+        
+        // Also fix any relative paths in existing external_plugins from profile
+        if (options['external_plugins']) {
+            for (let pluginName in options['external_plugins']) {
+                if (typeof options['external_plugins'][pluginName] === 'string') {
+                    options['external_plugins'][pluginName] = options['external_plugins'][pluginName].replace(/^\.\.\/assets\//, '/assets/');
+                }
+            }
         }
 
         if (!options.hasOwnProperty('setup')) {

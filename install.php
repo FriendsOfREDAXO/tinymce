@@ -7,6 +7,11 @@
 
 // ensure schema (include a plain PHP file — safe during install/update)
 $this->includeFile(__DIR__ . '/ensure_table.php');
+
+// Set flag to regenerate profiles.js on first backend request
+// This ensures external plugins get correct absolute URLs (boot.php runs at runtime)
+$this->setConfig('update_profiles', true);
+
 // Only import default profiles when there are no profiles yet. The package manager
 // also loads install.sql automatically, but we removed/avoid using install.sql to
 // prevent accidental overwrites or SQL syntax issues during reinstall. Insert
