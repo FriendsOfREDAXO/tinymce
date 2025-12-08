@@ -127,6 +127,35 @@ function tiny_init(container) {
             }
         }
 
+        // Merge global options from TINYMCE_GLOBAL_OPTIONS extension point
+        // This allows addons to add content_css, style_formats etc. to all profiles
+        if (typeof rex !== 'undefined' && rex.tinyGlobalOptions) {
+            let globalOpts = rex.tinyGlobalOptions;
+            
+            // Merge content_css (array)
+            if (globalOpts.content_css && globalOpts.content_css.length > 0) {
+                if (!options.content_css) {
+                    options.content_css = [];
+                } else if (typeof options.content_css === 'string') {
+                    options.content_css = [options.content_css];
+                }
+                // Prepend global CSS so it loads first
+                options.content_css = globalOpts.content_css.concat(options.content_css);
+            }
+            
+            // Merge style_formats
+            if (globalOpts.style_formats && globalOpts.style_formats.length > 0) {
+                if (globalOpts.style_formats_merge) {
+                    options.style_formats_merge = true;
+                }
+                if (!options.style_formats) {
+                    options.style_formats = [];
+                }
+                // Append global style formats
+                options.style_formats = options.style_formats.concat(globalOpts.style_formats);
+            }
+        }
+
         if (!options.hasOwnProperty('setup')) {
             options['setup'] = function(editor) {
                 editor.on('change', function(e) {
