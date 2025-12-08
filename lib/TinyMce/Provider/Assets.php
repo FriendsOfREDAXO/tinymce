@@ -33,6 +33,15 @@ class Assets
             $externalPlugins = PluginRegistry::getExternalPlugins();
             \rex_view::setJsProperty('tinyExternalPlugins', $externalPlugins);
 
+            // Fire extension point for addons to add profile options
+            // These options will be merged into all profiles at runtime
+            $globalOptions = \rex_extension::registerPoint(new \rex_extension_point('TINYMCE_GLOBAL_OPTIONS', [
+                'content_css' => [],
+                'style_formats' => [],
+                'style_formats_merge' => false,
+            ]));
+            \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
+
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/base.js'));
