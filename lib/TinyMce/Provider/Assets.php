@@ -33,14 +33,34 @@ class Assets
             $externalPlugins = PluginRegistry::getExternalPlugins();
             \rex_view::setJsProperty('tinyExternalPlugins', $externalPlugins);
 
+            // Load active Style-Sets from database
+            $styleSetsOptions = self::loadActiveStyleSets();
+            
+            // Debug: Log loaded style sets
+            \rex_logger::factory()->log('debug', 'TinyMCE Style-Sets loaded', [
+                'content_css_count' => count($styleSetsOptions['content_css']),
+                'style_formats_count' => count($styleSetsOptions['style_formats']),
+            ]);
+
+            // Global content_style to fix UIkit/Bootstrap focus outlines in editor
+            $contentStyle = 'body { outline: none !important; box-shadow: none !important; } :focus { outline: none !important; box-shadow: none !important; }';
+
             // Fire extension point for addons to add profile options
             // These options will be merged into all profiles at runtime
             $globalOptions = \rex_extension::registerPoint(new \rex_extension_point('TINYMCE_GLOBAL_OPTIONS', [
-                'content_css' => [],
-                'style_formats' => [],
-                'style_formats_merge' => false,
+                'content_css' => $styleSetsOptions['content_css'],
+                'style_formats' => $styleSetsOptions['style_formats'],
+                'style_formats_merge' => !empty($styleSetsOptions['style_formats']),
+                'content_style' => $contentStyle,
             ]));
             \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
+            
+            // Debug: Log global options after extension point
+            \rex_logger::factory()->log('debug', 'TinyMCE Global Options after EP', [
+                'content_css' => $globalOptions['content_css'] ?? [],
+                'style_formats_count' => count($globalOptions['style_formats'] ?? []),
+                'style_formats_merge' => $globalOptions['style_formats_merge'] ?? false,
+            ]);
 
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
@@ -48,6 +68,62 @@ class Assets
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
+    }
+
+    /**
+     * Load active Style-Sets from database.
+     * Each Style-Set includes its profile assignment for client-side filtering.
+     *
+     * @return array{content_css: list<array{url: string, profiles: list<string>}>, style_formats: list<array{format: array, profiles: list<string>}>}
+     */
+    private static function loadActiveStyleSets(): array
+    {
+        $contentCss = [];
+        $styleFormats = [];
+
+        try {
+            $sql = \rex_sql::factory();
+            $styleSets = $sql->getArray(
+                'SELECT content_css, style_formats, profiles FROM ' . \rex::getTable('tinymce_stylesets') . ' WHERE active = 1 ORDER BY prio ASC'
+            );
+
+            foreach ($styleSets as $set) {
+                // Parse profile assignment (comma-separated, empty = all profiles)
+                $profiles = [];
+                if (!empty($set['profiles'])) {
+                    $profiles = array_map('trim', explode(',', $set['profiles']));
+                    $profiles = array_filter($profiles);
+                }
+
+                // Content CSS hinzufügen mit Profil-Info
+                if (!empty($set['content_css'])) {
+                    $contentCss[] = [
+                        'url' => $set['content_css'],
+                        'profiles' => $profiles,
+                    ];
+                }
+
+                // Style Formats dekodieren und hinzufügen mit Profil-Info
+                if (!empty($set['style_formats'])) {
+                    $formats = json_decode($set['style_formats'], true);
+                    if (is_array($formats)) {
+                        foreach ($formats as $format) {
+                            $styleFormats[] = [
+                                'format' => $format,
+                                'profiles' => $profiles,
+                            ];
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \rex_logger::logException($e);
+        }
+
+        return [
+            'content_css' => $contentCss,
+            'style_formats' => $styleFormats,
+        ];
     }
 
     public static function provideProfileEditData(): void
@@ -105,7 +181,7 @@ class Assets
                     'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars', 'snippets'
                 ],
                 'toolbar' => [
-                    'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
+                    'styles', 'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
                     'forecolor', 'backcolor', 'removeformat', 'blocks', 'fontfamily', 'fontsize',
                     'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
                     'table', 'link', 'image', 'media', 'codesample', 'fullscreen', 'preview', 'code', 'help',

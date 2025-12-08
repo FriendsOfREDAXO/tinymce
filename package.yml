@@ -1,5 +1,5 @@
 package: tinymce
-version: '8.0.3'
+version: '8.1.0'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce/issues
 
@@ -13,6 +13,8 @@ page:
             title: 'translate:profiles'
         snippets:
             title: 'translate:snippets'
+        stylesets:
+            title: 'translate:stylesets'
         migration:
             title: 'translate:migration'
         help:

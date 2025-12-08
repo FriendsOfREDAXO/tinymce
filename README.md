@@ -114,6 +114,49 @@ Unter "TinyMCE" -> "Snippets" können Sie beliebige HTML-Schnipsel anlegen, bear
 2. Fügen Sie den Button `snippets` zur Toolbar hinzu.
 3. Im Editor erscheint nun ein Dropdown-Menü, über das Sie die angelegten Snippets in den Text einfügen können.
 
+## Style-Sets (CSS-Framework Styles)
+
+Style-Sets ermöglichen die zentrale Verwaltung von CSS-Framework-spezifischen Styles wie UIkit 3 oder Bootstrap 5.
+
+### Verwaltung
+Unter "TinyMCE" -> "Style-Sets" können Sie:
+- Eigene Style-Sets anlegen und bearbeiten
+- Demo-Sets für UIkit 3 und Bootstrap 5 installieren
+- Style-Sets importieren und exportieren (JSON)
+
+### Profil-Zuordnung
+Style-Sets können einzelnen Profilen zugewiesen werden:
+- **Leer** = Style-Set gilt für alle Profile
+- **Profilnamen** = Komma-getrennte Liste (z.B. `uikit, bootstrap-full`)
+
+So können UIkit-Styles nur im UIkit-Profil erscheinen und Bootstrap-Styles nur im Bootstrap-Profil.
+
+### Aufbau eines Style-Sets
+- **Name**: Eindeutiger Bezeichner
+- **Content CSS**: URL zum CSS-Framework (z.B. CDN-Link zu UIkit oder Bootstrap)
+- **Style Formats**: JSON-Array mit TinyMCE style_formats Definitionen
+- **Profile**: Optionale Zuordnung zu bestimmten Profilen
+
+### Beispiel Style Format (JSON)
+```json
+[
+    {
+        "title": "Buttons",
+        "items": [
+            {"title": "Primary", "name": "uk-button-primary", "selector": "a", "classes": "uk-button uk-button-primary"},
+            {"title": "Secondary", "name": "uk-button-secondary", "selector": "a", "classes": "uk-button uk-button-secondary"}
+        ]
+    }
+]
+```
+
+**Wichtige Format-Typen:**
+- `selector`: Wendet Klassen auf existierende Elemente an (z.B. `"selector": "a"` für Links)
+- `block`: Erstellt ein Block-Element (z.B. `"block": "div"`)
+- `inline`: Erstellt ein Inline-Element (z.B. `"inline": "span"`)
+- `name`: Eindeutiger interner Name (verhindert Kollisionen)
+- `wrapper`: Bei `true` wird das Element um die Auswahl gewickelt
+
 ## Link YForm Plugin
 
 Das `link_yform` Plugin ermöglicht es, Datensätze aus YForm-Tabellen direkt im Editor zu verlinken.

@@ -125,3 +125,54 @@ tinymce_toc_class = TOC Class
 tinymce_generate_config = Generate Configuration
 tinymce_overwrites_existing_config = Overwrites existing configuration!
 tinymce_none = None
+
+tinymce_devs = Developers
+
+tinymce_snippets = Snippets
+tinymce_snippets_name = Name
+tinymce_snippets_content = Content
+tinymce_snippets_add = Add Snippet
+tinymce_snippets_edit = Edit Snippet
+tinymce_snippets_deleted = Snippet deleted
+tinymce_snippets_no_content = No content
+tinymce_snippets_name_empty = Name cannot be empty!
+
+# Style-Sets
+stylesets = Style-Sets
+tinymce_stylesets = Style-Sets
+tinymce_stylesets_name = Name
+tinymce_stylesets_description = Description
+tinymce_stylesets_content_css = Content CSS
+tinymce_stylesets_content_css_notice = URL to CSS (e.g., CDN link to UIkit or Bootstrap)
+tinymce_stylesets_style_formats = Style Formats (JSON)
+tinymce_stylesets_style_formats_notice = JSON array with TinyMCE style_formats definitions. See TinyMCE documentation.
+tinymce_stylesets_profiles = Profile Assignment
+tinymce_stylesets_profiles_notice = Comma-separated list of profile names (e.g., uikit, bootstrap). Leave empty = applies to all profiles.
+tinymce_stylesets_active = Active
+tinymce_stylesets_active_label = Style-Set is active
+tinymce_stylesets_prio = Priority
+tinymce_stylesets_add = Add Style-Set
+tinymce_stylesets_edit = Edit Style-Set
+tinymce_stylesets_deleted = Style-Set deleted
+tinymce_stylesets_toggled = Status changed
+tinymce_stylesets_name_empty = Name cannot be empty!
+tinymce_stylesets_activate = Activate
+tinymce_stylesets_deactivate = Deactivate
+tinymce_stylesets_info_title = Info
+tinymce_stylesets_info = Style-Sets allow centralized management of CSS framework-specific styles (UIkit 3, Bootstrap 5, etc.). Active Style-Sets are automatically included in all TinyMCE profiles.
+tinymce_stylesets_info_merge = The content_css and style_formats of all active Style-Sets are merged and available in the editor via the "Styles" dropdown.
+tinymce_stylesets_demo_install = Install Demo Sets
+tinymce_stylesets_demo_info = Use this button to install predefined Style-Sets for UIkit 3 and Bootstrap 5.
+tinymce_stylesets_demo_confirm = Do you want to install the demo Style-Sets?
+tinymce_stylesets_demo_installed = %s demo Style-Set(s) were installed.
+tinymce_stylesets_demo_skipped = %s Style-Set(s) were skipped (name already exists).
+tinymce_stylesets_import_export = Import / Export
+tinymce_stylesets_import_export_info = Style-Sets can be exported and imported as JSON files to share them between projects.
+tinymce_stylesets_export = Export
+tinymce_stylesets_export_all = Export all
+tinymce_stylesets_import = Import
+tinymce_stylesets_imported = %s Style-Set(s) were imported.
+tinymce_stylesets_import_skipped = %s Style-Set(s) were skipped (name already exists).
+tinymce_stylesets_import_invalid_json = The file does not contain valid JSON.
+tinymce_stylesets_import_no_file = Please select a file to import.
+tinymce_stylesets_import_empty = No valid Style-Sets were found in the file.

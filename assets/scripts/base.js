@@ -98,6 +98,113 @@ function tiny_init(container) {
             }
         }
 
+        // IMPORTANT: Merge global options FIRST before any other processing
+        // This ensures style_formats are available when TinyMCE registers the 'styles' button
+        if (typeof rex !== 'undefined' && rex.tinyGlobalOptions) {
+            let globalOpts = rex.tinyGlobalOptions;
+            
+            // Debug: Log global options
+            console.log('TinyMCE Global Options for profile "' + profile + '":', globalOpts);
+            
+            // Helper function to check if a Style-Set applies to this profile
+            // Empty profiles array means it applies to ALL profiles
+            function appliesToProfile(profilesList) {
+                if (!profilesList || profilesList.length === 0) {
+                    return true; // Empty = applies to all profiles
+                }
+                return profilesList.indexOf(profile) !== -1;
+            }
+            
+            // Merge content_css (array) - filter by profile
+            // New format: [{url: "...", profiles: ["uikit", "bootstrap"]}]
+            // Legacy format: ["url1", "url2"]
+            if (globalOpts.content_css && globalOpts.content_css.length > 0) {
+                let filteredCss = [];
+                globalOpts.content_css.forEach(function(item) {
+                    if (typeof item === 'string') {
+                        // Legacy format - always include
+                        filteredCss.push(item);
+                    } else if (item.url && appliesToProfile(item.profiles)) {
+                        // New format with profile filter
+                        filteredCss.push(item.url);
+                    }
+                });
+                
+                if (filteredCss.length > 0) {
+                    if (!options.content_css) {
+                        options.content_css = filteredCss;
+                    } else if (typeof options.content_css === 'string') {
+                        // Profile CSS at the end to override global styles
+                        options.content_css = filteredCss.concat([options.content_css]);
+                    } else {
+                        // Profile CSS array at the end to override global styles
+                        options.content_css = filteredCss.concat(options.content_css);
+                    }
+                }
+            }
+            
+            // Merge content_style (string) - fixes focus outlines for UIkit/Bootstrap
+            if (globalOpts.content_style) {
+                if (!options.content_style) {
+                    options.content_style = globalOpts.content_style;
+                } else {
+                    // Append global styles to existing content_style
+                    options.content_style = globalOpts.content_style + ' ' + options.content_style;
+                }
+            }
+            
+            // Merge style_formats - filter by profile
+            // New format: [{format: {...}, profiles: ["uikit"]}]
+            // Legacy format: [{title: "...", items: [...]}]
+            if (globalOpts.style_formats && globalOpts.style_formats.length > 0) {
+                let filteredFormats = [];
+                globalOpts.style_formats.forEach(function(item) {
+                    if (item.format && appliesToProfile(item.profiles)) {
+                        // New format with profile filter
+                        filteredFormats.push(item.format);
+                    } else if (item.title) {
+                        // Legacy format (has title = is a format group) - always include
+                        filteredFormats.push(item);
+                    }
+                });
+                
+                if (filteredFormats.length > 0) {
+                    // Enable merging with default formats (Headings, Inline, Blocks, Align)
+                    options.style_formats_merge = true;
+                    
+                    if (!options.style_formats) {
+                        options.style_formats = [];
+                    }
+                    // Append filtered style formats to existing ones
+                    options.style_formats = options.style_formats.concat(filteredFormats);
+                    
+                    // Replace 'styles' with 'stylesets' in toolbar (our custom button)
+                    if (options.toolbar && typeof options.toolbar === 'string') {
+                        // Replace existing 'styles' with 'stylesets'
+                        options.toolbar = options.toolbar.replace(/\bstyles\b/g, 'stylesets');
+                        // If neither exists, add stylesets at the beginning
+                        if (options.toolbar.indexOf('stylesets') === -1) {
+                            options.toolbar = 'stylesets ' + options.toolbar;
+                        }
+                    }
+                    
+                    // Add stylesets to Format menu
+                    if (!options.menu) {
+                        options.menu = {};
+                    }
+                    options.menu.format = {
+                        title: 'Format',
+                        items: 'bold italic underline strikethrough superscript subscript codeformat | stylesets blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat'
+                    };
+                    
+                    // Debug: Log filtered style_formats
+                    console.log('TinyMCE style_formats for profile "' + profile + '":', filteredFormats.length, 'items');
+                }
+            }
+        } else {
+            console.log('TinyMCE: No rex.tinyGlobalOptions found');
+        }
+
         // Merge external plugins from PluginRegistry into profile options
         // First try rex.tinyExternalPlugins (set via PHP at runtime), fallback to global tinyExternalPlugins from profiles.js
         let externalPluginsSource = (typeof rex !== 'undefined' && rex.tinyExternalPlugins) ? rex.tinyExternalPlugins : 
@@ -127,42 +234,103 @@ function tiny_init(container) {
             }
         }
 
-        // Merge global options from TINYMCE_GLOBAL_OPTIONS extension point
-        // This allows addons to add content_css, style_formats etc. to all profiles
-        if (typeof rex !== 'undefined' && rex.tinyGlobalOptions) {
-            let globalOpts = rex.tinyGlobalOptions;
-            
-            // Merge content_css (array)
-            if (globalOpts.content_css && globalOpts.content_css.length > 0) {
-                if (!options.content_css) {
-                    options.content_css = [];
-                } else if (typeof options.content_css === 'string') {
-                    options.content_css = [options.content_css];
+        // Store the original setup function if it exists
+        let originalSetup = options['setup'] || null;
+        
+        // Create a new setup function that handles editor events and calls the original
+        options['setup'] = function(editor) {
+            // Register custom Style-Sets button and menu item
+            if (options.style_formats && options.style_formats.length > 0) {
+                
+                // Helper function to build menu items recursively
+                function buildMenuItems(formats) {
+                    let items = [];
+                    formats.forEach(function(format) {
+                        if (format.items) {
+                            // It's a submenu/group
+                            items.push({
+                                type: 'nestedmenuitem',
+                                text: format.title,
+                                getSubmenuItems: function() {
+                                    return buildMenuItems(format.items);
+                                }
+                            });
+                        } else {
+                            // It's a format item
+                            let formatName = format.name || format.format || 'custom-' + format.title.toLowerCase().replace(/\s+/g, '-');
+                            items.push({
+                                type: 'togglemenuitem',
+                                text: format.title,
+                                onAction: function() {
+                                    editor.formatter.toggle(formatName);
+                                },
+                                onSetup: function(api) {
+                                    let callback = function() {
+                                        api.setActive(editor.formatter.match(formatName));
+                                    };
+                                    editor.on('NodeChange', callback);
+                                    return function() {
+                                        editor.off('NodeChange', callback);
+                                    };
+                                }
+                            });
+                        }
+                    });
+                    return items;
                 }
-                // Prepend global CSS so it loads first
-                options.content_css = globalOpts.content_css.concat(options.content_css);
+                
+                // Register toolbar button 'stylesets'
+                editor.ui.registry.addMenuButton('stylesets', {
+                    text: 'Styles',
+                    tooltip: 'Style-Sets',
+                    fetch: function(callback) {
+                        callback(buildMenuItems(options.style_formats));
+                    }
+                });
+                
+                // Register menu item 'stylesets' for Format menu
+                editor.ui.registry.addNestedMenuItem('stylesets', {
+                    text: 'Style-Sets',
+                    getSubmenuItems: function() {
+                        return buildMenuItems(options.style_formats);
+                    }
+                });
+                
+                // Register all formats so they work when applied
+                editor.on('init', function() {
+                    function registerFormats(formats) {
+                        formats.forEach(function(format) {
+                            if (format.items) {
+                                registerFormats(format.items);
+                            } else if (format.inline || format.block || format.selector) {
+                                let formatName = format.name || format.format || 'custom-' + format.title.toLowerCase().replace(/\s+/g, '-');
+                                editor.formatter.register(formatName, {
+                                    inline: format.inline,
+                                    block: format.block,
+                                    selector: format.selector,
+                                    classes: format.classes,
+                                    styles: format.styles,
+                                    attributes: format.attributes,
+                                    wrapper: format.wrapper
+                                });
+                            }
+                        });
+                    }
+                    registerFormats(options.style_formats);
+                    console.log('TinyMCE: Registered', options.style_formats.length, 'style format groups');
+                });
             }
             
-            // Merge style_formats
-            if (globalOpts.style_formats && globalOpts.style_formats.length > 0) {
-                if (globalOpts.style_formats_merge) {
-                    options.style_formats_merge = true;
-                }
-                if (!options.style_formats) {
-                    options.style_formats = [];
-                }
-                // Append global style formats
-                options.style_formats = options.style_formats.concat(globalOpts.style_formats);
+            // Set up default change handler
+            editor.on('change', function(e) {
+                $(editor.targetElm).html(editor.getContent());
+            });
+            
+            // Call original setup if it existed
+            if (originalSetup && typeof originalSetup === 'function') {
+                originalSetup(editor);
             }
-        }
-
-        if (!options.hasOwnProperty('setup')) {
-            options['setup'] = function(editor) {
-                editor.on('change', function(e) {
-                    $(editor.targetElm).html(editor.getContent());
-                })
-            };
-        }
+        };
 
         if (!options.hasOwnProperty('selector')) {
             options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized)';

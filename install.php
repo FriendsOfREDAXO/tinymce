@@ -185,3 +185,6 @@ EXTRA;
 	\rex_logger::logException($e);
 	echo \rex_view::error($e->getMessage());
 }
+
+// Style-Sets: Table is created via ensure_table.php
+// Default sets are NOT auto-installed - user can install them via "Demo-Sets installieren" button

@@ -1,6 +1,28 @@
 Changelog
 =========
 
+Version 8.1.0
+-------------------------------
+
+### Neue Features
+* **Style-Sets:** Neue zentrale Verwaltung von CSS-Framework-spezifischen Styles.
+    * UIkit 3, Bootstrap 5 und eigene Style-Definitionen.
+    * Profil-Zuordnung: Style-Sets können einzelnen Profilen zugewiesen werden.
+    * Import/Export von Style-Sets als JSON.
+    * Demo-Sets für UIkit 3 und Bootstrap 5 vorinstallierbar.
+* **Verbesserter Styles-Button:** Eigener "stylesets" Button mit vollständiger Unterstützung für verschachtelte Menüs.
+* **Format-Menü Integration:** Style-Sets sind auch über das Format-Menü erreichbar.
+
+### Bugfixes
+* Fix: Button-Styles verwenden nun korrekt `selector` statt `inline` für `<a>`-Elemente.
+* Fix: Eindeutige Format-Namen verhindern Kollisionen zwischen Buttons, Backgrounds, Cards etc.
+* Fix: CSS-Ladereihenfolge korrigiert (Profil-CSS überschreibt globale Styles).
+
+### Verbesserungen
+* Style-Sets werden über die Datenbank verwaltet (`rex_tinymce_stylesets`).
+* Extension Point `TINYMCE_GLOBAL_OPTIONS` für globale TinyMCE-Optionen.
+* Bessere Debug-Ausgaben in der Browser-Konsole.
+
 Version 8.0.0
 -------------------------------
 

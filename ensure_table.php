@@ -31,3 +31,20 @@
     ->ensureColumn(new \rex_sql_column('createuser', 'varchar(255)', true))
     ->ensureColumn(new \rex_sql_column('updateuser', 'varchar(255)', true))
     ->ensure();
+
+// Style-Sets table for reusable style_formats collections
+\rex_sql_table::get(\rex::getTable('tinymce_stylesets'))
+    ->ensurePrimaryIdColumn()
+    ->ensureColumn(new \rex_sql_column('name', 'varchar(100)', false))
+    ->ensureColumn(new \rex_sql_column('description', 'varchar(255)', true))
+    ->ensureColumn(new \rex_sql_column('content_css', 'text', true))
+    ->ensureColumn(new \rex_sql_column('style_formats', 'longtext', true))
+    ->ensureColumn(new \rex_sql_column('profiles', 'text', true)) // Comma-separated profile names, empty = all profiles
+    ->ensureColumn(new \rex_sql_column('active', 'tinyint(1)', true, '1'))
+    ->ensureColumn(new \rex_sql_column('prio', 'int(11)', true, '0'))
+    ->ensureColumn(new \rex_sql_column('createdate', 'datetime', true))
+    ->ensureColumn(new \rex_sql_column('updatedate', 'datetime', true))
+    ->ensureColumn(new \rex_sql_column('createuser', 'varchar(255)', true))
+    ->ensureColumn(new \rex_sql_column('updateuser', 'varchar(255)', true))
+    ->ensureIndex(new \rex_sql_index('name', ['name'], \rex_sql_index::UNIQUE))
+    ->ensure();

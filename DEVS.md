@@ -92,6 +92,62 @@ Das Snippets-Plugin lädt seine Daten dynamisch über eine REDAXO-API-Funktion.
 *   **Aufruf:** `index.php?rex-api-call=tinymce_get_snippets`
 *   **Rückgabe:** JSON-Array mit Objekten `{title: "Name", content: "HTML-Inhalt"}`
 
+### Style-Sets System
+
+Style-Sets werden in der Datenbank-Tabelle `rex_tinymce_stylesets` gespeichert und über `TINYMCE_GLOBAL_OPTIONS` an alle Profile weitergegeben.
+
+#### Extension Point `TINYMCE_GLOBAL_OPTIONS`
+
+Dieser EP wird beim Laden der Backend-Assets aufgerufen und ermöglicht das Hinzufügen globaler TinyMCE-Optionen:
+
+```php
+rex_extension::register('TINYMCE_GLOBAL_OPTIONS', function (rex_extension_point $ep) {
+    $options = $ep->getSubject();
+    
+    // Beispiel: Zusätzliches CSS hinzufügen
+    $options['content_css'][] = ['url' => '/my/custom.css', 'profiles' => ['my_profile']];
+    
+    // Beispiel: Zusätzliche Style-Formats
+    $options['style_formats'][] = [
+        'format' => ['title' => 'Mein Stil', 'inline' => 'span', 'classes' => 'my-class'],
+        'profiles' => ['my_profile']  // Leer = alle Profile
+    ];
+    
+    return $options;
+});
+```
+
+#### Profil-Filterung
+
+Style-Sets können auf bestimmte Profile beschränkt werden:
+
+*   **Leeres `profiles`-Array:** Style-Set gilt für alle Profile
+*   **Gefülltes `profiles`-Array:** Style-Set gilt nur für die angegebenen Profile
+
+Die Filterung erfolgt client-seitig in `base.js` beim Initialisieren des Editors.
+
+#### Eigene Style-Sets programmatisch anlegen
+
+```php
+$sql = rex_sql::factory();
+$sql->setTable(rex::getTable('tinymce_stylesets'));
+$sql->setValue('name', 'mein_styleset');
+$sql->setValue('description', 'Meine Custom Styles');
+$sql->setValue('content_css', '/assets/css/my-framework.css');
+$sql->setValue('style_formats', json_encode([
+    [
+        'title' => 'Meine Styles',
+        'items' => [
+            ['title' => 'Highlight', 'name' => 'my-highlight', 'inline' => 'span', 'classes' => 'highlight']
+        ]
+    ]
+]));
+$sql->setValue('profiles', 'profil1, profil2');  // Leer = alle
+$sql->setValue('active', 1);
+$sql->setValue('prio', 10);
+$sql->insert();
+```
+
 ### Link YForm Plugin Internals
 
 Das `link_yform` Plugin speichert Links zu YForm-Datensätzen als interne Platzhalter.
