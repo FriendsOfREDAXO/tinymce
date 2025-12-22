@@ -5,7 +5,7 @@
     "custom_plugins/*"
   ],
   "dependencies": {
-    "tinymce": "^8.2.2",
+    "tinymce": "^8.3.1",
     "tinymce-i18n": "^25.11.17"
   },
   "devDependencies": {
