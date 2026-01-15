@@ -67,6 +67,14 @@ $(document).on('rex:change', function (e, container) {
     }
 });
 
+// Handle dynamically added content (e.g., from yform inline relations)
+$(document).on('rex:ready', function (e, container) {
+    if (container.find(tinyareas).length) {
+        console.log('TinyMCE: rex:ready event triggered');
+        tiny_init(container);
+    }
+});
+
 function tiny_init(container) {
     let profiles = [];
 
@@ -74,8 +82,14 @@ function tiny_init(container) {
         let $this = $(this);
         let e_id = $this.attr('id');
 
+        // Skip if already initialized
+        if ($this.hasClass('mce-initialized')) {
+            return true;
+        }
+
         profiles.push($this.data('profile'));
 
+        // Remove existing TinyMCE instance if it exists
         if(tinymce.get(e_id)) {
             $this.removeClass('mce-initialized');
             tinymce.remove('#'+e_id);
@@ -336,19 +350,48 @@ function tiny_init(container) {
             options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized)';
         }
 
+        // Log which elements we're initializing
+        let elementsToInit = $(options['selector']).length;
+        if (elementsToInit > 0) {
+            console.log('TinyMCE: Initializing', elementsToInit, 'editor(s) for profile "' + profile + '"');
+        }
+
         tinymce.init(options).then(function(editors) {
             for(let i in editors) {
                 $(editors[i].targetElm).addClass('mce-initialized');
+                console.log('TinyMCE: Initialized editor:', editors[i].targetElm.id);
             }
+        }).catch(function(error) {
+            console.error('TinyMCE: Initialization error for profile "' + profile + '":', error);
         });
     });
 }
 
 function tiny_restart(container) {
-    container.parents('.mblock_wrapper').find('.mce-initialized').removeClass('mce-initialized').show();
-    container.parents('.mblock_wrapper').find('.tox.tox-tinymce').remove();
-    tiny_init(container.parents('.mblock_wrapper'));
+    // For inline relations in yform, we need to find the parent wrapper differently
+    let $wrapper = container;
+    
+    // Try to find mblock_wrapper parent (for mblock scenarios)
+    if (container.parents('.mblock_wrapper').length) {
+        $wrapper = container.parents('.mblock_wrapper');
+    }
+    
+    // Clean up existing TinyMCE instances
+    $wrapper.find('.mce-initialized').each(function() {
+        let e_id = $(this).attr('id');
+        if (e_id && tinymce.get(e_id)) {
+            tinymce.remove('#' + e_id);
+        }
+        $(this).removeClass('mce-initialized').show();
+    });
+    
+    // Remove TinyMCE UI elements
+    $wrapper.find('.tox.tox-tinymce').remove();
+    
+    // Re-initialize TinyMCE
+    tiny_init($wrapper);
 }
+
 
 
 function openMyLinkMap(id, param,value)
