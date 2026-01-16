@@ -80,26 +80,25 @@ let tinyEditorCache = {};
 let tinyRestoringContent = false;
 
 function saveTinyEditorContent() {
-    if (typeof tinymce === 'undefined' || tinyRestoringContent) return;
+    if (typeof tinymce === 'undefined' || !tinymce.editors || tinymce.editors.length === 0) {
+        console.log('TinyMCE: No editors to save (tinymce not ready or no editors initialized)');
+        return;
+    }
     
-    tinymce.editors.forEach(function(editor) {
-        tinyEditorCache[editor.id] = editor.getContent();
-        console.log('TinyMCE: Saved content for editor:', editor.id);
-    });
-}
-
-function restoreTinyEditorContent() {
-    if (typeof tinymce === 'undefined') return;
-    
-    tinyRestoringContent = true;
-    tinymce.editors.forEach(function(editor) {
-        if (tinyEditorCache[editor.id]) {
-            editor.setContent(tinyEditorCache[editor.id]);
-            console.log('TinyMCE: Restored content for editor:', editor.id);
-        }
-    });
-    tinyEditorCache = {};
-    tinyRestoringContent = false;
+    // Simply save all current content to their textareas
+    // This way it's preserved when DOM is reorganized
+    try {
+        tinymce.editors.forEach(function(editor) {
+            if (editor && editor.targetElm) {
+                let $textarea = $(editor.targetElm);
+                let content = editor.getContent();
+                $textarea.val(content);
+                console.log('TinyMCE: Saved content to textarea:', editor.id);
+            }
+        });
+    } catch (e) {
+        console.error('TinyMCE: Error saving content:', e);
+    }
 }
 
 // Hook into yform relation move events (only, not mblock)
@@ -111,15 +110,21 @@ $(document).on('click', '[data-yform-be-relation-moveup], [data-yform-be-relatio
         return;
     }
     
-    console.log('TinyMCE: Move up/down event detected');
-    // Save all editor content before move
+    console.log('TinyMCE: Move up/down detected - waiting for DOM reorganization, then re-initializing editors');
+    
+    // Find the container that will be moved
+    let $container = $(this).closest('[data-yform-be-relation-item]');
+    
+    // Save content from current editors BEFORE yform reorganizes DOM
     saveTinyEditorContent();
     
-    // Give DOM manipulation a moment to complete
+    // After yform reorganizes DOM (small delay to ensure DOM is updated),
+    // re-initialize TinyMCE in the affected container
     setTimeout(function() {
-        restoreTinyEditorContent();
-        // Re-validate TinyMCE instances
-        validateTinyEditors();
+        console.log('TinyMCE: DOM reorganization complete, re-initializing editors in container');
+        if ($container.length > 0) {
+            tiny_restart($container);
+        }
     }, 100);
 });
 
@@ -429,59 +434,63 @@ function tiny_restart(container) {
         return;
     }
     
+    console.log('TinyMCE: tiny_restart triggered for container');
+    
     // For inline relations in yform, we need to find the parent wrapper differently
     let $wrapper = container;
     
+    // Try to find yform-be-relation-wrapper parent (for inline relations)
+    if (container.closest('[data-yform-be-relation-form]').length) {
+        $wrapper = container.closest('[data-yform-be-relation-form]');
+    }
     // Try to find mblock_wrapper parent (for mblock scenarios)
-    if (container.parents('.mblock_wrapper').length) {
+    else if (container.parents('.mblock_wrapper').length) {
         $wrapper = container.parents('.mblock_wrapper');
     }
     
-    // Clean up existing TinyMCE instances
-    $wrapper.find('.mce-initialized').each(function() {
+    // Only restart TinyMCE in the affected wrapper, not globally
+    // This prevents restarting unrelated editors
+    let $editorsInWrapper = $wrapper.find('.tiny-editor');
+    console.log('TinyMCE: Found', $editorsInWrapper.length, 'editors in wrapper to restart');
+    
+    // Clean up existing TinyMCE instances in this wrapper
+    $editorsInWrapper.each(function() {
         let e_id = $(this).attr('id');
         if (e_id && tinymce.get(e_id)) {
-            // Save content before destroying
-            let editor = tinymce.get(e_id);
-            if (editor && !tinyEditorCache[e_id]) {
-                tinyEditorCache[e_id] = editor.getContent();
-            }
+            console.log('TinyMCE: Removing editor instance:', e_id);
             tinymce.remove('#' + e_id);
         }
-        $(this).removeClass('mce-initialized').show();
+        $(this).removeClass('mce-initialized');
     });
     
-    // Remove TinyMCE UI elements
+    // Remove TinyMCE UI elements in this wrapper
     $wrapper.find('.tox.tox-tinymce').remove();
     
-    // Re-initialize TinyMCE
+    // Re-initialize TinyMCE only in this wrapper
     tiny_init($wrapper);
 }
 
 // Validate and fix TinyMCE instances that may have lost DOM references
 function validateTinyEditors() {
-    if (typeof tinymce === 'undefined' || !tinymce.editors) return;
+    if (typeof tinymce === 'undefined' || !tinymce.editors || tinymce.editors.length === 0) {
+        return;
+    }
     
-    tinymce.editors.forEach(function(editor) {
-        // Check if the target element still exists in the DOM
-        if (!editor.targetElm || !document.contains(editor.targetElm)) {
-            console.log('TinyMCE: Removed orphaned editor instance:', editor.id);
-            editor.remove();
-            return;
-        }
-        
-        // Check if editor is visible and properly attached
-        let $textarea = $(editor.targetElm);
-        if ($textarea.closest('body').length === 0) {
-            console.log('TinyMCE: Editor not in DOM:', editor.id);
-            return;
-        }
-        
-        // Ensure editor is marked as initialized
-        if (!$textarea.hasClass('mce-initialized')) {
-            $textarea.addClass('mce-initialized');
-        }
-    });
+    console.log('TinyMCE: Validating', tinymce.editors.length, 'editor instances');
+    
+    try {
+        // Check for orphaned editors (target no longer in DOM)
+        tinymce.editors.forEach(function(editor) {
+            if (!editor || !editor.targetElm || !document.contains(editor.targetElm)) {
+                console.log('TinyMCE: Removing orphaned editor:', editor ? editor.id : 'unknown');
+                if (editor) {
+                    editor.remove();
+                }
+            }
+        });
+    } catch (e) {
+        console.error('TinyMCE: Error validating editors:', e);
+    }
 }
 
 
