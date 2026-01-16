@@ -61,7 +61,6 @@ $(document).on('rex:ready', function (e, container) {
 });
 
 $(document).on('rex:change', function (e, container) {
-    console.log('change');
     if (container.find(tinyareas).length) {
         tiny_restart(container);
     }
@@ -70,7 +69,6 @@ $(document).on('rex:change', function (e, container) {
 // Handle dynamically added content (e.g., from yform inline relations)
 $(document).on('rex:ready', function (e, container) {
     if (container.find(tinyareas).length) {
-        console.log('TinyMCE: rex:ready event triggered');
         tiny_init(container);
     }
 });
@@ -81,7 +79,6 @@ let tinyRestoringContent = false;
 
 function saveTinyEditorContent() {
     if (typeof tinymce === 'undefined' || !tinymce.editors || tinymce.editors.length === 0) {
-        console.log('TinyMCE: No editors to save (tinymce not ready or no editors initialized)');
         return;
     }
     
@@ -93,11 +90,10 @@ function saveTinyEditorContent() {
                 let $textarea = $(editor.targetElm);
                 let content = editor.getContent();
                 $textarea.val(content);
-                console.log('TinyMCE: Saved content to textarea:', editor.id);
             }
         });
     } catch (e) {
-        console.error('TinyMCE: Error saving content:', e);
+        // Silent fail - editors may be destroyed
     }
 }
 
@@ -106,11 +102,8 @@ function saveTinyEditorContent() {
 $(document).on('click', '[data-yform-be-relation-moveup], [data-yform-be-relation-movedown]', function(e) {
     // Skip if inside mblock - mblock has its own handlers
     if ($(this).closest('.mblock_wrapper').length > 0) {
-        console.log('TinyMCE: Move event in mblock context - skipping (mblock will handle)');
         return;
     }
-    
-    console.log('TinyMCE: Move up/down detected - waiting for DOM reorganization, then re-initializing editors');
     
     // Find the container that will be moved
     let $container = $(this).closest('[data-yform-be-relation-item]');
@@ -121,7 +114,6 @@ $(document).on('click', '[data-yform-be-relation-moveup], [data-yform-be-relatio
     // After yform reorganizes DOM (small delay to ensure DOM is updated),
     // re-initialize TinyMCE in the affected container
     setTimeout(function() {
-        console.log('TinyMCE: DOM reorganization complete, re-initializing editors in container');
         if ($container.length > 0) {
             tiny_restart($container);
         }
@@ -156,7 +148,6 @@ function tiny_init(container) {
 
     // If no profiles found, skip initialization
     if (profiles.length === 0) {
-        console.log('TinyMCE: No profiles to initialize');
         return;
     }
 
@@ -176,9 +167,6 @@ function tiny_init(container) {
         // This ensures style_formats are available when TinyMCE registers the 'styles' button
         if (typeof rex !== 'undefined' && rex.tinyGlobalOptions) {
             let globalOpts = rex.tinyGlobalOptions;
-            
-            // Debug: Log global options
-            console.log('TinyMCE Global Options for profile "' + profile + '":', globalOpts);
             
             // Helper function to check if a Style-Set applies to this profile
             // Empty profiles array means it applies to ALL profiles
@@ -271,12 +259,8 @@ function tiny_init(container) {
                         items: 'bold italic underline strikethrough superscript subscript codeformat | stylesets blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat'
                     };
                     
-                    // Debug: Log filtered style_formats
-                    console.log('TinyMCE style_formats for profile "' + profile + '":', filteredFormats.length, 'items');
                 }
             }
-        } else {
-            console.log('TinyMCE: No rex.tinyGlobalOptions found');
         }
 
         // Merge external plugins from PluginRegistry into profile options
@@ -391,7 +375,6 @@ function tiny_init(container) {
                         });
                     }
                     registerFormats(options.style_formats);
-                    console.log('TinyMCE: Registered', options.style_formats.length, 'style format groups');
                 });
             }
             
@@ -410,19 +393,10 @@ function tiny_init(container) {
             options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized)';
         }
 
-        // Log which elements we're initializing
-        let elementsToInit = $(options['selector']).length;
-        if (elementsToInit > 0) {
-            console.log('TinyMCE: Initializing', elementsToInit, 'editor(s) for profile "' + profile + '"');
-        }
-
         tinymce.init(options).then(function(editors) {
             for(let i in editors) {
                 $(editors[i].targetElm).addClass('mce-initialized');
-                console.log('TinyMCE: Initialized editor:', editors[i].targetElm.id);
             }
-        }).catch(function(error) {
-            console.error('TinyMCE: Initialization error for profile "' + profile + '":', error);
         });
     });
 }
@@ -430,11 +404,8 @@ function tiny_init(container) {
 function tiny_restart(container) {
     // Don't restart during content restoration to avoid conflicts
     if (tinyRestoringContent) {
-        console.log('TinyMCE: Skipping restart during content restoration');
         return;
     }
-    
-    console.log('TinyMCE: tiny_restart triggered for container');
     
     // For inline relations in yform, we need to find the parent wrapper differently
     let $wrapper = container;
@@ -451,13 +422,11 @@ function tiny_restart(container) {
     // Only restart TinyMCE in the affected wrapper, not globally
     // This prevents restarting unrelated editors
     let $editorsInWrapper = $wrapper.find('.tiny-editor');
-    console.log('TinyMCE: Found', $editorsInWrapper.length, 'editors in wrapper to restart');
     
     // Clean up existing TinyMCE instances in this wrapper
     $editorsInWrapper.each(function() {
         let e_id = $(this).attr('id');
         if (e_id && tinymce.get(e_id)) {
-            console.log('TinyMCE: Removing editor instance:', e_id);
             tinymce.remove('#' + e_id);
         }
         $(this).removeClass('mce-initialized');
@@ -476,20 +445,17 @@ function validateTinyEditors() {
         return;
     }
     
-    console.log('TinyMCE: Validating', tinymce.editors.length, 'editor instances');
-    
     try {
         // Check for orphaned editors (target no longer in DOM)
         tinymce.editors.forEach(function(editor) {
             if (!editor || !editor.targetElm || !document.contains(editor.targetElm)) {
-                console.log('TinyMCE: Removing orphaned editor:', editor ? editor.id : 'unknown');
                 if (editor) {
                     editor.remove();
                 }
             }
         });
     } catch (e) {
-        console.error('TinyMCE: Error validating editors:', e);
+        // Silent fail
     }
 }
 
