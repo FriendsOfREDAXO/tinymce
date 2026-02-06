@@ -14,6 +14,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('phonelink', rex_url::addonAssets('tinymce', $pluginBasePath . 'phonelink/plugin.min.js'), 'phonelink');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('quote', rex_url::addonAssets('tinymce', $pluginBasePath . 'quote/plugin.min.js'), 'quote');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('snippets', rex_url::addonAssets('tinymce', $pluginBasePath . 'snippets/plugin.min.js'), 'snippets');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'for_images');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

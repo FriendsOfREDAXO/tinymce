@@ -1,0 +1,185 @@
+/**
+ * FOR Images - Frontend CSS
+ * =========================
+ * 
+ * CSS-Klassen für das FOR Images Plugin (TinyMCE).
+ * Diese Datei ist für Entwickler gedacht, die KEIN CSS-Framework (UIkit, Bootstrap) verwenden.
+ * 
+ * Einbindung im Frontend:
+ *   <link rel="stylesheet" href="/assets/addons/tinymce/css/for_images.css">
+ * 
+ * Oder via REDAXO:
+ *   rex_addon::get('tinymce')->getAssetsUrl('css/for_images.css')
+ */
+
+/* ==========================================================================
+   Base Figure Styles
+   ========================================================================== */
+
+figure {
+  margin: 0;
+  padding: 0;
+  display: table;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+figure > img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+figure > figcaption {
+  display: table-caption;
+  caption-side: bottom;
+  padding: 0.5em;
+  background: rgba(0, 0, 0, 0.03);
+  font-size: 0.9em;
+  color: #666;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Width Classes
+   ========================================================================== */
+
+/* Feste Breiten */
+figure.img-width-small {
+  width: 150px;
+}
+
+figure.img-width-medium {
+  width: 300px;
+}
+
+figure.img-width-large {
+  width: 600px;
+}
+
+figure.img-width-xlarge {
+  width: 900px;
+}
+
+/* Prozentuale Breiten */
+figure.img-width-25 {
+  width: 25%;
+}
+
+figure.img-width-33 {
+  width: 33.333%;
+}
+
+figure.img-width-50 {
+  width: 50%;
+}
+
+figure.img-width-66 {
+  width: 66.666%;
+}
+
+figure.img-width-75 {
+  width: 75%;
+}
+
+figure.img-width-full {
+  width: 100%;
+  display: block;
+}
+
+/* ==========================================================================
+   Alignment Classes
+   ========================================================================== */
+
+figure.img-align-left {
+  float: left;
+  margin: 0 1.5em 1em 0;
+}
+
+figure.img-align-right {
+  float: right;
+  margin: 0 0 1em 1.5em;
+}
+
+figure.img-align-center {
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+  float: none;
+}
+
+figure.img-align-none {
+  float: none;
+  margin: 0 0 1em 0;
+}
+
+/* ==========================================================================
+   Effect Classes
+   ========================================================================== */
+
+/* Schatten */
+figure.img-shadow-small {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+figure.img-shadow-medium {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+figure.img-shadow-large {
+  box-shadow: 0 14px 25px rgba(0, 0, 0, 0.16);
+}
+
+/* Abgerundete Ecken */
+figure.img-rounded > img {
+  border-radius: 5px;
+}
+
+figure.img-rounded-large > img {
+  border-radius: 10px;
+}
+
+figure.img-circle > img {
+  border-radius: 50%;
+}
+
+/* Rahmen */
+figure.img-border > img {
+  border: 1px solid #e5e5e5;
+}
+
+figure.img-border-dark > img {
+  border: 1px solid #333;
+}
+
+/* ==========================================================================
+   Responsive (Mobile First)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Auf kleinen Bildschirmen: Floats aufheben */
+  figure.img-align-left,
+  figure.img-align-right {
+    float: none;
+    width: 100%;
+    margin: 0 0 1em 0;
+  }
+  
+  /* Feste Breiten auf Mobile begrenzen */
+  figure.img-width-small,
+  figure.img-width-medium,
+  figure.img-width-large,
+  figure.img-width-xlarge {
+    max-width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Clearfix für Float-Container
+   ========================================================================== */
+
+.has-float-images::after {
+  content: "";
+  display: table;
+  clear: both;
+}

@@ -169,6 +169,14 @@ class Assets
                 'generate_config' => \rex_i18n::msg('tinymce_generate_config'),
                 'overwrites_existing_config' => \rex_i18n::msg('tinymce_overwrites_existing_config'),
                 'none' => \rex_i18n::msg('tinymce_none'),
+                'imagewidth' => \rex_i18n::msg('tinymce_imagewidth'),
+                'imagewidth_help' => \rex_i18n::msg('tinymce_imagewidth_help'),
+                'imagewidth_enable' => \rex_i18n::msg('tinymce_imagewidth_enable'),
+                'imagewidth_framework' => \rex_i18n::msg('tinymce_imagewidth_framework'),
+                'imagewidth_general' => \rex_i18n::msg('tinymce_imagewidth_general'),
+                'imagewidth_dialog' => \rex_i18n::msg('tinymce_imagewidth_dialog'),
+                'imagewidth_template' => \rex_i18n::msg('tinymce_imagewidth_template'),
+                'imagewidth_breakpoint' => \rex_i18n::msg('tinymce_imagewidth_breakpoint'),
             ];
             
             \rex_view::setJsProperty('tinymceProfileI18n', $i18n);
@@ -178,7 +186,7 @@ class Assets
                     'preview', 'searchreplace', 'autolink', 'directionality', 'visualblocks', 'visualchars', 'fullscreen',
                     'image', 'link', 'media', 'codesample', 'table', 'charmap', 'pagebreak', 'nonbreaking', 'anchor',
                     'insertdatetime', 'advlist', 'lists', 'wordcount', 'help', 'emoticons', 'code', 'save',
-                    'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars', 'snippets'
+                    'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars', 'snippets', 'for_images'
                 ],
                 'toolbar' => [
                     'styles', 'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',

@@ -126,6 +126,16 @@ tinymce_generate_config = Generate Configuration
 tinymce_overwrites_existing_config = Overwrites existing configuration!
 tinymce_none = None
 
+# imagewidth plugin
+tinymce_imagewidth = Image Width Plugin
+tinymce_imagewidth_help = Fixed image widths via CSS classes instead of manual resizing.
+tinymce_imagewidth_enable = Enable Image Width Plugin
+tinymce_imagewidth_framework = CSS Framework
+tinymce_imagewidth_general = General (pixel-based)
+tinymce_imagewidth_dialog = Dialog button in toolbar
+tinymce_imagewidth_template = Load Template
+tinymce_imagewidth_breakpoint = Breakpoint
+
 tinymce_devs = Developers
 
 tinymce_snippets = Snippets
