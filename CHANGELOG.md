@@ -1,6 +1,54 @@
 Changelog
 =========
 
+Version 8.2.0
+-------------------------------
+
+### Neues Plugin: FOR Images
+
+Komplett neues Bildformatierungs-Plugin mit umfangreichen Features:
+
+* **Preset-basierte Konfiguration:** Breiten, Ausrichtung und Effekte werden über JSON-Arrays im Profil definiert
+* **CSS-Framework Support:** Vordefinierte Templates für UIkit 3, Bootstrap 5 und allgemeine CSS-Klassen
+* **Responsive Breakpoints:** Automatische Generierung von responsive Klassen (@s, @m, @l für UIkit; sm, md, lg für Bootstrap)
+* **Figure-Wrapping:** Bilder werden automatisch in `<figure>` gewrappt für korrektes Float-Verhalten
+* **Bildunterschriften:** Eigener Caption-Button zum Hinzufügen/Entfernen von `<figcaption>`
+* **Alt-Text Button:** Schnelles Bearbeiten des Alt-Textes mit visuellem Status (aktiv = Alt-Text vorhanden)
+* **Effekte:** Schatten, abgerundete Ecken, Rahmen als toggle-bare Klassen
+* **Kein manuelles Resize:** Resize-Handles werden deaktiviert, Größen nur über Presets
+* **Aspect Ratio erhalten:** width/height Attribute bleiben für Browser-Ratio-Berechnung erhalten
+
+### Konfiguration im Profil
+
+```javascript
+plugins: 'for_images ...',
+imagewidth_presets: [
+    {label: 'Original', class: ''},
+    {label: 'Klein', class: 'uk-width-small@m'},
+    {label: '50%', class: 'uk-width-1-2@m'}
+],
+imagealign_presets: [
+    {label: 'Links', class: 'uk-float-left uk-margin-right uk-margin-bottom'},
+    {label: 'Rechts', class: 'uk-float-right uk-margin-left uk-margin-bottom'}
+],
+imageeffect_presets: [
+    {label: 'Schatten', class: 'uk-box-shadow-medium'},
+    {label: 'Abgerundet', class: 'uk-border-rounded'}
+]
+```
+
+### Profil-Assistent
+
+* Neue UI-Sektion "Bildformatierung" im Profil-Builder
+* Template-Auswahl (UIkit 3, Bootstrap 5, Allgemein)
+* Breakpoint-Selektor für responsive Klassen
+* JSON-Textareas für individuelle Anpassungen
+
+### Bugfixes & Verbesserungen
+* Fix: Inline-Styles auf Bildern werden entfernt, nur CSS-Klassen verwendet
+* Fix: Content-Styles für Editor-Preview aller Framework-Klassen
+
+
 Version 8.1.1
 -------------------------------
 Vendor-Update TinyMCE: ^8.2.2 → 8.3.1

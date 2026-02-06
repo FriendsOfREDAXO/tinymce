@@ -129,6 +129,14 @@ tinymce_generate_config = Konfiguration generieren
 tinymce_overwrites_existing_config = Überschreibt vorhandene Konfiguration!
 tinymce_none = Keine
 
+# imagewidth plugin
+tinymce_imagewidth = Bildbreiten-Plugin
+tinymce_imagewidth_help = Feste Bildbreiten statt manuellem Resize. Bilder bekommen CSS-Klassen statt Pixel-Werte.
+tinymce_imagewidth_enable = Bildbreiten-Plugin aktivieren
+tinymce_imagewidth_framework = CSS Framework
+tinymce_imagewidth_general = General (Pixel-basiert)
+tinymce_imagewidth_dialog = Dialog-Button in Toolbar
+
 tinymce_devs = Entwickler
 
 tinymce_snippets = Snippets

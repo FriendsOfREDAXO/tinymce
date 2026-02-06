@@ -157,6 +157,107 @@ So können UIkit-Styles nur im UIkit-Profil erscheinen und Bootstrap-Styles nur 
 - `name`: Eindeutiger interner Name (verhindert Kollisionen)
 - `wrapper`: Bei `true` wird das Element um die Auswahl gewickelt
 
+## FOR Images Plugin (Bildformatierung)
+
+Das `for_images` Plugin bietet umfassende Bildformatierung mit CSS-Framework-Unterstützung.
+
+### Features
+- **Preset-basierte Breiten:** Keine manuellen Pixel-Eingaben, nur vordefinierte CSS-Klassen
+- **Ausrichtung:** Links, Rechts, Zentriert mit Framework-spezifischen Float-Klassen
+- **Effekte:** Schatten, abgerundete Ecken, Rahmen als toggle-bare Optionen
+- **Bildunterschriften:** Eigener Button zum Hinzufügen/Entfernen von Captions
+- **Alt-Text:** Schnellzugriff-Button mit visuellem Status
+- **Figure-Wrapping:** Automatisches Wrappen in `<figure>` für korrektes Float-Verhalten
+- **Responsive:** Unterstützung für Breakpoint-Klassen (@s, @m, @l für UIkit; sm, md, lg für Bootstrap)
+
+### Aktivierung
+
+Im Profil `for_images` zu den Plugins hinzufügen. Der Profil-Assistent bietet eine komfortable UI mit Template-Auswahl.
+
+### Konfiguration im Profil
+
+```javascript
+plugins: 'for_images image ...',
+
+// Breiten-Presets
+imagewidth_presets: [
+    {label: 'Original', class: ''},
+    {label: 'Klein', class: 'uk-width-small@m'},
+    {label: 'Mittel', class: 'uk-width-medium@m'},
+    {label: 'Groß', class: 'uk-width-large@m'},
+    {label: '50%', class: 'uk-width-1-2@m'},
+    {label: '100%', class: 'uk-width-1-1'}
+],
+
+// Ausrichtungs-Presets
+imagealign_presets: [
+    {label: 'Keine', class: ''},
+    {label: 'Links', class: 'uk-float-left uk-margin-right uk-margin-bottom'},
+    {label: 'Rechts', class: 'uk-float-right uk-margin-left uk-margin-bottom'},
+    {label: 'Zentriert', class: 'uk-display-block uk-margin-auto'}
+],
+
+// Effekt-Presets (optional)
+imageeffect_presets: [
+    {label: 'Kein Effekt', class: ''},
+    {label: 'Schatten klein', class: 'uk-box-shadow-small'},
+    {label: 'Schatten mittel', class: 'uk-box-shadow-medium'},
+    {label: 'Abgerundet', class: 'uk-border-rounded'},
+    {label: 'Rahmen', class: 'uk-border'}
+]
+```
+
+### Verfügbare Templates
+
+Der Profil-Assistent bietet vorgefertigte Templates:
+
+| Template | Beschreibung |
+|----------|-------------|
+| UIkit 3 | `uk-width-*`, `uk-float-*`, `uk-box-shadow-*` Klassen |
+| Bootstrap 5 | `col-*`, `float-*`, `shadow-*` Klassen |
+| Allgemein | Generische CSS-Klassen (`img-width-small`, etc.) |
+
+### Context-Toolbar
+
+Bei Bildauswahl erscheint eine Toolbar mit:
+- **Breite:** Dropdown mit allen Breiten-Presets
+- **Ausrichtung:** Toggle-Buttons (Links, Zentriert, Rechts, Keine)
+- **Effekte:** Dialog zum Aktivieren/Deaktivieren von Effekten
+- **Alt:** Alt-Text bearbeiten (leuchtet bei vorhandenem Alt-Text)
+- **Caption:** Bildunterschrift hinzufügen/entfernen
+
+### HTML-Ausgabe
+
+```html
+<figure class="uk-float-left uk-margin-right uk-margin-bottom uk-width-medium@m">
+    <img class="uk-width-1-1" src="/media/bild.jpg" alt="Beschreibung" width="800" height="600">
+    <figcaption>Optionale Bildunterschrift</figcaption>
+</figure>
+```
+
+**Hinweis:** Das Bild erhält automatisch die passende 100%-Klasse (`uk-width-1-1` für UIkit, `w-100` für Bootstrap), damit es die Figure-Breite ausfüllt.
+
+### Frontend-CSS für allgemeine Klassen
+
+Wenn Sie **kein CSS-Framework** (UIkit, Bootstrap) verwenden und die "Allgemein"-Vorlage nutzen, benötigen Sie die mitgelieferte CSS-Datei im Frontend:
+
+```html
+<link rel="stylesheet" href="/assets/addons/tinymce/css/for_images.css">
+```
+
+Oder via REDAXO:
+```php
+echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_images.css') . '">';
+```
+
+Die CSS-Datei enthält:
+- **Breiten:** `img-width-small`, `img-width-medium`, `img-width-large`, `img-width-full`, `img-width-25`...`img-width-75`
+- **Ausrichtung:** `img-align-left`, `img-align-right`, `img-align-center`
+- **Effekte:** `img-shadow-small/medium/large`, `img-rounded`, `img-border`
+- **Responsive:** Floats werden auf mobilen Geräten automatisch aufgehoben
+
+**Tipp:** UIkit- und Bootstrap-Nutzer benötigen diese Datei nicht, da die Framework-eigenen Klassen verwendet werden.
+
 ## Link YForm Plugin
 
 Das `link_yform` Plugin ermöglicht es, Datensätze aus YForm-Tabellen direkt im Editor zu verlinken.

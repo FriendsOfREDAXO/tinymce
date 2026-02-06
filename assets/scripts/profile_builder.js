@@ -129,6 +129,43 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-yform-add"><i class="rex-icon fa-plus"></i> Add Item</button>';
     settingsHtml += '</div></div>';
 
+    // Image Width Plugin (Preset-based)
+    settingsHtml += '<br><legend><i class="rex-icon fa-image"></i> ' + (i18n.imagewidth || 'Bildformatierung') + '</legend>';
+    settingsHtml += '<p class="help-block">' + (i18n.imagewidth_help || 'Bilder werden in &lt;figure&gt; gewrappt. Breite, Ausrichtung und Effekte als CSS-Klassen.') + '</p>';
+    settingsHtml += '<div class="row">';
+    settingsHtml += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-imagewidth-enable"> ' + (i18n.imagewidth_enable || 'Aktivieren') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.imagewidth_template || 'Vorlage laden') + '</label>';
+    settingsHtml += '<select class="form-control builder-imagewidth-template" disabled>';
+    settingsHtml += '<option value="">-- Auswählen --</option>';
+    settingsHtml += '<option value="uikit">UIkit 3</option>';
+    settingsHtml += '<option value="bootstrap">Bootstrap 5</option>';
+    settingsHtml += '<option value="general">Allgemein (Pixel)</option>';
+    settingsHtml += '</select></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>Breakpoint (UIkit/BS)</label>';
+    settingsHtml += '<select class="form-control builder-imagewidth-breakpoint" disabled>';
+    settingsHtml += '<option value="">Alle Viewports</option>';
+    settingsHtml += '<option value="@s">UIkit @s (≥640px)</option>';
+    settingsHtml += '<option value="@m" selected>UIkit @m (≥960px)</option>';
+    settingsHtml += '<option value="@l">UIkit @l (≥1200px)</option>';
+    settingsHtml += '<option value="sm">Bootstrap sm (≥576px)</option>';
+    settingsHtml += '<option value="md">Bootstrap md (≥768px)</option>';
+    settingsHtml += '<option value="lg">Bootstrap lg (≥992px)</option>';
+    settingsHtml += '</select></div></div>';
+    settingsHtml += '</div>';
+    // Preset Textareas
+    settingsHtml += '<div class="builder-imagewidth-presets" style="display:none; margin-top:10px;">';
+    settingsHtml += '<div class="row">';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Breiten-Presets (JSON)</label>';
+    settingsHtml += '<textarea class="form-control builder-imagewidth-width-presets" rows="6" placeholder=\'[{"label":"Klein","class":"uk-width-small@m"}]\'></textarea>';
+    settingsHtml += '<p class="help-block small">Array: [{label, class}]</p></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Ausrichtungs-Presets (JSON)</label>';
+    settingsHtml += '<textarea class="form-control builder-imagewidth-align-presets" rows="6" placeholder=\'[{"label":"Links","class":"uk-float-left uk-margin-right"}]\'></textarea>';
+    settingsHtml += '<p class="help-block small">Array: [{label, class}]</p></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Effekt-Presets (JSON)</label>';
+    settingsHtml += '<textarea class="form-control builder-imagewidth-effect-presets" rows="6" placeholder=\'[{"label":"Schatten","class":"uk-box-shadow-medium"}]\'></textarea>';
+    settingsHtml += '<p class="help-block small">Multi-Select, kombinierbar</p></div></div>';
+    settingsHtml += '</div></div>';
+
     // TOC Settings
     settingsHtml += '<div class="row" style="margin-top:10px;">';
     settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_depth || 'TOC Depth') + '</label><input type="number" class="form-control builder-toc-depth" value="3"></div></div>';
@@ -150,6 +187,133 @@ function initTinyMceProfileAssistant() {
             $builderBody.find('.builder-context-toolbar-options').slideUp();
         }
     });
+
+    // Image Width Plugin Toggle
+    $builderBody.on('change', '.builder-imagewidth-enable', function() {
+        const enabled = $(this).is(':checked');
+        $builderBody.find('.builder-imagewidth-template').prop('disabled', !enabled);
+        $builderBody.find('.builder-imagewidth-breakpoint').prop('disabled', !enabled);
+        if (enabled) {
+            $builderBody.find('.builder-plugin[value="for_images"]').prop('checked', true);
+            $builderBody.find('.builder-imagewidth-presets').slideDown();
+        } else {
+            $builderBody.find('.builder-plugin[value="for_images"]').prop('checked', false);
+            $builderBody.find('.builder-imagewidth-presets').slideUp();
+        }
+    });
+
+    // Template loader for presets
+    $builderBody.on('change', '.builder-imagewidth-template', function() {
+        const template = $(this).val();
+        const bp = $builderBody.find('.builder-imagewidth-breakpoint').val() || '';
+        loadImagewidthPresets(template, bp);
+    });
+    $builderBody.on('change', '.builder-imagewidth-breakpoint', function() {
+        const template = $builderBody.find('.builder-imagewidth-template').val();
+        const bp = $(this).val() || '';
+        if (template) {
+            loadImagewidthPresets(template, bp);
+        }
+    });
+
+    function loadImagewidthPresets(template, bp) {
+        let widthPresets = [];
+        let alignPresets = [];
+        let effectPresets = [];
+        
+        if (template === 'uikit') {
+            const suffix = bp.startsWith('@') ? bp : '';
+            widthPresets = [
+                { label: 'Original', class: '' },
+                { label: 'Klein (150px)', class: 'uk-width-small' + suffix },
+                { label: 'Mittel (300px)', class: 'uk-width-medium' + suffix },
+                { label: 'Groß (450px)', class: 'uk-width-large' + suffix },
+                { label: 'XL (600px)', class: 'uk-width-xlarge' + suffix },
+                { label: '1/2 (50%)', class: 'uk-width-1-2' + suffix },
+                { label: '1/3 (33%)', class: 'uk-width-1-3' + suffix },
+                { label: '1/4 (25%)', class: 'uk-width-1-4' + suffix },
+                { label: '2/3 (66%)', class: 'uk-width-2-3' + suffix },
+                { label: '3/4 (75%)', class: 'uk-width-3-4' + suffix },
+                { label: '100%', class: 'uk-width-1-1' }
+            ];
+            alignPresets = [
+                { label: 'Keine', class: '' },
+                { label: 'Links (Text umfließt)', class: 'uk-float-left uk-margin-right uk-margin-bottom' },
+                { label: 'Rechts (Text umfließt)', class: 'uk-float-right uk-margin-left uk-margin-bottom' },
+                { label: 'Zentriert', class: 'uk-display-block uk-margin-auto' }
+            ];
+            effectPresets = [
+                { label: 'Kein Effekt', class: '' },
+                { label: 'Schatten klein', class: 'uk-box-shadow-small' },
+                { label: 'Schatten mittel', class: 'uk-box-shadow-medium' },
+                { label: 'Schatten groß', class: 'uk-box-shadow-large' },
+                { label: 'Abgerundet', class: 'uk-border-rounded' },
+                { label: 'Rund (Kreis)', class: 'uk-border-circle' },
+                { label: 'Rahmen', class: 'uk-border' }
+            ];
+        } else if (template === 'bootstrap') {
+            const prefix = bp && !bp.startsWith('@') ? bp + '-' : '';
+            widthPresets = [
+                { label: 'Original', class: '' },
+                { label: '25%', class: 'col-' + prefix + '3' },
+                { label: '33%', class: 'col-' + prefix + '4' },
+                { label: '50%', class: 'col-' + prefix + '6' },
+                { label: '66%', class: 'col-' + prefix + '8' },
+                { label: '75%', class: 'col-' + prefix + '9' },
+                { label: '100%', class: 'col-12' }
+            ];
+            alignPresets = [
+                { label: 'Keine', class: '' },
+                { label: 'Links (Text umfließt)', class: 'float-start me-3 mb-3' },
+                { label: 'Rechts (Text umfließt)', class: 'float-end ms-3 mb-3' },
+                { label: 'Zentriert', class: 'd-block mx-auto' }
+            ];
+            effectPresets = [
+                { label: 'Kein Effekt', class: '' },
+                { label: 'Schatten klein', class: 'shadow-sm' },
+                { label: 'Schatten', class: 'shadow' },
+                { label: 'Schatten groß', class: 'shadow-lg' },
+                { label: 'Abgerundet', class: 'rounded' },
+                { label: 'Rund (Kreis)', class: 'rounded-circle' },
+                { label: 'Rahmen', class: 'border' }
+            ];
+        } else if (template === 'general') {
+            widthPresets = [
+                { label: 'Original', class: '' },
+                { label: 'Klein (150px)', class: 'img-width-small' },
+                { label: 'Mittel (300px)', class: 'img-width-medium' },
+                { label: 'Groß (600px)', class: 'img-width-large' },
+                { label: 'XL (900px)', class: 'img-width-xlarge' },
+                { label: '25%', class: 'img-width-25' },
+                { label: '33%', class: 'img-width-33' },
+                { label: '50%', class: 'img-width-50' },
+                { label: '66%', class: 'img-width-66' },
+                { label: '75%', class: 'img-width-75' },
+                { label: '100%', class: 'img-width-full' }
+            ];
+            alignPresets = [
+                { label: 'Keine', class: '' },
+                { label: 'Links (Text umfließt)', class: 'img-align-left' },
+                { label: 'Rechts (Text umfließt)', class: 'img-align-right' },
+                { label: 'Zentriert', class: 'img-align-center' }
+            ];
+            effectPresets = [
+                { label: 'Kein Effekt', class: '' },
+                { label: 'Schatten klein', class: 'img-shadow-small' },
+                { label: 'Schatten mittel', class: 'img-shadow-medium' },
+                { label: 'Schatten groß', class: 'img-shadow-large' },
+                { label: 'Abgerundet', class: 'img-rounded' },
+                { label: 'Stark abgerundet', class: 'img-rounded-large' },
+                { label: 'Rund (Kreis)', class: 'img-circle' },
+                { label: 'Rahmen', class: 'img-border' },
+                { label: 'Rahmen (dunkel)', class: 'img-border-dark' }
+            ];
+        }
+
+        $builderBody.find('.builder-imagewidth-width-presets').val(JSON.stringify(widthPresets, null, 2));
+        $builderBody.find('.builder-imagewidth-align-presets').val(JSON.stringify(alignPresets, null, 2));
+        $builderBody.find('.builder-imagewidth-effect-presets').val(JSON.stringify(effectPresets, null, 2));
+    }
 
     // Styles for Sortable
     const style = document.createElement('style');
@@ -233,6 +397,8 @@ function initTinyMceProfileAssistant() {
         setPlugins(pluginsList);
         clearItems();
         ['undo', 'redo', '|', 'blocks', 'fontsize', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'forecolor', 'backcolor', '|', 'alignleft', 'aligncenter', 'alignright', 'alignjustify', '|', 'bullist', 'numlist', 'outdent', 'indent', '|', 'link', 'link_yform', 'phonelink', 'quote', 'image', 'media', 'table', 'codesample', 'accordion', '|', 'removeformat', 'code', 'fullscreen'].forEach(addItem);
+        // Enable for_images in Full preset
+        $builderBody.find('.builder-imagewidth-enable').prop('checked', true).trigger('change');
     });
 
     // Add Item Click
@@ -412,6 +578,29 @@ function generateConfig($textarea, $builderBody) {
     const defaultCodesample = $builderBody.find('.builder-default-codesample').is(':checked');
     const defaultRelList = $builderBody.find('.builder-default-rellist').is(':checked');
 
+    // Image Width (preset-based)
+    const imagewidthEnabled = $builderBody.find('.builder-imagewidth-enable').is(':checked');
+    let imagewidthWidthPresets = null;
+    let imagewidthAlignPresets = null;
+    let imagewidthEffectPresets = null;
+    try {
+        const widthJson = $builderBody.find('.builder-imagewidth-width-presets').val();
+        if (widthJson && widthJson.trim()) imagewidthWidthPresets = JSON.parse(widthJson);
+    } catch (e) { console.warn('Invalid width presets JSON'); }
+    try {
+        const alignJson = $builderBody.find('.builder-imagewidth-align-presets').val();
+        if (alignJson && alignJson.trim()) imagewidthAlignPresets = JSON.parse(alignJson);
+    } catch (e) { console.warn('Invalid align presets JSON'); }
+    try {
+        const effectJson = $builderBody.find('.builder-imagewidth-effect-presets').val();
+        if (effectJson && effectJson.trim()) imagewidthEffectPresets = JSON.parse(effectJson);
+    } catch (e) { console.warn('Invalid effect presets JSON'); }
+
+    // Ensure for_images plugin is in the list
+    if (imagewidthEnabled && !plugins.includes('for_images')) {
+        plugins.push('for_images');
+    }
+
     // YForm Config
     const yformTitle = escapeString($builderBody.find('.builder-yform-title').val());
     const yformItems = [];
@@ -490,7 +679,8 @@ function generateConfig($textarea, $builderBody) {
     }
     
     if (toolbar) {
-        configStr += `toolbar: '${toolbar}',\n`;
+        let finalToolbar = toolbar;
+        configStr += `toolbar: '${finalToolbar}',\n`;
     }
     
     configStr += `height: ${height},\n\n`;
@@ -505,6 +695,23 @@ function generateConfig($textarea, $builderBody) {
     configStr += `document_base_url: "${baseUrl}",\n`;
     configStr += `entity_encoding: '${entityEncoding}',\n`;
     configStr += `convert_urls: ${convertUrls},\n\n`;
+
+    // Image Width (preset-based: width, alignment, effects on <figure>)
+    if (imagewidthEnabled) {
+        configStr += `object_resizing: false,\n`;
+        configStr += `quickbars_image_toolbar: false,\n`;
+        configStr += `extended_valid_elements: 'figure[class|style|contenteditable],figcaption[contenteditable]',\n`;
+        if (imagewidthWidthPresets) {
+            configStr += `imagewidth_presets: ${JSON.stringify(imagewidthWidthPresets)},\n`;
+        }
+        if (imagewidthAlignPresets) {
+            configStr += `imagealign_presets: ${JSON.stringify(imagewidthAlignPresets)},\n`;
+        }
+        if (imagewidthEffectPresets && imagewidthEffectPresets.length > 1) {
+            configStr += `imageeffect_presets: ${JSON.stringify(imagewidthEffectPresets)},\n`;
+        }
+        configStr += '\n';
+    }
 
     if (defaultCodesample) {
         configStr += `codesample_languages: [
