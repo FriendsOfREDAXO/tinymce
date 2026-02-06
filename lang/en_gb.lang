@@ -133,6 +133,8 @@ tinymce_imagewidth_enable = Enable Image Width Plugin
 tinymce_imagewidth_framework = CSS Framework
 tinymce_imagewidth_general = General (pixel-based)
 tinymce_imagewidth_dialog = Dialog button in toolbar
+tinymce_imagewidth_template = Load Template
+tinymce_imagewidth_breakpoint = Breakpoint
 
 tinymce_devs = Developers
 

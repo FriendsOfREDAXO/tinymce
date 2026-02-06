@@ -175,6 +175,8 @@ class Assets
                 'imagewidth_framework' => \rex_i18n::msg('tinymce_imagewidth_framework'),
                 'imagewidth_general' => \rex_i18n::msg('tinymce_imagewidth_general'),
                 'imagewidth_dialog' => \rex_i18n::msg('tinymce_imagewidth_dialog'),
+                'imagewidth_template' => \rex_i18n::msg('tinymce_imagewidth_template'),
+                'imagewidth_breakpoint' => \rex_i18n::msg('tinymce_imagewidth_breakpoint'),
             ];
             
             \rex_view::setJsProperty('tinymceProfileI18n', $i18n);

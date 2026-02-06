@@ -134,8 +134,10 @@ tinymce_imagewidth = Bildbreiten-Plugin
 tinymce_imagewidth_help = Feste Bildbreiten statt manuellem Resize. Bilder bekommen CSS-Klassen statt Pixel-Werte.
 tinymce_imagewidth_enable = Bildbreiten-Plugin aktivieren
 tinymce_imagewidth_framework = CSS Framework
-tinymce_imagewidth_general = General (Pixel-basiert)
+tinymce_imagewidth_general = Allgemein (Pixel-basiert)
 tinymce_imagewidth_dialog = Dialog-Button in Toolbar
+tinymce_imagewidth_template = Vorlage laden
+tinymce_imagewidth_breakpoint = Breakpoint
 
 tinymce_devs = Entwickler
 

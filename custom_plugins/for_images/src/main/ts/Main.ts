@@ -5,5 +5,7 @@ Plugin();
 /** *****
  * DO NOT EXPORT ANYTHING
  *
- * IF YOU DO ROLLUP WILL LEAVE A `imagewidth` GLOBAL ON THE PAGE
+ * This entry file is bundled by esbuild as the `for_images` plugin.
+ * Exporting anything from here can change how the plugin bundle is
+ * retained/loaded on the page, so keep this file free of exports.
  *******/

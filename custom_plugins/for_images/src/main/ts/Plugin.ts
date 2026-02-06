@@ -151,6 +151,14 @@ function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allP
       });
       // Apply full width to img so it fills the figure
       applyImgFullWidth(img, fullWidthClass);
+    } else {
+      // "Original" selected - remove full width classes from img
+      if (fullWidthClass) {
+        fullWidthClass.split(/\s+/).forEach(c => {
+          if (c) img.classList.remove(c);
+        });
+        if (img.classList.length === 0) img.removeAttribute('class');
+      }
     }
     if (figure.classList.length === 0) figure.removeAttribute('class');
   }

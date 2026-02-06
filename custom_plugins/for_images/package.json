@@ -1,12 +1,12 @@
 {
-  "name": "imagewidth",
+  "name": "for_images",
   "version": "1.0.0",
-  "description": "Fixed image width classes for UIkit 3 and Bootstrap",
+  "description": "Image formatting with CSS classes for UIkit 3, Bootstrap 5, and general use",
   "scripts": {
     "prepublishOnly": "pnpm lint && pnpm build",
     "lint": "eslint src/**/*.ts",
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/imagewidth/ ../../assets/scripts/tinymce/plugins/imagewidth/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/imagewidth/ ../../assets/vendor/tinymce/plugins/imagewidth/",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_images/ ../../assets/scripts/tinymce/plugins/for_images/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_images/ ../../assets/vendor/tinymce/plugins/for_images/",
     "test": "bedrock-auto -b chrome-headless -d src/test/ts/",
     "test-manual": "bedrock -d src/test/ts/"
   },
