@@ -1,0 +1,6 @@
+Version 1.0.0 (2026-02-06)
+  - Initial release
+  - UIkit 3 width classes with breakpoint support
+  - Bootstrap width classes
+  - Original size and small preset
+  - Disable manual image resizing
