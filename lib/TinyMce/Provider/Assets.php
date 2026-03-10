@@ -35,12 +35,6 @@ class Assets
 
             // Load active Style-Sets from database
             $styleSetsOptions = self::loadActiveStyleSets();
-            
-            // Debug: Log loaded style sets
-            \rex_logger::factory()->log('debug', 'TinyMCE Style-Sets loaded', [
-                'content_css_count' => count($styleSetsOptions['content_css']),
-                'style_formats_count' => count($styleSetsOptions['style_formats']),
-            ]);
 
             // Global content_style to fix UIkit/Bootstrap focus outlines in editor
             $contentStyle = 'body { outline: none !important; box-shadow: none !important; } :focus { outline: none !important; box-shadow: none !important; }';
@@ -54,13 +48,6 @@ class Assets
                 'content_style' => $contentStyle,
             ]));
             \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
-            
-            // Debug: Log global options after extension point
-            \rex_logger::factory()->log('debug', 'TinyMCE Global Options after EP', [
-                'content_css' => $globalOptions['content_css'] ?? [],
-                'style_formats_count' => count($globalOptions['style_formats'] ?? []),
-                'style_formats_merge' => $globalOptions['style_formats_merge'] ?? false,
-            ]);
 
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
