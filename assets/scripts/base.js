@@ -382,6 +382,13 @@ function tiny_init(container) {
             editor.on('change', function(e) {
                 $(editor.targetElm).html(editor.getContent());
             });
+
+            // Fix: TinyMCE setzt overflow:hidden auf <html> bei Dialogen und entfernt es nicht
+            // zuverlässig – das blockiert window.scroll-Events und damit die REDAXO-Nav (Issue #139)
+            editor.on('CloseWindow', function() {
+                document.documentElement.style.removeProperty('overflow');
+                document.documentElement.style.removeProperty('overflow-y');
+            });
             
             // Call original setup if it existed
             if (originalSetup && typeof originalSetup === 'function') {

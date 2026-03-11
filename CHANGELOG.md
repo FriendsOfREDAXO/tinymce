@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 8.2.3
+-------------------------------
+
+### Bugfix
+* Fix: `html`-Block in `assets/styles/base.css` entfernt, der `height: auto` und `min-height: 100%` setzte und damit die REDAXO-Backend-Navigation beim Scrollen blockierte (Backend-Header wurde nicht mehr aus- und eingeblendet) – Issue #139
+
+
 Version 8.2.0
 -------------------------------
 
