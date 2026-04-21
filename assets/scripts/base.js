@@ -154,7 +154,11 @@ function tiny_init(container) {
     profiles.forEach(function(profile) {
         let options = {};
         if (profile in tinyprofiles) {
-            options = tinyprofiles[profile];
+            // Shallow copy to avoid mutating the shared tinyprofiles cache.
+            // Without this, repeated calls (e.g., multiple editors with the same
+            // profile) would accumulate style_formats on the global object, causing
+            // duplicated entries in the Styles dropdown.
+            options = Object.assign({}, tinyprofiles[profile]);
         } else {
             options = {
                 license_key: 'gpl',
@@ -354,7 +358,9 @@ function tiny_init(container) {
                     }
                 });
                 
-                // Register all formats so they work when applied
+                // Register all formats so they work when applied.
+                // Only include defined properties in the spec – passing undefined values
+                // can confuse TinyMCE's internal format detection logic.
                 editor.on('init', function() {
                     function registerFormats(formats) {
                         formats.forEach(function(format) {
@@ -362,15 +368,13 @@ function tiny_init(container) {
                                 registerFormats(format.items);
                             } else if (format.inline || format.block || format.selector) {
                                 let formatName = format.name || format.format || 'custom-' + format.title.toLowerCase().replace(/\s+/g, '-');
-                                editor.formatter.register(formatName, {
-                                    inline: format.inline,
-                                    block: format.block,
-                                    selector: format.selector,
-                                    classes: format.classes,
-                                    styles: format.styles,
-                                    attributes: format.attributes,
-                                    wrapper: format.wrapper
+                                let spec = {};
+                                ['inline', 'block', 'selector', 'classes', 'styles', 'attributes', 'wrapper', 'exact', 'collapse', 'split', 'deep', 'expand', 'remove', 'mixed'].forEach(function(key) {
+                                    if (format[key] !== undefined && format[key] !== null) {
+                                        spec[key] = format[key];
+                                    }
                                 });
+                                editor.formatter.register(formatName, spec);
                             }
                         });
                     }

@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.2.6
+-------------------------------
+
+### Bugfixes
+* Fix: Style-Sets wurden bei mehreren Editoren mit demselben Profil auf einer Seite doppelt in das Styles-Dropdown eingebunden. Ursache war eine direkte Objektreferenz auf `tinyprofiles[profile]` statt eines Klons – Mutationen wie `style_formats.concat(...)` haben das globale Cache-Objekt verändert. Behoben durch `Object.assign({}, tinyprofiles[profile])` in `base.js`
+* Fix: `registerFormats` in `base.js` übergibt ab sofort nur definierte Properties an `editor.formatter.register()`. Undefinierte Properties (z.B. `inline: undefined` bei Selector-Formaten) konnten TinyMCEs internen Format-Typ-Erkennungsmechanismus stören und dazu führen, dass Listen-, Tabellen- und Bildstile nicht griffen
+* Fix: Alle Format-Items in den Default Style-Sets (UIkit3, Bootstrap5) erhalten jetzt explizite `name`-Properties. Der zuvor automatisch aus dem Titel generierte Name war bei Sonderzeichen (Umlaute) und Leerzeichen unzuverlässig und konnte Kollisionen verursachen
+* Fix: UIkit3 Style-Set "Überschriften" enthielt nur UIkit-spezifische Heading-Varianten. Ergänzt um normale `h1`–`h6` ohne Klasse als erste Einträge der Gruppe
+
+
 Version 8.2.3
 -------------------------------
 
