@@ -1,0 +1,158 @@
+/* ==========================================================================
+ * for_footnotes – Frontend Stylesheet
+ * --------------------------------------------------------------------------
+ * Minimales, framework-agnostisches Styling für Fußnoten, die mit dem
+ * FriendsOfREDAXO `for_footnotes` TinyMCE-Plugin erzeugt wurden.
+ *
+ * Alle Farben, Abstände und Typo-Werte werden über CSS Custom Properties
+ * gesteuert. Einfach im eigenen Theme überschreiben:
+ *
+ *   :root {
+ *       --for-footnotes-color: #333;
+ *       --for-footnotes-link-color: #006ce0;
+ *       --for-footnotes-font-size: 0.85em;
+ *   }
+ *
+ * Einbinden:
+ *   <link rel="stylesheet" href="/assets/addons/tinymce/css/for_footnotes.css">
+ *
+ * Oder in REDAXO:
+ *   echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_footnotes.css') . '">';
+ * ========================================================================== */
+
+:root {
+    /* Container */
+    --for-footnotes-margin-top: 2.5rem;
+    --for-footnotes-padding-top: 1rem;
+    --for-footnotes-max-width: 100%;
+    --for-footnotes-font-size: 0.85em;
+    --for-footnotes-line-height: 1.5;
+    --for-footnotes-color: inherit;
+    --for-footnotes-font-family: inherit;
+
+    /* Trenner (<hr>) */
+    --for-footnotes-hr-width: 25%;
+    --for-footnotes-hr-height: 1px;
+    --for-footnotes-hr-color: rgba(0, 0, 0, 0.15);
+    --for-footnotes-hr-margin-bottom: 1rem;
+
+    /* Liste */
+    --for-footnotes-list-padding-left: 2rem;
+    --for-footnotes-item-margin-bottom: 0.35rem;
+
+    /* Hochgestellte Referenz (<sup>) */
+    --for-footnote-ref-color: #0066cc;
+    --for-footnote-ref-hover-color: #004a99;
+    --for-footnote-ref-font-size: 0.75em;
+    --for-footnote-ref-padding: 0 0.1em;
+
+    /* Rück-Link (^) */
+    --for-footnote-back-color: #888;
+    --for-footnote-back-hover-color: #000;
+    --for-footnote-back-margin-right: 0.35em;
+    --for-footnote-back-font-weight: 700;
+}
+
+/* Dark-Mode defaults */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --for-footnotes-hr-color: rgba(255, 255, 255, 0.15);
+        --for-footnote-ref-color: #6cb3ff;
+        --for-footnote-ref-hover-color: #9cccff;
+        --for-footnote-back-color: #999;
+        --for-footnote-back-hover-color: #fff;
+    }
+}
+
+/* ==========================================================================
+ * Layout
+ * ========================================================================== */
+
+div.for-footnotes {
+    margin-top: var(--for-footnotes-margin-top);
+    padding-top: var(--for-footnotes-padding-top);
+    max-width: var(--for-footnotes-max-width);
+    font-size: var(--for-footnotes-font-size);
+    line-height: var(--for-footnotes-line-height);
+    color: var(--for-footnotes-color);
+    font-family: var(--for-footnotes-font-family);
+}
+
+div.for-footnotes hr {
+    width: var(--for-footnotes-hr-width);
+    height: var(--for-footnotes-hr-height);
+    margin: 0 auto 0 0;
+    margin-bottom: var(--for-footnotes-hr-margin-bottom);
+    border: 0;
+    background-color: var(--for-footnotes-hr-color);
+}
+
+div.for-footnotes ol {
+    padding-left: var(--for-footnotes-list-padding-left);
+    margin: 0;
+}
+
+div.for-footnotes ol > li {
+    margin-bottom: var(--for-footnotes-item-margin-bottom);
+    scroll-margin-top: 5rem; /* für #-Sprünge mit fixem Header */
+}
+
+/* ==========================================================================
+ * Hochgestellte Referenz
+ * ========================================================================== */
+
+sup.for-footnote-ref {
+    font-size: var(--for-footnote-ref-font-size);
+    padding: var(--for-footnote-ref-padding);
+    scroll-margin-top: 5rem;
+}
+
+sup.for-footnote-ref a {
+    color: var(--for-footnote-ref-color);
+    text-decoration: none;
+    font-weight: inherit;
+}
+
+sup.for-footnote-ref a:hover,
+sup.for-footnote-ref a:focus {
+    color: var(--for-footnote-ref-hover-color);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+ * Rück-Link
+ * ========================================================================== */
+
+div.for-footnotes a.for-footnote-back {
+    color: var(--for-footnote-back-color);
+    text-decoration: none;
+    font-weight: var(--for-footnote-back-font-weight);
+    margin-right: var(--for-footnote-back-margin-right);
+}
+
+div.for-footnotes a.for-footnote-back:hover,
+div.for-footnotes a.for-footnote-back:focus {
+    color: var(--for-footnote-back-hover-color);
+    text-decoration: none;
+}
+
+/* ==========================================================================
+ * Print
+ * ========================================================================== */
+
+@media print {
+    sup.for-footnote-ref a {
+        color: black;
+        text-decoration: none;
+    }
+
+    div.for-footnotes {
+        break-inside: avoid;
+        width: 100%;
+    }
+
+    /* Rück-Links sind im Druck sinnlos */
+    div.for-footnotes a.for-footnote-back {
+        display: none;
+    }
+}

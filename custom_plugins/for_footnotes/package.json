@@ -1,0 +1,17 @@
+{
+  "name": "for_footnotes",
+  "version": "1.0.0",
+  "description": "Footnotes plugin for TinyMCE (FriendsOfREDAXO, free & open-source)",
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_footnotes/ ../../assets/scripts/tinymce/plugins/for_footnotes/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_footnotes/ ../../assets/vendor/tinymce/plugins/for_footnotes/"
+  },
+  "keywords": ["tinymce", "footnotes", "redaxo"],
+  "author": "FriendsOfREDAXO",
+  "devDependencies": {
+    "esbuild": "^0.18.0",
+    "tinymce": "^8.2.2",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0"
+  }
+}

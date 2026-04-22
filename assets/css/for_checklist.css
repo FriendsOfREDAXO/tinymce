@@ -1,0 +1,137 @@
+/* ==================================================================
+ *  FriendsOfREDAXO Checklist – Styles
+ *  -----------------------------------------------------------------
+ *  HTML-Format:
+ *    <ul class="for-checklist">
+ *      <li class="for-checklist__item" data-checked="true|false">…</li>
+ *    </ul>
+ *
+ *  Modernes Design via ::before-Pseudo-Element (keine Form-Checkbox).
+ *  Alle Farben/Größen per CSS-Variable überschreibbar.
+ * ================================================================== */
+
+:root {
+    /* Layout */
+    --for-checklist-gap: 0.35em;
+    --for-checklist-indent: 1.75em;
+    --for-checklist-item-margin: 0.25em 0;
+
+    /* Checkbox */
+    --for-checkbox-size: 1.15em;
+    --for-checkbox-radius: 6px;
+    --for-checkbox-border-width: 1.5px;
+    --for-checkbox-border-color: #b5bcc7;
+    --for-checkbox-border-color-hover: #7a8595;
+    --for-checkbox-bg: transparent;
+    --for-checkbox-checked-bg: #2f80ed;
+    --for-checkbox-checked-border-color: #2f80ed;
+    --for-checkbox-check-color: #ffffff;
+    --for-checkbox-transition: background-color .15s ease, border-color .15s ease, transform .1s ease;
+    --for-checkbox-offset-top: 0.15em;
+
+    /* Typo */
+    --for-checklist-text-color: inherit;
+    --for-checklist-checked-text-color: #8a8f99;
+    --for-checklist-checked-decoration: line-through;
+
+    /* Feature-Variante (Benefit-Listen ohne Durchstreichen) */
+    --for-checklist-feature-checked-bg: #22c55e;
+    --for-checklist-feature-checked-border-color: #22c55e;
+    --for-checklist-feature-checked-text-color: inherit;
+    --for-checklist-feature-checked-decoration: none;
+    --for-checklist-feature-unchecked-border-style: dashed;
+}
+
+/* Dark-Mode (auto) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --for-checkbox-border-color: #4a5260;
+        --for-checkbox-border-color-hover: #6b7685;
+        --for-checkbox-checked-bg: #4f9dfd;
+        --for-checkbox-checked-border-color: #4f9dfd;
+        --for-checklist-checked-text-color: #6b7280;
+        --for-checklist-feature-checked-bg: #34d399;
+        --for-checklist-feature-checked-border-color: #34d399;
+    }
+}
+
+ul.for-checklist {
+    list-style: none;
+    padding-left: var(--for-checklist-indent);
+    margin: 0.5em 0;
+}
+
+ul.for-checklist li.for-checklist__item {
+    position: relative;
+    margin: var(--for-checklist-item-margin);
+    padding-left: calc(var(--for-checkbox-size) + var(--for-checklist-gap));
+    color: var(--for-checklist-text-color);
+    cursor: text;
+}
+
+/* Die Checkbox als ::before */
+ul.for-checklist li.for-checklist__item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: var(--for-checkbox-offset-top);
+    width: var(--for-checkbox-size);
+    height: var(--for-checkbox-size);
+    box-sizing: border-box;
+    border: var(--for-checkbox-border-width) solid var(--for-checkbox-border-color);
+    border-radius: var(--for-checkbox-radius);
+    background-color: var(--for-checkbox-bg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 72% 72%;
+    transition: var(--for-checkbox-transition);
+    cursor: pointer;
+}
+
+ul.for-checklist li.for-checklist__item:hover::before {
+    border-color: var(--for-checkbox-border-color-hover);
+}
+
+/* Checked-Zustand: gefüllter Hintergrund + SVG-Häkchen */
+ul.for-checklist li.for-checklist__item[data-checked="true"]::before {
+    background-color: var(--for-checkbox-checked-bg);
+    border-color: var(--for-checkbox-checked-border-color);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5l3 3 6-6.5'/></svg>");
+}
+
+ul.for-checklist li.for-checklist__item[data-checked="true"] {
+    color: var(--for-checklist-checked-text-color);
+    text-decoration: var(--for-checklist-checked-decoration);
+}
+
+/* =============================================================
+ * Feature-/Benefit-Liste: kein Strikethrough, grüner Check,
+ * offene Einträge mit gestricheltem Rahmen zur Differenzierung.
+ * ============================================================= */
+ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="true"] {
+    color: var(--for-checklist-feature-checked-text-color);
+    text-decoration: var(--for-checklist-feature-checked-decoration);
+}
+ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="true"]::before {
+    background-color: var(--for-checklist-feature-checked-bg);
+    border-color: var(--for-checklist-feature-checked-border-color);
+}
+ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="false"]::before {
+    border-style: var(--for-checklist-feature-unchecked-border-style);
+}
+
+/* Verschachtelte Listen */
+ul.for-checklist ul.for-checklist {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+/* Print */
+@media print {
+    ul.for-checklist li.for-checklist__item::before {
+        border-color: #000;
+    }
+    ul.for-checklist li.for-checklist__item[data-checked="true"]::before {
+        background-color: #000;
+    }
+}

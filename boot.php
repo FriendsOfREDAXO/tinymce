@@ -17,6 +17,10 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'for_images');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('cleanpaste', rex_url::addonAssets('tinymce', $pluginBasePath . 'cleanpaste/plugin.min.js'), 'cleanpaste');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('mediapaste', rex_url::addonAssets('tinymce', $pluginBasePath . 'mediapaste/plugin.min.js'), 'mediapaste');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_footnotes', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_footnotes/plugin.min.js'), 'for_footnote_insert');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_footnotes', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_footnotes/plugin.min.js'), 'for_footnote_update');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_checklist', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_checklist/plugin.min.js'), 'for_checklist');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_checklist', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_checklist/plugin.min.js'), 'for_checklist_feature');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

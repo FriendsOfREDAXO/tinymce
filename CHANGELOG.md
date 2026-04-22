@@ -4,6 +4,59 @@ Changelog
 Version 8.4.0
 -------------------------------
 
+### Neues Plugin: `for_footnotes` – FriendsOfREDAXO Fußnoten
+
+Eigenständige, freie Fußnoten-Funktion für den TinyMCE-Editor – entwickelt von FriendsOfREDAXO. **Keine Kompatibilität zu Tiny's kommerziellem Premium-Plugin** – eigener Namespace mit `for_`/`for-`-Prefix.
+
+* **Plugin-Name:** `for_footnotes`
+* **Toolbar-Buttons:** `for_footnote_insert` (Fußnote einfügen) und `for_footnote_update` (Nummerierung aktualisieren / Waisen entfernen).
+* **Menüeintrag:** `for_footnote` (fürs Insert-Menü).
+* **Commands:** `forFootnoteInsert` und `forFootnoteUpdate`.
+* **Automatische Nummerierung:** Fußnoten werden nach DOM-Reihenfolge durchnummeriert. Einfügen zwischen bestehenden Fußnoten, Verschieben oder Löschen löst automatisch Neu-Nummerierung aus.
+* **Bidirektionale Verlinkung:** Hochgestellte Nummer springt zum Eintrag, `^`-Caret am Eintrag zurück zur Nummer.
+* **Sektion wird Auto-managed:** `<div class="for-footnotes">` mit `<hr>` + `<ol>` wird beim ersten Einfügen erzeugt und entfernt, wenn keine Fußnoten mehr vorhanden sind.
+* **Idempotente Sync-Logik:** Existierende `<li>`-Einträge werden nicht neu erzeugt, wenn sich nichts geändert hat – so bleibt der Cursor beim Tippen erhalten.
+* **Schutz vor TinyMCE-Klonen:** Beim Klick auf die hochgestellte Nummer klont TinyMCE intern kurzzeitig das `<sup>` für die Selection-Darstellung. Duplikate werden erkannt und entfernt, statt neue Fußnoten anzulegen.
+* **Waisen-Cleanup:** `forFootnoteUpdate` entfernt Einträge, deren Referenz im Dokument nicht (mehr) existiert.
+* **Eigene CSS-Klassen:** `for-footnotes`, `for-footnote-ref`, `for-footnote-back`, `for-footnote-text` – fürs Frontend-Styling entsprechend anpassen.
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_footnotes ...',
+toolbar: 'for_footnote_insert for_footnote_update ...',
+```
+
+### Neues Plugin: `for_checklist` – Moderne Checkliste mit CKEditor-5-Import
+
+Eigenständige Checklist-Implementierung mit modernem CSS-Look (keine klassische Form-Checkbox).
+
+* **Plugin-Name:** `for_checklist`
+* **Zwei Varianten – zwei Toolbar-Buttons:**
+  * `for_checklist` – klassische **To-Do-Liste** (erledigte Einträge durchgestrichen/ausgegraut).
+  * `for_checklist_feature` – **Feature-/Benefit-Liste**: kein Strikethrough, grüner Check, offene Einträge mit gestricheltem Rahmen, neue Einträge sind per Default direkt als „erfüllt" markiert.
+  * Nahtloses Umschalten zwischen den Varianten, ohne Inhaltsverlust – Klick auf den gleichen Button löst die Liste auf.
+* **Command:** `forChecklistToggle` mit Parameter `'todo'` (Default) oder `'feature'`.
+* **HTML-Format:** Schlank und semantisch –
+  `<ul class="for-checklist"><li class="for-checklist__item" data-checked="true|false">…</li></ul>`
+* **Automatischer CKEditor-5-Import:** Beim `SetContent`, `BeforeSetContent` und `PastePostProcess` werden `ul.todo-list`-Strukturen aus CKE5 automatisch ins neue Format konvertiert. Der Checked-Zustand aus dem versteckten `<input type="checkbox">` wird übernommen, Labels und `.todo-list__label__description`-Wrapper werden entfernt.
+* **Modernes Design per CSS:** Die visuelle Checkbox wird als `::before`-Pseudo-Element gerendert – abgerundetes Quadrat, Hover-Zustand, gefüllter Check-State mit SVG-Häkchen, Dark-Mode über `prefers-color-scheme`, Print-Variante. Komplett über CSS-Variablen anpassbar (`--for-checkbox-size`, `--for-checkbox-radius`, `--for-checkbox-checked-bg` u. v. m.).
+* **Toggle per Klick:** Klick auf die Checkbox-Zone (links vom Text) schaltet `data-checked` um – in eine `undoManager.transact`-Transaktion gewrappt.
+* **Schema-Anpassung:** `ul[class]` und `li[class|data-checked]` werden im PreInit freigeschaltet, sodass TinyMCE die Auszeichnung beim Speichern nicht strippt.
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_checklist ...',
+toolbar: 'for_checklist for_checklist_feature ...',
+```
+
+Beispiel-Einbindung der Styles im Frontend:
+
+```php
+rex_view::addCssFile(rex_url::addonAssets('tinymce', 'css/for_checklist.css'));
+```
+
 ### Neues Plugin: `cleanpaste` – Intelligentes Paste-Cleanup
 
 Komplett neues Paste-System, das PowerPaste (kostenpflichtig) ersetzt und speziell auf typische Copy-&-Paste-Quellen im Redaktionsalltag optimiert ist.

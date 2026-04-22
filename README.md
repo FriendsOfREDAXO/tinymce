@@ -322,6 +322,225 @@ rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
 });
 ```
 
+## Clean Paste Plugin (`cleanpaste`)
+
+Das `cleanpaste` Plugin ist ein freier Ersatz für das kostenpflichtige PowerPaste: Es bereinigt eingefügten Text automatisch von Office-/Google-Docs-Markup, unerwünschten Klassen, Styles und leeren Elementen.
+
+### Features
+
+- **Office-Cleanup:** Entfernt MS Word/Outlook/Google-Docs-Markup (`MsoNormal`, `docs-*`, `<o:p>`, mso-Conditionals, Smart Tags) bereits auf String-Ebene.
+- **DOM-Cleanup:** Entfernt konfigurierbar `class`, `style`, `id`, `data-*` Attribute.
+- **BR-Reduktion:** Reduziert aufeinanderfolgende `<br>`-Ketten.
+- **Leer-Paragraphen:** Entfernt leere `<p>` nach dem Einfügen.
+- **Positiv-Listen mit Regex:** Erlaubte Tags/Klassen/Styles/IDs/data-Attribute werden pro Profil definiert – alles andere wird verworfen. Regex-Patterns werden unterstützt (z. B. `^uk-.*`).
+
+### Aktivierung
+
+Im Profil `cleanpaste` zu den Plugins hinzufügen. Die Einstellungen werden zentral unter **TinyMCE → Paste-Einstellungen** gepflegt und in die generierte `profiles.js` eingebettet (funktioniert daher auch im Frontend).
+
+```javascript
+plugins: 'cleanpaste ...',
+```
+
+### Einstellungsseite
+
+Unter **TinyMCE → Paste-Einstellungen** finden Sie eine GUI zur Konfiguration der Allow-Lists:
+
+- **Erlaubte Tags**
+- **Erlaubte Klassen** (unterstützt Regex)
+- **Erlaubte Inline-Styles** (unterstützt Regex)
+- **Erlaubte IDs** (unterstützt Regex)
+- **Erlaubte data-Attribute** (unterstützt Regex)
+- **Cleanup-Stufen** (BR-Reduktion, Leer-Paragraph-Entfernung, Office-Strip, DOM-Cleanup)
+
+## Mediapaste Plugin (`mediapaste`)
+
+Bilder, die per Drag & Drop in den Editor gezogen oder aus dem Browser (Copy Image) eingefügt werden, landen direkt im REDAXO-Medienpool. Kein manueller Upload-Umweg.
+
+### Features
+
+- **Drag & Drop:** Bild-Dateien werden automatisch hochgeladen. Original-Dateiname wird übernommen.
+- **Copy Image aus Browser:** Binäre Bilddaten aus der Zwischenablage werden hochgeladen, externe URLs werden nicht eingefügt. Dateiname wird aus dem `<img src="…">` im Clipboard-HTML extrahiert.
+- **Screenshots/Clipboard-Binaries:** Werden mit `image-<timestamp>.<ext>` benannt.
+- **Kategorie-Picker:** Dialog zur Auswahl der Medienkategorie mit Berücksichtigung der REDAXO-Medienrechte (`rex_media_perm`).
+- **Default-Kategorie:** Profil kann eine feste Kategorie vorgeben – dann entfällt der Dialog.
+- **Formate:** Unterstützt JPG, PNG, GIF, WebP, AVIF, SVG (TinyMCE `images_file_types` wird intern entsprechend erweitert).
+- **TinyMCE-interne Blob-Namen** (`mceclip*`, `blobid*`, `imagetools*`) werden erkannt und durch saubere Dateinamen ersetzt.
+
+### Aktivierung
+
+Im Profil `mediapaste` zu den Plugins hinzufügen. Zusätzlich muss unter **TinyMCE → Einstellungen → Bild-Upload** der Upload aktiviert werden.
+
+```javascript
+plugins: 'mediapaste ...',
+```
+
+### Einstellungen
+
+- **Upload aktivieren:** Generell ein/aus
+- **Default-Kategorie:** `-1` = Dialog anzeigen, `0` = Root, `>0` = feste Kategorie-ID
+- **Media Manager Type:** Optional (z. B. `tiny`), damit die eingefügten Bilder über den Media Manager ausgeliefert werden
+
+### Hinweis zum Medienpool
+
+Wenn ein Dateityp (z. B. SVG) nicht hochgeladen werden kann, prüfen Sie die REDAXO-Systemeinstellung **Erlaubte Dateitypen** im Medienpool. SVG ist aus Sicherheitsgründen oft nicht standardmäßig freigegeben, da SVG-Dateien JavaScript enthalten können.
+
+## FriendsOfREDAXO Fußnoten Plugin (`for_footnotes`)
+
+Freie, eigenständige Fußnoten-Funktion – kein Ersatz und keine API-Kompatibilität zum kommerziellen Tiny-Premium-Plugin.
+
+### Features
+
+- **Toolbar-Buttons:** `for_footnote_insert`, `for_footnote_update`
+- **Menü-Item:** `for_footnote` (fürs Insert-Menü)
+- **Commands:** `forFootnoteInsert`, `forFootnoteUpdate`
+- **Automatische Nummerierung** nach DOM-Reihenfolge
+- **Bidirektionale Verlinkung** (Nummer ↔ Eintrag)
+- **Automatische Sektion** `<div class="for-footnotes">` am Dokumentende
+- **Enter → Soft-Break** innerhalb eines Fußnoteneintrags (keine verschachtelten/leeren `<li>`)
+- **Waisen-Cleanup** über den `for_footnote_update` Button
+
+### Aktivierung
+
+```javascript
+plugins: 'for_footnotes ...',
+toolbar: 'for_footnote_insert for_footnote_update ...',
+```
+
+### HTML-Ausgabe
+
+```html
+<p>Der Text<sup class="for-footnote-ref" data-for-fn-id="abc1z" id="for-fnref-abc1z">
+    <a href="#for-fn-abc1z">[1]</a>
+</sup> mit Fußnote.</p>
+
+<div class="for-footnotes">
+    <hr>
+    <ol>
+        <li id="for-fn-abc1z" data-for-fn-id="abc1z">
+            <a class="for-footnote-back" href="#for-fnref-abc1z">^</a>
+            <span class="for-footnote-text">Fußnoten-Text</span>
+        </li>
+    </ol>
+</div>
+```
+
+### Frontend-CSS
+
+Das mitgelieferte Stylesheet ist framework-agnostisch und nutzt CSS Custom Properties:
+
+```html
+<link rel="stylesheet" href="/assets/addons/tinymce/css/for_footnotes.css">
+```
+
+Oder via REDAXO:
+
+```php
+echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_footnotes.css') . '">';
+```
+
+### CSS-Variablen zum Anpassen
+
+Im eigenen Theme einfach überschreiben:
+
+```css
+:root {
+    --for-footnotes-margin-top: 3rem;
+    --for-footnotes-font-size: 0.9em;
+    --for-footnotes-hr-width: 40%;
+    --for-footnotes-hr-color: #ddd;
+    --for-footnote-ref-color: #e6007e;
+    --for-footnote-ref-hover-color: #a3005a;
+    --for-footnote-back-color: #999;
+    --for-footnote-back-hover-color: #000;
+}
+```
+
+Verfügbare Variablen (Auszug):
+
+| Variable | Zweck |
+|---|---|
+| `--for-footnotes-margin-top` | Abstand oberhalb der Fußnoten-Sektion |
+| `--for-footnotes-font-size` | Schriftgröße der gesamten Sektion |
+| `--for-footnotes-line-height` | Zeilenhöhe |
+| `--for-footnotes-color` | Textfarbe |
+| `--for-footnotes-hr-width` | Breite des Trenners |
+| `--for-footnotes-hr-color` | Farbe des Trenners |
+| `--for-footnotes-list-padding-left` | Einrückung der `<ol>` |
+| `--for-footnote-ref-color` | Farbe der hochgestellten Nummer |
+| `--for-footnote-ref-hover-color` | Hover-Farbe der Nummer |
+| `--for-footnote-ref-font-size` | Schriftgröße der Nummer |
+| `--for-footnote-back-color` | Farbe des `^` Rück-Links |
+| `--for-footnote-back-hover-color` | Hover-Farbe des Rück-Links |
+
+Ein Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist bereits im Stylesheet enthalten.
+
+## FriendsOfREDAXO Checklist Plugin (`for_checklist`)
+
+Moderne Checkliste im Editor – ohne klassische Form-Checkbox. Das Plugin rendert die Checkbox als reines CSS-`::before`-Element und ist vollständig über CSS-Variablen anpassbar. Beim Einfügen von CKEditor-5-Inhalten werden `ul.todo-list`-Strukturen automatisch in das neue Format konvertiert.
+
+### Features
+
+* **Zwei Varianten – zwei Buttons:**
+  * `for_checklist` – klassische **To-Do-Liste**: erledigte Einträge werden durchgestrichen und ausgegraut.
+  * `for_checklist_feature` – **Feature-/Benefit-Liste**: neue Einträge sind sofort als „erfüllt" markiert, **kein** Strikethrough, grüner Check, offene Einträge mit gestricheltem Rahmen. Ideal für Feature-Übersichten, Preis-Tabellen, Benefits.
+  * Klick auf den gleichen Button in einer bestehenden Liste hebt sie auf; Klick auf den anderen Button wechselt zur anderen Variante, ohne die Einträge zu verlieren.
+* Command: `forChecklistToggle` (mit Parameter `'todo'` oder `'feature'`)
+* Schlanke HTML-Ausgabe: `<ul class="for-checklist"><li class="for-checklist__item" data-checked="true|false">…</li></ul>`
+* **Automatischer CKEditor-5-Import:** `ul.todo-list` → `ul.for-checklist`, inkl. Übernahme des Checked-Zustands aus den versteckten `<input type="checkbox">`
+* Toggle per Klick auf die Checkbox-Zone (links vom Text), in einer `undoManager.transact`-Transaktion
+* Schema-Anpassung: `ul[class]` und `li[class|data-checked]` werden nicht mehr vom Editor gestrippt
+* Modernes Design: abgerundete Checkbox, Hover-/Checked-Zustand, SVG-Häkchen, Dark-Mode (`prefers-color-scheme`), Print-Variante
+
+### Aktivierung im Profil
+
+```javascript
+plugins: 'for_checklist ...',
+toolbar: 'for_checklist for_checklist_feature ...',
+```
+
+### Styling im Frontend
+
+Die mitgelieferte CSS-Datei einbinden:
+
+```html
+<link rel="stylesheet" href="/assets/addons/tinymce/css/for_checklist.css">
+```
+
+oder in REDAXO:
+
+```php
+echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_checklist.css') . '">';
+```
+
+### CSS-Variablen
+
+| Variable | Zweck |
+|---|---|
+| `--for-checklist-gap` | Abstand zwischen Checkbox und Text |
+| `--for-checklist-indent` | Linke Einrückung der Liste |
+| `--for-checklist-item-margin` | Abstand zwischen Items |
+| `--for-checkbox-size` | Kantenlänge der Checkbox |
+| `--for-checkbox-radius` | Eckenradius |
+| `--for-checkbox-border-width` | Rahmenbreite |
+| `--for-checkbox-border-color` | Rahmen im leeren Zustand |
+| `--for-checkbox-border-color-hover` | Rahmen beim Hover |
+| `--for-checkbox-bg` | Hintergrund im leeren Zustand |
+| `--for-checkbox-checked-bg` | Hintergrund im Checked-Zustand |
+| `--for-checkbox-checked-border-color` | Rahmen im Checked-Zustand |
+| `--for-checkbox-check-color` | Häkchen-Farbe (SVG wird entsprechend eingefärbt) |
+| `--for-checkbox-transition` | CSS-Transition |
+| `--for-checklist-text-color` | Textfarbe offene Einträge |
+| `--for-checklist-checked-text-color` | Textfarbe erledigter Einträge |
+| `--for-checklist-checked-decoration` | Text-Decoration (z. B. `line-through`) |
+| `--for-checklist-feature-checked-bg` | Hintergrund Check (Feature-Variante, Default Grün) |
+| `--for-checklist-feature-checked-border-color` | Rahmen Check (Feature-Variante) |
+| `--for-checklist-feature-checked-text-color` | Textfarbe erledigter Einträge (Feature) |
+| `--for-checklist-feature-checked-decoration` | Text-Decoration (Feature, Default `none`) |
+| `--for-checklist-feature-unchecked-border-style` | Rahmenstil offene Einträge (Default `dashed`) |
+
+Ein Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist im Stylesheet enthalten.
+
 ## Entwickler
 
 Informationen zur Erweiterung des Addons und zur Registrierung eigener Plugins finden Sie in der [Entwickler-Dokumentation](DEVS.md) oder im Backend unter dem Reiter "Entwickler".

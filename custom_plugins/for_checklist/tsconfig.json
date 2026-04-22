@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2017",
+    "module": "es2015",
+    "importHelpers": true,
+    "lib": ["es2017", "dom"],
+    "declaration": false,
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "outDir": "lib",
+    "baseUrl": ".",
+    "strict": true
+  },
+  "include": ["src/main/ts"]
+}

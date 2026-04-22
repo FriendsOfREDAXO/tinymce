@@ -1,0 +1,17 @@
+{
+  "name": "for_checklist",
+  "version": "1.0.0",
+  "description": "Checklist plugin for TinyMCE (FriendsOfREDAXO, free & open-source) — modern checkbox styling, imports CKEditor 5 todo lists",
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_checklist/ ../../assets/scripts/tinymce/plugins/for_checklist/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_checklist/ ../../assets/vendor/tinymce/plugins/for_checklist/"
+  },
+  "keywords": ["tinymce", "checklist", "todo", "redaxo"],
+  "author": "FriendsOfREDAXO",
+  "devDependencies": {
+    "esbuild": "^0.18.0",
+    "tinymce": "^8.2.2",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0"
+  }
+}
