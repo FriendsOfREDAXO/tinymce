@@ -572,6 +572,70 @@ toolbar: 'for_htmlembed ...',
 
 Der Wrapper `<div class="for-htmlembed">` bleibt im Save-Output. Standardmäßig wird er im Frontend nicht gestylt. Falls gewünscht, kann das Frontend den Block visuell hervorheben (`display: contents;` für völlig unsichtbar, oder eigenes CSS).
 
+## FriendsOfREDAXO oEmbed Plugin (`for_oembed`)
+
+Video-Einbettung per URL-Paste – YouTube & Vimeo werden sofort erkannt. Im Editor gibt es eine echte Live-Vorschau (iframe + Overlay, `contenteditable="false"`), gespeichert wird das **CKEditor-5-kompatible** Format:
+
+```html
+<figure class="media"><oembed url="https://www.youtube.com/watch?v=…"></oembed></figure>
+```
+
+Damit lassen sich Inhalte 1:1 zwischen REDAXO/TinyMCE und CKE5-basierten Systemen austauschen.
+
+### Features
+
+* **Paste-Erkennung:** Einfach eine YouTube- oder Vimeo-URL in den Editor pasten – wird automatisch in einen Video-Block umgewandelt.
+* **Toolbar-Button & Menü:** `for_oembed`, plus Context-Toolbar mit Edit-/Remove-Button, plus Doppelklick zum Bearbeiten.
+* **Commands:** `forOembedInsert`, `forOembedEdit`.
+* **Provider:** YouTube (watch/shorts/embed/youtu.be/nocookie), Vimeo (vimeo.com, player.vimeo.com). Erweiterbar im `parseUrl`-Modul.
+* **Live-Preview im Editor:** Echter iframe mit YouTube/Vimeo-Badge, Overlay fängt Klicks ab (Video spielt im Editor nicht ab, Cursor kann nicht reinrutschen).
+* **Save-Format:** CKE5-kompatibles `<figure class="media"><oembed url="…"></oembed></figure>` – wird beim Speichern automatisch aus der Preview zurückgebaut (`GetContent`-Event).
+* **Reverse-Import:** Vorhandene CKE5-Inhalte mit `<oembed>` werden beim Laden in die Preview entfaltet (`SetContent`-Event).
+
+### Aktivierung im Profil
+
+```javascript
+plugins: 'for_oembed ...',
+toolbar: 'for_oembed ...',
+```
+
+### Frontend-Rendering (zwei Varianten)
+
+**Variante A: PHP-Renderer** – empfohlen, läuft serverseitig:
+
+```php
+use FriendsOfRedaxo\TinyMce\Renderer\OembedRenderer;
+
+echo OembedRenderer::render($article->getValue('art_text'));
+```
+
+**Variante B: JS-Helper** – wandelt die `<oembed>`-Tags im Browser um. Im Frontend-Template direkt einbinden (`rex_view::addJsFile()` ist backend-only):
+
+```php
+echo '<script src="' . rex_addon::get('tinymce')->getAssetsUrl('js/for_oembed.js') . '" defer></script>';
+```
+
+### Optionale Vidstack-Integration
+
+Wenn das [`vidstack`-AddOn](https://github.com/FriendsOfREDAXO/vidstack) installiert und verfügbar ist, verwendet der Renderer **automatisch** einen `<media-player>`-Player (YouTube/Vimeo-Provider von vidstack). Ohne vidstack gibt es einen responsiven `<iframe>`-Fallback. Der JS-Helper erkennt das Custom-Element `<media-player>` zur Laufzeit ebenfalls und nutzt es.
+
+Für das automatische Einbinden der vidstack-Assets im Frontend (falls vorhanden):
+
+```php
+echo OembedRenderer::registerFrontendAssets();
+```
+
+### HTML-Struktur im Editor
+
+```html
+<figure class="media for-oembed for-oembed--youtube" contenteditable="false" data-for-oembed-url="https://www.youtube.com/watch?v=…">
+  <div class="for-oembed__ratio">
+    <iframe src="https://www.youtube.com/embed/…" allow="…" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <div class="for-oembed__overlay"></div>
+  </div>
+</figure>
+```
+
 ## Entwickler
 
 Informationen zur Erweiterung des Addons und zur Registrierung eigener Plugins finden Sie in der [Entwickler-Dokumentation](DEVS.md) oder im Backend unter dem Reiter "Entwickler".

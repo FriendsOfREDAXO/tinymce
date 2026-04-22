@@ -27,6 +27,35 @@ plugins: 'for_footnotes ...',
 toolbar: 'for_footnote_insert for_footnote_update ...',
 ```
 
+### Neues Plugin: `for_oembed` – YouTube/Vimeo-Einbettung (CKE5-kompatibel)
+
+Video-Einbettung per URL-Paste mit Live-Preview im Editor, Save-Format voll kompatibel zu CKEditor 5.
+
+* **Plugin-Name:** `for_oembed`
+* **Toolbar-Button, Menü, Context-Toolbar, Doppelklick** – Edit per Dialog
+* **Commands:** `forOembedInsert`, `forOembedEdit`
+* **Save-Format (CKE5-kompatibel):** `<figure class="media"><oembed url="…"></oembed></figure>`
+* **Editor-Preview:** echter iframe mit Provider-Badge (YouTube rot, Vimeo blau), Overlay fängt Klicks ab, Video spielt im Editor nicht ab, Cursor kann nicht reinrutschen. `contenteditable="false"`.
+* **Paste-Erkennung:** Plain-URLs aus YouTube (watch, shorts, youtu.be, embed, nocookie) und Vimeo werden beim Paste automatisch in einen Video-Block umgewandelt.
+* **Bidirektionale Konvertierung:** `SetContent` entfaltet vorhandene `<oembed>`-Tags in die Preview, `GetContent` baut sie beim Speichern wieder zusammen – so bleibt der gespeicherte Content immer im CKE5-Format.
+* **PHP-Renderer** `\FriendsOfRedaxo\TinyMce\Renderer\OembedRenderer::render($html)` wandelt die `<oembed>`-Tags im Frontend in lauffähige Player um.
+* **Optionale vidstack-Integration:** Ist das [`vidstack`-AddOn](https://github.com/FriendsOfREDAXO/vidstack) installiert, nutzt der Renderer automatisch `<media-player>` von vidstack. Ohne vidstack gibt es einen responsiven `<iframe>`-Fallback. `OembedRenderer::registerFrontendAssets()` bindet die vidstack-Assets ein, falls verfügbar.
+* **JS-Helper** `assets/js/for_oembed.js` für clientseitiges Auffalten (auch vidstack-aware).
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_oembed ...',
+toolbar: 'for_oembed ...',
+```
+
+Frontend (PHP):
+
+```php
+use FriendsOfRedaxo\TinyMce\Renderer\OembedRenderer;
+echo OembedRenderer::render($article->getValue('art_text'));
+```
+
 ### Neues Plugin: `for_htmlembed` – Geschützte HTML-/JS-Einbettung
 
 Ideal für Widgets, Tracking-Pixel, Social-Embeds, `<iframe>`, Mini-Apps – Redakteure können den Block nicht versehentlich im Fließtext zerschießen.
@@ -72,10 +101,10 @@ plugins: 'for_checklist ...',
 toolbar: 'for_checklist for_checklist_feature ...',
 ```
 
-Beispiel-Einbindung der Styles im Frontend:
+Beispiel-Einbindung der Styles im Frontend (direkt im Template, da `rex_view::addCssFile()` nur im Backend existiert):
 
 ```php
-rex_view::addCssFile(rex_url::addonAssets('tinymce', 'css/for_checklist.css'));
+echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_checklist.css') . '">';
 ```
 
 ### Neues Plugin: `cleanpaste` – Intelligentes Paste-Cleanup
