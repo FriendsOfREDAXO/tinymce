@@ -186,3 +186,39 @@ tinymce_stylesets_import_skipped = %s Style-Set(s) were skipped (name already ex
 tinymce_stylesets_import_invalid_json = The file does not contain valid JSON.
 tinymce_stylesets_import_no_file = Please select a file to import.
 tinymce_stylesets_import_empty = No valid Style-Sets were found in the file.
+
+# paste settings (cleanpaste plugin)
+tinymce_paste_settings = Paste cleanup
+tinymce_cleanpaste_saved = Settings saved.
+
+tinymce_cleanpaste_section_source = Source cleanup
+tinymce_cleanpaste_strip_ms_office = Remove MS Office markup
+tinymce_cleanpaste_strip_ms_office_help = Removes conditional comments, Office XML namespace tags (o:p, w:sdtPr etc.) and mso-* CSS properties.
+tinymce_cleanpaste_strip_google_docs = Remove Google Docs markup
+tinymce_cleanpaste_strip_google_docs_help = Removes startFragment/endFragment comments and internal Google IDs.
+
+tinymce_cleanpaste_section_styles = Classes & styles
+tinymce_cleanpaste_remove_styles = Remove inline styles
+tinymce_cleanpaste_remove_styles_help = Removes all style="..." attributes from pasted content.
+tinymce_cleanpaste_preserve_styles = Preserve style properties (allow list)
+tinymce_cleanpaste_preserve_styles_help = One CSS property name per line. Use prefix regex: for regular expressions (e.g. regex:^border-).
+tinymce_cleanpaste_remove_classes = Remove CSS classes
+tinymce_cleanpaste_remove_classes_help = Removes all class="..." attributes from pasted content.
+tinymce_cleanpaste_preserve_classes = Preserve CSS classes (allow list)
+tinymce_cleanpaste_preserve_classes_help = One class name per line. Use prefix regex: for regular expressions (e.g. regex:^uk- or preserve_class:uikit-card).
+
+tinymce_cleanpaste_section_attributes = Attributes
+tinymce_cleanpaste_remove_ids = Remove id attributes
+tinymce_cleanpaste_remove_ids_help = Removes id="..." attributes from pasted content to avoid duplicate IDs.
+tinymce_cleanpaste_remove_data_attrs = Remove data-* attributes
+tinymce_cleanpaste_remove_data_attrs_help = Removes all data-* attributes from pasted content.
+
+tinymce_cleanpaste_section_whitespace = Empty lines & line breaks
+tinymce_cleanpaste_max_br = Maximum consecutive &lt;br&gt;
+tinymce_cleanpaste_max_br_help = Limits multiple consecutive line breaks. 0 = unlimited.
+tinymce_cleanpaste_max_empty_paragraphs = Maximum empty paragraphs
+tinymce_cleanpaste_max_empty_paragraphs_help = Limits multiple consecutive empty &lt;p&gt; tags. 0 = unlimited.
+
+tinymce_cleanpaste_section_tags = Allowed HTML tags (allow list)
+tinymce_cleanpaste_allowed_tags = Allowed tags
+tinymce_cleanpaste_allowed_tags_help = One tag per line (without angle brackets, e.g. p, br, strong). Empty = all tags allowed. Disallowed tags are unwrapped, their content is preserved.

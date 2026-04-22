@@ -113,6 +113,35 @@ class Assets
         ];
     }
 
+    /**
+     * Provides the cleanpaste plugin configuration as a JS property.
+     * Only used as a backend-only fallback. The primary config is embedded in profiles.js
+     * via Profiles::profilesCreate() so it also works in the frontend.
+     *
+     * @deprecated Use Profiles::profilesCreate() – config is now embedded in profiles.js
+     */
+    public static function provideCleanPasteConfig(): void
+    {
+        $addon = self::getAddon();
+
+        /** @var array<string, mixed> $cfg */
+        $cfg = $addon->getConfig('cleanpaste_settings', [
+            'strip_ms_office'        => true,
+            'strip_google_docs'      => true,
+            'remove_styles'          => true,
+            'preserve_styles'        => [],
+            'remove_classes'         => true,
+            'preserve_classes'       => [],
+            'remove_ids'             => true,
+            'remove_data_attrs'      => true,
+            'max_br'                 => 2,
+            'max_empty_paragraphs'   => 2,
+            'allowed_tags'           => [],
+        ]);
+
+        \rex_view::setJsProperty('tinyCleanPasteConfig', $cfg);
+    }
+
     public static function provideProfileEditData(): void
     {
         if ('tinymce' === rex_be_controller::getCurrentPagePart(1) && 'profiles' === rex_be_controller::getCurrentPagePart(2)) {

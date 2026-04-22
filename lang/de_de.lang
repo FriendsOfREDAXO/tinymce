@@ -189,3 +189,39 @@ tinymce_stylesets_import_skipped = %s Style-Set(s) wurden übersprungen (Name be
 tinymce_stylesets_import_invalid_json = Die Datei enthält kein gültiges JSON.
 tinymce_stylesets_import_no_file = Bitte wählen Sie eine Datei zum Importieren aus.
 tinymce_stylesets_import_empty = Es wurden keine gültigen Style-Sets in der Datei gefunden.
+
+# paste settings (cleanpaste plugin)
+tinymce_paste_settings = Einfügen-Bereinigung
+tinymce_cleanpaste_saved = Einstellungen gespeichert.
+
+tinymce_cleanpaste_section_source = Quell-Bereinigung
+tinymce_cleanpaste_strip_ms_office = MS Office Markup entfernen
+tinymce_cleanpaste_strip_ms_office_help = Entfernt bedingte Kommentare, Office-XML-Namespace-Tags (o:p, w:sdtPr usw.) und mso-* CSS-Eigenschaften.
+tinymce_cleanpaste_strip_google_docs = Google Docs Markup entfernen
+tinymce_cleanpaste_strip_google_docs_help = Entfernt startFragment/endFragment-Kommentare und interne Google-IDs.
+
+tinymce_cleanpaste_section_styles = Klassen & Styles
+tinymce_cleanpaste_remove_styles = Inline-Styles entfernen
+tinymce_cleanpaste_remove_styles_help = Entfernt alle style="..." Attribute aus eingefügtem Inhalt.
+tinymce_cleanpaste_preserve_styles = Style-Eigenschaften beibehalten (Posivliste)
+tinymce_cleanpaste_preserve_styles_help = Eine CSS-Eigenschaft pro Zeile. Präfix regex: für reguläre Ausdrücke (z. B. regex:^border-).
+tinymce_cleanpaste_remove_classes = CSS-Klassen entfernen
+tinymce_cleanpaste_remove_classes_help = Entfernt alle class="..." Attribute aus eingefügtem Inhalt.
+tinymce_cleanpaste_preserve_classes = CSS-Klassen beibehalten (Posivliste)
+tinymce_cleanpaste_preserve_classes_help = Ein Klassenname pro Zeile. Präfix regex: für reguläre Ausdrücke (z. B. regex:^uk- oder preserve_class:uikit-card).
+
+tinymce_cleanpaste_section_attributes = Attribute
+tinymce_cleanpaste_remove_ids = id-Attribute entfernen
+tinymce_cleanpaste_remove_ids_help = Entfernt id="..." Attribute aus eingefügtem Inhalt und vermeidet so doppelte IDs.
+tinymce_cleanpaste_remove_data_attrs = data-* Attribute entfernen
+tinymce_cleanpaste_remove_data_attrs_help = Entfernt alle data-* Attribute aus eingefügtem Inhalt.
+
+tinymce_cleanpaste_section_whitespace = Leerzeilen & Zeilenumbrüche
+tinymce_cleanpaste_max_br = Maximale aufeinanderfolgende &lt;br&gt;
+tinymce_cleanpaste_max_br_help = Begrenzt mehrfache aufeinanderfolgende Zeilenumbrüche. 0 = unbegrenzt.
+tinymce_cleanpaste_max_empty_paragraphs = Maximale leere Absätze
+tinymce_cleanpaste_max_empty_paragraphs_help = Begrenzt mehrfache aufeinanderfolgende leere &lt;p&gt;-Tags. 0 = unbegrenzt.
+
+tinymce_cleanpaste_section_tags = Erlaubte HTML-Tags (Posivliste)
+tinymce_cleanpaste_allowed_tags = Erlaubte Tags
+tinymce_cleanpaste_allowed_tags_help = Ein Tag pro Zeile (ohne spitze Klammern, z. B. p, br, strong). Leer = alle Tags erlaubt. Nicht erlaubte Tags werden entfernt, ihr Inhalt bleibt erhalten.

@@ -1,0 +1,22 @@
+{
+  "name": "cleanpaste",
+  "version": "1.0.0",
+  "description": "Automatically cleans pasted content from MS Office, Google Docs and other external sources",
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/cleanpaste/ ../../assets/scripts/tinymce/plugins/cleanpaste/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/cleanpaste/ ../../assets/vendor/tinymce/plugins/cleanpaste/"
+  },
+  "keywords": ["tinymce", "paste", "clean", "office"],
+  "author": "FriendsOfREDAXO",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "esbuild": "^0.18.0",
+    "tinymce": "^8.2.2",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0"
+  },
+  "files": [
+    "lib/main"
+  ]
+}

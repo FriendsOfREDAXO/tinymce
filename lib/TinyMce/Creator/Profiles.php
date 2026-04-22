@@ -68,9 +68,26 @@ class Profiles
             // See base.js: rex.tinyExternalPlugins (runtime) takes precedence over tinyExternalPlugins (static).
             $externalPluginsJs = '{}';
 
+            // CleanPaste config – embedded here so it works in frontend too (rex_view::setJsProperty is backend-only)
+            $cleanPasteCfg = self::getAddon()->getConfig('cleanpaste_settings', [
+                'strip_ms_office'        => true,
+                'strip_google_docs'      => true,
+                'remove_styles'          => true,
+                'preserve_styles'        => [],
+                'remove_classes'         => true,
+                'preserve_classes'       => [],
+                'remove_ids'             => true,
+                'remove_data_attrs'      => true,
+                'max_br'                 => 2,
+                'max_empty_paragraphs'   => 2,
+                'allowed_tags'           => [],
+            ]);
+            $cleanPasteConfigJs = json_encode($cleanPasteCfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
             $content =
                 "
 const tinyExternalPlugins = $externalPluginsJs;
+const tinyCleanPasteConfig = $cleanPasteConfigJs;
 const tinyprofiles = $profiles;
 ";
         }
