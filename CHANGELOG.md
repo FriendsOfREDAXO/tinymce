@@ -3,7 +3,38 @@ Changelog
 
 Version 8.4.0
 -------------------------------
-Neues Paste-System. 
+
+### Neues Plugin: `cleanpaste` – Intelligentes Paste-Cleanup
+
+Komplett neues Paste-System, das PowerPaste (kostenpflichtig) ersetzt und speziell auf typische Copy-&-Paste-Quellen im Redaktionsalltag optimiert ist.
+
+* **Office- & Google-Docs-Bereinigung:** Entfernt automatisch MS Word/Outlook/Google-Docs-spezifische Klassen (`MsoNormal`, `docs-*`), Conditional Comments, `<o:p>`-Namespaces, Smart-Tags und inline mso-Styles bereits auf String-Ebene – bevor das HTML in den Editor kommt.
+* **DOM-Level-Cleanup:** Entfernt konfigurierbar `class`, `style`, `id`, `data-*`-Attribute, leere Paragraphen und reduziert `<br>`-Ketten. Füllzeichen (`&nbsp;`, Zero-Width-Space) werden normalisiert.
+* **Positiv-Listen statt Blacklists:** Erlaubte Tags, Klassen, Styles, IDs und data-Attribute werden pro Profil definiert – alles andere wird verworfen. Einträge unterstützen **Regex-Patterns** (z. B. `^uk-.*` für alle UIkit-Klassen).
+* **Konfigurierbare Cleanup-Stufen:** BR-Reduktion, Leer-Paragraph-Entfernung, Office-Strip und DOM-Bereinigung lassen sich einzeln ein-/ausschalten.
+* **Neue Einstellungsseite:** _AddOn → TinyMCE → Paste-Einstellungen_ mit GUI für alle Allow-Lists, ohne Profil-JS anfassen zu müssen.
+* **Frontend-kompatibel:** Konfiguration wird direkt in die generierte `profiles.js` als `tinyCleanPasteConfig` eingebettet (nicht mehr via `rex_view::setJsProperty`, das nur im Backend funktioniert).
+
+### Neues Plugin: `mediapaste` – Direkter Medienpool-Upload aus Zwischenablage & Drag-&-Drop
+
+Bilder landen beim Einfügen direkt im REDAXO Medienpool – kein manueller Upload-Umweg mehr.
+
+* **Drag & Drop:** Bilder per Drag-&-Drop in den Editor werden über `images_upload_handler` automatisch in den Medienpool hochgeladen. Original-Dateiname (`<File>.name`) wird übernommen.
+* **Copy-Image aus Browser:** "Bild kopieren" aus beliebigen Websites funktioniert – der Binär-Anteil aus der Zwischenablage wird abgegriffen, das Einfügen der externen URL blockiert (synchrones `preventDefault` + `stopImmediatePropagation`). Der Dateiname wird aus `<img src="…">` im Clipboard-HTML extrahiert, inkl. URL-Decoding und Strip von Query-/Fragment-Teilen.
+* **Kategorien-Picker:** Dialog zur Auswahl der Medienkategorie beim Upload. Respektiert die Medienkategorie-Berechtigungen des REDAXO-Users (`rex_media_perm`) – inklusive verschachtelter Darstellung mit Einrückung.
+* **Default-Kategorie konfigurierbar:** Profil kann eine feste Kategorie-ID vorgeben, dann entfällt der Dialog.
+* **Screenshots & Clipboard-Binaries:** Auch reine Binär-Einfügungen ohne HTML-Begleitung (Screenshots, Ausschnitte aus Bildbearbeitung) werden sauber verarbeitet und bekommen einen `image-<timestamp>.<ext>`-Namen, wenn kein Original verfügbar ist.
+* **TinyMCE-interne Blob-Namen neutralisiert:** `mceclip*`, `blobid*`, `imagetools*` werden erkannt und durch saubere Dateinamen ersetzt.
+* **Upload-Progress & Fehlerbehandlung:** XHR mit Progress-Callback, Abbruch-Erkennung, JSON-Fehlerrückgabe.
+* **Zwei neue API-Endpunkte:**
+  * `rex-api-call=tinymce_media_upload` – nimmt `file` + `category_id` entgegen, nutzt `rex_media_service::addMedia()`, gibt `{ location }` zurück.
+  * `rex-api-call=tinymce_media_categories` – liefert die erlaubten Kategorien für den aktuellen User (gecached auf Client-Seite).
+
+### Infrastruktur
+
+* **Config-Bridge:** `TinyMce\Creator\Profiles::profilesCreate()` bettet Plugin-Konfigurationen als JS-Konstanten (`tinyCleanPasteConfig`, `tinyMediaUploadConfig`, `tinyExternalPlugins`) in `assets/generated/profiles.js` ein. Damit funktionieren alle neuen Features nahtlos im Backend **und** im Frontend.
+* **Neue Sprachkeys:** `tinymce_cleanpaste_*`, `tinymce_paste_settings`, `mediapaste_*`, `tinymce_media_no_category` (de_de / en_gb).
+* **Rexstan-Clean:** Alle neuen und geänderten Dateien bestehen `php redaxo/bin/console rexstan:analyze`.
 
 
 Version 8.2.6
