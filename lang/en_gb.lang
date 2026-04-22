@@ -222,3 +222,14 @@ tinymce_cleanpaste_max_empty_paragraphs_help = Limits multiple consecutive empty
 tinymce_cleanpaste_section_tags = Allowed HTML tags (allow list)
 tinymce_cleanpaste_allowed_tags = Allowed tags
 tinymce_cleanpaste_allowed_tags_help = One tag per line (without angle brackets, e.g. p, br, strong). Empty = all tags allowed. Disallowed tags are unwrapped, their content is preserved.
+
+# mediapaste plugin (image upload via drag & drop / paste)
+tinymce_media_no_category = No category
+mediapaste_section_title = Image upload (drag & drop / paste)
+mediapaste_upload_enabled = Enable image upload to mediapool
+mediapaste_upload_enabled_help = When enabled, images dropped or pasted into the editor are automatically uploaded to the REDAXO mediapool.
+mediapaste_default_category = Default media category
+mediapaste_category_ask = — Always ask —
+mediapaste_default_category_help = Category to upload images to. "Always ask" shows a dialog on upload. For frontend users without media permission, a fixed category must be selected.
+mediapaste_media_manager_type = Media manager type for image URL
+mediapaste_media_manager_type_help = Optional media manager type for the image URL displayed in the editor (e.g. tiny). Empty = direct /media/ URL.

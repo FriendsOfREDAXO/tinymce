@@ -225,3 +225,14 @@ tinymce_cleanpaste_max_empty_paragraphs_help = Begrenzt mehrfache aufeinanderfol
 tinymce_cleanpaste_section_tags = Erlaubte HTML-Tags (Posivliste)
 tinymce_cleanpaste_allowed_tags = Erlaubte Tags
 tinymce_cleanpaste_allowed_tags_help = Ein Tag pro Zeile (ohne spitze Klammern, z. B. p, br, strong). Leer = alle Tags erlaubt. Nicht erlaubte Tags werden entfernt, ihr Inhalt bleibt erhalten.
+
+# mediapaste plugin (image upload via drag & drop / paste)
+tinymce_media_no_category = Ohne Kategorie
+mediapaste_section_title = Bild-Upload (Drag & Drop / Einfügen)
+mediapaste_upload_enabled = Bild-Upload in den Medienpool aktivieren
+mediapaste_upload_enabled_help = Wenn aktiv, werden per Drag & Drop oder Einfügen abgelegte Bilder automatisch in den REDAXO-Medienpool hochgeladen.
+mediapaste_default_category = Standard-Medienkategorie
+mediapaste_category_ask = — Immer nachfragen —
+mediapaste_default_category_help = Kategorie, in die Bilder hochgeladen werden. "Immer nachfragen" öffnet einen Dialog beim Upload. Für Frontend-Nutzer ohne Medienberechtigung muss eine feste Kategorie gewählt werden.
+mediapaste_media_manager_type = Media-Manager-Type für Bild-URL
+mediapaste_media_manager_type_help = Optionaler Media-Manager-Type für die im Editor angezeigte Bild-URL (z. B. tiny). Leer = direkte /media/-URL.

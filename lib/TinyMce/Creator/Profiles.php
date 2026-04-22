@@ -9,6 +9,7 @@ use rex_addon_interface;
 use rex_file;
 use rex_functional_exception;
 use rex_i18n;
+use rex_url;
 
 use function count;
 use function is_string;
@@ -25,6 +26,7 @@ class Profiles
     ];
 
     /**
+     * @param array<string, mixed>|null $getProfile
      * @throws rex_functional_exception
      */
     public static function profilesCreate(?array $getProfile = null): void
@@ -32,7 +34,7 @@ class Profiles
         $profiles = TinyMceDatabaseHandler::getAllProfiles();
 
         $content = '';
-        if (count($profiles) > 0) {
+        if (null !== $profiles && [] !== $profiles) {
             $jsonProfiles = [];
             $extras = [];
 
@@ -59,8 +61,12 @@ class Profiles
             }
 
             $profiles = json_encode($jsonProfiles);
-            $profiles = is_string($profiles) ? $profiles : '';
-            $profiles = str_replace(array_values($extraKeys), array_values($extraValues), $profiles);
+            $profiles = is_string($profiles) ? $profiles : '{}';
+            /** @var array<string> $extraKeysValues */
+            $extraKeysValues = array_values($extraKeys);
+            /** @var array<string> $extraValuesValues */
+            $extraValuesValues = array_values($extraValues);
+            $profiles = str_replace($extraKeysValues, $extraValuesValues, $profiles);
             $profiles = str_replace(',,', ',', $profiles);
 
             // External plugins are provided at runtime via rex_view::setJsProperty() in Assets::provideBaseAssets()
@@ -84,10 +90,22 @@ class Profiles
             ]);
             $cleanPasteConfigJs = json_encode($cleanPasteCfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
+            // MediaUpload config – embedded here so it works in frontend too
+            /** @var array{upload_enabled?: bool, upload_default_category?: int, upload_media_manager_type?: string} $mediaUploadSettings */
+            $mediaUploadSettings = self::getAddon()->getConfig('media_upload_settings', []);
+            $mediaUploadCfg = [
+                'enabled'          => (bool) ($mediaUploadSettings['upload_enabled'] ?? false),
+                'default_category' => (int) ($mediaUploadSettings['upload_default_category'] ?? -1),
+                'upload_url'       => rex_url::backendController(['rex-api-call' => 'tinymce_media_upload'], false),
+                'categories_url'   => rex_url::backendController(['rex-api-call' => 'tinymce_media_categories'], false),
+            ];
+            $mediaUploadConfigJs = json_encode($mediaUploadCfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
             $content =
                 "
 const tinyExternalPlugins = $externalPluginsJs;
 const tinyCleanPasteConfig = $cleanPasteConfigJs;
+const tinyMediaUploadConfig = $mediaUploadConfigJs;
 const tinyprofiles = $profiles;
 ";
         }
@@ -97,6 +115,10 @@ const tinyprofiles = $profiles;
         }
     }
 
+    /**
+     * @param array<string, mixed> $profile
+     * @return string|array<mixed>
+     */
     public static function mapProfile(array $profile): string|array
     {
         $jsonProfile = [];

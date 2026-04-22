@@ -1,0 +1,22 @@
+{
+  "name": "mediapaste",
+  "version": "1.0.0",
+  "description": "Upload images dropped or pasted into TinyMCE directly to the REDAXO mediapool",
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/mediapaste/ ../../assets/scripts/tinymce/plugins/mediapaste/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/mediapaste/ ../../assets/vendor/tinymce/plugins/mediapaste/"
+  },
+  "keywords": ["tinymce", "upload", "paste", "mediapool", "redaxo"],
+  "author": "FriendsOfREDAXO",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "esbuild": "^0.18.0",
+    "tinymce": "^8.2.2",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0"
+  },
+  "files": [
+    "lib/main"
+  ]
+}

@@ -27,10 +27,16 @@ if ($send) {
             array_map('trim', explode("\n", rex_request::request('allowed_tags', 'string', '')))
         )),
     ];
-
     $addon->setConfig('cleanpaste_settings', $settings);
 
-    // Rebuild profiles.js so the new cleanpaste config is embedded (works frontend + backend)
+    $uploadSettings = [
+        'upload_enabled'            => (bool) rex_request::request('upload_enabled', 'boolean', false),
+        'upload_default_category'   => (int) rex_request::request('upload_default_category', 'int', -1),
+        'upload_media_manager_type' => trim(rex_request::request('upload_media_manager_type', 'string', '')),
+    ];
+    $addon->setConfig('media_upload_settings', $uploadSettings);
+
+    // Rebuild profiles.js so new configs are embedded (works frontend + backend)
     try {
         TinyMceProfilesCreator::profilesCreate();
     } catch (rex_functional_exception $e) {
@@ -66,6 +72,27 @@ $cfg = $addon->getConfig('cleanpaste_settings', [
     'max_empty_paragraphs'   => 2,
     'allowed_tags'           => [],
 ]);
+
+/** @var array{upload_enabled: bool, upload_default_category: int, upload_media_manager_type: string} $uploadCfg */
+$uploadCfg = $addon->getConfig('media_upload_settings', [
+    'upload_enabled'            => false,
+    'upload_default_category'   => -1,
+    'upload_media_manager_type' => '',
+]);
+
+// Helper: render media category <option> elements recursively
+$renderCategoryOptions = static function (array $cats, int $selected, int $depth = 0) use (&$renderCategoryOptions): string {
+    $html = '';
+    foreach ($cats as $cat) {
+        $prefix = str_repeat('&nbsp;&nbsp;', $depth);
+        $sel    = ($cat->getId() === $selected) ? ' selected' : '';
+        $html  .= '<option value="' . $cat->getId() . '"' . $sel . '>' . $prefix . rex_escape($cat->getName()) . '</option>';
+        /** @var list<rex_media_category> $children */
+        $children = $cat->getChildren();
+        $html    .= $renderCategoryOptions($children, $selected, $depth + 1);
+    }
+    return $html;
+};
 
 echo $message;
 
@@ -226,6 +253,51 @@ $formUrl = rex_url::currentBackendPage([], false);
                     <textarea class="form-control" name="allowed_tags" rows="4"
                         placeholder="p&#10;br&#10;strong&#10;em&#10;a&#10;ul&#10;ol&#10;li&#10;h1&#10;h2&#10;h3"><?= rex_escape(implode("\n", $cfg['allowed_tags'])) ?></textarea>
                     <p class="help-block"><?= $addon->i18n('cleanpaste_allowed_tags_help') ?></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title"><?= $addon->i18n('mediapaste_section_title') ?></div>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="upload_enabled" value="1"
+                                <?= !empty($uploadCfg['upload_enabled']) ? 'checked' : '' ?>>
+                            <?= $addon->i18n('mediapaste_upload_enabled') ?>
+                        </label>
+                    </div>
+                    <p class="help-block"><?= $addon->i18n('mediapaste_upload_enabled_help') ?></p>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label"><?= $addon->i18n('mediapaste_default_category') ?></label>
+                            <select class="form-control" name="upload_default_category">
+                                <option value="-1"<?= ((int) $uploadCfg['upload_default_category']) === -1 ? ' selected' : '' ?>>
+                                    <?= $addon->i18n('mediapaste_category_ask') ?>
+                                </option>
+                                <option value="0"<?= ((int) $uploadCfg['upload_default_category']) === 0 ? ' selected' : '' ?>>
+                                    <?= rex_escape(rex_i18n::msg('pool_kats_no_category')) ?>
+                                </option>
+                                <?= $renderCategoryOptions(rex_media_category::getRootCategories(), (int) $uploadCfg['upload_default_category']) ?>
+                            </select>
+                            <p class="help-block"><?= $addon->i18n('mediapaste_default_category_help') ?></p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label"><?= $addon->i18n('mediapaste_media_manager_type') ?></label>
+                            <input type="text" class="form-control" name="upload_media_manager_type"
+                                value="<?= rex_escape($uploadCfg['upload_media_manager_type']) ?>"
+                                placeholder="tiny">
+                            <p class="help-block"><?= $addon->i18n('mediapaste_media_manager_type_help') ?></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
