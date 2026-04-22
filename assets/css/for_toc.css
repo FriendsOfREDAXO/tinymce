@@ -1,0 +1,133 @@
+/* ==========================================================================
+ * for_toc – Frontend Stylesheet
+ * --------------------------------------------------------------------------
+ * Minimales, framework-agnostisches Styling für das Inhaltsverzeichnis,
+ * das vom FriendsOfREDAXO `for_toc` TinyMCE-Plugin erzeugt wird.
+ *
+ * Alle Farben, Abstände und Typo-Werte werden über CSS Custom Properties
+ * gesteuert. Im eigenen Theme einfach überschreiben:
+ *
+ *   :root {
+ *       --for-toc-bg: #f7f7f9;
+ *       --for-toc-accent: #0066cc;
+ *       --for-toc-radius: 6px;
+ *   }
+ *
+ * Einbinden:
+ *   <link rel="stylesheet" href="/assets/addons/tinymce/css/for_toc.css">
+ *
+ * Oder in REDAXO:
+ *   echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_toc.css') . '">';
+ *
+ * Optional: sticky Sidebar-TOC
+ *   <nav class="for-toc for-toc--sticky">…</nav>
+ * ========================================================================== */
+
+:root {
+    --for-toc-margin: 1.5rem 0;
+    --for-toc-padding: 1rem 1.25rem;
+    --for-toc-bg: rgba(0, 0, 0, 0.03);
+    --for-toc-border-color: rgba(0, 0, 0, 0.15);
+    --for-toc-border-width: 3px;
+    --for-toc-radius: 4px;
+    --for-toc-color: inherit;
+    --for-toc-font-size: 0.95em;
+    --for-toc-line-height: 1.55;
+
+    --for-toc-title-font-size: 1em;
+    --for-toc-title-font-weight: 700;
+    --for-toc-title-margin-bottom: 0.5rem;
+
+    --for-toc-link-color: #0066cc;
+    --for-toc-link-hover-color: #004a99;
+    --for-toc-link-active-color: #000;
+    --for-toc-link-active-weight: 700;
+
+    --for-toc-list-indent: 1.25rem;
+    --for-toc-item-margin: 0.15rem 0;
+
+    --for-toc-sticky-top: 1rem;
+    --for-toc-sticky-max-height: calc(100vh - 2rem);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --for-toc-bg: rgba(255, 255, 255, 0.04);
+        --for-toc-border-color: rgba(255, 255, 255, 0.18);
+        --for-toc-link-color: #6cb3ff;
+        --for-toc-link-hover-color: #a9d4ff;
+        --for-toc-link-active-color: #fff;
+    }
+}
+
+/* Container */
+nav.for-toc {
+    margin: var(--for-toc-margin);
+    padding: var(--for-toc-padding);
+    background: var(--for-toc-bg);
+    border-left: var(--for-toc-border-width) solid var(--for-toc-border-color);
+    border-radius: var(--for-toc-radius);
+    color: var(--for-toc-color);
+    font-size: var(--for-toc-font-size);
+    line-height: var(--for-toc-line-height);
+}
+
+/* Titel */
+nav.for-toc .for-toc__title {
+    margin: 0 0 var(--for-toc-title-margin-bottom) 0;
+    font-size: var(--for-toc-title-font-size);
+    font-weight: var(--for-toc-title-font-weight);
+}
+
+nav.for-toc .for-toc__title__empty {
+    color: color-mix(in srgb, currentColor 60%, transparent);
+    font-style: italic;
+    margin: 0.25rem 0 0 0;
+}
+
+/* Listen */
+nav.for-toc ol.for-toc__list,
+nav.for-toc ul.for-toc__list {
+    margin: 0 0 0 var(--for-toc-list-indent);
+    padding: 0;
+}
+
+nav.for-toc > ol.for-toc__list,
+nav.for-toc > ul.for-toc__list {
+    margin-left: var(--for-toc-list-indent);
+}
+
+nav.for-toc li.for-toc__item {
+    margin: var(--for-toc-item-margin);
+}
+
+nav.for-toc li.for-toc__item--filler {
+    list-style: none;
+    margin-left: -1em;
+}
+
+/* Links */
+nav.for-toc a {
+    color: var(--for-toc-link-color);
+    text-decoration: none;
+}
+
+nav.for-toc a:hover,
+nav.for-toc a:focus-visible {
+    color: var(--for-toc-link-hover-color);
+    text-decoration: underline;
+}
+
+nav.for-toc a.for-toc__link--active,
+nav.for-toc a[aria-current="true"] {
+    color: var(--for-toc-link-active-color);
+    font-weight: var(--for-toc-link-active-weight);
+}
+
+/* Optional: sticky Sidebar-TOC */
+nav.for-toc.for-toc--sticky {
+    position: sticky;
+    top: var(--for-toc-sticky-top);
+    max-height: var(--for-toc-sticky-max-height);
+    overflow-y: auto;
+}

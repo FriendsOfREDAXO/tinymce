@@ -194,8 +194,16 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
 }
 
 if ('clone' === $func) {
-    $message = TinyMceListHelper::cloneData($profileTable, $id);
-    rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
+    $sql = rex_sql::factory();
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('name');
+    if ($sql->getRows() > 0 && $sql->getValue('name') === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
+        echo rex_view::error(rex_i18n::msg('tinymce_profile_demo_locked'));
+    } else {
+        $message = TinyMceListHelper::cloneData($profileTable, $id);
+        rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
+    }
     $func = '';
 }
 
@@ -204,8 +212,11 @@ if ('delete' === $func) {
     $sql->setTable($profileTable);
     $sql->setWhere(['id' => $id]);
     $sql->select('name');
-    if ($sql->getRows() > 0 && $sql->getValue('name') === 'full') {
+    $rowName = $sql->getRows() > 0 ? (string) $sql->getValue('name') : '';
+    if ($rowName === 'full') {
         echo rex_view::error(rex_i18n::msg('tinymce_profile_full_delete_error'));
+    } elseif ($rowName === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
+        echo rex_view::error(rex_i18n::msg('tinymce_profile_demo_locked'));
     } else {
         $message = TinyMceListHelper::deleteData($profileTable, $id);
         rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_DELETE', $id));
@@ -244,6 +255,16 @@ if ('' === $func) {
     $list->setColumnParams('name', ['func' => 'edit', 'id' => '###id###', 'start' => $start]);
 
     $list->setColumnLabel('description', rex_i18n::msg('tinymce_description'));
+    $list->setColumnFormat('description', 'custom', static function ($params) {
+        $list = $params['list'];
+        $desc = (string) $list->getValue('description');
+        $name = (string) $list->getValue('name');
+        $prefix = '';
+        if ($name === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
+            $prefix = '<span class="label label-warning" title="' . rex_i18n::msg('tinymce_profile_demo_locked_info') . '" style="margin-right:6px;"><i class="rex-icon fa-lock"></i> ' . rex_i18n::msg('tinymce_profile_demo_locked_badge') . '</span> ';
+        }
+        return $prefix . rex_escape($desc);
+    }, ['list' => $list]);
 
     // preview action is in the actions dropdown (compact UI)
 
@@ -267,10 +288,14 @@ if ('' === $func) {
             . '<ul class="dropdown-menu dropdown-menu-right">'
             . '<li><a href="#" class="tinymce-preview" data-url="' . $list->getUrl(['func' => 'preview', 'id' => $id]) . '">' . rex_i18n::msg('tinymce_preview') . '</a></li>'
             . '<li class="dropdown-divider"></li>'
-            . '<li><a href="' . $exportUrl . '">' . rex_i18n::msg('tinymce_profile_export') . '</a></li>'
-            . '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>';
+            . '<li><a href="' . $exportUrl . '">' . rex_i18n::msg('tinymce_profile_export') . '</a></li>';
 
-        if ($list->getValue('name') !== 'full') {
+        $isDemo = $list->getValue('name') === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME;
+        if (!$isDemo) {
+            $dropdown .= '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>';
+        }
+
+        if ($list->getValue('name') !== 'full' && !$isDemo) {
             $dropdown .= '<li><a href="' . $deleteUrl . '" data-confirm="' . rex_i18n::msg('delete') . ' ?">' . rex_i18n::msg('delete') . '</a></li>';
         }
 
@@ -310,6 +335,29 @@ if ('' === $func) {
     echo $fragment->parse('core/page/section.php');
 } elseif ('edit' === $func || 'add' === $func) {
     $id = rex_request('id', 'int');
+
+    // Demo-Profil ist gesperrt – kein Bearbeiten erlaubt.
+    if ('edit' === $func && $id > 0) {
+        $lockSql = rex_sql::factory();
+        $lockSql->setTable($profileTable);
+        $lockSql->setWhere(['id' => $id]);
+        $lockSql->select('name');
+        if ($lockSql->getRows() > 0 && $lockSql->getValue('name') === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
+            $backUrl = rex_url::backendPage('tinymce/profiles');
+            $info = rex_view::info(
+                rex_i18n::msg('tinymce_profile_demo_locked_info')
+                . ' <a href="' . $backUrl . '" class="btn btn-xs btn-default" style="margin-left:8px;">'
+                . rex_i18n::msg('tinymce_back_to_list') . '</a>'
+            );
+            $fragment = new rex_fragment();
+            $fragment->setVar('class', 'edit', false);
+            $fragment->setVar('title', rex_i18n::msg('tinymce_profile_edit'));
+            $fragment->setVar('body', $info, false);
+            echo $fragment->parse('core/page/section.php');
+            return;
+        }
+    }
+
     $form = rex_form::factory($profileTable, '', 'id=' . $id, 'post', false);
     $form->addParam('start', $start);
     $form->addParam('send', true);

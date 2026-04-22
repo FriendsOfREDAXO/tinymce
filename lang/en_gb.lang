@@ -7,6 +7,10 @@ tinymce_demo = TinyMCE demo
 tinymce_mblock_demo = MBlock demo
 tinymce_profiles = Editor profile
 tinymce_for_plugins = FOR Plugins
+tinymce_profile_demo_locked_badge = Demo (locked)
+tinymce_profile_demo_locked = The demo profile is locked and cannot be edited, cloned or deleted.
+tinymce_profile_demo_locked_info = This profile is refreshed automatically on every AddOn update and must not be edited. Please clone it to make your own adjustments.
+tinymce_back_to_list = Back to list
 tinymce_help = Help
 
 # heading

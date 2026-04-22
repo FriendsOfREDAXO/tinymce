@@ -76,6 +76,8 @@ language: 'de',
 branding: false,
 statusbar: true,
 menubar: true,
+toolbar_sticky: true,
+toolbar_sticky_offset: 0,
 plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save link_yform phonelink quote snippets',
 toolbar: 'blocks | undo redo save | bold italic underline strikethrough subscript superscript forecolor backcolor | ltr rtl | table visualblocks visualchars | link image media | codesample fontsize align alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | removeformat code | hr print preview media fullscreen | searchreplace | emoticons visualaid cut copy paste pastetext selectall wordcount charmap pagebreak nonbreaking anchor toc insertdatetime | link_yform phonelink quote snippets',
 height: 400,
@@ -134,6 +136,8 @@ allow_script_urls: true,
 branding: false,
 statusbar: true,
 menubar: false,
+toolbar_sticky: true,
+toolbar_sticky_offset: 0,
 plugins: 'autolink directionality visualblocks visualchars fullscreen image link media charmap pagebreak nonbreaking code',
 toolbar: 'blocks |  bold italic subscript superscript | blockquote bullist numlist | charmap nonbreaking | link unlink | image | removeformat code | undo redo | cut copy paste pastetext wordcount',
 height: 400,
@@ -161,6 +165,8 @@ language: 'de',
 branding: false,
 statusbar: true,
 menubar: false,
+toolbar_sticky: true,
+toolbar_sticky_offset: 0,
 plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link codesample charmap nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code link_yform phonelink quote',
 toolbar1: 'undo redo | cut copy paste pastetext | bold italic underline strikethrough subscript superscript removeformat | link anchor | image emoticons charmap nonbreaking | link_yform phonelink quote',
 toolbar2: 'blocks | fontsize | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | code fullscreen searchreplace',
@@ -229,6 +235,22 @@ EXTRA;
 } catch (\Throwable $e) {
 	\rex_logger::logException($e);
 	echo \rex_view::error($e->getMessage());
+}
+
+// =============================================================================
+// Demo-Profil: immer (bei Install und Update) auf aktuellen Stand setzen.
+// Das Profil ist im Backend gesperrt (siehe pages/profiles.php) und versorgt
+// die Demo-Seite (pages/main.php) mit allen FOR-Plugins.
+// =============================================================================
+try {
+	\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
+		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME,
+		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::DESCRIPTION,
+		['extra' => \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::getExtra()],
+		true
+	);
+} catch (\Throwable $e) {
+	\rex_logger::logException($e);
 }
 
 // Style-Sets: Table is created via ensure_table.php

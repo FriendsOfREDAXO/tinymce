@@ -18,7 +18,8 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_htmlembed` | HTML-Snippets sicher einbetten (iframe-ähnliches Pattern, ohne Inline-Script-Risiken) | `for_htmlembed` |
 | `for_checklist` | Aufzählungen mit Checkboxen (Task-Listen) | `for_checklist` |
 | `for_checklist_feature` | Feature-Listen mit Icons (Haken, Kreuze, Sterne) | `for_checklist_feature` |
-| `for_footnote` | Fußnoten im Text mit automatischer Nummerierung & Rück-Verweisen | `for_footnote` |
+| `for_footnote` | Fußnoten im Text mit automatischer Nummerierung & Rück-Verweisen | `for_footnote_insert`, `for_footnote_update` |
+| `for_toc` | **Inhaltsverzeichnis** aus den Überschriften – Live-Sync beim Bearbeiten | `for_toc_insert`, `for_toc_update` |
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
 
 Zusätzlich enthält das AddOn diese Kern-Helfer (ohne `for_`-Präfix, da älter):
@@ -82,6 +83,17 @@ Beide produzieren semantisch sauberes, Frontend-CSS-freies Markup.
 - Fußnote per Dialog hinzufügen, automatische Nummerierung `[1]`, `[2]`, …
 - Referenzen im Text und Fußnoten-Block am Ende werden beim Save synchronisiert
 - Klick auf eine Fußnote im Text springt im Frontend zum Eintrag, Rück-Link zurück
+
+### `for_toc` – Inhaltsverzeichnis
+
+- Button **Inhaltsverzeichnis einfügen** scannt alle Überschriften (h1–h6) im Editor und erzeugt einen `<nav class="for-toc">`-Block mit verschachtelter Liste.
+- **Stabile Slug-IDs** auf den Überschriften (`for-toc-<slug>`, kollisionsfrei). Bestehende IDs bleiben beim Re-Edit erhalten.
+- **Live-Sync** wie `for_footnote`: beim Tippen/Einfügen/Undo wird die TOC automatisch aktualisiert – neue/umbenannte/gelöschte Überschriften werden synchron gehalten.
+- **Einstellungen pro TOC** (Dialog): Titel, Ab-/Bis-Ebene (h1–h6), nummeriert (`<ol>`) vs. unsortiert (`<ul>`). Werte werden als `data-for-toc-*` am Block gespeichert.
+- **Context-Toolbar** bei aktivem TOC-Block: Aktualisieren, Einstellungen, Entfernen.
+- Klick auf einen TOC-Link im Editor scrollt zum Ziel-Heading.
+- **Frontend-CSS** framework-agnostisch über CSS-Variablen (`--for-toc-*`) inkl. Dark-Mode und optionaler `.for-toc--sticky`-Variante für Sidebar-TOCs.
+- Optionales Frontend-JS `for_toc.js` für Active-Section-Highlighting via IntersectionObserver (setzt `for-toc__link--active` und `aria-current="true"`).
 
 ### `for_a11y` – Accessibility-Checker (on-demand)
 

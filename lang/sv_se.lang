@@ -8,6 +8,10 @@ tinymce_mblock_demo = MBlock demo
 tinymce_profiles = Editor Profile
 tinymce_help = Hjälp
 tinymce_for_plugins = FOR-plugin
+tinymce_profile_demo_locked_badge = Demo (låst)
+tinymce_profile_demo_locked = Demo-profilen är låst och kan inte redigeras, klonas eller tas bort.
+tinymce_profile_demo_locked_info = Den här profilen uppdateras automatiskt vid varje AddOn-uppdatering och får inte redigeras. Klona den för att göra egna ändringar.
+tinymce_back_to_list = Tillbaka till listan
 
 # heading
 tinymce_subnavigation_header_title = TinyMCE 8 till REDAXO 5

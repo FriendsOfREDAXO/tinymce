@@ -52,6 +52,7 @@ class Assets
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/base.js'));
+            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/sticky_navbar_freeze.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
@@ -236,6 +237,7 @@ class Assets
                     'for_checklist_feature' => 'Checkliste – Feature',
                     'for_footnote'         => 'Fußnote',
                     'for_a11y'             => 'Barrierefreiheit prüfen…',
+                    'for_toc'              => 'Inhaltsverzeichnis',
                 ],
                 'external_plugins' => []
             ];

@@ -25,6 +25,8 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_oembed', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_oembed/plugin.min.js'), 'for_oembed');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_video', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_video/plugin.min.js'), 'for_video');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_a11y', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_a11y/plugin.min.js'), 'for_a11y');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_toc', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_toc/plugin.min.js'), 'for_toc_insert');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_toc', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_toc/plugin.min.js'), 'for_toc_update');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

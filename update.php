@@ -58,4 +58,66 @@ try {
 // Set flag to regenerate profiles.js on next backend request
 $this->setConfig('update_profiles', true);
 
+// =============================================================================
+// Migration (v8.4.0): toolbar_sticky als Default in allen bestehenden Profilen
+// ergänzen, sofern noch nicht vorhanden. Das Demo-Profil wird unten separat
+// komplett überschrieben und braucht hier keine Sonderbehandlung.
+// =============================================================================
+try {
+    $stickySql = rex_sql::factory();
+    $stickyProfiles = $stickySql->getArray(
+        'SELECT id, name, extra FROM ' . rex::getTable('tinymce_profiles')
+    );
+
+    foreach ($stickyProfiles as $profile) {
+        if ($profile['name'] === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
+            continue;
+        }
+
+        $extra = (string) $profile['extra'];
+        if (str_contains($extra, 'toolbar_sticky')) {
+            // Zwischenstand-Migration: alten Offset 50 auf 0 normalisieren,
+            // damit die Toolbar bündig am Viewport-Rand klebt.
+            $normalized = preg_replace('/toolbar_sticky_offset\s*:\s*50\b/', 'toolbar_sticky_offset: 0', $extra);
+            if (null !== $normalized && $normalized !== $extra) {
+                $upd = rex_sql::factory();
+                $upd->setTable(rex::getTable('tinymce_profiles'));
+                $upd->setWhere(['id' => $profile['id']]);
+                $upd->setValue('extra', $normalized);
+                $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+                $upd->update();
+            }
+            continue;
+        }
+
+        $injection = "toolbar_sticky: true,\ntoolbar_sticky_offset: 0,\n";
+        $newExtra = '' === trim($extra) ? $injection : $injection . $extra;
+
+        $upd = rex_sql::factory();
+        $upd->setTable(rex::getTable('tinymce_profiles'));
+        $upd->setWhere(['id' => $profile['id']]);
+        $upd->setValue('extra', $newExtra);
+        $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+        $upd->update();
+    }
+} catch (rex_sql_exception $e) {
+    // Migration ist best-effort – Fehler nicht weiterreichen
+    rex_logger::logException($e);
+}
+
+// =============================================================================
+// Demo-Profil bei jedem Update auf aktuellen Stand bringen (ggf. neu anlegen).
+// Das Profil ist im Backend gesperrt (siehe pages/profiles.php).
+// =============================================================================
+try {
+    \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
+        \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME,
+        \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::DESCRIPTION,
+        ['extra' => \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::getExtra()],
+        true
+    );
+} catch (\Throwable $e) {
+    \rex_logger::logException($e);
+}
+
 return true;

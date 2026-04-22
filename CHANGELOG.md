@@ -4,6 +4,19 @@ Changelog
 Version 8.4.0
 -------------------------------
 
+### Sticky Toolbar & Koexistenz mit REDAXO-Topnav
+
+* **`toolbar_sticky: true` als neuer Default** in allen mitgelieferten Profilen (`full`, `light`, `default`, `demo`). Toolbar und Menüleiste kleben beim Scrollen im langen Editor-Content am oberen Viewport-Rand, `toolbar_sticky_offset: 0`.
+* **Automatische Migration in bestehenden Profilen** (`update.php`): Profile ohne `toolbar_sticky`-Setting werden einmalig ergänzt; bereits vorhandener `toolbar_sticky_offset: 50` wird auf `0` normalisiert. Profile mit eigener Einstellung bleiben unberührt.
+* **Neues JS `assets/scripts/sticky_navbar_freeze.js`** (automatisch geladen über `Provider\Assets::provideBaseAssets()`) – Workaround für die automatische Einblende-Logik der REDAXO-Topnav (`#rex-js-nav-top`, siehe `be_style/plugins/redaxo/assets/javascripts/redaxo.js`, Methode `navigationBar.update`): Beim Hochscrollen taucht der Kopf sonst während des Schreibens auf und überdeckt die sticky TinyMCE-Toolbar. Unser Script hält die Topnav versteckt, solange mindestens ein TinyMCE-Editor auf der Seite existiert und `window.scrollY >= 50`. Am Seitenanfang wird sie wieder freigegeben. Umgesetzt per `MutationObserver` auf der Klassen-Liste der Topnav + passivem Scroll-Listener (race-condition-sicher gegen schnelles Scrollen). Debug-Helper in der Browser-Konsole: `window.__tinyNavFreeze()`.
+
+### Neues gesperrtes Demo-Profil (`demo`)
+
+* **Dedicated profile** für die Demo-Seite (Backend → TinyMCE → Demo): aktiviert bewusst **alle FOR-Plugins**, volle Toolbar, alle Einfügen-/Format-/Werkzeuge-Menüs, Quickbars, `a11y_new_window_warning`, Bild-Presets, theme-aware Skin/Content-CSS.
+* **Locked im Backend**: In der Profilliste per gelbem Lock-Badge (`<i class="fa-lock"></i>`) in der Beschreibungsspalte markiert. Edit, Clone und Delete sind für dieses Profil im UI gesperrt (`pages/profiles.php`). Ein Edit-Aufruf zeigt stattdessen einen Info-Kasten mit „Zurück zur Liste".
+* **Auto-Refresh:** Die Config lebt in `lib/TinyMce/Utils/DemoProfile.php` als Single Source of Truth. `install.php` und `update.php` rufen `ProfileHelper::ensureProfile(..., forceUpdate: true)` auf – bei jedem AddOn-Update wird das Demo-Profil vollständig überschrieben.
+* **Neue Lang-Keys** (de/en/sv): `tinymce_profile_demo_locked_badge`, `tinymce_profile_demo_locked`, `tinymce_profile_demo_locked_info`, `tinymce_back_to_list`.
+
 ### Profil-Assistent: Einfügen-Menü & Config-Loader
 
 * **FOR-Plugin-Hervorhebung:** Eigene FriendsOfREDAXO-Plugins (`for_*`) bekommen im Assistenten ein farbiges **„FOR"-Badge** und werden bei Plugin-Liste, verfügbaren Toolbar-Buttons und Custom-Menu-Items optisch hervorgehoben.
@@ -51,6 +64,28 @@ Verwendung im Profil:
 ```javascript
 plugins: 'for_a11y ...',
 toolbar: '... for_a11y',
+```
+
+### Neues Plugin: `for_toc` – Inhaltsverzeichnis (mit Live-Sync)
+
+Generiert aus den Überschriften im Editor einen `<nav class="for-toc">`-Block mit verschachtelter Liste und springt automatisch bei jeder Änderung mit – ähnlich dem `for_footnotes`-Pattern.
+
+* **Plugin-Name:** `for_toc`
+* **Toolbar-Buttons:** `for_toc_insert`, `for_toc_update`
+* **Menü-Item:** `for_toc` (fürs Insert-Menü)
+* **Commands:** `forTocInsert`, `forTocUpdate`, `forTocSettings`
+* **Live-Sync:** beim Tippen/Einfügen/Undo/Redo wird die TOC automatisch neu generiert. Verwaiste Einträge entfernt, neue ergänzt.
+* **Stabile IDs:** Überschriften bekommen eindeutige Slug-IDs (`for-toc-<slug>`) und behalten diese beim Re-Edit.
+* **Einstellungen (Dialog):** Titel, Ab-Ebene, Bis-Ebene, `<ol>` oder `<ul>` – gespeichert als `data-for-toc-*` am Block.
+* **Context-Toolbar:** Aktualisieren, Einstellungen, Entfernen.
+* **Intelligente Verschachtelung:** Überspringt ein Heading eine Ebene (z. B. h2 → h4), bleibt das TOC-Markup trotzdem valide (Filler-Items).
+* **Frontend:** `assets/css/for_toc.css` – framework-agnostisch über CSS-Variablen (`--for-toc-*`), Dark-Mode ready, optional `.for-toc--sticky` für Sidebar-TOCs. Dazu optional `assets/js/for_toc.js` für Active-Section-Highlighting (IntersectionObserver, setzt `for-toc__link--active` + `aria-current`).
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_toc ...',
+toolbar: 'for_toc_insert for_toc_update ...',
 ```
 
 ### Neues Plugin: `for_video` – Lokale Videos aus dem Mediapool
