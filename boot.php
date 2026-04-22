@@ -21,6 +21,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_footnotes', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_footnotes/plugin.min.js'), 'for_footnote_update');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_checklist', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_checklist/plugin.min.js'), 'for_checklist');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_checklist', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_checklist/plugin.min.js'), 'for_checklist_feature');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_htmlembed', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_htmlembed/plugin.min.js'), 'for_htmlembed');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

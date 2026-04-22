@@ -27,6 +27,27 @@ plugins: 'for_footnotes ...',
 toolbar: 'for_footnote_insert for_footnote_update ...',
 ```
 
+### Neues Plugin: `for_htmlembed` – Geschützte HTML-/JS-Einbettung
+
+Ideal für Widgets, Tracking-Pixel, Social-Embeds, `<iframe>`, Mini-Apps – Redakteure können den Block nicht versehentlich im Fließtext zerschießen.
+
+* **Plugin-Name:** `for_htmlembed`
+* **Toolbar-Button & Menü:** `for_htmlembed`
+* **Commands:** `forHtmlEmbedInsert`, `forHtmlEmbedEdit`
+* **HTML-Format (bleibt im Save-Output erhalten):** `<div class="for-htmlembed" contenteditable="false">…Code…</div>`
+* **Bearbeitung per Dialog:** Toolbar-Button, Doppelklick oder Context-Toolbar-Edit-Button öffnen einen Dialog mit Textarea. Die Textarea bekommt die Klasse `rex-js-code-editor` und `data-mode="htmlmixed"` – das code-AddOn klinkt sich automatisch ein, Fallback ist Monospace.
+* **Schutz im Editor:** `contenteditable="false"` auf dem Wrapper verhindert versehentliches Editieren, Cursor kann nicht in den Code reinrutschen. Das Plugin setzt das Attribut bei jedem `SetContent` neu, falls es verloren geht.
+* **Schema-Erweiterung:** `<script>`, `<iframe>`, `<style>`, `<noscript>` werden als valide Elemente registriert, Sanitization wird deaktiviert (`xss_sanitization: false`, `allow_script_urls: true`).
+* **Editor-Chrome per CSS:** gestrichelter Rahmen + blaues Badge mit Dateityp (`script · 248 Zeichen`) – **nur** im Editor-Iframe, im Frontend sichtbar als schlichtes `<div>`.
+* **Context-Toolbar:** Edit- und Remove-Button erscheinen, wenn der Embed-Block angeklickt ist.
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_htmlembed ...',
+toolbar: 'for_htmlembed ...',
+```
+
 ### Neues Plugin: `for_checklist` – Moderne Checkliste mit CKEditor-5-Import
 
 Eigenständige Checklist-Implementierung mit modernem CSS-Look (keine klassische Form-Checkbox).

@@ -541,6 +541,37 @@ echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('
 
 Ein Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist im Stylesheet enthalten.
 
+## FriendsOfREDAXO HTML-Embed Plugin (`for_htmlembed`)
+
+Geschützte HTML-/JS-Einbettung für Widgets, Tracking-Pixel, Social-Embeds, `<iframe>`, Mini-Apps. Der Code-Block ist im Editor **nicht direkt editierbar** (`contenteditable="false"`), nur als Ganzes verschiebbar/löschbar, und wird über einen separaten Dialog bearbeitet – Redakteure können ihn damit nicht versehentlich zerschießen.
+
+### Features
+
+* Toolbar-Button & Menüeintrag: `for_htmlembed`
+* Commands: `forHtmlEmbedInsert` (einfügen/bearbeiten), `forHtmlEmbedEdit` (nur bearbeiten)
+* **Doppelklick** auf den Embed-Block öffnet den Bearbeiten-Dialog
+* **Context-Toolbar** mit Edit- und Remove-Button
+* HTML-Format (bleibt unverändert im Save-Output):
+  ```html
+  <div class="for-htmlembed" contenteditable="false">
+    <!-- beliebiger HTML/JS/CSS-Code -->
+  </div>
+  ```
+* Editor-Chrome (dashed border + Badge) nur im Editor-Iframe sichtbar, im Frontend nur ein schlichtes `<div>`
+* Das Plugin setzt `xss_sanitization: false` und `allow_script_urls: true` auf den Editor, sobald es geladen ist – damit `<script>`, `<iframe>`, `<style>` & `on*`-Attribute nicht entfernt werden. **Nur aktivieren, wenn die Redakteure beliebigen Code einbetten dürfen sollen.**
+* Textarea im Dialog bekommt die CSS-Klasse `rex-js-code-editor` – das [code-AddOn](https://github.com/FriendsOfRedaxo/code) hängt sich automatisch an, falls installiert, sonst Fallback auf monospace.
+
+### Aktivierung im Profil
+
+```javascript
+plugins: 'for_htmlembed ...',
+toolbar: 'for_htmlembed ...',
+```
+
+### Styling im Frontend
+
+Der Wrapper `<div class="for-htmlembed">` bleibt im Save-Output. Standardmäßig wird er im Frontend nicht gestylt. Falls gewünscht, kann das Frontend den Block visuell hervorheben (`display: contents;` für völlig unsichtbar, oder eigenes CSS).
+
 ## Entwickler
 
 Informationen zur Erweiterung des Addons und zur Registrierung eigener Plugins finden Sie in der [Entwickler-Dokumentation](DEVS.md) oder im Backend unter dem Reiter "Entwickler".
