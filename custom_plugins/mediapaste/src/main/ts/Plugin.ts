@@ -275,6 +275,12 @@ const Plugin = (): void => {
         // Allow pasting & dropping images into the editor
         editor.options.set('paste_data_images', true);
         editor.options.set('automatic_uploads', true);
+        // Extend TinyMCE's default images_file_types with SVG, AVIF & modern formats
+        // (default does not include svg, so drag-dropped SVGs would be silently rejected)
+        editor.options.set(
+            'images_file_types',
+            'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp,avif,svg'
+        );
 
         // Handle drag-dropped image files via TinyMCE's standard blob flow
         editor.options.set(
