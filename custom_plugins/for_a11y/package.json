@@ -1,0 +1,17 @@
+{
+  "name": "for_a11y",
+  "version": "1.0.0",
+  "description": "Accessibility checker plugin for TinyMCE (FriendsOfREDAXO) — on-demand a11y audit for images, links, tables, headings, iframes",
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_a11y/ ../../assets/scripts/tinymce/plugins/for_a11y/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_a11y/ ../../assets/vendor/tinymce/plugins/for_a11y/"
+  },
+  "keywords": ["tinymce", "a11y", "accessibility", "redaxo"],
+  "author": "FriendsOfREDAXO",
+  "devDependencies": {
+    "esbuild": "^0.18.0",
+    "tinymce": "^8.2.2",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0"
+  }
+}

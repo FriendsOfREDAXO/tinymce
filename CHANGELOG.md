@@ -4,6 +4,73 @@ Changelog
 Version 8.4.0
 -------------------------------
 
+### Neues Plugin: `for_a11y` – Accessibility-Checker (on-demand)
+
+Prüft den aktuellen Editor-Inhalt gegen gängige Barrierefreiheits-Regeln und zeigt die Befunde in einem Dialog an. Läuft ausschließlich auf Knopfdruck, verändert den Inhalt **nicht** automatisch.
+
+* **Plugin-Name:** `for_a11y`
+* **Toolbar-Button & Menüeintrag:** `for_a11y` ("Barrierefreiheit prüfen")
+* **Command:** `forA11yCheck`
+* **Regeln** (einzeln abschaltbar via `a11y_rules: { "regel-id": false }`):
+  * `img-missing-alt` – Bild ohne alt-Attribut (Fehler; in Textlinks: Warnung, alt="" fehlt)
+  * `img-alt-in-text-link` – alt-Text, obwohl das umschließende `<a>` schon sichtbaren Text hat (Warnung)
+  * `img-empty-alt-nondeco` – alt="", ohne dass das Bild dekorativ (`role="presentation"`) oder in einem Textlink ist (Warnung)
+  * `link-no-accname` – Link ohne erkennbaren accessible name (Fehler)
+  * `link-generic-text` – „hier", „klicken", „weiterlesen", „read more", … (Warnung). Liste konfigurierbar über `a11y_generic_link_texts`
+  * `link-new-window` – `target="_blank"` ohne Hinweis im Text/`aria-label`/`title` (Hinweis). Abschaltbar über `a11y_new_window_warning: false`
+  * `heading-empty` – leere Überschrift (Warnung)
+  * `heading-skip` – Hierarchie-Sprung (z.B. h1 → h3) (Warnung)
+  * `table-no-th` – Datentabelle ohne `<th>` (Warnung)
+  * `table-no-caption` – Tabelle ohne `<caption>` (Hinweis)
+  * `table-th-no-scope` – Matrix-Tabelle mit Zeilen- und Spaltenköpfen, deren `<th>` kein `scope` haben (Hinweis)
+  * `iframe-no-title` – `<iframe>` ohne title-Attribut (Warnung)
+* **Dialog-UI:** Tabellarische Liste mit Schwere-Icon, Regel-Titel, Erklärung, Kurzvorschau und „Anzeigen"-Button (scrollt zum Element, setzt Selektion, markiert es 2 s mit orangem Outline).
+* **Persistente Marker im Editor:** Solange der Report-Dialog offen ist, werden alle betroffenen Elemente direkt im Editor farbig umrahmt (rot = Fehler, orange = Warnung, blau-gestrichelt = Hinweis). Beim Schließen des Dialogs verschwinden die Marker wieder. Klick auf „Anzeigen" pulsiert das Element zusätzlich.
+* **Button „Erneut prüfen"** – nach Korrektur direkt erneut validieren.
+* **Default-Profile-Hinweis:** Wenn `for_images`, `for_oembed`, `for_video`, `for_htmlembed` genutzt werden, können die Core-Plugins `image` und `media` aus dem TinyMCE-Profil entfernt werden. Unsere Plugins liefern bessere Vorschau, konsistente Preset-Klassen und sauberere Save-Formate.
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_a11y ...',
+toolbar: '... for_a11y',
+```
+
+### Neues Plugin: `for_video` – Lokale Videos aus dem Mediapool
+
+Einbettung von lokalen Videodateien (mp4, webm, ogg) aus dem REDAXO-Mediapool – mit Poster, Click-to-Play-Vorschau im Editor und den gleichen Breiten-/Ausrichtungs-/Seitenverhältnis-Presets wie `for_oembed`.
+
+* **Plugin-Name:** `for_video`
+* **Toolbar-Button / Menü / Context-Toolbar / Doppelklick** – Edit per Dialog.
+* **Commands:** `forVideoInsert`, `forVideoEdit`
+* **Save-Format (HTML5):**
+
+  ```html
+  <figure class="media for-video [user-klassen]">
+      <video src="/media/movie.mp4" poster="/media/poster.jpg" controls playsinline preload="metadata">
+          <a href="/media/movie.mp4">movie.mp4</a>
+      </video>
+  </figure>
+  ```
+
+* **Mediapool-Picker:** Dialog mit Feldern für Video-Datei und Poster-Bild, jeweils mit „Aus Mediapool wählen…"-Button (nutzt `openMediaPool()`).
+* **Optionen im Dialog:** Controls, Autoplay (setzt automatisch `muted`), Loop, Muted, Playsinline.
+* **Editor-Vorschau:** Poster-Bild + Play-Overlay + Toolbar-Header (Badge, Dateiname, Stop, Auswahl-Handle). Klick aufs Video aktiviert eine echte `<video>`-Instanz mit Controls, Stop-Button kehrt zur Vorschau zurück. `contenteditable="false"`.
+* **Preset-Klassen** (analog zu `for_oembed`, mit Präfix `for-video--`):
+  * Breite: `for-video--w-sm`, `-w-md`, `-w-lg`, `-w-full`
+  * Ausrichtung: `for-video--align-left`, `-align-center`, `-align-right`
+  * Seitenverhältnis: `for-video--ratio-4-3`, `-ratio-1-1`, `-ratio-9-16`, `-ratio-21-9` (16:9 = Default, keine Klasse)
+* **Konfigurierbar per Profil-Option:** `videowidth_presets`, `videoalign_presets`, `videoratio_presets` (selbes Format wie `oembed*_presets`).
+* **Frontend-CSS:** `assets/css/for_video.css` für Default-Klassen.
+* **Zwei-stufiger Save-Schutz:** `GetContent`-String-Hook + `PreProcess`-DOM-Tree-Hook über `tinymce.html.DomParser` stellen sicher, dass niemals Preview-Markup (Toolbar/Buttons) in der Textarea landet.
+
+Verwendung im Profil:
+
+```javascript
+plugins: 'for_video ...',
+toolbar: 'for_video ...',
+```
+
 ### Neues Plugin: `for_footnotes` – FriendsOfREDAXO Fußnoten
 
 Eigenständige, freie Fußnoten-Funktion für den TinyMCE-Editor – entwickelt von FriendsOfREDAXO. **Keine Kompatibilität zu Tiny's kommerziellem Premium-Plugin** – eigener Namespace mit `for_`/`for-`-Prefix.

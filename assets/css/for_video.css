@@ -1,0 +1,94 @@
+/* =====================================================================
+ *  for_video – Frontend-Styles für lokale HTML5-Videos
+ *  ---------------------------------------------------------------------
+ *  Einbinden, wenn die Default-Preset-Klassen
+ *  (for-video--w-*, for-video--align-*, for-video--ratio-*) verwendet
+ *  werden. Projekte, die eigene Klassen in `videowidth_presets` /
+ *  `videoalign_presets` / `videoratio_presets` konfigurieren, benötigen
+ *  diese Datei nicht.
+ * =================================================================== */
+
+figure.for-video {
+    margin: 1em 0 1.5em;
+    position: relative;
+}
+
+figure.for-video video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    background: #000;
+    border-radius: 4px;
+}
+
+/* --- Breiten-Presets --- */
+figure.for-video.for-video--w-sm    { max-width: 320px; }
+figure.for-video.for-video--w-md    { max-width: 480px; }
+figure.for-video.for-video--w-lg    { max-width: 720px; }
+figure.for-video.for-video--w-full  { max-width: 100%; }
+
+/* --- Seitenverhältnis-Presets (Default ist das Originalverhältnis des Videos) --- */
+figure.for-video.for-video--ratio-4-3  video,
+figure.for-video.for-video--ratio-1-1  video,
+figure.for-video.for-video--ratio-9-16 video,
+figure.for-video.for-video--ratio-21-9 video {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+}
+
+figure.for-video.for-video--ratio-4-3,
+figure.for-video.for-video--ratio-1-1,
+figure.for-video.for-video--ratio-9-16,
+figure.for-video.for-video--ratio-21-9 {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    border-radius: 4px;
+}
+
+figure.for-video.for-video--ratio-4-3   { aspect-ratio: 4 / 3;  }
+figure.for-video.for-video--ratio-1-1   { aspect-ratio: 1 / 1;  }
+figure.for-video.for-video--ratio-9-16  { aspect-ratio: 9 / 16; }
+figure.for-video.for-video--ratio-21-9  { aspect-ratio: 21 / 9; }
+
+/* Fallback für Browser ohne aspect-ratio */
+@supports not (aspect-ratio: 1 / 1) {
+    figure.for-video.for-video--ratio-4-3   { padding-bottom: 75%;     height: 0; }
+    figure.for-video.for-video--ratio-1-1   { padding-bottom: 100%;    height: 0; }
+    figure.for-video.for-video--ratio-9-16  { padding-bottom: 177.78%; height: 0; }
+    figure.for-video.for-video--ratio-21-9  { padding-bottom: 42.86%;  height: 0; }
+}
+
+/* Hochkant-Videos: engere Max-Breite */
+figure.for-video.for-video--ratio-9-16 { max-width: 360px; }
+figure.for-video.for-video--ratio-1-1  { max-width: 480px; }
+
+/* --- Ausrichtung / Textumlauf --- */
+figure.for-video.for-video--align-left {
+    float: left;
+    margin: 0 1.25em 1em 0;
+    clear: left;
+}
+figure.for-video.for-video--align-right {
+    float: right;
+    margin: 0 0 1em 1.25em;
+    clear: right;
+}
+figure.for-video.for-video--align-center {
+    margin-left: auto;
+    margin-right: auto;
+    float: none;
+}
+
+/* Schmalere Geräte: Floats aufheben */
+@media (max-width: 640px) {
+    figure.for-video.for-video--align-left,
+    figure.for-video.for-video--align-right {
+        float: none;
+        margin: 1em 0 1.5em;
+    }
+}
