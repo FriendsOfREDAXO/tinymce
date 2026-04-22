@@ -19,8 +19,23 @@ function initTinyMceProfileAssistant() {
     $toggleBtn.on('click', function() {
         $builderContainer.slideToggle();
     });
-    
+
+    // Load-from-config Button (populates the builder with the current textarea config)
+    const $loadBtn = $('<button type="button" class="btn btn-default" style="margin-bottom: 10px; margin-left: 6px;" title="' + (i18n.load_from_config_help || '') + '"><i class="rex-icon fa-upload"></i> ' + (i18n.load_from_config || 'Load from current config') + '</button>');
+    $loadBtn.on('click', function() {
+        const loaded = loadFromConfig($textarea, $builderBody);
+        if (loaded) {
+            if (!$builderContainer.is(':visible')) {
+                $builderContainer.slideDown();
+            }
+            alert(i18n.loaded_from_config || 'Configuration loaded into the assistant.');
+        } else {
+            alert(i18n.load_failed || 'Could not parse configuration.');
+        }
+    });
+
     $textarea.before($toggleBtn);
+    $textarea.before($loadBtn);
     $textarea.before($builderContainer);
 
     // Presets
@@ -35,20 +50,27 @@ function initTinyMceProfileAssistant() {
     const pluginsList = options.plugins || [];
     const toolbarButtons = options.toolbar || [];
 
-    // Plugins Section
-    let pluginsHtml = '<legend>' + (i18n.plugins || 'Plugins') + '</legend><div class="row">';
+    // Plugins Section – FOR plugins (for_*) are highlighted as "premium" custom plugins
+    const isForPlugin = (name) => typeof name === 'string' && name.indexOf('for_') === 0;
+    let pluginsHtml = '<legend>' + (i18n.plugins || 'Plugins') + ' <small class="for-plugin-legend-hint"><span class="for-plugin-badge-inline">FOR</span> ' + (i18n.for_plugins_hint || 'FriendsOfREDAXO custom plugins') + '</small></legend><div class="row">';
     pluginsList.forEach(plugin => {
-        pluginsHtml += `<div class="col-md-3 col-sm-4"><div class="checkbox"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${plugin}</label></div></div>`;
+        const forClass = isForPlugin(plugin) ? ' builder-plugin-row--for' : '';
+        const badge = isForPlugin(plugin) ? '<span class="for-plugin-badge" title="FriendsOfREDAXO">FOR</span> ' : '';
+        pluginsHtml += `<div class="col-md-3 col-sm-4${forClass}"><div class="checkbox"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${badge}${plugin}</label></div></div>`;
     });
     pluginsHtml += '</div><br>';
 
     // Toolbar Section
     let toolbarHtml = '<legend>' + (i18n.toolbar || 'Toolbar') + '</legend><p class="help-block">' + (i18n.toolbar_help || 'Click to add items. Drag and drop selected items to reorder.') + '</p>';
     
-    // Available Buttons
+    // Available Buttons – FOR-* buttons highlighted
     toolbarHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.available_items || 'Available Items') + '</div><div class="panel-body" id="builder-available-items">';
     toolbarButtons.forEach(btn => {
-        toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="${btn}" style="margin-bottom: 4px;">${btn}</button> `;
+        if (isForPlugin(btn)) {
+            toolbarHtml += `<button type="button" class="btn btn-xs builder-toolbar-btn builder-toolbar-btn--for" data-value="${btn}" style="margin-bottom: 4px;" title="FriendsOfREDAXO"><span class="for-plugin-badge">FOR</span> ${btn}</button> `;
+        } else {
+            toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="${btn}" style="margin-bottom: 4px;">${btn}</button> `;
+        }
     });
     // Add Separator Button
     toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (${i18n.separator || 'Separator'})</strong></button> `;
@@ -59,6 +81,27 @@ function initTinyMceProfileAssistant() {
     
     // Toolbar Input (Result)
     toolbarHtml += '<div class="form-group"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><input type="text" class="form-control builder-toolbar-input" readonly></div>';
+
+    // Insert Menu Section
+    const defaultInsertItems = options.menu_insert_items || [];
+    const customMenuItems = options.custom_menu_items || {};
+    let insertMenuHtml = '<legend>' + (i18n.insert_menu || 'Insert Menu') + '</legend>';
+    insertMenuHtml += '<p class="help-block">' + (i18n.insert_menu_help || 'Configure which items appear in the menubar "Insert" menu.') + '</p>';
+    insertMenuHtml += '<div class="row"><div class="col-md-6"><div class="form-group"><label>' + (i18n.insert_menu_title || 'Menu title') + '</label><input type="text" class="form-control builder-insert-menu-title" value="Einfügen"></div></div></div>';
+    insertMenuHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.available_items || 'Available Items') + '</div><div class="panel-body" id="builder-insert-available-items">';
+    defaultInsertItems.forEach(function (btn) {
+        insertMenuHtml += '<button type="button" class="btn btn-default btn-xs builder-insert-item-btn" data-value="' + btn + '" style="margin-bottom: 4px;">' + btn + '</button> ';
+    });
+    insertMenuHtml += '<button type="button" class="btn btn-default btn-xs builder-insert-item-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (' + (i18n.separator || 'Separator') + ')</strong></button> ';
+    insertMenuHtml += '</div></div>';
+    insertMenuHtml += '<div class=\"panel panel-info\"><div class=\"panel-heading\"><span class=\"for-plugin-badge\">FOR</span> ' + (i18n.custom_menu_items || 'Custom plugin items') + '</div><div class=\"panel-body\" id=\"builder-insert-custom-items\">';
+    Object.keys(customMenuItems).forEach(function (key) {
+        insertMenuHtml += '<button type=\"button\" class=\"btn btn-info btn-xs builder-insert-item-btn builder-insert-item-btn--for\" data-value=\"' + key + '\" title=\"' + customMenuItems[key] + '\" style=\"margin-bottom: 4px;\"><span class=\"for-plugin-badge\">FOR</span> ' + key + '</button> ';
+    });
+    insertMenuHtml += '</div></div>';
+    insertMenuHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected (Drag to reorder)') + '</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-insert-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
+    insertMenuHtml += '<div class="form-group"><label>' + (i18n.insert_menu_result || 'Insert menu items (result)') + '</label><input type="text" class="form-control builder-insert-menu-input" readonly></div>';
+    toolbarHtml += insertMenuHtml;
 
     // Common Settings
     let settingsHtml = '<br><legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
@@ -318,11 +361,51 @@ function initTinyMceProfileAssistant() {
     // Styles for Sortable
     const style = document.createElement('style');
     style.innerHTML = `
-        #builder-selected-items, #builder-context-selected-items { min-height: 40px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; background: #fff; }
-        #builder-selected-items li, #builder-context-selected-items li { cursor: move; margin-bottom: 5px; background: #324050; color: #fff; border: 1px solid #202b35; padding: 5px 10px; border-radius: 3px; display: inline-block; }
-        #builder-selected-items li:hover, #builder-context-selected-items li:hover { background: #283340; border-color: #000; }
-        #builder-selected-items li .remove-item, #builder-context-selected-items li .remove-item { margin-left: 8px; color: #ff9999; cursor: pointer; font-weight: bold; }
-        #builder-selected-items li.placeholder, #builder-context-selected-items li.placeholder { background: #dff0d8; border: 1px dashed #3c763d; height: 32px; width: 50px; }
+        #builder-selected-items, #builder-context-selected-items, #builder-insert-selected-items { min-height: 40px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; background: #fff; }
+        #builder-selected-items li, #builder-context-selected-items li, #builder-insert-selected-items li { cursor: move; margin-bottom: 5px; background: #324050; color: #fff; border: 1px solid #202b35; padding: 5px 10px; border-radius: 3px; display: inline-block; }
+        #builder-selected-items li:hover, #builder-context-selected-items li:hover, #builder-insert-selected-items li:hover { background: #283340; border-color: #000; }
+        #builder-selected-items li .remove-item, #builder-context-selected-items li .remove-item, #builder-insert-selected-items li .remove-item { margin-left: 8px; color: #ff9999; cursor: pointer; font-weight: bold; }
+        #builder-selected-items li.placeholder, #builder-context-selected-items li.placeholder, #builder-insert-selected-items li.placeholder { background: #dff0d8; border: 1px dashed #3c763d; height: 32px; width: 50px; }
+
+        /* FOR Plugin highlighting (FriendsOfREDAXO) */
+        .for-plugin-badge, .for-plugin-badge-inline {
+            display: inline-block;
+            padding: 1px 5px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
+            border-radius: 3px;
+            background: linear-gradient(135deg, #e91e63, #9c27b0);
+            color: #fff;
+            vertical-align: middle;
+            text-shadow: 0 1px 1px rgba(0,0,0,.15);
+            box-shadow: 0 1px 2px rgba(0,0,0,.1);
+        }
+        .for-plugin-badge-inline { margin-left: 6px; }
+        .for-plugin-legend-hint { margin-left: 8px; color: #999; font-weight: 400; }
+        .builder-plugin-row--for label { font-weight: 600; }
+        .builder-plugin-row--for label input { accent-color: #e91e63; }
+        .builder-toolbar-btn--for {
+            background: linear-gradient(135deg, #fff 0%, #fff 50%, #fce4ec 100%) !important;
+            color: #880e4f !important;
+            border: 1px solid #e91e63 !important;
+            font-weight: 600;
+        }
+        .builder-toolbar-btn--for:hover { background: #fce4ec !important; }
+        .builder-insert-item-btn--for {
+            background: linear-gradient(135deg, #e91e63, #9c27b0) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+        .builder-insert-item-btn--for:hover { filter: brightness(1.1); }
+        body.rex-theme-dark .builder-toolbar-btn--for {
+            background: linear-gradient(135deg, #2a2a2a 0%, #3a2030 100%) !important;
+            color: #f48fb1 !important;
+            border-color: #c2185b !important;
+        }
+        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #3a2030 !important; }
     `;
     document.head.appendChild(style);
 
@@ -333,6 +416,10 @@ function initTinyMceProfileAssistant() {
     // Context Logic
     const $contextSelectedList = $('#builder-context-selected-items');
     const $contextInput = $builderBody.find('.builder-context-toolbar-selection');
+
+    // Insert-Menu Logic
+    const $insertSelectedList = $('#builder-insert-selected-items');
+    const $insertInput = $builderBody.find('.builder-insert-menu-input');
 
     function updateInput() {
         const items = [];
@@ -350,6 +437,14 @@ function initTinyMceProfileAssistant() {
         $contextInput.val(items.join(' '));
     }
 
+    function updateInsertInput() {
+        const items = [];
+        $insertSelectedList.find('li').each(function() {
+            items.push($(this).data('value'));
+        });
+        $insertInput.val(items.join(' '));
+    }
+
     function addItem(value) {
         const $li = $(`<li draggable="true" data-value="${value}">${value} <span class="remove-item">&times;</span></li>`);
         $selectedList.append($li);
@@ -362,6 +457,18 @@ function initTinyMceProfileAssistant() {
         $contextSelectedList.append($li);
         updateContextInput();
         setupDragEvents($li[0]);
+    }
+
+    function addInsertItem(value) {
+        const $li = $(`<li draggable="true" data-value="${value}">${value} <span class="remove-item">&times;</span></li>`);
+        $insertSelectedList.append($li);
+        updateInsertInput();
+        setupDragEvents($li[0]);
+    }
+
+    function clearInsertItems() {
+        $insertSelectedList.empty();
+        updateInsertInput();
     }
 
     function clearItems() {
@@ -410,6 +517,10 @@ function initTinyMceProfileAssistant() {
         addContextItem($(this).data('value'));
     });
 
+    $builderBody.find('.builder-insert-item-btn').on('click', function() {
+        addInsertItem($(this).data('value'));
+    });
+
     // Remove Item Click
     $selectedList.on('click', '.remove-item', function() {
         $(this).parent().remove();
@@ -421,17 +532,48 @@ function initTinyMceProfileAssistant() {
         updateContextInput();
     });
 
+    $insertSelectedList.on('click', '.remove-item', function() {
+        $(this).parent().remove();
+        updateInsertInput();
+    });
+
     // Drag and Drop Implementation
     let dragSrcEl = null;
 
     function setupDragEvents(item) {
+        if (item.dataset && item.dataset.dragBound === '1') {
+            return;
+        }
         item.addEventListener('dragstart', handleDragStart, false);
         item.addEventListener('dragenter', handleDragEnter, false);
         item.addEventListener('dragover', handleDragOver, false);
         item.addEventListener('dragleave', handleDragLeave, false);
         item.addEventListener('drop', handleDrop, false);
         item.addEventListener('dragend', handleDragEnd, false);
+        if (item.dataset) {
+            item.dataset.dragBound = '1';
+        }
     }
+
+    // Auto-wire drag events for <li> elements added by loadFromConfig() or any
+    // other code path that inserts items without going through addItem().
+    [$selectedList[0], $contextSelectedList[0], $insertSelectedList[0]].forEach(function (list) {
+        if (!list) return;
+        const mo = new MutationObserver(function (mutations) {
+            mutations.forEach(function (m) {
+                m.addedNodes.forEach(function (node) {
+                    if (node && node.nodeType === 1 && node.tagName === 'LI') {
+                        setupDragEvents(node);
+                    }
+                });
+            });
+            // Keep hidden inputs in sync with whatever content is currently in the list.
+            if (list.id === 'builder-selected-items') updateInput();
+            else if (list.id === 'builder-context-selected-items') updateContextInput();
+            else if (list.id === 'builder-insert-selected-items') updateInsertInput();
+        });
+        mo.observe(list, { childList: true });
+    });
 
     function handleDragStart(e) {
         dragSrcEl = this;
@@ -486,6 +628,8 @@ function initTinyMceProfileAssistant() {
                 updateInput();
             } else if (this.parentNode.id === 'builder-context-selected-items') {
                 updateContextInput();
+            } else if (this.parentNode.id === 'builder-insert-selected-items') {
+                updateInsertInput();
             }
         }
         return false;
@@ -495,6 +639,7 @@ function initTinyMceProfileAssistant() {
         this.classList.remove('dragging');
         $selectedList.find('li').removeClass('over');
         $contextSelectedList.find('li').removeClass('over');
+        $insertSelectedList.find('li').removeClass('over');
     }
 
     $builderBody.find('.builder-apply').on('click', function() {
@@ -522,6 +667,16 @@ function initTinyMceProfileAssistant() {
     $yformTable.on('click', '.yform-remove', function() {
         $(this).closest('tr').remove();
     });
+
+    // Auto-load existing config into the builder when in edit mode.
+    // Runs after the DOM is ready; if the textarea already contains data we try
+    // to hydrate the form controls so the user doesn't have to start over.
+    setTimeout(function () {
+        const existing = ($textarea.val() || '').trim();
+        if (existing.length > 0) {
+            loadFromConfig($textarea, $builderBody);
+        }
+    }, 50);
 }
 
 function escapeString(str) {
@@ -635,6 +790,13 @@ function generateConfig($textarea, $builderBody) {
     
     if (mediaType) {
         configStr += `tinymce_media_type: '${mediaType}',\n`;
+    }
+
+    // Insert Menu (menubar > Einfügen)
+    const insertMenuItems = escapeString($builderBody.find('.builder-insert-menu-input').val() || '');
+    const insertMenuTitle = escapeString($builderBody.find('.builder-insert-menu-title').val() || 'Einfügen');
+    if (menubar && insertMenuItems) {
+        configStr += `menu: {\n  insert: { title: '${insertMenuTitle}', items: '${insertMenuItems}' }\n},\n`;
     }
 
     if (plugins.length > 0) {
@@ -792,4 +954,175 @@ function generateConfig($textarea, $builderBody) {
     if ($textarea[0].nextElementSibling && $textarea[0].nextElementSibling.classList.contains('CodeMirror')) {
         $textarea[0].nextElementSibling.CodeMirror.setValue(configStr);
     }
+}
+
+/**
+ * Best-effort parsing of the existing profile config (stored as a raw JS object
+ * body) into a plain JS object. Admin-only context; the same text is injected
+ * as JS into profiles.js at runtime so `new Function` does not add risk.
+ *
+ * @param {string} extra
+ * @returns {object|null}
+ */
+function parseProfileExtra(extra) {
+    const src = String(extra || '').trim();
+    if (src === '') {
+        return null;
+    }
+    try {
+        // Wrap in parentheses so the body is parsed as an object literal.
+        return new Function('"use strict"; return ({' + src + '});')();
+    } catch (e) {
+        console.warn('[tinymce profile assistant] cannot parse extra config:', e);
+        return null;
+    }
+}
+
+/**
+ * Populates the builder UI from the current textarea content. Returns true
+ * when parsing succeeded (regardless of which fields could be mapped).
+ */
+function loadFromConfig($textarea, $builderBody) {
+    const cfg = parseProfileExtra($textarea.val());
+    if (!cfg || typeof cfg !== 'object') {
+        return false;
+    }
+
+    const tokenize = (s) => String(s || '').trim().split(/\s+/).filter(Boolean);
+
+    // Plugins
+    if (typeof cfg.plugins === 'string' || Array.isArray(cfg.plugins)) {
+        const list = Array.isArray(cfg.plugins) ? cfg.plugins : tokenize(cfg.plugins);
+        $builderBody.find('.builder-plugin').prop('checked', false);
+        list.forEach((p) => {
+            $builderBody.find('.builder-plugin[value="' + p + '"]').prop('checked', true);
+        });
+    }
+
+    // Toolbar
+    if (typeof cfg.toolbar === 'string') {
+        const $selectedList = $('#builder-selected-items');
+        $selectedList.empty();
+        tokenize(cfg.toolbar).forEach((v) => {
+            $selectedList.append('<li draggable="true" data-value="' + v + '">' + v + ' <span class="remove-item">&times;</span></li>');
+        });
+        $builderBody.find('.builder-toolbar-input').val(tokenize(cfg.toolbar).join(' '));
+    }
+
+    // Common
+    if (typeof cfg.height === 'number') {
+        $builderBody.find('.builder-height').val(cfg.height);
+    }
+    if (typeof cfg.language === 'string') {
+        $builderBody.find('.builder-lang').val(cfg.language);
+    }
+    if (typeof cfg.menubar !== 'undefined') {
+        $builderBody.find('.builder-menubar').prop('checked', !!cfg.menubar);
+    }
+
+    // Context toolbar (quickbars)
+    if (typeof cfg.quickbars_selection_toolbar === 'string') {
+        $builderBody.find('.builder-context-toolbar').prop('checked', true).trigger('change');
+        const $ctxList = $('#builder-context-selected-items');
+        $ctxList.empty();
+        tokenize(cfg.quickbars_selection_toolbar).forEach((v) => {
+            $ctxList.append('<li draggable="true" data-value="' + v + '">' + v + ' <span class="remove-item">&times;</span></li>');
+        });
+        $builderBody.find('.builder-context-toolbar-selection').val(tokenize(cfg.quickbars_selection_toolbar).join(' '));
+    }
+    if (cfg.quickbars_insert_toolbar && cfg.quickbars_insert_toolbar !== false) {
+        $builderBody.find('.builder-context-toolbar-insert').prop('checked', true);
+    }
+
+    // Insert menu
+    if (cfg.menu && cfg.menu.insert) {
+        const title = cfg.menu.insert.title || 'Einfügen';
+        const items = cfg.menu.insert.items || '';
+        $builderBody.find('.builder-insert-menu-title').val(title);
+        const $insertList = $('#builder-insert-selected-items');
+        $insertList.empty();
+        tokenize(items).forEach((v) => {
+            $insertList.append('<li draggable="true" data-value="' + v + '">' + v + ' <span class="remove-item">&times;</span></li>');
+        });
+        $builderBody.find('.builder-insert-menu-input').val(tokenize(items).join(' '));
+    }
+
+    // Advanced options
+    const boolMap = {
+        image_caption: '.builder-image-caption',
+        image_uploadtab: '.builder-image-uploadtab',
+        relative_urls: '.builder-relative-urls',
+        remove_script_host: '.builder-remove-script-host',
+        convert_urls: '.builder-convert-urls',
+    };
+    Object.keys(boolMap).forEach((key) => {
+        if (typeof cfg[key] !== 'undefined') {
+            $builderBody.find(boolMap[key]).prop('checked', !!cfg[key]);
+        }
+    });
+
+    const strMap = {
+        document_base_url: '.builder-base-url',
+        entity_encoding: '.builder-entity-encoding',
+        powerpaste_word_import: '.builder-pp-word',
+        powerpaste_html_import: '.builder-pp-html',
+        tinymce_media_type: '.builder-media-type',
+    };
+    Object.keys(strMap).forEach((key) => {
+        if (typeof cfg[key] === 'string') {
+            $builderBody.find(strMap[key]).val(cfg[key]);
+        }
+    });
+
+    // TOC
+    if (typeof cfg.toc_depth === 'number') {
+        $builderBody.find('.builder-toc-depth').val(cfg.toc_depth);
+    }
+    if (typeof cfg.toc_header === 'string') {
+        $builderBody.find('.builder-toc-header').val(cfg.toc_header);
+    }
+    if (typeof cfg.toc_class === 'string') {
+        $builderBody.find('.builder-toc-class').val(cfg.toc_class);
+    }
+
+    // for_images presets
+    const hasImagewidth = Array.isArray(cfg.imagewidth_presets) || Array.isArray(cfg.imagealign_presets) || Array.isArray(cfg.imageeffect_presets);
+    if (hasImagewidth) {
+        $builderBody.find('.builder-imagewidth-enable').prop('checked', true).trigger('change');
+        if (Array.isArray(cfg.imagewidth_presets)) {
+            $builderBody.find('.builder-imagewidth-width-presets').val(JSON.stringify(cfg.imagewidth_presets, null, 2));
+        }
+        if (Array.isArray(cfg.imagealign_presets)) {
+            $builderBody.find('.builder-imagewidth-align-presets').val(JSON.stringify(cfg.imagealign_presets, null, 2));
+        }
+        if (Array.isArray(cfg.imageeffect_presets)) {
+            $builderBody.find('.builder-imagewidth-effect-presets').val(JSON.stringify(cfg.imageeffect_presets, null, 2));
+        }
+    }
+
+    // YForm link tables
+    if (cfg.link_yform_tables && Array.isArray(cfg.link_yform_tables.items)) {
+        if (typeof cfg.link_yform_tables.title === 'string') {
+            $builderBody.find('.builder-yform-title').val(cfg.link_yform_tables.title);
+        }
+        const $yformTable = $builderBody.find('#builder-yform-table tbody');
+        $yformTable.empty();
+        cfg.link_yform_tables.items.forEach((item) => {
+            const title = (item && item.title) || '';
+            const table = (item && item.table) || '';
+            const field = (item && item.field) || '';
+            const url = (item && item.url) || '';
+            $yformTable.append(
+                '<tr>' +
+                '<td><input type="text" class="form-control input-sm yform-title" value="' + title + '"></td>' +
+                '<td><input type="text" class="form-control input-sm yform-table" value="' + table + '"></td>' +
+                '<td><input type="text" class="form-control input-sm yform-field" value="' + field + '"></td>' +
+                '<td><input type="text" class="form-control input-sm yform-url" value="' + url + '"></td>' +
+                '<td><button type="button" class="btn btn-danger btn-xs yform-remove"><i class="rex-icon fa-times"></i></button></td>' +
+                '</tr>'
+            );
+        });
+    }
+
+    return true;
 }

@@ -7,6 +7,7 @@ tinymce_demo = TinyMCE Demo
 tinymce_mblock_demo = MBlock Demo
 tinymce_profiles = Editor Profile
 tinymce_help = Hilfe
+tinymce_for_plugins = FOR-Plugins
 
 # heading
 tinymce_subnavigation_header_title = TinyMCE 8 für REDAXO 5
@@ -236,3 +237,14 @@ mediapaste_category_ask = — Immer nachfragen —
 mediapaste_default_category_help = Kategorie, in die Bilder hochgeladen werden. "Immer nachfragen" öffnet einen Dialog beim Upload. Für Frontend-Nutzer ohne Medienberechtigung muss eine feste Kategorie gewählt werden.
 mediapaste_media_manager_type = Media-Manager-Type für Bild-URL
 mediapaste_media_manager_type_help = Optionaler Media-Manager-Type für die im Editor angezeigte Bild-URL (z. B. tiny). Leer = direkte /media/-URL.
+
+tinymce_insert_menu = Einfügen-Menü
+tinymce_insert_menu_help = Legt fest, welche Einträge im "Einfügen"-Menü der Menüleiste erscheinen. Per Drag & Drop sortieren, individuelle Plugins (oEmbed, Video, HTML Embed, Checkliste, Fußnote, Barrierefreiheit …) landen automatisch im Einfügen-Menü, sobald sie hier aktiviert sind.
+tinymce_insert_menu_title = Menü-Titel
+tinymce_insert_menu_result = Menü-Items (Ergebnis)
+tinymce_load_from_config = Bestehende Konfiguration übernehmen
+tinymce_load_from_config_help = Liest die aktuelle Konfiguration aus dem Textfeld und befüllt die Formularfelder des Assistenten.
+tinymce_loaded_from_config = Konfiguration wurde in den Assistenten übernommen.
+tinymce_load_failed = Konfiguration konnte nicht ausgelesen werden. Bitte manuell ergänzen.
+tinymce_custom_menu_items = Custom-Plugin-Einträge
+tinymce_for_plugins_hint = FriendsOfREDAXO-eigene Plugins – hervorgehoben

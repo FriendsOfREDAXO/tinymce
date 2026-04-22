@@ -22,6 +22,9 @@ page:
         help:
             title: 'translate:help'
             subPath: README.md
+        for_plugins:
+            title: 'translate:for_plugins'
+            subPath: FOR_PLUGINS.md
         devs:
             title: 'translate:devs'
             subPath: DEVS.md

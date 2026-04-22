@@ -386,66 +386,96 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
 
 /* ---------------- UI ---------------- */
 
-function renderReportHtml(findings: Finding[]): string {
-    if (findings.length === 0) {
-        return (
-            `<div class="for-a11y-report for-a11y-report--ok">` +
-                `<p><strong>✓ Keine Probleme gefunden.</strong></p>` +
-                `<p>Der geprüfte Inhalt ist nach den aktivierten Regeln barrierefrei.</p>` +
-            `</div>`
-        );
-    }
-
-    const counts = findings.reduce<Record<Severity, number>>((acc, f) => {
-        acc[f.severity] = (acc[f.severity] || 0) + 1;
-        return acc;
-    }, { error: 0, warn: 0, info: 0 });
-
-    const summary =
-        `<p class="for-a11y-report__summary">` +
-            `${SEVERITY_ICON.error} <strong>${counts.error}</strong> ${counts.error === 1 ? 'Fehler' : 'Fehler'}, ` +
-            `${SEVERITY_ICON.warn} <strong>${counts.warn}</strong> ${counts.warn === 1 ? 'Warnung' : 'Warnungen'}, ` +
-            `${SEVERITY_ICON.info} <strong>${counts.info}</strong> ${counts.info === 1 ? 'Hinweis' : 'Hinweise'}` +
-        `</p>`;
-
-    const rows = findings.map((f, idx) => (
-        `<tr class="for-a11y-row for-a11y-row--${f.severity}" data-a11y-index="${idx}">` +
-            `<td class="for-a11y-sev">${SEVERITY_ICON[f.severity]} <span>${SEVERITY_LABEL[f.severity]}</span></td>` +
-            `<td class="for-a11y-title"><strong>${escHtml(f.title)}</strong><br><span>${escHtml(f.message)}</span></td>` +
-            `<td class="for-a11y-preview"><code>${escHtml(f.preview)}</code></td>` +
-            `<td class="for-a11y-action"><button type="button" class="for-a11y-goto" data-a11y-index="${idx}">Anzeigen</button></td>` +
-        `</tr>`
-    )).join('');
-
-    return (
-        `<div class="for-a11y-report">` +
-            summary +
-            `<table class="for-a11y-table">` +
-                `<thead><tr><th>Schwere</th><th>Regel</th><th>Stelle</th><th></th></tr></thead>` +
-                `<tbody>${rows}</tbody>` +
-            `</table>` +
-        `</div>`
-    );
-}
-
 function escHtml(s: string): string {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 const DIALOG_CSS = `
-.for-a11y-report { font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-.for-a11y-report--ok { padding: 1em; background: #e8f5e9; border-radius: 4px; color: #1b5e20; }
-.for-a11y-report__summary { margin: 0 0 .75em; font-size: 13px; }
-.for-a11y-table { width: 100%; border-collapse: collapse; }
-.for-a11y-table th { text-align: left; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #ddd; background: #f6f6f6; }
-.for-a11y-table td { padding: 8px; vertical-align: top; border-bottom: 1px solid #eee; }
-.for-a11y-row--error { background: #fff5f5; }
-.for-a11y-row--warn  { background: #fffbea; }
-.for-a11y-row--info  { background: #f0f7ff; }
-.for-a11y-sev { white-space: nowrap; font-weight: 600; }
-.for-a11y-preview code { display: block; font-size: 11px; background: #fafafa; padding: 4px 6px; border-radius: 3px; white-space: pre-wrap; word-break: break-all; }
-.for-a11y-goto { padding: 4px 10px; border: 1px solid #ccc; background: #fff; border-radius: 3px; cursor: pointer; font-size: 12px; }
-.for-a11y-goto:hover { background: #f0f0f0; }
+.for-a11y-panel {
+    position: fixed;
+    z-index: 1300;
+    width: 420px; max-width: calc(100vw - 20px);
+    background: #fff; color: #222;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.1);
+    font: 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column;
+    user-select: none;
+}
+.for-a11y-panel__drag {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #e91e63, #9c27b0);
+    color: #fff;
+    border-top-left-radius: 8px; border-top-right-radius: 8px;
+    cursor: move;
+    font-weight: 600; font-size: 12px;
+    letter-spacing: .3px;
+}
+.for-a11y-panel__drag-grip { opacity: .7; font-size: 14px; line-height: 1; }
+.for-a11y-panel__drag-title { flex: 1 1 auto; }
+.for-a11y-panel__close { background: transparent; border: 0; color: #fff; cursor: pointer; font-size: 16px; padding: 0 4px; line-height: 1; opacity: .85; }
+.for-a11y-panel__close:hover { opacity: 1; }
+.for-a11y-panel__body {
+    padding: 14px 16px;
+    user-select: text;
+    max-height: 50vh; overflow: auto;
+}
+.for-a11y-panel__foot {
+    padding: 8px 12px;
+    border-top: 1px solid #eee;
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+    background: #fafafa;
+    border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;
+}
+.for-a11y-panel__foot .for-a11y-btn { font: inherit; padding: 6px 12px; border: 1px solid #d0d0d0; background: #fff; color: #222; border-radius: 4px; cursor: pointer; font-size: 13px; line-height: 1.2; }
+.for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #f0f0f0; }
+.for-a11y-panel__foot .for-a11y-btn:disabled { opacity: .4; cursor: not-allowed; }
+.for-a11y-panel__foot .for-a11y-btn--nav { min-width: 36px; padding: 6px 10px; }
+.for-a11y-panel__foot .for-a11y-btn--primary { background: #1976d2; color: #fff; border-color: #1976d2; }
+.for-a11y-panel__foot .for-a11y-btn--primary:hover:not(:disabled) { background: #1565c0; border-color: #1565c0; }
+.for-a11y-panel__foot .for-a11y-spacer { flex: 1 1 auto; }
+
+.for-a11y-dlg { color: inherit; }
+.for-a11y-dlg__progress { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .6; margin-bottom: 10px; }
+.for-a11y-dlg__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.for-a11y-dlg__badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    padding: 4px 10px; border-radius: 999px;
+}
+.for-a11y-dlg__badge--error { background: rgba(229, 57, 53, .12); color: #c62828; }
+.for-a11y-dlg__badge--warn  { background: rgba(251, 140, 0, .14); color: #ef6c00; }
+.for-a11y-dlg__badge--info  { background: rgba(30, 136, 229, .12); color: #1565c0; }
+.for-a11y-dlg__title { margin: 0; font-size: 15px; font-weight: 600; flex: 1 1 auto; min-width: 0; }
+.for-a11y-dlg__rule { font-size: 10px; opacity: .5; font-family: Menlo, Consolas, monospace; }
+
+.for-a11y-dlg__msg { margin: 0 0 12px; font-size: 13px; line-height: 1.55; }
+.for-a11y-dlg__preview-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .6; margin-bottom: 4px; }
+.for-a11y-dlg__preview { margin: 0; font-family: Menlo, Consolas, monospace; font-size: 11px; background: #f6f6f6; padding: 8px 10px; border-radius: 4px; white-space: pre-wrap; word-break: break-all; border-left: 3px solid #bbb; }
+.for-a11y-dlg__preview--error { border-left-color: #e53935; }
+.for-a11y-dlg__preview--warn  { border-left-color: #fb8c00; }
+.for-a11y-dlg__preview--info  { border-left-color: #1e88e5; }
+
+.for-a11y-dlg--ok { text-align: center; padding: 20px 0; }
+.for-a11y-dlg--ok .for-a11y-dlg__icon { font-size: 40px; color: #4caf50; margin-bottom: 8px; }
+.for-a11y-dlg--ok h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+.for-a11y-dlg--ok p { margin: 0; opacity: .7; font-size: 12px; }
+
+/* dark mode */
+body.rex-theme-dark .for-a11y-panel,
+body.tox-dialog__body-iframe-dark .for-a11y-panel { background: #2d2d2d; color: #eee; }
+body.rex-theme-dark .for-a11y-panel__foot { background: #222; border-top-color: #3a3a3a; }
+body.rex-theme-dark .for-a11y-panel__foot .for-a11y-btn { background: #3a3a3a; color: #eee; border-color: #4a4a4a; }
+body.rex-theme-dark .for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #4a4a4a; }
+body.rex-theme-dark .for-a11y-dlg__preview { background: #222; }
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel { background: #2d2d2d; color: #eee; }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot { background: #222; border-top-color: #3a3a3a; }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot .for-a11y-btn { background: #3a3a3a; color: #eee; border-color: #4a4a4a; }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #4a4a4a; }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-dlg__preview { background: #222; }
+}
 `;
 
 /** In den Editor-IFrame injizierte Marker-Styles. Werden nur hinzugefügt, solange der Report-Dialog offen ist. */
@@ -553,49 +583,193 @@ function highlightElement(editor: any, el: HTMLElement): void {
     pulseActive(el);
 }
 
-function openReportDialog(editor: any, findings: Finding[]): void {
-    // Persistent markieren, solange der Dialog offen ist
-    applyMarkers(editor, findings);
+let styleInjected = false;
+function ensurePanelStyle(): void {
+    if (styleInjected) return;
+    const style = document.createElement('style');
+    style.id = 'for-a11y-panel-style';
+    style.textContent = DIALOG_CSS;
+    document.head.appendChild(style);
+    styleInjected = true;
+}
 
-    const html = `<style>${DIALOG_CSS}</style>` + renderReportHtml(findings);
-    const dlg = editor.windowManager.open({
-        title: 'Accessibility-Check',
-        size: 'large',
-        body: {
-            type: 'panel',
-            items: [{ type: 'htmlpanel', html }]
-        },
-        buttons: [
-            { type: 'custom', name: 'recheck', text: 'Erneut prüfen' },
-            { type: 'cancel', text: 'Schließen', primary: true }
-        ],
-        onAction: (api: any, details: any) => {
-            if (details.name === 'recheck') {
-                api.close();
-                // onClose entfernt die alten Marker, runAndShow setzt neue.
-                runAndShow(editor);
-            }
-        },
-        onClose: () => {
-            clearMarkers(editor);
+let activePanel: HTMLElement | null = null;
+
+function openReportDialog(editor: any, findings: Finding[]): void {
+    // Schwebendes, draggbares Panel – KEIN Modal-Backdrop, KEIN Overlay.
+    // Element bleibt sichtbar, Panel kann verschoben werden.
+    if (activePanel) {
+        try { activePanel.remove(); } catch (_e) { /* noop */ }
+        activePanel = null;
+    }
+    ensurePanelStyle();
+
+    let remaining = findings.slice();
+    let currentIndex = 0;
+
+    const fireEvent = (name: string, data?: any) => {
+        try { editor.fire(name, data || {}); } catch (_e) { /* noop */ }
+    };
+
+    const panel = document.createElement('div');
+    panel.className = 'for-a11y-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', 'Barrierefreiheits-Check');
+
+    // Initial-Position: rechts-unten im Viewport, sodass der Editor-Content meist sichtbar bleibt.
+    panel.style.right = '24px';
+    panel.style.bottom = '24px';
+
+    const closePanel = () => {
+        try { panel.remove(); } catch (_e) { /* noop */ }
+        if (activePanel === panel) activePanel = null;
+        clearMarkers(editor);
+        fireEvent('A11ycheckStop');
+    };
+
+    const renderBodyHtml = (): string => {
+        if (remaining.length === 0) {
+            return `<div class="for-a11y-dlg for-a11y-dlg--ok">` +
+                `<div class="for-a11y-dlg__icon">✓</div>` +
+                `<h3>Keine Probleme gefunden</h3>` +
+                `<p>Der Inhalt ist nach den aktivierten Regeln barrierefrei.</p>` +
+            `</div>`;
         }
+        const f = remaining[currentIndex];
+        return `<div class="for-a11y-dlg">` +
+            `<div class="for-a11y-dlg__progress">Befund ${currentIndex + 1} von ${remaining.length}</div>` +
+            `<div class="for-a11y-dlg__head">` +
+                `<span class="for-a11y-dlg__badge for-a11y-dlg__badge--${f.severity}">` +
+                    `${SEVERITY_ICON[f.severity]} ${escHtml(SEVERITY_LABEL[f.severity])}` +
+                `</span>` +
+                `<h3 class="for-a11y-dlg__title">${escHtml(f.title)}</h3>` +
+                `<span class="for-a11y-dlg__rule">${escHtml(f.id)}</span>` +
+            `</div>` +
+            `<p class="for-a11y-dlg__msg">${escHtml(f.message)}</p>` +
+            `<div class="for-a11y-dlg__preview-label">Betroffenes Element</div>` +
+            `<pre class="for-a11y-dlg__preview for-a11y-dlg__preview--${f.severity}">${escHtml(f.preview)}</pre>` +
+        `</div>`;
+    };
+
+    const render = () => {
+        const hasCurrent = remaining.length > 0;
+        panel.innerHTML =
+            `<div class="for-a11y-panel__drag" data-role="drag">` +
+                `<span class="for-a11y-panel__drag-grip" aria-hidden="true">⠿</span>` +
+                `<span class="for-a11y-panel__drag-title">Barrierefreiheits-Check</span>` +
+                `<button type="button" class="for-a11y-panel__close" data-act="close" aria-label="Schließen" title="Schließen">✕</button>` +
+            `</div>` +
+            `<div class="for-a11y-panel__body">${renderBodyHtml()}</div>` +
+            `<div class="for-a11y-panel__foot">` +
+                (hasCurrent ? (
+                    `<button type="button" class="for-a11y-btn for-a11y-btn--nav" data-act="prev" ${currentIndex <= 0 ? 'disabled' : ''} title="Vorheriger Befund">◀</button>` +
+                    `<button type="button" class="for-a11y-btn for-a11y-btn--nav" data-act="next" ${currentIndex >= remaining.length - 1 ? 'disabled' : ''} title="Nächster Befund">▶</button>` +
+                    `<button type="button" class="for-a11y-btn" data-act="ignore">Ignorieren</button>` +
+                    `<button type="button" class="for-a11y-btn for-a11y-btn--primary" data-act="edit">Element bearbeiten</button>`
+                ) : '') +
+                `<span class="for-a11y-spacer"></span>` +
+                `<button type="button" class="for-a11y-btn" data-act="recheck">Neu prüfen</button>` +
+            `</div>`;
+    };
+
+    const focusCurrent = () => {
+        const curr = remaining[currentIndex];
+        if (curr && curr.element && curr.element.isConnected) {
+            try { curr.element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_e) { /* noop */ }
+            pulseActive(curr.element);
+        }
+    };
+
+    // Klick-Delegation
+    panel.addEventListener('click', (ev) => {
+        const t = (ev.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
+        if (!t) return;
+        const act = t.getAttribute('data-act');
+        const curr = remaining[currentIndex];
+        switch (act) {
+            case 'close': closePanel(); return;
+            case 'prev':
+                if (currentIndex > 0) currentIndex--;
+                break;
+            case 'next':
+                if (currentIndex < remaining.length - 1) currentIndex++;
+                break;
+            case 'ignore':
+                if (curr) {
+                    fireEvent('A11ycheckIgnore', { issue: curr });
+                    remaining.splice(currentIndex, 1);
+                    if (currentIndex >= remaining.length) currentIndex = Math.max(0, remaining.length - 1);
+                    applyMarkers(editor, remaining);
+                }
+                break;
+            case 'edit':
+                if (curr && curr.element && curr.element.isConnected) {
+                    highlightElement(editor, curr.element);
+                    closePanel();
+                    return;
+                }
+                break;
+            case 'recheck':
+                remaining = runAudit(editor.getBody() as HTMLElement, editor);
+                currentIndex = 0;
+                applyMarkers(editor, remaining);
+                break;
+        }
+        render();
+        focusCurrent();
     });
 
-    // Klick-Delegation auf die "Anzeigen"-Buttons – erst nach dem Rendern des Dialogs verfügbar
-    setTimeout(() => {
-        const root = document.querySelector('.tox-dialog .for-a11y-report');
-        if (!root) return;
-        root.addEventListener('click', (ev) => {
-            const btn = (ev.target as HTMLElement).closest('.for-a11y-goto') as HTMLElement | null;
-            if (!btn) return;
-            const idx = parseInt(btn.getAttribute('data-a11y-index') || '-1', 10);
-            if (idx < 0 || idx >= findings.length) return;
-            const f = findings[idx];
-            if (f.element && f.element.isConnected) {
-                highlightElement(editor, f.element);
-            }
-        });
-    }, 100);
+    // Drag – Panel per Header-Balken verschieben.
+    const onDragStart = (ev: MouseEvent) => {
+        const handle = (ev.target as HTMLElement).closest('[data-role="drag"]');
+        if (!handle) return;
+        if ((ev.target as HTMLElement).closest('[data-act="close"]')) return;
+        ev.preventDefault();
+        const rect = panel.getBoundingClientRect();
+        const offX = ev.clientX - rect.left;
+        const offY = ev.clientY - rect.top;
+        // Von right/bottom auf left/top umstellen, damit Drag eindeutig ist.
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+        panel.style.left = rect.left + 'px';
+        panel.style.top = rect.top + 'px';
+
+        const onMove = (e: MouseEvent) => {
+            const maxX = window.innerWidth - panel.offsetWidth - 4;
+            const maxY = window.innerHeight - panel.offsetHeight - 4;
+            const nx = Math.max(4, Math.min(maxX, e.clientX - offX));
+            const ny = Math.max(4, Math.min(maxY, e.clientY - offY));
+            panel.style.left = nx + 'px';
+            panel.style.top = ny + 'px';
+        };
+        const onUp = () => {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    };
+    panel.addEventListener('mousedown', onDragStart);
+
+    // Reposition bei Viewport-Resize, falls das Panel sonst rausläuft.
+    const onResize = () => {
+        if (!panel.isConnected) return;
+        const r = panel.getBoundingClientRect();
+        if (r.right > window.innerWidth) panel.style.left = Math.max(4, window.innerWidth - panel.offsetWidth - 4) + 'px';
+        if (r.bottom > window.innerHeight) panel.style.top = Math.max(4, window.innerHeight - panel.offsetHeight - 4) + 'px';
+    };
+    window.addEventListener('resize', onResize);
+
+    // Auto-Close wenn Editor entfernt wird.
+    editor.once('remove', closePanel);
+
+    render();
+    document.body.appendChild(panel);
+    activePanel = panel;
+
+    applyMarkers(editor, remaining);
+    fireEvent('A11ycheckStart', { total: remaining.length });
+    setTimeout(focusCurrent, 80);
 }
 
 function runAndShow(editor: any): void {
@@ -637,6 +811,22 @@ const Plugin = (): void => {
             text: 'Barrierefreiheit prüfen…',
             onAction: () => editor.execCommand('forA11yCheck')
         });
+
+        /* Public API – vergleichbar mit dem kommerziellen a11ychecker.
+         * Verwendung:
+         *   tinymce.activeEditor.plugins.for_a11y.toggleaudit();
+         *   const issues = tinymce.activeEditor.plugins.for_a11y.getReport();
+         */
+        return {
+            toggleaudit: () => {
+                runAndShow(editor);
+            },
+            getReport: (): Array<{ id: string; severity: Severity; title: string; message: string; element: HTMLElement; preview: string }> => {
+                const body = editor.getBody();
+                if (!body) return [];
+                return runAudit(body as HTMLElement, editor);
+            }
+        };
     });
 };
 

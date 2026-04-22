@@ -6,6 +6,7 @@ tinymce_main = Overview & demo
 tinymce_demo = TinyMCE demo
 tinymce_mblock_demo = MBlock demo
 tinymce_profiles = Editor profile
+tinymce_for_plugins = FOR Plugins
 tinymce_help = Help
 
 # heading
@@ -233,3 +234,14 @@ mediapaste_category_ask = — Always ask —
 mediapaste_default_category_help = Category to upload images to. "Always ask" shows a dialog on upload. For frontend users without media permission, a fixed category must be selected.
 mediapaste_media_manager_type = Media manager type for image URL
 mediapaste_media_manager_type_help = Optional media manager type for the image URL displayed in the editor (e.g. tiny). Empty = direct /media/ URL.
+
+tinymce_insert_menu = Insert menu
+tinymce_insert_menu_help = Defines which entries appear in the menubar "Insert" menu. Drag & drop to sort. Custom plugins (oEmbed, Video, HTML Embed, Checklist, Footnote, Accessibility …) appear in the Insert menu as soon as they are enabled here.
+tinymce_insert_menu_title = Menu title
+tinymce_insert_menu_result = Menu items (result)
+tinymce_load_from_config = Import existing configuration
+tinymce_load_from_config_help = Reads the current configuration from the textarea and fills in the assistant form fields.
+tinymce_loaded_from_config = Configuration loaded into the assistant.
+tinymce_load_failed = Could not parse configuration. Please adjust manually.
+tinymce_custom_menu_items = Custom plugin items
+tinymce_for_plugins_hint = FriendsOfREDAXO exclusive plugins – highlighted

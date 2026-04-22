@@ -193,8 +193,18 @@ class Assets
                 'imagewidth_dialog' => \rex_i18n::msg('tinymce_imagewidth_dialog'),
                 'imagewidth_template' => \rex_i18n::msg('tinymce_imagewidth_template'),
                 'imagewidth_breakpoint' => \rex_i18n::msg('tinymce_imagewidth_breakpoint'),
+                'insert_menu' => \rex_i18n::msg('tinymce_insert_menu'),
+                'insert_menu_help' => \rex_i18n::msg('tinymce_insert_menu_help'),
+                'insert_menu_title' => \rex_i18n::msg('tinymce_insert_menu_title'),
+                'insert_menu_result' => \rex_i18n::msg('tinymce_insert_menu_result'),
+                'load_from_config' => \rex_i18n::msg('tinymce_load_from_config'),
+                'load_from_config_help' => \rex_i18n::msg('tinymce_load_from_config_help'),
+                'loaded_from_config' => \rex_i18n::msg('tinymce_loaded_from_config'),
+                'load_failed' => \rex_i18n::msg('tinymce_load_failed'),
+                'custom_menu_items' => \rex_i18n::msg('tinymce_custom_menu_items'),
+                'for_plugins_hint' => \rex_i18n::msg('tinymce_for_plugins_hint'),
             ];
-            
+
             \rex_view::setJsProperty('tinymceProfileI18n', $i18n);
 
             $options = [
@@ -210,6 +220,22 @@ class Assets
                     'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
                     'table', 'link', 'image', 'media', 'codesample', 'fullscreen', 'preview', 'code', 'help',
                     'accordion', 'restoredraft', 'snippets'
+                ],
+                // Default TinyMCE insert-menu items (from core plugins).
+                'menu_insert_items' => [
+                    'image', 'link', 'media', 'codesample', 'inserttable', 'charmap', 'emoticons',
+                    'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime',
+                ],
+                // Custom plugin menu items (name => label). Keeps the assistant aware of
+                // menu entries registered by custom_plugins via editor.ui.registry.addMenuItem().
+                'custom_menu_items' => [
+                    'for_oembed'           => 'oEmbed (YouTube/Vimeo)',
+                    'for_video'            => 'Video (Mediapool)',
+                    'for_htmlembed'        => 'HTML Embed',
+                    'for_checklist'        => 'Checkliste',
+                    'for_checklist_feature' => 'Checkliste – Feature',
+                    'for_footnote'         => 'Fußnote',
+                    'for_a11y'             => 'Barrierefreiheit prüfen…',
                 ],
                 'external_plugins' => []
             ];

@@ -4,13 +4,33 @@ Changelog
 Version 8.4.0
 -------------------------------
 
+### Profil-Assistent: Einfügen-Menü & Config-Loader
+
+* **FOR-Plugin-Hervorhebung:** Eigene FriendsOfREDAXO-Plugins (`for_*`) bekommen im Assistenten ein farbiges **„FOR"-Badge** und werden bei Plugin-Liste, verfügbaren Toolbar-Buttons und Custom-Menu-Items optisch hervorgehoben.
+* **Einfügen-Menü-Builder:** Neue Sektion im Profil-Assistenten zum Zusammenklicken der Einträge des Menüleisten-Menüs „Einfügen". Alle Custom-Plugin-Menüeinträge (`for_oembed`, `for_video`, `for_htmlembed`, `for_checklist`, `for_checklist_feature`, `for_footnote`, `for_a11y`) sind als eigene Button-Gruppe auswählbar. Drag & Drop zum Sortieren; Ergebnis wird als `menu: { insert: { title, items } }` in die Profilkonfiguration geschrieben.
+* **Bestehende Konfiguration übernehmen:** Beim Öffnen eines Profils wird der Assistent automatisch mit den Werten aus der aktuell gespeicherten Konfiguration (Plugins, Toolbar, Menü, Quickbars, Image-Width-Presets, YForm-Link-Tabellen, Advanced-Settings, TOC …) befüllt. Zusätzlich steht ein „Bestehende Konfiguration übernehmen"-Button manuell zur Verfügung, falls nachträglich Änderungen ohne den Assistenten gemacht wurden.
+* **Migration:** Keine DB-Änderung notwendig – die `extra`-Spalte speichert wie gehabt den rohen JS-Body. Bestehende Profile bleiben 1:1 funktionsfähig. Beim Addon-Update wird `profiles.js` automatisch neu generiert (über `update_profiles`-Flag in `update.php`).
+
 ### Neues Plugin: `for_a11y` – Accessibility-Checker (on-demand)
 
-Prüft den aktuellen Editor-Inhalt gegen gängige Barrierefreiheits-Regeln und zeigt die Befunde in einem Dialog an. Läuft ausschließlich auf Knopfdruck, verändert den Inhalt **nicht** automatisch.
+Prüft den aktuellen Editor-Inhalt gegen gängige Barrierefreiheits-Regeln und zeigt die Befunde in einem geführten Dialog an. Läuft ausschließlich auf Knopfdruck, verändert den Inhalt **nicht** automatisch. Inspiriert vom kommerziellen TinyMCE `a11ychecker`, aber Open Source.
 
 * **Plugin-Name:** `for_a11y`
 * **Toolbar-Button & Menüeintrag:** `for_a11y` ("Barrierefreiheit prüfen")
 * **Command:** `forA11yCheck`
+* **Geführter Dialog-Workflow:** Ein Befund nach dem anderen mit Severity-Badge, Titel, Regel-ID, Beschreibung und Preview des betroffenen Elements. Navigation per **◀ / ▶** durch alle Befunde.
+* **Schwebendes, verschiebbares Panel (non-modal):** Der Befund-Dialog ist **kein Modal** mit Backdrop, sondern ein frei positionierbares Panel. Am Header-Balken (⠿) per Drag verschieben, um die Sicht auf das markierte Element freizugeben. Der Editor bleibt parallel voll bedienbar.
+* **Pro-Befund-Aktionen:**
+  * **Ignorieren** – entfernt den Befund aus der aktuellen Session (Event `A11ycheckIgnore`).
+  * **Element bearbeiten** – schließt den Dialog, springt zum Element und selektiert es im Editor (z. B. um es über die normale Bild-/Link-/Tabellen-Toolbar zu reparieren).
+  * **Neu prüfen** – führt ein frisches Audit aus.
+* **Editor-Highlighting:** Solange der Dialog offen ist, werden alle Befund-Elemente im Editor markiert (rot = Fehler, orange = Warnung, blau-gestrichelt = Hinweis). Das aktuell ausgewählte Element pulsiert zusätzlich. Beim Schließen des Dialogs verschwinden die Marker.
+* **Public API** am Plugin:
+  ```javascript
+  tinymce.activeEditor.plugins.for_a11y.toggleaudit();   // öffnet Dialog
+  const issues = tinymce.activeEditor.plugins.for_a11y.getReport();  // nur Audit, ohne UI
+  ```
+* **Events:** `A11ycheckStart` (mit `total`), `A11ycheckStop`, `A11ycheckIgnore` (mit `issue`).
 * **Regeln** (einzeln abschaltbar via `a11y_rules: { "regel-id": false }`):
   * `img-missing-alt` – Bild ohne alt-Attribut (Fehler; in Textlinks: Warnung, alt="" fehlt)
   * `img-alt-in-text-link` – alt-Text, obwohl das umschließende `<a>` schon sichtbaren Text hat (Warnung)
@@ -24,9 +44,6 @@ Prüft den aktuellen Editor-Inhalt gegen gängige Barrierefreiheits-Regeln und z
   * `table-no-caption` – Tabelle ohne `<caption>` (Hinweis)
   * `table-th-no-scope` – Matrix-Tabelle mit Zeilen- und Spaltenköpfen, deren `<th>` kein `scope` haben (Hinweis)
   * `iframe-no-title` – `<iframe>` ohne title-Attribut (Warnung)
-* **Dialog-UI:** Tabellarische Liste mit Schwere-Icon, Regel-Titel, Erklärung, Kurzvorschau und „Anzeigen"-Button (scrollt zum Element, setzt Selektion, markiert es 2 s mit orangem Outline).
-* **Persistente Marker im Editor:** Solange der Report-Dialog offen ist, werden alle betroffenen Elemente direkt im Editor farbig umrahmt (rot = Fehler, orange = Warnung, blau-gestrichelt = Hinweis). Beim Schließen des Dialogs verschwinden die Marker wieder. Klick auf „Anzeigen" pulsiert das Element zusätzlich.
-* **Button „Erneut prüfen"** – nach Korrektur direkt erneut validieren.
 * **Default-Profile-Hinweis:** Wenn `for_images`, `for_oembed`, `for_video`, `for_htmlembed` genutzt werden, können die Core-Plugins `image` und `media` aus dem TinyMCE-Profil entfernt werden. Unsere Plugins liefern bessere Vorschau, konsistente Preset-Klassen und sauberere Save-Formate.
 
 Verwendung im Profil:
