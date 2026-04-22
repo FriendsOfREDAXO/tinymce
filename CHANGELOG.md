@@ -4,6 +4,15 @@ Changelog
 Version 8.4.0
 -------------------------------
 
+### Security: API-Endpoint `tinymce_get_snippets` gegen anonymen Zugriff geschützt
+
+Der API-Endpoint `rex-api-call=tinymce_get_snippets` war zuvor uneingeschränkt erreichbar (`published = true`, keine Auth-Prüfung) und hat Name + HTML-Inhalt **aller** konfigurierten Snippets an beliebige Anfragende ausgeliefert. Snippets sind Redaktions-Bausteine, die Interna oder nicht-öffentliche HTML-Fragmente enthalten können.
+
+* **Fix:** `execute()` prüft jetzt zu Beginn `rex::getUser()`; ohne Login wird mit HTTP 403 + JSON-Fehler abgebrochen.
+* Die beiden anderen Endpoints bleiben unverändert:
+  * `tinymce_media_upload` – bewusst auch anonym erreichbar, aber nur wenn `upload_enabled` in den Paste-Settings aktiv ist; ohne User wird zwingend die konfigurierte Default-Kategorie verwendet. Backend-User durchlaufen die volle `rex_media_perm`-Prüfung.
+  * `tinymce_media_categories` – liefert ohne User nur die Root-Kategorie, also kein Informationsleck.
+
 ### Sticky Toolbar & Koexistenz mit REDAXO-Topnav
 
 * **`toolbar_sticky: true` als neuer Default** in allen mitgelieferten Profilen (`full`, `light`, `default`, `demo`). Toolbar und Menüleiste kleben beim Scrollen im langen Editor-Content am oberen Viewport-Rand, `toolbar_sticky_offset: 0`.
