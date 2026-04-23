@@ -105,9 +105,18 @@ function initTinyMceProfileAssistant() {
 
     // Common Settings
     let settingsHtml = '<br><legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="text" class="form-control builder-height" value="400" placeholder="400, 400px, 50vh, 80%, auto"><p class="help-block" style="margin-top:4px;">' + (i18n.height_help || 'Zahl (px), oder CSS-Einheit (px, vh, vw, %, em, rem). <code>auto</code> bzw. <code>wachsend</code> = Editor wächst mit dem Inhalt (aktiviert das autoresize-Plugin).') + '</p></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.language || 'Language') + '</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox" style="margin-top: 25px;"><label><input type="checkbox" class="builder-menubar" checked> ' + (i18n.menubar || 'Show Menubar') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="text" class="form-control builder-height" value="400" placeholder="400, 400px, 20em"><p class="help-block" style="margin-top:4px;">' + (i18n.height_help || 'Zahl = Pixel, sonst gültiger CSS-Wert (<code>px</code>, <code>pt</code>, <code>em</code>). Laut TinyMCE-Doku sind <code>%</code>, <code>vh</code> und <code>auto</code> <strong>nicht</strong> unterstützt – für variable Höhe bitte Autoresize anhaken.') + '</p></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.width || 'Breite') + '</label><input type="text" class="form-control builder-width" placeholder="auto, 100%, 800, 50vh"><p class="help-block" style="margin-top:4px;">' + (i18n.width_help || 'Optional. Zahl = Pixel, sonst CSS-Wert (unterstützt <code>%</code>, <code>em</code>, <code>vh</code> …). Leer lassen = volle Container-Breite.') + '</p></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.language || 'Language') + '</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="checkbox" style="margin-top: 25px;"><label><input type="checkbox" class="builder-menubar" checked> ' + (i18n.menubar || 'Show Menubar') + '</label></div></div>';
+    settingsHtml += '</div>';
+
+    // Resize & Autoresize
+    settingsHtml += '<div class="row">';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.resize_handle || 'Resize-Handle') + '</label><select class="form-control builder-resize"><option value="true" selected>' + (i18n.resize_vertical || 'vertikal (Standard)') + '</option><option value="false">' + (i18n.resize_off || 'aus') + '</option><option value="both">' + (i18n.resize_both || 'beide Richtungen') + '</option></select></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.min_height || 'Min-Höhe (px)') + '</label><input type="number" class="form-control builder-min-height" placeholder="100" min="0"></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.max_height || 'Max-Höhe (px)') + '</label><input type="number" class="form-control builder-max-height" placeholder="" min="0"></div></div>';
+    settingsHtml += '<div class="col-md-3"><div class="checkbox" style="margin-top: 25px;"><label><input type="checkbox" class="builder-autoresize"> <strong>' + (i18n.autoresize || 'Autoresize (Editor wächst mit Inhalt)') + '</strong></label><p class="help-block" style="margin-top:4px;">' + (i18n.autoresize_help || 'Aktiviert das <code>autoresize</code>-Plugin. <code>min_height</code>/<code>max_height</code> setzen die Grenzen des automatischen Wachstums, <code>height</code> wird ignoriert.') + '</p></div></div>';
     settingsHtml += '</div>';
 
     // Advanced Settings
@@ -680,25 +689,51 @@ function escapeString(str) {
 }
 
 /**
- * Parst den Höhen-Input aus dem Profil-Assistenten.
- *  - leer / ungültig  → { num: 400 }
- *  - reine Zahl       → { num: 400 }
- *  - Zahl + Einheit   → { css: "50vh" }      (px, vh, vw, %, em, rem)
- *  - "auto"/"wachsend"→ { autoresize: true, min: 200 }
+ * Parst den Höhen-Input für TinyMCE-`height`.
+ * TinyMCE-Doku: Number → px, String → valider CSS-Wert (px, pt, em …).
+ * Ausdrücklich NICHT unterstützt: %, vh, auto.
+ *
+ *  leer / ungültig                → { num: 400 }
+ *  reine Zahl                     → { num: 400 }
+ *  Zahl + CSS-Einheit (ohne %/vh) → { css: '20em' }
+ *  %/vh/auto                      → { num: 400, warn: true }  (Fallback)
  */
 function parseHeightValue(raw) {
     const s = String(raw || '').trim().toLowerCase();
     if (!s) return { num: 400 };
-    if (s === 'auto' || s === 'wachsend' || s === 'grow' || s === 'autoresize') {
-        return { autoresize: true, min: 200 };
+    // Reine Zahl
+    if (/^\d+(\.\d+)?$/.test(s)) {
+        return { num: Math.round(parseFloat(s)) };
     }
-    const m = s.match(/^(\d+(?:\.\d+)?)(px|vh|vw|%|em|rem)?$/);
-    if (!m) return { num: 400 };
-    const n = parseFloat(m[1]);
-    if (!m[2] || m[2] === 'px') {
-        return { num: Math.round(n) };
+    // Zahl + erlaubte Einheit (laut TinyMCE-Doku)
+    const m = s.match(/^(\d+(?:\.\d+)?)(px|pt|em|rem|cm|mm|in|pc)$/);
+    if (m) {
+        if (m[2] === 'px') return { num: Math.round(parseFloat(m[1])) };
+        return { css: m[1] + m[2] };
     }
-    return { css: m[1] + m[2] };
+    // Nicht unterstützte Einheit → Fallback
+    return { num: 400, warn: true };
+}
+
+/**
+ * Parst den Breiten-Input für TinyMCE-`width`.
+ * TinyMCE-Doku: Number → px, String → valider CSS-Wert inkl. %, em, vh.
+ *
+ *  leer        → null (kein width in Config)
+ *  reine Zahl  → { num: 800 }
+ *  CSS-Wert    → { css: '50%' }
+ */
+function parseWidthValue(raw) {
+    const s = String(raw || '').trim().toLowerCase();
+    if (!s || s === 'auto') return null;
+    if (/^\d+(\.\d+)?$/.test(s)) {
+        return { num: Math.round(parseFloat(s)) };
+    }
+    // Akzeptiere gängige CSS-Einheiten
+    if (/^\d+(?:\.\d+)?(px|pt|em|rem|%|vh|vw|cm|mm|in|pc)$/.test(s)) {
+        return { css: s };
+    }
+    return null;
 }
 
 function generateConfig($textarea, $builderBody) {
@@ -728,12 +763,27 @@ function generateConfig($textarea, $builderBody) {
     const toolbar = escapeString($builderBody.find('.builder-toolbar-input').val());
     const heightRaw = String($builderBody.find('.builder-height').val() || '').trim();
     const height = parseHeightValue(heightRaw);
+    const widthRaw = String($builderBody.find('.builder-width').val() || '').trim();
+    const width = parseWidthValue(widthRaw);
+    const minHeightRaw = parseInt($builderBody.find('.builder-min-height').val(), 10);
+    const maxHeightRaw = parseInt($builderBody.find('.builder-max-height').val(), 10);
+    const minHeight = Number.isFinite(minHeightRaw) && minHeightRaw > 0 ? minHeightRaw : null;
+    const maxHeight = Number.isFinite(maxHeightRaw) && maxHeightRaw > 0 ? maxHeightRaw : null;
+    const resizeVal = String($builderBody.find('.builder-resize').val() || 'true');
+    const autoresize = $builderBody.find('.builder-autoresize').is(':checked');
     const lang = escapeString($builderBody.find('.builder-lang').val() || 'de');
     const menubar = $builderBody.find('.builder-menubar').is(':checked');
 
-    // Autoresize: Editor wächst mit Inhalt
-    if (height && height.autoresize && !plugins.includes('autoresize')) {
-        plugins.push('autoresize');
+    // Autoresize-Plugin synchron mit der Checkbox.
+    if (autoresize) {
+        if (!plugins.includes('autoresize')) {
+            plugins.push('autoresize');
+        }
+    } else {
+        const ar = plugins.indexOf('autoresize');
+        if (ar !== -1) {
+            plugins.splice(ar, 1);
+        }
     }
 
     // Advanced Values
@@ -866,15 +916,35 @@ function generateConfig($textarea, $builderBody) {
         configStr += `toolbar: '${finalToolbar}',\n`;
     }
     
-    // Height: number | 'px|vh|vw|%|em|rem' | autoresize (min_height)
-    if (height && height.autoresize) {
-        configStr += `min_height: ${height.min},\n`;
-        configStr += `autoresize_bottom_margin: 20,\n\n`;
+    // Editor-Größe (TinyMCE-Doku: `height` = Number|CSS ohne %/vh, `width` = Number|CSS inkl. %/vh)
+    if (autoresize) {
+        // Bei Autoresize ignoriert TinyMCE `height` → nur min/max_height setzen.
+        configStr += `min_height: ${minHeight !== null ? minHeight : 200},\n`;
+        if (maxHeight !== null) {
+            configStr += `max_height: ${maxHeight},\n`;
+        }
+        configStr += `autoresize_bottom_margin: 20,\n`;
     } else if (height && height.css) {
-        configStr += `height: '${height.css}',\n\n`;
+        configStr += `height: '${height.css}',\n`;
     } else {
-        configStr += `height: ${(height && height.num) || 400},\n\n`;
+        configStr += `height: ${(height && height.num) || 400},\n`;
+        if (minHeight !== null) configStr += `min_height: ${minHeight},\n`;
+        if (maxHeight !== null) configStr += `max_height: ${maxHeight},\n`;
     }
+    if (width) {
+        if (width.css) {
+            configStr += `width: '${width.css}',\n`;
+        } else {
+            configStr += `width: ${width.num},\n`;
+        }
+    }
+    // Resize-Handle
+    if (resizeVal === 'false') {
+        configStr += `resize: false,\n`;
+    } else if (resizeVal === 'both') {
+        configStr += `resize: 'both',\n`;
+    } // true ist TinyMCE-Default → nicht emittieren
+    configStr += `\n`;
     
     // Advanced
     configStr += `image_caption: ${imageCaption},\n`;
@@ -1036,18 +1106,41 @@ function loadFromConfig($textarea, $builderBody) {
         $builderBody.find('.builder-toolbar-input').val(tokenize(cfg.toolbar).join(' '));
     }
 
-    // Common
-    if (typeof cfg.height === 'number') {
+    // Common: Höhe / Breite / Resize / Autoresize
+    const pluginList = Array.isArray(cfg.plugins)
+        ? cfg.plugins
+        : (typeof cfg.plugins === 'string' ? cfg.plugins.split(/\s+/) : []);
+    const hasAutoresize = pluginList.indexOf('autoresize') !== -1;
+
+    if (hasAutoresize) {
+        $builderBody.find('.builder-autoresize').prop('checked', true);
+        // height bei autoresize ignoriert; min_height gibt die "Start"-Höhe an.
+        if (typeof cfg.min_height === 'number') {
+            $builderBody.find('.builder-height').val(cfg.min_height);
+        }
+    } else if (typeof cfg.height === 'number') {
         $builderBody.find('.builder-height').val(cfg.height);
     } else if (typeof cfg.height === 'string' && cfg.height.trim()) {
         $builderBody.find('.builder-height').val(cfg.height.trim());
+    }
+
+    if (typeof cfg.width === 'number') {
+        $builderBody.find('.builder-width').val(cfg.width);
+    } else if (typeof cfg.width === 'string' && cfg.width.trim()) {
+        $builderBody.find('.builder-width').val(cfg.width.trim());
+    }
+    if (typeof cfg.min_height === 'number') {
+        $builderBody.find('.builder-min-height').val(cfg.min_height);
+    }
+    if (typeof cfg.max_height === 'number') {
+        $builderBody.find('.builder-max-height').val(cfg.max_height);
+    }
+    if (cfg.resize === false) {
+        $builderBody.find('.builder-resize').val('false');
+    } else if (cfg.resize === 'both') {
+        $builderBody.find('.builder-resize').val('both');
     } else {
-        const pluginList = Array.isArray(cfg.plugins)
-            ? cfg.plugins
-            : (typeof cfg.plugins === 'string' ? cfg.plugins.split(/\s+/) : []);
-        if (typeof cfg.min_height === 'number' && pluginList.indexOf('autoresize') !== -1) {
-            $builderBody.find('.builder-height').val('auto');
-        }
+        $builderBody.find('.builder-resize').val('true');
     }
     if (typeof cfg.language === 'string') {
         $builderBody.find('.builder-lang').val(cfg.language);

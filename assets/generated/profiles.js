@@ -8,14 +8,12 @@ branding: false,
 statusbar: true,
 menubar: false,
 plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize autosave importcss quickbars snippets for_images redaxo_snippets link_yform phonelink quote cleanpaste mediapaste for_footnotes for_checklist for_htmlembed for_oembed for_video for_a11y for_toc for_markdown writeassist_translate writeassist_generate',
-external_plugins: {"snippets":"/assets/addons/tinymce/scripts/tinymce/plugins/snippets/plugin.min.js?v=8.4.1","for_images":"/assets/addons/tinymce/scripts/tinymce/plugins/for_images/plugin.min.js?v=8.4.1","redaxo_snippets":"/assets/addons/snippets/js/tinymce-snippets.js?v=8.4.1","link_yform":"/assets/addons/tinymce/scripts/tinymce/plugins/link_yform/plugin.min.js?v=8.4.1","phonelink":"/assets/addons/tinymce/scripts/tinymce/plugins/phonelink/plugin.min.js?v=8.4.1","quote":"/assets/addons/tinymce/scripts/tinymce/plugins/quote/plugin.min.js?v=8.4.1","cleanpaste":"/assets/addons/tinymce/scripts/tinymce/plugins/cleanpaste/plugin.min.js?v=8.4.1","mediapaste":"/assets/addons/tinymce/scripts/tinymce/plugins/mediapaste/plugin.min.js?v=8.4.1","for_footnotes":"/assets/addons/tinymce/scripts/tinymce/plugins/for_footnotes/plugin.min.js?v=8.4.1","for_checklist":"/assets/addons/tinymce/scripts/tinymce/plugins/for_checklist/plugin.min.js?v=8.4.1","for_htmlembed":"/assets/addons/tinymce/scripts/tinymce/plugins/for_htmlembed/plugin.min.js?v=8.4.1","for_oembed":"/assets/addons/tinymce/scripts/tinymce/plugins/for_oembed/plugin.min.js?v=8.4.1","for_video":"/assets/addons/tinymce/scripts/tinymce/plugins/for_video/plugin.min.js?v=8.4.1","for_a11y":"/assets/addons/tinymce/scripts/tinymce/plugins/for_a11y/plugin.min.js?v=8.4.1","for_toc":"/assets/addons/tinymce/scripts/tinymce/plugins/for_toc/plugin.min.js?v=8.4.1","for_markdown":"/assets/addons/tinymce/scripts/tinymce/plugins/for_markdown/plugin.min.js?v=8.4.1","writeassist_translate":"/assets/addons/writeassist/js/tinymce-deepl-plugin.js?v=8.4.1","writeassist_generate":"/assets/addons/writeassist/js/tinymce-generate-plugin.js?v=8.4.1"},
+external_plugins: {"snippets":"/assets/addons/tinymce/scripts/tinymce/plugins/snippets/plugin.min.js?v=8.4.2","for_images":"/assets/addons/tinymce/scripts/tinymce/plugins/for_images/plugin.min.js?v=8.4.2","redaxo_snippets":"/assets/addons/snippets/js/tinymce-snippets.js?v=8.4.2","link_yform":"/assets/addons/tinymce/scripts/tinymce/plugins/link_yform/plugin.min.js?v=8.4.2","phonelink":"/assets/addons/tinymce/scripts/tinymce/plugins/phonelink/plugin.min.js?v=8.4.2","quote":"/assets/addons/tinymce/scripts/tinymce/plugins/quote/plugin.min.js?v=8.4.2","cleanpaste":"/assets/addons/tinymce/scripts/tinymce/plugins/cleanpaste/plugin.min.js?v=8.4.2","mediapaste":"/assets/addons/tinymce/scripts/tinymce/plugins/mediapaste/plugin.min.js?v=8.4.2","for_footnotes":"/assets/addons/tinymce/scripts/tinymce/plugins/for_footnotes/plugin.min.js?v=8.4.2","for_checklist":"/assets/addons/tinymce/scripts/tinymce/plugins/for_checklist/plugin.min.js?v=8.4.2","for_htmlembed":"/assets/addons/tinymce/scripts/tinymce/plugins/for_htmlembed/plugin.min.js?v=8.4.2","for_oembed":"/assets/addons/tinymce/scripts/tinymce/plugins/for_oembed/plugin.min.js?v=8.4.2","for_video":"/assets/addons/tinymce/scripts/tinymce/plugins/for_video/plugin.min.js?v=8.4.2","for_a11y":"/assets/addons/tinymce/scripts/tinymce/plugins/for_a11y/plugin.min.js?v=8.4.2","for_toc":"/assets/addons/tinymce/scripts/tinymce/plugins/for_toc/plugin.min.js?v=8.4.2","for_markdown":"/assets/addons/tinymce/scripts/tinymce/plugins/for_markdown/plugin.min.js?v=8.4.2","writeassist_translate":"/assets/addons/writeassist/js/tinymce-deepl-plugin.js?v=8.4.2","writeassist_generate":"/assets/addons/writeassist/js/tinymce-generate-plugin.js?v=8.4.2"},
 toolbar: 'undo for_toc_insert redo | blocks fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link link_yform phonelink quote image media table codesample accordion | removeformat code fullscreen',
 height: 800,
 
 image_caption: true,
 image_uploadtab: true,
-powerpaste_word_import: "clean",
-powerpaste_html_import: "merge",
 relative_urls: false,
 remove_script_host: true,
 document_base_url: "/",
@@ -25,7 +23,6 @@ convert_urls: true,
 object_resizing: false,
 quickbars_image_toolbar: false,
 extended_valid_elements: 'figure[class|style|contenteditable],figcaption[contenteditable]',
-imagewidth_presets: [{"label":"Original","class":""},{"label":"Klein (150px)","class":"uk-width-small@m"},{"label":"Mittel (300px)","class":"uk-width-medium@m"},{"label":"Groß (450px)","class":"uk-width-large@m"},{"label":"XL (600px)","class":"uk-width-xlarge@m"},{"label":"1/2 (50%)","class":"uk-width-1-2@m"},{"label":"1/3 (33%)","class":"uk-width-1-3@m"},{"label":"1/4 (25%)","class":"uk-width-1-4@m"},{"label":"2/3 (66%)","class":"uk-width-2-3@m"},{"label":"3/4 (75%)","class":"uk-width-3-4@m"},{"label":"100%","class":"uk-width-1-1"}],
 imagealign_presets: [{"label":"Keine","class":""},{"label":"Links (Text umfließt)","class":"uk-float-left uk-margin-right uk-margin-bottom"},{"label":"Rechts (Text umfließt)","class":"uk-float-right uk-margin-left uk-margin-bottom"},{"label":"Zentriert","class":"uk-display-block uk-margin-auto"}],
 imageeffect_presets: [{"label":"Kein Effekt","class":""},{"label":"Schatten klein","class":"uk-box-shadow-small"},{"label":"Schatten mittel","class":"uk-box-shadow-medium"},{"label":"Schatten groß","class":"uk-box-shadow-large"},{"label":"Abgerundet","class":"uk-border-rounded"},{"label":"Rund (Kreis)","class":"uk-border-circle"},{"label":"Rahmen","class":"uk-border"}],
 
@@ -55,7 +52,7 @@ setup: function (editor) {
 },
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69ea069d2585e":"69ea069d2585e"},"light":{license_key: 'gpl',
+},"69ea08b9a9136":"69ea08b9a9136"},"light":{license_key: 'gpl',
 relative_urls : false,
 remove_script_host : true,
 document_base_url : '/',
@@ -89,7 +86,7 @@ style_formats: [
    {title: 'Überschrift 5', format: 'h5'}
  ]}
 ]
-,"69ea069d25860":"69ea069d25860"},"default":{license_key: 'gpl',
+,"69ea08b9a9138":"69ea08b9a9138"},"default":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -118,7 +115,7 @@ file_picker_callback: function (callback, value, meta) {
  rex5_picker_function(callback, value, meta);
 },
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
-content_css: redaxo.theme.current === "dark" ? "dark" : "default","69ea069d25862":"69ea069d25862"},"demo":{license_key: 'gpl',
+content_css: redaxo.theme.current === "dark" ? "dark" : "default","69ea08b9a913a":"69ea08b9a913a"},"demo":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -194,4 +191,4 @@ content_css: redaxo.theme.current === 'dark' ? 'dark' : 'default',
 
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69ea069d25864":"69ea069d25864"}};
+},"69ea08b9a913c":"69ea08b9a913c"}};

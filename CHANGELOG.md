@@ -4,15 +4,19 @@ Changelog
 Version 8.4.2
 -------------------------------
 
-### Profil-Assistent – Höhe akzeptiert jetzt px/vh/%/em/rem und `auto` (autoresize)
+### Profil-Assistent – Editor-Größe gemäß offizieller TinyMCE-Doku
 
-Das Feld **Höhe** war bisher ein reines `<input type="number">`. Einträge wie `50vh`, `80%` oder `auto` wurden vom Browser gar nicht erst akzeptiert und beim Speichern landete immer nur `height: 400` in der generierten Konfiguration – die vom User eingestellte Höhe wurde also effektiv ignoriert.
+Die Größen-Sektion wurde auf Basis der [TinyMCE-Doku *Editor size and resize options*](https://www.tiny.cloud/docs/tinymce/latest/editor-size-options/) komplett überarbeitet. Grund: ein bereits aktives `autoresize`-Plugin im Profil hat den neu gesetzten `height`-Wert schweigend ignoriert; außerdem sind `%`, `vh` und `auto` laut Doku für `height` gar nicht unterstützt (nur für `width`).
 
-Jetzt:
+Neue Felder im Abschnitt „Allgemeine Einstellungen“:
 
-* Input ist `type="text"` mit Placeholder und Hilfetext.
-* Akzeptierte Werte: reine Zahl (→ `height: 400`), Zahl mit CSS-Einheit `px|vh|vw|%|em|rem` (→ `height: '50vh'`) oder `auto` bzw. `wachsend` (→ aktiviert das `autoresize`-Plugin und schreibt `min_height` + `autoresize_bottom_margin`, damit der Editor mit dem Inhalt mitwächst).
-* Beim Re-Import bestehender Konfigs werden Zahlen, CSS-Strings und `min_height + autoresize`-Kombis wieder korrekt in das Feld geladen.
+* **Höhe** – Zahl (px) oder CSS-Wert mit erlaubten Einheiten `px|pt|em|rem|cm|mm|in|pc`. Ungültige Einheiten (`%`, `vh`, `auto`) werden ignoriert und fallen auf `400` zurück; der Hilfetext weist darauf hin.
+* **Breite** (neu) – optional, Zahl oder CSS-Wert inkl. `%`, `em`, `vh`. Leer = volle Container-Breite.
+* **Min-Höhe / Max-Höhe** (neu) – Zahlen in Pixel. Begrenzen entweder den manuellen Resize-Handle oder (bei aktivem Autoresize) das automatische Wachstum.
+* **Resize-Handle** (neu) – Dropdown `vertikal` (Default) / `aus` / `beide Richtungen`. Gibt `resize`-Option in der Config aus.
+* **Autoresize** (neu) – Checkbox, aktiviert das `autoresize`-Plugin und emittiert `min_height` + `autoresize_bottom_margin`. `height` wird in diesem Modus bewusst weggelassen, weil TinyMCE es sonst ignoriert.
+
+Generator + Re-Import kennen jetzt alle fünf Optionen und halten das `autoresize`-Plugin synchron mit der Checkbox – ein bestehendes Profil mit `autoresize` im Plugin-String wird beim Laden automatisch erkannt und das Kreuz gesetzt, ein Abschalten entfernt das Plugin wieder.
 
 ### PowerPaste-Einstellungen entfernt
 

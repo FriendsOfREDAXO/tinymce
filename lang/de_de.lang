@@ -108,7 +108,17 @@ tinymce_selected_toolbar = Ausgewählte Toolbar (Ziehen zum Neuanordnen)
 tinymce_toolbar_result = Toolbar String (Ergebnis)
 tinymce_common_settings = Allgemeine Einstellungen
 tinymce_height = Höhe
-tinymce_height_help = Zahl (px), oder CSS-Einheit (px, vh, vw, %, em, rem). <code>auto</code> bzw. <code>wachsend</code> = Editor wächst mit dem Inhalt (aktiviert das autoresize-Plugin).
+tinymce_height_help = Zahl = Pixel, sonst gültiger CSS-Wert (<code>px</code>, <code>pt</code>, <code>em</code>). Laut TinyMCE-Doku sind <code>%</code>, <code>vh</code> und <code>auto</code> <strong>nicht</strong> unterstützt – für variable Höhe bitte Autoresize anhaken.
+tinymce_width = Breite
+tinymce_width_help = Optional. Zahl = Pixel, sonst CSS-Wert (unterstützt <code>%</code>, <code>em</code>, <code>vh</code> …). Leer lassen = volle Container-Breite.
+tinymce_min_height = Min-Höhe (px)
+tinymce_max_height = Max-Höhe (px)
+tinymce_resize_handle = Resize-Handle
+tinymce_resize_vertical = vertikal (Standard)
+tinymce_resize_off = aus
+tinymce_resize_both = beide Richtungen
+tinymce_autoresize = Autoresize (Editor wächst mit Inhalt)
+tinymce_autoresize_help = Aktiviert das <code>autoresize</code>-Plugin. <code>min_height</code>/<code>max_height</code> setzen die Grenzen des automatischen Wachstums, <code>height</code> wird ignoriert.
 tinymce_link_schema_help = <strong>Link-Schema (optional):</strong> URL-Muster für den erzeugten Link. Platzhalter: <code>[id]</code> = ID des YForm-Datensatzes, <code>[field]</code> = gewählter Feldwert. Beispiele: <code>index.php?article_id=5&amp;news=[id]</code> oder <code>/produkt/[id]</code>. Leer lassen = nur der Feldwert wird als Link-Text eingefügt.
 tinymce_menubar = Menüleiste anzeigen
 tinymce_language = Sprache
