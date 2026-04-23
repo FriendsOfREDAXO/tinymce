@@ -462,9 +462,9 @@ nav.for-toc a { text-decoration: none; }
 nav.for-toc a:hover { text-decoration: underline; }
 /* Hierarchische Nummerierung (geordnete TOC, 1 / 1.1 / 1.1.1 …) */
 nav.for-toc ol.for-toc__list { counter-reset: for-toc-item; list-style: none; padding-left: 0; margin-left: 1.25em; }
-nav.for-toc ol.for-toc__list > li.for-toc__item { counter-increment: for-toc-item; position: relative; padding-left: 2.6em; }
-nav.for-toc ol.for-toc__list > li.for-toc__item::before { content: counters(for-toc-item, ".") " "; position: absolute; left: 0; top: 0; min-width: 2.2em; font-weight: 600; font-variant-numeric: tabular-nums; color: #333; }
-nav.for-toc ol.for-toc__list > li.for-toc__item--filler { counter-increment: none; padding-left: 0; }
+nav.for-toc ol.for-toc__list > li.for-toc__item { counter-increment: for-toc-item; display: flex; align-items: baseline; gap: 0.4em; }
+nav.for-toc ol.for-toc__list > li.for-toc__item::before { content: counters(for-toc-item, ".") " "; flex: 0 0 auto; min-width: 2.2em; font-weight: 600; font-variant-numeric: tabular-nums; color: #333; white-space: nowrap; }
+nav.for-toc ol.for-toc__list > li.for-toc__item--filler { counter-increment: none; display: list-item; }
 nav.for-toc ol.for-toc__list > li.for-toc__item--filler::before { content: none; }
 `;
             editor.dom.addStyle(css);

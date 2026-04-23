@@ -132,26 +132,28 @@ nav.for-toc ol.for-toc__list {
 
 nav.for-toc ol.for-toc__list > li.for-toc__item {
     counter-increment: for-toc-item;
-    position: relative;
-    padding-left: calc(var(--for-toc-number-min-width) + var(--for-toc-number-gap));
+    /* Flex-Layout: Nummer nimmt exakt ihren natürlichen Platz ein, der Text
+       bleibt über mehrere Zeilen sauber ausgerichtet (hanging indent). */
+    display: flex;
+    align-items: baseline;
+    gap: var(--for-toc-number-gap);
 }
 
 nav.for-toc ol.for-toc__list > li.for-toc__item::before {
     content: counters(for-toc-item, var(--for-toc-number-separator)) var(--for-toc-number-suffix);
-    position: absolute;
-    left: 0;
-    top: 0;
+    flex: 0 0 auto;
     min-width: var(--for-toc-number-min-width);
     color: var(--for-toc-number-color);
     font-weight: var(--for-toc-number-font-weight);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 /* Filler-Einträge (übersprungene Ebenen, z. B. h2 → h4) nicht mitzählen
    und keinen Nummerierungs-Präfix zeigen.                                   */
 nav.for-toc ol.for-toc__list > li.for-toc__item--filler {
     counter-increment: none;
-    padding-left: 0;
+    display: list-item;
 }
 nav.for-toc ol.for-toc__list > li.for-toc__item--filler::before {
     content: none;

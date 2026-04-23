@@ -4,6 +4,14 @@ Changelog
 Version 8.4.1
 -------------------------------
 
+### `for_toc` – Layout-Fix: Nummer und Text überschneiden sich bei tiefer Verschachtelung
+
+Bei geordneten TOCs mit mehrstelligen Zählern (`1.12.5`, `2.10.3` …) reichte die feste `min-width: 2.2em` am `::before`-Pseudo nicht aus und der Text schob sich über die Nummer. Umstellung auf Flex-Layout:
+
+* `li.for-toc__item` ist jetzt `display: flex` mit `align-items: baseline` und `gap: var(--for-toc-number-gap)`.
+* Der `::before`-Counter ist ein `flex: 0 0 auto`-Item mit `white-space: nowrap`, wächst also mit längeren Zählern mit und kollidiert nie mit dem Titel-Text.
+* Gilt für Frontend-CSS ([assets/css/for_toc.css](public/redaxo/src/addons/tinymce/assets/css/for_toc.css)) und das im Editor inline injizierte Parallel-Stylesheet.
+
 ### Install/Update: `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` behoben
 
 Bei einer frischen Installation (und in manchen Update-Szenarien) ist Composers Classmap-Cache noch nicht (neu) aufgebaut, bevor `install.php`/`update.php` läuft – der REDAXO-Autoloader findet die AddOn-Klassen dann nicht, und das Demo-Profil-Setup bricht mit `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` ab.

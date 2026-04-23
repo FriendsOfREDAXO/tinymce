@@ -1,6 +1,6 @@
 
 const tinyExternalPlugins = {};
-const tinyCleanPasteConfig = {"strip_ms_office":true,"strip_google_docs":true,"remove_styles":true,"preserve_styles":[],"remove_classes":false,"preserve_classes":[],"remove_ids":true,"remove_data_attrs":true,"max_br":2,"max_empty_paragraphs":2,"allowed_tags":[]};
+const tinyCleanPasteConfig = {"strip_ms_office":true,"strip_google_docs":true,"remove_styles":true,"preserve_styles":[],"remove_classes":true,"preserve_classes":[],"remove_ids":true,"remove_data_attrs":true,"max_br":2,"max_empty_paragraphs":2,"allowed_tags":[]};
 const tinyMediaUploadConfig = {"enabled":false,"default_category":-1,"upload_url":"index.php?rex-api-call=tinymce_media_upload","categories_url":"index.php?rex-api-call=tinymce_media_categories"};
 const tinyprofiles = {"full":{toolbar_sticky: true,
 toolbar_sticky_offset: 0,
@@ -50,7 +50,7 @@ setup: function (editor) {
 },
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69e9d9d72b540":"69e9d9d72b540"},"light":{license_key: 'gpl',
+},"69e9faa65ca5d":"69e9faa65ca5d"},"light":{license_key: 'gpl',
 relative_urls : false,
 remove_script_host : true,
 document_base_url : '/',
@@ -84,7 +84,7 @@ style_formats: [
    {title: 'Überschrift 5', format: 'h5'}
  ]}
 ]
-,"69e9d9d72b542":"69e9d9d72b542"},"default":{license_key: 'gpl',
+,"69e9faa65ca60":"69e9faa65ca60"},"default":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -113,7 +113,7 @@ file_picker_callback: function (callback, value, meta) {
  rex5_picker_function(callback, value, meta);
 },
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
-content_css: redaxo.theme.current === "dark" ? "dark" : "default","69e9d9d72b544":"69e9d9d72b544"},"demo":{license_key: 'gpl',
+content_css: redaxo.theme.current === "dark" ? "dark" : "default","69e9faa65ca62":"69e9faa65ca62"},"demo":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -189,4 +189,4 @@ content_css: redaxo.theme.current === 'dark' ? 'dark' : 'default',
 
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69e9d9d72b546":"69e9d9d72b546"}};
+},"69e9faa65ca64":"69e9faa65ca64"}};
