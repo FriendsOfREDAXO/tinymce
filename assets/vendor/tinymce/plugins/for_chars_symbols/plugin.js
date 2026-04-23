@@ -855,8 +855,12 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
                 var label = insertBtn.getAttribute('data-fcs-label') || val;
                 var invisible = insertBtn.getAttribute('data-fcs-invisible') === '1';
                 var hint = insertBtn.getAttribute('data-fcs-hint') || undefined;
-                try { editor.focus(); } catch (_e) {}
+                try {
+                    editor.focus();
+                    if (editor.__fcsBm) { editor.selection.moveToBookmark(editor.__fcsBm); }
+                } catch (_e) {}
                 renderAndInsert(editor, val);
+                try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
                 addRecent({ kind: kind, value: val, label: label, invisible: invisible || undefined, hint: hint });
                 // Recent-Sektion im Zeichen-Tab live aktualisieren.
                 refreshFavsAndRecent(root);
@@ -865,16 +869,23 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
             var action = e.target.closest('[data-fcs-action]');
             if (action) {
                 e.preventDefault();
-                try { editor.focus(); } catch (_e) {}
+                try {
+                    editor.focus();
+                    if (editor.__fcsBm) { editor.selection.moveToBookmark(editor.__fcsBm); }
+                } catch (_e) {}
                 performAction(editor, action.getAttribute('data-fcs-action'));
+                try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
                 return;
             }
         });
 
         // Mousedown im Panel darf dem Editor nicht den Fokus klauen (sonst verliert die Selektion ihren Anchor).
+        // Zusätzlich: aktuelle Editor-Selektion als Bookmark sichern, damit wir sie vor dem Einfügen/Aktionen
+        // zuverlässig wiederherstellen können (sonst landen Zeichen manchmal am Body-Ende im neuen Block).
         root.addEventListener('mousedown', function (e) {
             if (!e.target.closest('input, textarea, [contenteditable="true"]')) {
                 e.preventDefault();
+                try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
             }
         });
 
@@ -893,6 +904,8 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
 
     function openPicker(editor) {
         ensureCss();
+        // Selektion sichern, bevor der Fokus eventuell ans Panel wandert.
+        try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
         var root = panelsByEditor.get(editor);
         if (!root || !root.isConnected) {
             root = buildPanel(editor);

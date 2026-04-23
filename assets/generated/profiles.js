@@ -54,7 +54,7 @@ setup: function (editor) {
 },
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69ea69da24c79":"69ea69da24c79"},"light":{license_key: 'gpl',
+},"69ea6a4e2035f":"69ea6a4e2035f"},"light":{license_key: 'gpl',
 relative_urls : false,
 remove_script_host : true,
 document_base_url : '/',
@@ -88,7 +88,7 @@ style_formats: [
    {title: 'Überschrift 5', format: 'h5'}
  ]}
 ]
-,"69ea69da24c7b":"69ea69da24c7b"},"default":{license_key: 'gpl',
+,"69ea6a4e20361":"69ea6a4e20361"},"default":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -117,7 +117,7 @@ file_picker_callback: function (callback, value, meta) {
  rex5_picker_function(callback, value, meta);
 },
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
-content_css: redaxo.theme.current === "dark" ? "dark" : "default","69ea69da24c7d":"69ea69da24c7d"},"demo":{license_key: 'gpl',
+content_css: redaxo.theme.current === "dark" ? "dark" : "default","69ea6a4e20363":"69ea6a4e20363"},"demo":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -153,7 +153,7 @@ menu: {
 quickbars_selection_toolbar: 'bold italic underline | forecolor | link',
 quickbars_insert_toolbar: 'for_images for_oembed for_video | for_checklist for_footnote_insert | hr',
 
-contextmenu: 'link table for_a11y for_chars_symbols',
+contextmenu: 'link table for_a11y',
 
 codesample_languages: [
     { text: 'HTML/XML', value: 'markup' },
@@ -193,4 +193,4 @@ content_css: redaxo.theme.current === 'dark' ? 'dark' : 'default',
 
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69ea69da24c7f":"69ea69da24c7f"}};
+},"69ea6a4e20365":"69ea6a4e20365"}};
