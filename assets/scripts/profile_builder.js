@@ -47,16 +47,39 @@ function initTinyMceProfileAssistant() {
 
     // Builder UI
     const options = rex.tinymceProfileOptions || {};
-    const pluginsList = options.plugins || [];
-    const toolbarButtons = options.toolbar || [];
+    // Sort plugin and toolbar lists alphabetically for easier scanning in the assistant.
+    const pluginsList = (options.plugins || []).slice().sort((a, b) => String(a).localeCompare(String(b)));
+    const toolbarButtons = (options.toolbar || []).slice().sort((a, b) => String(a).localeCompare(String(b)));
 
-    // Plugins Section – FOR plugins (for_*) are highlighted as "premium" custom plugins
-    const isForPlugin = (name) => typeof name === 'string' && name.indexOf('for_') === 0;
-    let pluginsHtml = '<legend>' + (i18n.plugins || 'Plugins') + ' <small class="for-plugin-legend-hint"><span class="for-plugin-badge-inline">FOR</span> ' + (i18n.for_plugins_hint || 'FriendsOfREDAXO custom plugins') + '</small></legend><div class="row">';
+    // Plugins Section – FOR plugins are highlighted as FriendsOfREDAXO custom plugins.
+    // Besides the `for_*` naming convention there are legacy custom plugins that predate
+    // the convention (mediapaste, snippets, cleanpaste, phonelink, quote, link_yform, …).
+    // The server computes the full list of bundled FOR plugins in `for_plugins` /
+    // `for_toolbar_buttons`. Plugins registered by OTHER AddOns (writeassist, …) are
+    // highlighted separately in green.
+    const addonPluginSet = new Set(options.addon_plugins || []);
+    const addonToolbarSet = new Set(options.addon_toolbar_buttons || []);
+    const forPluginSet = new Set(options.for_plugins || []);
+    const forToolbarSet = new Set(options.for_toolbar_buttons || []);
+    const isAddonPlugin = (name) => addonPluginSet.has(name);
+    const isAddonToolbarBtn = (name) => addonToolbarSet.has(name);
+    const isForPlugin = (name) => typeof name === 'string' && (name.indexOf('for_') === 0 || forPluginSet.has(name));
+    const isForToolbarBtn = (name) => typeof name === 'string' && (name.indexOf('for_') === 0 || forToolbarSet.has(name));
+    let pluginsHtml = '<legend>' + (i18n.plugins || 'Plugins') + ' '
+        + '<small class="for-plugin-legend-hint"><span class="for-plugin-badge-inline">FOR</span> ' + (i18n.for_plugins_hint || 'FriendsOfREDAXO custom plugins') + '</small> '
+        + '<small class="for-plugin-legend-hint"><span class="for-plugin-badge-inline for-plugin-badge--addon">AddOn</span> ' + (i18n.addon_plugins_hint || 'Plugins aus externen AddOns') + '</small>'
+        + '</legend><div class="row">';
     pluginsList.forEach(plugin => {
-        const forClass = isForPlugin(plugin) ? ' builder-plugin-row--for' : '';
-        const badge = isForPlugin(plugin) ? '<span class="for-plugin-badge" title="FriendsOfREDAXO">FOR</span> ' : '';
-        pluginsHtml += `<div class="col-md-3 col-sm-4${forClass}"><div class="checkbox"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${badge}${plugin}</label></div></div>`;
+        let rowClass = '';
+        let badge = '';
+        if (isAddonPlugin(plugin)) {
+            rowClass = ' builder-plugin-row--addon';
+            badge = '<span class="for-plugin-badge for-plugin-badge--addon" title="Plugin aus externem AddOn">AddOn</span> ';
+        } else if (isForPlugin(plugin)) {
+            rowClass = ' builder-plugin-row--for';
+            badge = '<span class="for-plugin-badge" title="FriendsOfREDAXO">FOR</span> ';
+        }
+        pluginsHtml += `<div class="col-md-3 col-sm-4${rowClass}"><div class="checkbox"><label><input type="checkbox" class="builder-plugin" value="${plugin}"> ${badge}${plugin}</label></div></div>`;
     });
     pluginsHtml += '</div><br>';
 
@@ -66,7 +89,9 @@ function initTinyMceProfileAssistant() {
     // Available Buttons – FOR-* buttons highlighted
     toolbarHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.available_items || 'Available Items') + '</div><div class="panel-body" id="builder-available-items">';
     toolbarButtons.forEach(btn => {
-        if (isForPlugin(btn)) {
+        if (isAddonToolbarBtn(btn)) {
+            toolbarHtml += `<button type="button" class="btn btn-xs builder-toolbar-btn builder-toolbar-btn--addon" data-value="${btn}" style="margin-bottom: 4px;" title="Button aus externem AddOn"><span class="for-plugin-badge for-plugin-badge--addon">AddOn</span> ${btn}</button> `;
+        } else if (isForToolbarBtn(btn)) {
             toolbarHtml += `<button type="button" class="btn btn-xs builder-toolbar-btn builder-toolbar-btn--for" data-value="${btn}" style="margin-bottom: 4px;" title="FriendsOfREDAXO"><span class="for-plugin-badge">FOR</span> ${btn}</button> `;
         } else {
             toolbarHtml += `<button type="button" class="btn btn-default btn-xs builder-toolbar-btn" data-value="${btn}" style="margin-bottom: 4px;">${btn}</button> `;
@@ -380,7 +405,7 @@ function initTinyMceProfileAssistant() {
             letter-spacing: 0.5px;
             line-height: 1.3;
             border-radius: 3px;
-            background: linear-gradient(135deg, #e91e63, #9c27b0);
+            background: linear-gradient(135deg, #4b9ad9, #2c7cb8);
             color: #fff;
             vertical-align: middle;
             text-shadow: 0 1px 1px rgba(0,0,0,.15);
@@ -389,27 +414,54 @@ function initTinyMceProfileAssistant() {
         .for-plugin-badge-inline { margin-left: 6px; }
         .for-plugin-legend-hint { margin-left: 8px; color: #999; font-weight: 400; }
         .builder-plugin-row--for label { font-weight: 600; }
-        .builder-plugin-row--for label input { accent-color: #e91e63; }
+        .builder-plugin-row--for label input { accent-color: #4b9ad9; }
         .builder-toolbar-btn--for {
-            background: linear-gradient(135deg, #fff 0%, #fff 50%, #fce4ec 100%) !important;
-            color: #880e4f !important;
-            border: 1px solid #e91e63 !important;
+            background: linear-gradient(135deg, #fff 0%, #fff 50%, #e3f0fa 100%) !important;
+            color: #1a5a8a !important;
+            border: 1px solid #4b9ad9 !important;
             font-weight: 600;
         }
-        .builder-toolbar-btn--for:hover { background: #fce4ec !important; }
+        .builder-toolbar-btn--for:hover { background: #e3f0fa !important; }
         .builder-insert-item-btn--for {
-            background: linear-gradient(135deg, #e91e63, #9c27b0) !important;
+            background: linear-gradient(135deg, #4b9ad9, #2c7cb8) !important;
             border-color: transparent !important;
             color: #fff !important;
             font-weight: 600;
         }
         .builder-insert-item-btn--for:hover { filter: brightness(1.1); }
         body.rex-theme-dark .builder-toolbar-btn--for {
-            background: linear-gradient(135deg, #2a2a2a 0%, #3a2030 100%) !important;
-            color: #f48fb1 !important;
-            border-color: #c2185b !important;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1e3a4f 100%) !important;
+            color: #8ec5ea !important;
+            border-color: #2c7cb8 !important;
         }
-        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #3a2030 !important; }
+        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #1e3a4f !important; }
+
+        /* AddOn Plugin highlighting (plugins registered by OTHER addons) */
+        .for-plugin-badge--addon {
+            background: linear-gradient(135deg, #5bb585, #3e8c60);
+        }
+        .builder-plugin-row--addon label { font-weight: 600; }
+        .builder-plugin-row--addon label input { accent-color: #5bb585; }
+        .builder-toolbar-btn--addon {
+            background: linear-gradient(135deg, #fff 0%, #fff 50%, #edf7f0 100%) !important;
+            color: #2d6a45 !important;
+            border: 1px solid #5bb585 !important;
+            font-weight: 600;
+        }
+        .builder-toolbar-btn--addon:hover { background: #edf7f0 !important; }
+        .builder-insert-item-btn--addon {
+            background: linear-gradient(135deg, #5bb585, #3e8c60) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+        .builder-insert-item-btn--addon:hover { filter: brightness(1.1); }
+        body.rex-theme-dark .builder-toolbar-btn--addon {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1e3a28 100%) !important;
+            color: #8fd4a8 !important;
+            border-color: #3e8c60 !important;
+        }
+        body.rex-theme-dark .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
     `;
     document.head.appendChild(style);
 

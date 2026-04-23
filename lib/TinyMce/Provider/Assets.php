@@ -220,6 +220,7 @@ class Assets
                 'load_failed' => \rex_i18n::msg('tinymce_load_failed'),
                 'custom_menu_items' => \rex_i18n::msg('tinymce_custom_menu_items'),
                 'for_plugins_hint' => \rex_i18n::msg('tinymce_for_plugins_hint'),
+                'addon_plugins_hint' => \rex_i18n::msg('tinymce_addon_plugins_hint'),
             ];
 
             \rex_view::setJsProperty('tinymceProfileI18n', $i18n);
@@ -256,8 +257,56 @@ class Assets
                     'for_toc'              => 'Inhaltsverzeichnis',
                     'for_markdown_paste'   => 'Markdown einfügen…',
                 ],
-                'external_plugins' => []
+                'external_plugins' => [],
+                // Names of plugins registered by OTHER AddOns (not bundled with
+                // the tinymce addon itself). Used by the profile assistant to
+                // visually highlight them as "AddOn plugins" (green). Detection
+                // happens via URL path: bundled plugins live under the tinymce
+                // addon assets path, external ones don't.
+                'addon_plugins' => [],
+                'addon_toolbar_buttons' => [],
+                // Names of plugins/buttons bundled with the tinymce addon itself
+                // (FriendsOfREDAXO custom plugins). Includes legacy ones that
+                // predate the `for_` naming convention (e.g. mediapaste, snippets,
+                // cleanpaste, phonelink, quote, link_yform, …). Used by the
+                // profile assistant to color these as FOR-plugins even if their
+                // name does not start with `for_`.
+                'for_plugins' => [],
+                'for_toolbar_buttons' => [],
             ];
+
+            // Split registered plugins into "bundled with tinymce addon" (FOR)
+            // and "provided by other addons" (AddOn) based on the plugin URL path.
+            $tinymceAssetsBase = (string) \rex_url::addonAssets('tinymce', '');
+            $addonPlugins = [];
+            $addonToolbarButtons = [];
+            $forPlugins = [];
+            $forToolbarButtons = [];
+            foreach (PluginRegistry::getPlugins() as $pluginName => $pluginData) {
+                $pluginUrl = (string) ($pluginData['url'] ?? '');
+                if ('' === $pluginUrl) {
+                    continue;
+                }
+                // Strip query string (cache-buster) before comparing
+                $pluginUrlPath = (string) (parse_url($pluginUrl, PHP_URL_PATH) ?? $pluginUrl);
+                $isBundled = '' !== $tinymceAssetsBase && str_contains($pluginUrlPath, rtrim($tinymceAssetsBase, '/'));
+                $toolbarBtn = $pluginData['toolbar'] ?? null;
+                if ($isBundled) {
+                    $forPlugins[] = (string) $pluginName;
+                    if (null !== $toolbarBtn && '' !== $toolbarBtn) {
+                        $forToolbarButtons[] = (string) $toolbarBtn;
+                    }
+                    continue;
+                }
+                $addonPlugins[] = (string) $pluginName;
+                if (null !== $toolbarBtn && '' !== $toolbarBtn) {
+                    $addonToolbarButtons[] = (string) $toolbarBtn;
+                }
+            }
+            $options['addon_plugins'] = array_values(array_unique($addonPlugins));
+            $options['addon_toolbar_buttons'] = array_values(array_unique($addonToolbarButtons));
+            $options['for_plugins'] = array_values(array_unique($forPlugins));
+            $options['for_toolbar_buttons'] = array_values(array_unique($forToolbarButtons));
 
             $options = \rex_extension::registerPoint(new \rex_extension_point('TINYMCE_PROFILE_OPTIONS', $options));
 

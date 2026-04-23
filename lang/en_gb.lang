@@ -259,3 +259,4 @@ tinymce_loaded_from_config = Configuration loaded into the assistant.
 tinymce_load_failed = Could not parse configuration. Please adjust manually.
 tinymce_custom_menu_items = Custom plugin items
 tinymce_for_plugins_hint = FriendsOfREDAXO exclusive plugins – highlighted
+tinymce_addon_plugins_hint = Plugins from external AddOns – highlighted

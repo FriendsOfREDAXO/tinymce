@@ -262,3 +262,4 @@ tinymce_loaded_from_config = Konfiguration wurde in den Assistenten übernommen.
 tinymce_load_failed = Konfiguration konnte nicht ausgelesen werden. Bitte manuell ergänzen.
 tinymce_custom_menu_items = Custom-Plugin-Einträge
 tinymce_for_plugins_hint = FriendsOfREDAXO-eigene Plugins – hervorgehoben
+tinymce_addon_plugins_hint = Plugins aus externen AddOns – hervorgehoben
