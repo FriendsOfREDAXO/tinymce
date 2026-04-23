@@ -132,28 +132,41 @@ nav.for-toc ol.for-toc__list {
 
 nav.for-toc ol.for-toc__list > li.for-toc__item {
     counter-increment: for-toc-item;
-    /* Flex-Layout: Nummer nimmt exakt ihren natürlichen Platz ein, der Text
-       bleibt über mehrere Zeilen sauber ausgerichtet (hanging indent). */
-    display: flex;
-    align-items: baseline;
-    gap: var(--for-toc-number-gap);
+    display: block;
+    /* Hanging Indent: Nummer steht links, Text/Nested-List laufen ab dem
+       Einzug. Der negative text-indent zieht die erste Zeile (inkl. ::before)
+       nach links, padding-left sorgt für den eigentlichen Einzug. */
+    padding-left: calc(var(--for-toc-number-min-width) + var(--for-toc-number-gap));
+    text-indent: calc(-1 * (var(--for-toc-number-min-width) + var(--for-toc-number-gap)));
+}
+
+nav.for-toc ol.for-toc__list > li.for-toc__item > a,
+nav.for-toc ol.for-toc__list > li.for-toc__item > ol,
+nav.for-toc ol.for-toc__list > li.for-toc__item > ul {
+    /* Text-Indent wirkt nur auf die erste Zeile; verschachtelte Listen und
+       Links setzen wir zurück, damit mehrzeilige Link-Titel sauber am
+       Einzug bleiben und Sub-Listen ihre eigene Struktur behalten. */
+    text-indent: 0;
 }
 
 nav.for-toc ol.for-toc__list > li.for-toc__item::before {
     content: counters(for-toc-item, var(--for-toc-number-separator)) var(--for-toc-number-suffix);
-    flex: 0 0 auto;
+    display: inline-block;
     min-width: var(--for-toc-number-min-width);
+    margin-right: var(--for-toc-number-gap);
     color: var(--for-toc-number-color);
     font-weight: var(--for-toc-number-font-weight);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
+    text-indent: 0;
 }
 
 /* Filler-Einträge (übersprungene Ebenen, z. B. h2 → h4) nicht mitzählen
    und keinen Nummerierungs-Präfix zeigen.                                   */
 nav.for-toc ol.for-toc__list > li.for-toc__item--filler {
     counter-increment: none;
-    display: list-item;
+    padding-left: 0;
+    text-indent: 0;
 }
 nav.for-toc ol.for-toc__list > li.for-toc__item--filler::before {
     content: none;

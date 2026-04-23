@@ -50,7 +50,7 @@ setup: function (editor) {
 },
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69e9faa65ca5d":"69e9faa65ca5d"},"light":{license_key: 'gpl',
+},"69e9fe2b427e7":"69e9fe2b427e7"},"light":{license_key: 'gpl',
 relative_urls : false,
 remove_script_host : true,
 document_base_url : '/',
@@ -84,7 +84,7 @@ style_formats: [
    {title: 'Überschrift 5', format: 'h5'}
  ]}
 ]
-,"69e9faa65ca60":"69e9faa65ca60"},"default":{license_key: 'gpl',
+,"69e9fe2b427e9":"69e9fe2b427e9"},"default":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -113,7 +113,7 @@ file_picker_callback: function (callback, value, meta) {
  rex5_picker_function(callback, value, meta);
 },
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
-content_css: redaxo.theme.current === "dark" ? "dark" : "default","69e9faa65ca62":"69e9faa65ca62"},"demo":{license_key: 'gpl',
+content_css: redaxo.theme.current === "dark" ? "dark" : "default","69e9fe2b427eb":"69e9fe2b427eb"},"demo":{license_key: 'gpl',
 language: 'de',
 branding: false,
 statusbar: true,
@@ -189,4 +189,4 @@ content_css: redaxo.theme.current === 'dark' ? 'dark' : 'default',
 
 file_picker_callback: function (callback, value, meta) {
     rex5_picker_function(callback, value, meta);
-},"69e9faa65ca64":"69e9faa65ca64"}};
+},"69e9fe2b427ed":"69e9fe2b427ed"}};
