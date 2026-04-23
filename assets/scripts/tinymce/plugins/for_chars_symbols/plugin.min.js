@@ -637,7 +637,27 @@ body.rex-theme-dark .fcs-btn:hover,body.rex-theme-dark .fcs-btn:focus-visible,bo
 body.rex-theme-dark .fcs-glyph--invisible{color:#7a8599}\
 body.rex-theme-dark .fcs-action{background:#2b2e34;border-color:#3a3e47;color:#dde2ea}\
 body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
-@media (prefers-color-scheme: dark){body.rex-has-theme:not(.rex-theme-light) .fcs-panel{background:#23272e;color:#e6e9ef;border-color:#3a3e47}body.rex-has-theme:not(.rex-theme-light) .fcs-name,body.rex-has-theme:not(.rex-theme-light) .fcs-hint,body.rex-has-theme:not(.rex-theme-light) .fcs-group-title{color:#a9b0bc}}\
+@media (prefers-color-scheme: dark){\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel{background:#23272e;color:#e6e9ef;border-color:#3a3e47}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__head{background:linear-gradient(#2a2e36,#23272e);border-bottom-color:#3a3e47}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__close{color:#a9b0bc}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__close:hover{background:rgba(255,255,255,.08);color:#fff}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tabs{background:#1e2127;border-bottom-color:#3a3e47}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tab{color:#a9b0bc}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tab:hover{background:rgba(255,255,255,.05)}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tab.is-active{background:#23272e;border-color:#3a3e47;color:#fff}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-searchbar{background:#23272e}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-search{background:#1e2127;border-color:#3a3e47;color:#e6e9ef}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-name,body.rex-has-theme:not(.rex-theme-light) .fcs-hint,body.rex-has-theme:not(.rex-theme-light) .fcs-group-title{color:#a9b0bc}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-row-btn .fcs-name{color:#dde2ea}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-btn:hover,body.rex-has-theme:not(.rex-theme-light) .fcs-btn:focus-visible,body.rex-has-theme:not(.rex-theme-light) .fcs-row-btn:hover,body.rex-has-theme:not(.rex-theme-light) .fcs-row-btn:focus-visible{background:rgba(90,170,230,.18)}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-glyph--invisible{color:#7a8599}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-action{background:#2b2e34;border-color:#3a3e47;color:#dde2ea}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-group--pinned{background:rgba(246,166,35,.08);border-color:rgba(246,166,35,.28)}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-group--pinned .fcs-group-title{color:#f6c772}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.03)}\
+}\
 ';
 
     var EDITOR_CSS = '\
