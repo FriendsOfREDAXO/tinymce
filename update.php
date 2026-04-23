@@ -43,7 +43,7 @@ try {
         if ($needsUpdate) {
             $updateSql = rex_sql::factory();
             $updateSql->setTable(rex::getTable('tinymce_profiles'));
-            $updateSql->setWhere(['id' => $profile['id']]);
+            $updateSql->setWhere(['id' => (int) $profile['id']]);
             $updateSql->setValue('plugins', $plugins);
             $updateSql->setValue('toolbar', $toolbar);
             $updateSql->setValue('extra', $extra);
@@ -107,7 +107,7 @@ try {
             if (null !== $normalized && $normalized !== $extra) {
                 $upd = rex_sql::factory();
                 $upd->setTable(rex::getTable('tinymce_profiles'));
-                $upd->setWhere(['id' => $profile['id']]);
+                $upd->setWhere(['id' => (int) $profile['id']]);
                 $upd->setValue('extra', $normalized);
                 $upd->setValue('updatedate', date('Y-m-d H:i:s'));
                 $upd->update();
@@ -120,7 +120,7 @@ try {
 
         $upd = rex_sql::factory();
         $upd->setTable(rex::getTable('tinymce_profiles'));
-        $upd->setWhere(['id' => $profile['id']]);
+        $upd->setWhere(['id' => (int) $profile['id']]);
         $upd->setValue('extra', $newExtra);
         $upd->setValue('updatedate', date('Y-m-d H:i:s'));
         $upd->update();

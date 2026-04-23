@@ -32,13 +32,13 @@ if ($func == 'add' || $func == 'edit') {
     if ($func == 'edit') {
         $form->addParam('func', 'edit');
         $form->addHiddenField('updatedate', date('Y-m-d H:i:s'));
-        $form->addHiddenField('updateuser', rex::getUser()->getLogin());
+        $form->addHiddenField('updateuser', rex::requireUser()->getLogin());
     } else {
         $form->addParam('func', 'add');
         $form->addHiddenField('createdate', date('Y-m-d H:i:s'));
         $form->addHiddenField('updatedate', date('Y-m-d H:i:s'));
-        $form->addHiddenField('createuser', rex::getUser()->getLogin());
-        $form->addHiddenField('updateuser', rex::getUser()->getLogin());
+        $form->addHiddenField('createuser', rex::requireUser()->getLogin());
+        $form->addHiddenField('updateuser', rex::requireUser()->getLogin());
     }
 
     $content = $form->get();

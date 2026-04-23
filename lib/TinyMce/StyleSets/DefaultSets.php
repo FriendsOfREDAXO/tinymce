@@ -11,7 +11,9 @@ namespace FriendsOfRedaxo\TinyMce\StyleSets;
 class DefaultSets
 {
     /**
-     * UIkit 3 Style-Set
+     * UIkit 3 Style-Set.
+     *
+     * @return array<string, mixed>
      */
     public static function getUikit3(): array
     {
@@ -197,7 +199,9 @@ class DefaultSets
     }
 
     /**
-     * Bootstrap 5 Style-Set
+     * Bootstrap 5 Style-Set.
+     *
+     * @return array<string, mixed>
      */
     public static function getBootstrap5(): array
     {
@@ -324,7 +328,9 @@ class DefaultSets
     }
 
     /**
-     * Alle Default-Sets
+     * Alle Default-Sets.
+     *
+     * @return list<array<string, mixed>>
      */
     public static function getAll(): array
     {

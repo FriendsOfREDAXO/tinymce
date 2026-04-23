@@ -6,6 +6,8 @@ use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
 /**
  * Inline migration logic (avoid adding new classes required by updates/install).
  * Returns array with 'extra' => string and 'changes' => array of change descriptions.
+ *
+ * @return array{extra: string, changes: list<string>}
  */
 function tinymce_migrate_extra(string $extra): array
 {
@@ -31,7 +33,7 @@ function tinymce_migrate_extra(string $extra): array
         ];
         foreach ($templatePatterns as $pattern => $replacement) {
             if (preg_match($pattern, $result)) {
-                $result = preg_replace($pattern, $replacement, $result);
+                $result = (string) preg_replace($pattern, $replacement, $result);
                 if (!in_array('Removed template plugin', $changes, true)) {
                     $changes[] = 'Removed template plugin';
                 }
@@ -42,31 +44,31 @@ function tinymce_migrate_extra(string $extra): array
     // Fix external_plugins paths - ensure absolute paths (starting with /)
     if ('' !== $result && preg_match('/external_plugins:\s*\{/', $result)) {
         // Fix relative paths like "assets/addons/..." to "/assets/addons/..."
-        $result = preg_replace(
+        $result = (string) preg_replace(
             '/"(assets\/addons\/)/',
             '"/assets/addons/',
             $result
         );
         // Fix escaped relative paths like "..\/assets\/addons\/..." to "/assets/addons/..."
-        $result = preg_replace(
+        $result = (string) preg_replace(
             '/"(?:\.\.\\\\\/)+assets\\\\\/addons\\\\\//',
             '"/assets/addons/',
             $result
         );
         // Fix unescaped relative paths like "../assets/addons/..." to "/assets/addons/..."
-        $result = preg_replace(
+        $result = (string) preg_replace(
             '/"(?:\.\.\/)+assets\/addons\//',
             '"/assets/addons/',
             $result
         );
-        if ($result !== $extra && !in_array('Fixed external_plugins paths', $changes, true)) {
+        if ($result !== $extra) {
             $changes[] = 'Fixed external_plugins paths to absolute URLs';
         }
     }
 
     // Fix content_css for proper dark mode support if needed
     if ('' !== $result && preg_match('/content_css:\s*redaxo\.theme\.current\s*===\s"dark"\s*\?\s*"[^\"]+"\s*:\s*"light"/', $result)) {
-        $result = preg_replace(
+        $result = (string) preg_replace(
             '/content_css:\s*redaxo\.theme\.current\s*===\s"dark"\s*\?\s*"([^\"]+)"\s*:\s*"light"/',
             'content_css: redaxo.theme.current === "dark" ? "$1" : "default"',
             $result
@@ -103,9 +105,9 @@ if ('repair' === $func && $id > 0) {
                 // ignore
             }
             rex_logger::factory()->log('info', 'TinyMCE: Repaired profile "'.$profile['name'].'" via migration page.');
-            echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired', $profile['name']));
+            echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired', (string) $profile['name']));
         } else {
-            echo rex_view::info(rex_i18n::msg('tinymce_migration_no_changes', $profile['name']));
+            echo rex_view::info(rex_i18n::msg('tinymce_migration_no_changes', (string) $profile['name']));
         }
     }
 }
@@ -120,7 +122,7 @@ if ('repair_all' === $func) {
         if (!empty($result['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
-            $update->setWhere(['id' => $profile['id']]);
+            $update->setWhere(['id' => (int) $profile['id']]);
             $update->setValue('extra', $result['extra']);
             $update->update();
             $count++;

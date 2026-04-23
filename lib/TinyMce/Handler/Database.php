@@ -11,6 +11,9 @@ class Database
 {
     public const TINY_PROFILES = 'tinymce_profiles';
 
+    /**
+     * @return list<array<string, mixed>>|null
+     */
     public static function getAllProfiles(): ?array
     {
         try {

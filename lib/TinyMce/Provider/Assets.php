@@ -285,24 +285,24 @@ class Assets
             $forPlugins = [];
             $forToolbarButtons = [];
             foreach (PluginRegistry::getPlugins() as $pluginName => $pluginData) {
-                $pluginUrl = (string) ($pluginData['url'] ?? '');
+                $pluginUrl = $pluginData['url'];
                 if ('' === $pluginUrl) {
                     continue;
                 }
                 // Strip query string (cache-buster) before comparing
                 $pluginUrlPath = (string) (parse_url($pluginUrl, PHP_URL_PATH) ?? $pluginUrl);
-                $isBundled = '' !== $tinymceAssetsBase && str_contains($pluginUrlPath, rtrim($tinymceAssetsBase, '/'));
-                $toolbarBtn = $pluginData['toolbar'] ?? null;
+                $isBundled = str_contains($pluginUrlPath, rtrim($tinymceAssetsBase, '/'));
+                $toolbarBtn = $pluginData['toolbar'];
                 if ($isBundled) {
                     $forPlugins[] = (string) $pluginName;
-                    if (null !== $toolbarBtn && '' !== $toolbarBtn) {
-                        $forToolbarButtons[] = (string) $toolbarBtn;
+                    if (null !== $toolbarBtn) {
+                        $forToolbarButtons[] = $toolbarBtn;
                     }
                     continue;
                 }
                 $addonPlugins[] = (string) $pluginName;
-                if (null !== $toolbarBtn && '' !== $toolbarBtn) {
-                    $addonToolbarButtons[] = (string) $toolbarBtn;
+                if (null !== $toolbarBtn) {
+                    $addonToolbarButtons[] = $toolbarBtn;
                 }
             }
             $options['addon_plugins'] = array_values(array_unique($addonPlugins));

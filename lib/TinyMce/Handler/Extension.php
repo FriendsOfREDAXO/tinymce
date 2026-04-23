@@ -10,7 +10,10 @@ use rex_view;
 
 class Extension
 {
-    /** @api */
+    /**
+     * @api
+     * @param rex_extension_point<mixed> $ep
+     */
     public static function createProfiles(rex_extension_point $ep): void
     {
         if ('profiles' === rex_be_controller::getCurrentPagePart(2) || 'TINY_PROFILE_ADD' === $ep->getName()) {

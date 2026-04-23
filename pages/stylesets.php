@@ -21,7 +21,7 @@ if ('install_demo' === $func) {
         echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
         $now = date('Y-m-d H:i:s');
-        $user = rex::getUser()->getLogin();
+        $user = rex::requireUser()->getLogin();
         $defaultSets = DefaultSets::getAll();
         $installed = 0;
         $skipped = 0;
@@ -99,7 +99,7 @@ if ('toggle' === $func && $id > 0) {
             $upd->setWhere(['id' => $id]);
             $upd->setValue('active', $newActive);
             $upd->setValue('updatedate', date('Y-m-d H:i:s'));
-            $upd->setValue('updateuser', rex::getUser()->getLogin());
+            $upd->setValue('updateuser', rex::requireUser()->getLogin());
             $upd->update();
             echo rex_view::success(rex_i18n::msg('tinymce_stylesets_toggled'));
             // Flag zum Neugenerieren der profiles.js setzen
@@ -116,12 +116,12 @@ if ('export' === $func && $id > 0) {
     if (!empty($data)) {
         $export = $data[0];
         // style_formats ist bereits JSON-String, decodieren für sauberen Export
-        $export['style_formats'] = json_decode($export['style_formats'], true);
+        $export['style_formats'] = json_decode((string) $export['style_formats'], true);
         
         rex_response::cleanOutputBuffers();
         rex_response::sendContentType('application/json');
-        rex_response::setHeader('Content-Disposition', 'attachment; filename="styleset_' . rex_string::normalize($export['name']) . '.json"');
-        rex_response::sendContent(json_encode($export, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        rex_response::setHeader('Content-Disposition', 'attachment; filename="styleset_' . rex_string::normalize((string) $export['name']) . '.json"');
+        rex_response::sendContent((string) json_encode($export, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         exit;
     }
     $func = '';
@@ -133,14 +133,14 @@ if ('export_all' === $func) {
     $data = $sql->getArray('SELECT name, description, content_css, style_formats FROM ' . rex::getTable('tinymce_stylesets') . ' ORDER BY prio ASC');
     $exports = [];
     foreach ($data as $row) {
-        $row['style_formats'] = json_decode($row['style_formats'], true);
+        $row['style_formats'] = json_decode((string) $row['style_formats'], true);
         $exports[] = $row;
     }
     
     rex_response::cleanOutputBuffers();
     rex_response::sendContentType('application/json');
     rex_response::setHeader('Content-Disposition', 'attachment; filename="tinymce_stylesets_export.json"');
-    rex_response::sendContent(json_encode($exports, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    rex_response::sendContent((string) json_encode($exports, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     exit;
 }
 
@@ -152,7 +152,7 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
         $file = rex_files('import_file', 'array');
         if (!empty($file['tmp_name']) && is_uploaded_file($file['tmp_name'])) {
             $content = rex_file::get($file['tmp_name']);
-            $importData = json_decode($content, true);
+            $importData = json_decode((string) $content, true);
             
             if (null === $importData) {
                 echo rex_view::error(rex_i18n::msg('tinymce_stylesets_import_invalid_json'));
@@ -163,7 +163,7 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
                 }
                 
                 $now = date('Y-m-d H:i:s');
-                $user = rex::getUser()->getLogin();
+                $user = rex::requireUser()->getLogin();
                 $imported = 0;
                 $skipped = 0;
                 
@@ -270,13 +270,13 @@ if ('add' === $func || 'edit' === $func) {
     if ('edit' === $func) {
         $form->addParam('func', 'edit');
         $form->addHiddenField('updatedate', date('Y-m-d H:i:s'));
-        $form->addHiddenField('updateuser', rex::getUser()->getLogin());
+        $form->addHiddenField('updateuser', rex::requireUser()->getLogin());
     } else {
         $form->addParam('func', 'add');
         $form->addHiddenField('createdate', date('Y-m-d H:i:s'));
         $form->addHiddenField('updatedate', date('Y-m-d H:i:s'));
-        $form->addHiddenField('createuser', rex::getUser()->getLogin());
-        $form->addHiddenField('updateuser', rex::getUser()->getLogin());
+        $form->addHiddenField('createuser', rex::requireUser()->getLogin());
+        $form->addHiddenField('updateuser', rex::requireUser()->getLogin());
     }
 
     $content = $form->get();

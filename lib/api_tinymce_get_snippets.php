@@ -22,8 +22,8 @@ class rex_api_tinymce_get_snippets extends rex_api_function
         $snippets = $sql->getArray();
         
         // Sort by name ASC
-        usort($snippets, function($a, $b) {
-            return strcasecmp($a['name'], $b['name']);
+        usort($snippets, static function ($a, $b) {
+            return strcasecmp((string) $a['name'], (string) $b['name']);
         });
         
         $data = [];

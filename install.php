@@ -41,7 +41,7 @@ try {
         if ($needsUpdate) {
             $updateSql = rex_sql::factory();
             $updateSql->setTable(rex::getTable('tinymce_profiles'));
-            $updateSql->setWhere(['id' => $profile['id']]);
+            $updateSql->setWhere(['id' => (int) $profile['id']]);
             $updateSql->setValue('plugins', $plugins);
             $updateSql->setValue('toolbar', $toolbar);
             $updateSql->setValue('extra', $extra);

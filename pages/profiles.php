@@ -5,7 +5,7 @@ use FriendsOfRedaxo\TinyMce\Utils\ListHelper as TinyMceListHelper;
 
 $func = rex_request::request('func', 'string');
 $id = (int) rex_request::request('id', 'int');
-$start = rex_request::request('start', 'int', null);
+$start = rex_request::request('start', 'int', 0);
 $send = rex_request::request('send', 'boolean', false);
 
 $profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
@@ -62,18 +62,14 @@ if ('preview' === $func && $id > 0) {
     if ('html' === $mode) {
         rex_response::cleanOutputBuffers();
         header('Content-Type: text/html; charset=utf-8');
-        $name = htmlspecialchars($row[0]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $extra = $row[0]['extra'] ?? '';
+        $name = htmlspecialchars((string) $row[0]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $extra = (string) ($row[0]['extra'] ?? '');
         $body = '<h4 id="tinymcePreviewName" style="margin-top:0">' . $name . '</h4>';
         $body .= '<div id="tinymcePreviewJson" style="white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:280px; overflow:auto; font-family:monospace;">';
         // show pretty-printed JSON if parsable, fallback to raw
-        try {
-            $rawParsed = @json_decode($extra, true);
-        } catch (\Throwable $e) {
-            $rawParsed = null;
-        }
+        $rawParsed = @json_decode($extra, true);
         if (is_array($rawParsed)) {
-            $body .= htmlspecialchars(json_encode($rawParsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $body .= htmlspecialchars((string) json_encode($rawParsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         } else {
             $body .= htmlspecialchars($extra, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         }
@@ -96,7 +92,7 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
             throw new Exception('upload_error');
         }
         $content = file_get_contents($_FILES['profiles_file']['tmp_name']);
-        $data = json_decode($content, true);
+        $data = json_decode((string) $content, true);
         if (null === $data) {
             throw new Exception('json_invalid');
         }
