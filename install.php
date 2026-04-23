@@ -246,15 +246,30 @@ EXTRA;
 // Classmap-Cache noch nicht (neu) aufgebaut, daher greift der Autoloader für
 // AddOn-Klassen hier noch nicht. Wir ziehen alle PHP-Klassendateien unter
 // lib/TinyMce/ rekursiv nach.
+//
+// Beim Update läuft der Code im .new.tinymce-Pfad, während der Autoloader
+// die gleichnamigen Klassen bereits aus dem alten tinymce-Pfad geladen hat.
+// Darum vor jedem require_once prüfen, ob die Klasse / das Interface schon
+// existiert – sonst gibt es „Cannot declare class … already in use“.
 $__tinymceClassIter = new \RecursiveIteratorIterator(
     new \RecursiveDirectoryIterator(__DIR__ . '/lib/TinyMce', \FilesystemIterator::SKIP_DOTS)
 );
 foreach ($__tinymceClassIter as $__tinymceClassFile) {
-    if ($__tinymceClassFile->isFile() && str_ends_with($__tinymceClassFile->getFilename(), '.php')) {
-        require_once $__tinymceClassFile->getPathname();
+    if (!$__tinymceClassFile->isFile() || !str_ends_with($__tinymceClassFile->getFilename(), '.php')) {
+        continue;
     }
+    $__tinymceClassSource = (string) file_get_contents($__tinymceClassFile->getPathname());
+    if (preg_match('/namespace\s+([^;\s]+)\s*;/', $__tinymceClassSource, $__ns)
+        && preg_match('/\b(?:class|interface|trait|enum)\s+([A-Za-z_][A-Za-z0-9_]*)/', $__tinymceClassSource, $__cls)
+    ) {
+        $__fqn = $__ns[1] . '\\' . $__cls[1];
+        if (class_exists($__fqn, false) || interface_exists($__fqn, false) || trait_exists($__fqn, false) || (function_exists('enum_exists') && enum_exists($__fqn, false))) {
+            continue;
+        }
+    }
+    require_once $__tinymceClassFile->getPathname();
 }
-unset($__tinymceClassIter, $__tinymceClassFile);
+unset($__tinymceClassIter, $__tinymceClassFile, $__tinymceClassSource, $__ns, $__cls, $__fqn);
 
 try {
 	\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(

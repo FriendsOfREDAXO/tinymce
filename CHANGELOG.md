@@ -14,9 +14,10 @@ Bei geordneten TOCs mit mehrstelligen Zählern (`1.12.5`, `2.10.3` …) reichte 
 
 ### Install/Update: `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` behoben
 
-Bei einer frischen Installation (und in manchen Update-Szenarien) ist Composers Classmap-Cache noch nicht (neu) aufgebaut, bevor `install.php`/`update.php` läuft – der REDAXO-Autoloader findet die AddOn-Klassen dann nicht, und das Demo-Profil-Setup bricht mit `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` ab.
+Bei einer frischen Installation (und in manchen Update-Szenarien) ist Composers Classmap-Cache noch nicht (neu) aufgebaut, bevor `install.php`/`update.php` läuft – der REDAXO-Autoloader findet die AddOn-Klassen dann nicht, und das Demo-Profil-Setup bricht mit `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` ab. Weil install.php **in** der AddOn-Installation läuft, brach auch die ganze Installation ab (der temporäre Ordner `redaxo/src/addons/.new.tinymce/` wurde vom REDAXO-Installer wieder zurückgerollt).
 
 * `install.php` und `update.php` laden jetzt alle PHP-Dateien unter `lib/TinyMce/` rekursiv via `RecursiveIteratorIterator` + `require_once` als Fallback. Funktioniert unabhängig vom Classmap-Status.
+* Beim Update: Vor jedem `require_once` wird per `class_exists`/`interface_exists`/`trait_exists`/`enum_exists` geprüft, ob die Klasse bereits vom Autoloader geladen wurde (aus dem alten `tinymce/`-Pfad). Vermeidet `Cannot declare class … already in use`, weil die Update-Skripte im `.new.tinymce`-Pfad laufen.
 
 ### Cache-Busting für externe Plugin-URLs
 
