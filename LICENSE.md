@@ -1,6 +1,19 @@
 The MIT License (MIT)
 
-Copyright (c) 2016 Friends Of REDAXO
+Copyright (c) 2016-2026 Friends Of REDAXO
+
+This license applies to the REDAXO AddOn code (PHP, JavaScript, TypeScript,
+templates, translations) including the custom TinyMCE plugins under
+`custom_plugins/`.
+
+The bundled TinyMCE editor in `assets/vendor/tinymce/` is distributed separately
+under the GNU General Public License v2 or later (as of TinyMCE 8.0).
+See `assets/vendor/tinymce/license.md` for the full TinyMCE license text and
+`assets/vendor/tinymce/notices.txt` for third-party notices. Commercial
+licenses for TinyMCE are available from Tiny Technologies, Inc.
+(https://www.tiny.cloud/).
+
+---
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

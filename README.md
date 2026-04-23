@@ -999,8 +999,11 @@ Das erlaubt, die Plugins direkt per `plugins` Konfiguration zu nutzen, ohne `ext
 
 ## Licenses
 
-- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md)
-- TinyMCE: [GPL v2+ LICENSE](https://github.com/tinymce/tinymce/blob/develop/license.md) (ab Version 8.0)
+- AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md) – siehe [LICENSE.md](LICENSE.md)
+- TinyMCE: [GPL v2+ LICENSE](https://github.com/tinymce/tinymce/blob/develop/license.md) (ab Version 8.0) – gebündelt unter [assets/vendor/tinymce/license.md](assets/vendor/tinymce/license.md), Drittanbieter-Hinweise unter [assets/vendor/tinymce/notices.txt](assets/vendor/tinymce/notices.txt)
+- Eigene Custom-Plugins (`custom_plugins/*`): MIT (als Teil dieses AddOns)
+
+Für kommerzielle Nutzung ohne GPL bietet Tiny kostenpflichtige Lizenzen an – siehe [tiny.cloud](https://www.tiny.cloud/). In diesem AddOn wird standardmäßig `license_key: 'gpl'` gesetzt.
 
 ## Author
 
