@@ -120,4 +120,50 @@ try {
     \rex_logger::logException($e);
 }
 
+// =============================================================================
+// Style-Sets: „Standardabsatz"-Reset als ersten Eintrag in mitgelieferte
+// Default-Sets (uikit3, bootstrap5) ergänzen, falls noch nicht vorhanden.
+// =============================================================================
+try {
+    $sql = rex_sql::factory();
+    $sets = $sql->getArray(
+        'SELECT id, name, style_formats FROM ' . rex::getTable('tinymce_stylesets')
+            . ' WHERE name IN (:n1, :n2)',
+        ['n1' => 'uikit3', 'n2' => 'bootstrap5']
+    );
+
+    foreach ($sets as $set) {
+        $raw = (string) $set['style_formats'];
+        if ('' === $raw) {
+            continue;
+        }
+        $formats = json_decode($raw, true);
+        if (!is_array($formats)) {
+            continue;
+        }
+
+        $hasReset = false;
+        foreach ($formats as $entry) {
+            if (is_array($entry) && isset($entry['format']) && 'p' === $entry['format']) {
+                $hasReset = true;
+                break;
+            }
+        }
+        if ($hasReset) {
+            continue;
+        }
+
+        array_unshift($formats, ['title' => 'Standardabsatz', 'format' => 'p']);
+
+        $upd = rex_sql::factory();
+        $upd->setTable(rex::getTable('tinymce_stylesets'));
+        $upd->setWhere('id = :id', ['id' => (int) $set['id']]);
+        $upd->setValue('style_formats', json_encode($formats, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+        $upd->update();
+    }
+} catch (rex_sql_exception $e) {
+    rex_logger::logException($e);
+}
+
 return true;

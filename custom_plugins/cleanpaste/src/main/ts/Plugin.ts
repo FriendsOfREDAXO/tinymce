@@ -251,6 +251,58 @@ function cleanPastedHtml(html: string, config: CleanPasteConfig): string {
 }
 
 /* ================================================================== */
+/*  Style-Set / style_formats class auto-collection                    */
+/* ------------------------------------------------------------------- */
+/*  Reads the active TinyMCE style_formats (provided by                */
+/*  `Provider\Assets::provideBaseAssets()` as `window.rex             */
+/*  .tinyGlobalOptions.style_formats`) and returns a flat list of      */
+/*  every class name referenced by any format. These classes are       */
+/*  added to `preserve_classes` so editors can paste content that      */
+/*  uses the project's own style-set classes without losing them.      */
+/* ================================================================== */
+
+interface StyleFormat {
+    classes?: string | string[];
+    items?: StyleFormat[];
+    [k: string]: unknown;
+}
+
+function collectStyleSetClasses(): string[] {
+    const collected = new Set<string>();
+    const w = window as unknown as { rex?: { tinyGlobalOptions?: { style_formats?: unknown } } };
+    const raw = w.rex?.tinyGlobalOptions?.style_formats;
+    if (!Array.isArray(raw)) return [];
+
+    const visit = (node: unknown): void => {
+        if (!node || typeof node !== 'object') return;
+        const fmt = (node as { format?: StyleFormat }).format ?? (node as StyleFormat);
+        if (!fmt) return;
+
+        const classes = fmt.classes;
+        if (typeof classes === 'string') {
+            classes.split(/\s+/).filter(Boolean).forEach((c) => collected.add(c));
+        } else if (Array.isArray(classes)) {
+            classes.forEach((c) => {
+                if (typeof c === 'string') collected.add(c);
+            });
+        }
+
+        const items = fmt.items;
+        if (Array.isArray(items)) {
+            items.forEach(visit);
+        }
+        // Some entries embed nested formats under .format.items
+        const nestedItems = (node as { items?: unknown }).items;
+        if (Array.isArray(nestedItems)) {
+            nestedItems.forEach(visit);
+        }
+    };
+
+    raw.forEach(visit);
+    return Array.from(collected);
+}
+
+/* ================================================================== */
 /*  Plugin registration                                                */
 /* ================================================================== */
 
@@ -267,7 +319,22 @@ const Plugin = (): void => {
             ...runtimeConfig,
         };
 
-        editor.on('PastePreProcess', (e: { content: string }) => {
+        // Auto-preserve classes coming from active Style-Sets (style_formats)
+        // so editors can paste their own styled content without losing classes.
+        const styleSetClasses = collectStyleSetClasses();
+        if (styleSetClasses.length > 0) {
+            const merged = new Set<string>([...config.preserve_classes, ...styleSetClasses]);
+            config.preserve_classes = Array.from(merged);
+        }
+
+        editor.on('PastePreProcess', (e: { content: string; internal?: boolean }) => {
+            // Skip cleanup for internal pastes (cut/copy/paste inside the same editor).
+            // Otherwise styles applied via Style-Sets or content inserted via the
+            // snippets plugin would lose their classes/styles when the user copies
+            // and re-pastes them inside the editor.
+            if (e.internal) {
+                return;
+            }
             if (e.content) {
                 e.content = cleanPastedHtml(e.content, config);
             }

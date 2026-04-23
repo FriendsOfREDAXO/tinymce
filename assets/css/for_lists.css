@@ -1,0 +1,56 @@
+/* ==========================================================================
+ * for_lists – Optionales CSS für hierarchische Nummerierung
+ * --------------------------------------------------------------------------
+ * Für normale nummerierte Listen (`<ol>`) im TinyMCE-Editor und im Frontend.
+ *
+ * Aktivierung per Klasse `ol-hierarchical` am äußeren `<ol>`:
+ *
+ *   <ol class="ol-hierarchical">
+ *       <li>Kapitel
+ *           <ol>
+ *               <li>Unterkapitel
+ *                   <ol>
+ *                       <li>Detail</li>
+ *                   </ol>
+ *               </li>
+ *           </ol>
+ *       </li>
+ *   </ol>
+ *
+ * Ergebnis: 1. / 1.1. / 1.1.1. statt 1. / 1. / 1.
+ *
+ * Einbindung Editor:
+ *   Im Profil unter `content_style` diese Datei einhängen oder einen
+ *   style_format-Eintrag "Nummeriert (hierarchisch)" mit selector `ol`
+ *   und classes `ol-hierarchical` anlegen.
+ *
+ * Einbindung Frontend:
+ *   <link rel="stylesheet" href="/assets/addons/tinymce/css/for_lists.css">
+ * ========================================================================== */
+
+ol.ol-hierarchical {
+    counter-reset: ol-hier-item;
+    list-style: none;
+    padding-left: 1.75em;
+}
+
+ol.ol-hierarchical ol {
+    counter-reset: ol-hier-item;
+    list-style: none;
+}
+
+ol.ol-hierarchical li {
+    position: relative;
+    counter-increment: ol-hier-item;
+}
+
+ol.ol-hierarchical li::before {
+    content: counters(ol-hier-item, ".") ". ";
+    position: absolute;
+    left: -1.75em;
+    width: 1.75em;
+    text-align: right;
+    padding-right: 0.35em;
+    color: color-mix(in srgb, currentColor 60%, transparent);
+    font-variant-numeric: tabular-nums;
+}

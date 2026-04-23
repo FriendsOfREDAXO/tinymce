@@ -101,6 +101,13 @@ class rex_api_tinymce_media_upload extends rex_api_function
                 $url = rex_url::base('media/' . rawurlencode($filename));
             }
 
+            // rex_url::base() returns a relative path like "../media/foo.png" when called
+            // from a backend script. The browser would resolve that against the editor page
+            // (e.g. an article in the frontend) and produce a wrong absolute URL. Resolve
+            // the relative URL against the API request URI's directory to obtain a stable
+            // root-relative URL like "/media/foo.png" (or "/<subdir>/media/foo.png").
+            $url = self::makeRootRelative($url);
+
             rex_response::sendJson(['location' => $url]);
         } catch (rex_api_exception $e) {
             http_response_code(400);
@@ -108,5 +115,38 @@ class rex_api_tinymce_media_upload extends rex_api_function
         }
 
         exit;
+    }
+
+    /**
+     * Resolves a (potentially relative) REDAXO URL against the current API request URI
+     * and returns a stable root-relative URL such as "/media/foo.png" or
+     * "/<subdir>/media/foo.png" for subdirectory installs.
+     *
+     * Accepts already absolute URLs (starting with "http(s)://", "//" or "/") unchanged.
+     */
+    private static function makeRootRelative(string $url): string
+    {
+        // Already absolute or root-relative – nothing to do.
+        if (preg_match('#^([a-z][a-z0-9+.-]*:)?//#i', $url) === 1 || str_starts_with($url, '/')) {
+            return $url;
+        }
+
+        $requestPath = (string) parse_url((string) rex_request::server('REQUEST_URI', 'string', '/'), PHP_URL_PATH);
+        $baseDir = rtrim(str_replace('\\', '/', dirname($requestPath)), '/');
+
+        $combined = $baseDir . '/' . $url;
+        $parts = [];
+        foreach (explode('/', $combined) as $segment) {
+            if ('' === $segment || '.' === $segment) {
+                continue;
+            }
+            if ('..' === $segment) {
+                array_pop($parts);
+                continue;
+            }
+            $parts[] = $segment;
+        }
+
+        return '/' . implode('/', $parts);
     }
 }

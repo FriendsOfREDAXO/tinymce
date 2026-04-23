@@ -20,6 +20,7 @@ class DefaultSets
             'description' => 'UIkit 3 - Vollständige Styles für Überschriften, Text, Buttons, Listen, Tabellen und mehr',
             'content_css' => 'https://cdn.jsdelivr.net/npm/uikit@3/dist/css/uikit.min.css',
             'style_formats' => [
+                ['title' => 'Standardabsatz', 'format' => 'p'],
                 [
                     'title' => 'Überschriften',
                     'items' => [
@@ -205,6 +206,7 @@ class DefaultSets
             'description' => 'Bootstrap 5 - Vollständige Styles für Text, Buttons, Alerts, Cards, Badges und mehr',
             'content_css' => 'https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css',
             'style_formats' => [
+                ['title' => 'Standardabsatz', 'format' => 'p'],
                 [
                     'title' => 'Text',
                     'items' => [
