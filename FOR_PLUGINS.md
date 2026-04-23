@@ -17,12 +17,12 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_video` | Lokale Videos aus dem Mediapool einbinden (HTML5 `<video>`) | `for_video` |
 | `for_htmlembed` | HTML-Snippets sicher einbetten (iframe-ähnliches Pattern, ohne Inline-Script-Risiken) | `for_htmlembed` |
 | `for_checklist` | Aufzählungen mit Checkboxen (Task-Listen) | `for_checklist` |
-| `for_checklist_feature` | Feature-Listen mit Icons (Haken, Kreuze, Sterne) | `for_checklist_feature` |
+| `for_checklist_feature` | Feature-Listen mit Checkboxen | `for_checklist_feature` |
 | `for_footnote` | Fußnoten im Text mit automatischer Nummerierung & Rück-Verweisen | `for_footnote_insert`, `for_footnote_update` |
 | `for_toc` | **Inhaltsverzeichnis** aus den Überschriften – Live-Sync beim Bearbeiten | `for_toc_insert`, `for_toc_update` |
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
 | `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
-| `for_rootstrip` | Nutzt automatisch den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`) im Editor und entfernt ihn beim Speichern wieder. Aktivierbar über `for_rootstrip: true/false` (Default: `true`). | — |
+| `for_rootstrip` | Entfernt beim Speichern/Auslesen den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`). Für Felder gedacht, in denen das äußere Tag vom Modul vorgegeben wird. **Opt-in:** muss explizit in der Profil-`plugins`-Liste stehen. | — |
 | `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), Favoriten + Zuletzt verwendet pro Browser | `for_chars_symbols` |
 
 Zusätzlich enthält das AddOn diese Kern-Helfer (ohne `for_`-Präfix, da älter):
@@ -138,9 +138,9 @@ Ersatz für `forced_root_block: false` unter TinyMCE 6/7/8 – dort ist diese Op
 
 - Reines Content-Processing-Plugin – kein Button, kein Menüeintrag, keine Toolbar-Einträge
 - Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (`h2`, `h3`, `span`, …) vom Modul vorgegeben wird
-- Entfernt den Wrapper nur, wenn genau **ein** Root-Element vorhanden ist
-- Standardmäßig aktiv (`for_rootstrip: true`); deaktivierbar via Profil-Option `for_rootstrip: false`
-- **Muss vom Nutzer bewusst in die `plugins`-Liste des Profils aufgenommen werden** – die mitgelieferten Demo-Profile aktivieren es nicht automatisch, da es das Save-Verhalten verändert.
+- Entfernt den Wrapper nur, wenn genau **ein** Root-Element mit reinem Inline-Inhalt vorhanden ist – bei mehreren Blöcken bleibt der Content unangetastet
+- Paste-/Insert-sicher: programmatisches `setContent`, Zwischenablage-Inhalte und Auswahl-Operationen werden nicht zusätzlich umhüllt
+- **Aktivierung ausschließlich über die Profil-`plugins`-Liste.** Ohne Eintrag registriert das Plugin keinerlei Handler. Es gibt keine zusätzliche `for_rootstrip: true/false`-Option, die global etwas einschaltet – das Listen-Mitglied ist die einzige Wahrheitsquelle. Die mitgelieferten Demo-Profile nehmen das Plugin bewusst **nicht** auf, da es das Save-Verhalten verändert.
 
 ---
 
@@ -154,7 +154,7 @@ Unified Picker für Sonderzeichen, native Emojis und Typografie. Als **schwebend
 - **Echte Unicode-Zeichen** statt HTML-Entities (`\u00A0`, `\u00AD`, `\u202F` …) – nichts wird escaped.
 - **Direkt-Einfüge-Menu-Items** für Einfügen-Menüs: `fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp` oder gesammelt via `fcs_insert_invisibles`.
 - **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker (`[nbsp]`, `[shy]`, …) sichtbar. Die Marker sind `data-mce-bogus="1"` – werden niemals gespeichert.
-- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Fehler-Highlight.
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
 - **Shortcut:** `Strg/⌘ + Shift + I` öffnet den Picker.
 - **Locale:** `for_chars_symbols_locale` – `de` (Default), `de-ch`, `en`, `fr`.
 - **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.

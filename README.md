@@ -664,9 +664,10 @@ Entfernt den von TinyMCE intern erzwungenen Root-Wrapper (`forced_root_block`, F
 
 - Kein eigener Button/Menüeintrag: reines Content-Processing-Plugin
 - Nutzt automatisch `forced_root_block`; falls leer/ungültig, wird `div` verwendet
-- Entfernt den Wrapper nur, wenn genau **ein** Root-Element vorhanden ist (inkl. Whitespace-Toleranz)
+- Entfernt den Wrapper nur, wenn genau **ein** Root-Element mit reinem Inline-Inhalt vorhanden ist (inkl. Whitespace-Toleranz) – mehrere Blöcke bleiben unangetastet
+- Paste-/Insert-sicher: Zwischenablage-Inhalte, programmatisches `setContent` und Auswahl-Operationen werden nicht zusätzlich umhüllt
 - Verhindert doppelte Struktur-Tags, wenn das umgebende Markup bereits im Modul/Template definiert wird
-- Rückwärtskompatibel aktiv (`for_rootstrip` default `true`)
+- **Opt-in pro Profil:** nur aktiv, wenn `for_rootstrip` in der `plugins`-Liste des Profils steht
 
 ### Typischer Einsatzfall
 
@@ -708,11 +709,9 @@ Damit bleibt die redaktionelle Bearbeitung flexibel, während Struktur und Desig
 plugins: 'for_rootstrip ...',
 ```
 
-Das Plugin ist nach dem Laden automatisch aktiv — `for_rootstrip: true` muss **nicht** explizit gesetzt werden. Der Profil-Assistent trägt das Plugin korrekt in die `plugins`-Liste ein, ohne eine zusätzliche Option zu erzeugen.
+`for_rootstrip` ist **Opt-in pro Profil**: das Plugin wird nur aktiv, wenn es in der `plugins`-Liste des jeweiligen TinyMCE-Profils eingetragen ist. Ohne Eintrag registriert es keinerlei Content-Handler – es lässt sich also nicht versehentlich global einschalten. Es gibt keine zusätzliche `for_rootstrip: true/false`-Option, die aus der Plugin-Liste herausgeschaltet werden müsste; die Listen-Mitgliedschaft ist die einzige Wahrheitsquelle.
 
-### Option
-
-- `for_rootstrip` (`boolean`): aktiviert/deaktiviert das Entfernen des TinyMCE-Root-Wrappers. Standard: `true`. Nur nötig, wenn das Verhalten explizit abgeschaltet werden soll (`for_rootstrip: false`).
+Die mitgelieferten Demo-Profile nehmen `for_rootstrip` bewusst **nicht** auf, weil es das Save-Verhalten verändert. Der Profil-Assistent trägt das Plugin beim manuellen Hinzufügen sauber in die `plugins`-Liste ein, ohne eine zusätzliche Option zu erzeugen.
 
 ## FriendsOfREDAXO Zeichen, Symbole & Emoji (`for_chars_symbols`)
 
@@ -727,7 +726,7 @@ Ein vereinter Picker für **Sonderzeichen, native Emojis und Typografie-Helfer**
 - **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird escaped.
 - **Kontextmenü-Einträge** für geschützte und weiche Trenner: Rechtsklick im Editor → „Geschütztes Leerzeichen (nbsp)", „Schmales geschütztes Leerzeichen (nnbsp)", „Weiches Trennzeichen (shy)".
 - **Toggle-Button** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Steuerzeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Der Marker ist `data-mce-bogus="1"` – wird nie gespeichert.
-- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, Gedankenstrich-/en-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Fehler-Highlight.
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, Gedankenstrich-/en-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
 - **Shortcut**: `Strg/⌘ + Shift + I` öffnet das Panel.
 
 ### Aktivierung im Profil
