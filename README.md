@@ -419,6 +419,67 @@ plugins: 'mediapaste ...',
 
 Wenn ein Dateityp (z. B. SVG) nicht hochgeladen werden kann, prüfen Sie die REDAXO-Systemeinstellung **Erlaubte Dateitypen** im Medienpool. SVG ist aus Sicherheitsgründen oft nicht standardmäßig freigegeben, da SVG-Dateien JavaScript enthalten können.
 
+## Phonelink Plugin (`phonelink`)
+
+Dialog zum Einfügen einer Telefonnummer als anklickbarer `tel:`-Link. Redakteure geben Nummer, Anzeigetext und optional einen Title ein – das Plugin erzeugt daraus einen sauberen `<a href="tel:…">`-Link.
+
+### Features
+
+- **Toolbar-Button / Menüeintrag:** `phonelink` (eigenes SVG-Icon, in neutralem TinyMCE-Stil)
+- **Dialog-Felder:** *Phone number*, *Text to display*, *Title*
+- **Href-Normalisierung:** Die Telefonnummer wird für das `tel:`-Attribut auf RFC-3966-gültige Zeichen (`+`, Ziffern, `-.()`) reduziert. Leerzeichen, `/` oder Buchstaben im Nummernfeld wandern nicht in den Link.
+- **Anzeigetext bleibt wie eingegeben** – Klammern, Leerzeichen, nationale Formatierung dürfen im sichtbaren Text stehen.
+- **Aktuelle Auswahl** im Editor wird als initialer *Text to display* übernommen. Ist eine bestehende `tel:`-Link-Auswahl aktiv, wird die Nummer aus dem `href` rekonstruiert.
+- **Ergänzt sich mit `for_chars_symbols`:** dort gibt es zusätzlich *Typografie-Aktionen* „Telefonnummer normalisieren (E.164/national)" für den reinen Text.
+
+### Aktivierung
+
+```javascript
+plugins: 'phonelink ...',
+toolbar: '... phonelink ...',
+```
+
+## Quote Plugin (`quote`)
+
+Fügt ein semantisch sauberes Blockquote mit optionalem Autor und `<cite>`-Quellenangabe ein.
+
+### Features
+
+- **Toolbar-Button / Menüeintrag:** `quote`
+- **Dialog-Felder:** *Quote text* (Textarea), *Quote author*, *Quote cite*
+- **Saubere HTML5-Ausgabe:** `<blockquote><p>…</p><footer>Autor, <cite>Quelle</cite></footer></blockquote>`. Ist nur Autor oder nur Cite gesetzt, wird der Footer entsprechend reduziert; sind beide leer, wird gar kein Footer erzeugt.
+- **Zeilenumbrüche im Zitat-Text** werden zu `<br>`.
+- **HTML-Escaping** aller Eingaben – Redakteure können keine versteckten Tags in Zitat, Autor oder Cite einschleusen.
+- **Aktuelle Auswahl** wird als Plain-Text in das Textarea übernommen.
+- Keine Inline-Styles, keine Framework-Abhängigkeit – das Ziel-Stylesheet entscheidet über das Aussehen.
+
+### Aktivierung
+
+```javascript
+plugins: 'quote ...',
+toolbar: '... quote ...',
+```
+
+## Snippets Plugin (`snippets`)
+
+Bindet die REDAXO-*Snippet-Verwaltung* an TinyMCE an. Redakteure können wiederverwendbare HTML-Bausteine direkt aus dem Editor auswählen und einfügen.
+
+### Features
+
+- **Menüeintrag:** `snippets` (Default im „Einfügen"-Menü)
+- Snippets werden zentral im REDAXO-Backend gepflegt – Änderungen wirken sofort auf alle Editor-Instanzen
+- Nur-Lese-Ausgabe: das Plugin selbst ändert keine Snippet-Inhalte, es fügt sie an Cursor-Position ein
+- Ideal für wiederkehrende Blöcke (Call-to-Action-Boxen, Disclaimer-Texte, Info-Kästen)
+
+### Aktivierung
+
+```javascript
+plugins: 'snippets ...',
+menu: {
+    insert: { title: 'Einfügen', items: '... snippets ...' }
+},
+```
+
 ## FriendsOfREDAXO Fußnoten Plugin (`for_footnotes`)
 
 Freie, eigenständige Fußnoten-Funktion – kein Ersatz und keine API-Kompatibilität zum kommerziellen Tiny-Premium-Plugin.

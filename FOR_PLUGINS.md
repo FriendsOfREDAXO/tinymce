@@ -24,14 +24,14 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
 | `for_rootstrip` | Entfernt beim Speichern/Auslesen den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`). Für Felder gedacht, in denen das äußere Tag vom Modul vorgegeben wird. **Opt-in:** muss explizit in der Profil-`plugins`-Liste stehen. | — |
 | `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), Favoriten + Zuletzt verwendet pro Browser | `for_chars_symbols` |
+| `link_yform` | Verlinkt YForm-Datensätze direkt aus dem Editor – Tabellen-/Feldauswahl und konfigurierbares Link-Schema im Profil-Assistenten | Erweiterung des Link-Dialogs |
+| `phonelink` | Fügt Telefonnummern als `tel:`-Links ein (inkl. Normalisierung auf RFC-3966-gültige Zeichen) | `phonelink` |
+| `quote` | Formatierte Zitate (`<blockquote>`) mit optionalem Autor/`<cite>` einfügen | `quote` |
+| `cleanpaste` | Paste-Bereinigung: entfernt Word-/Office-Rauschen, normalisiert Klassen und Attribute, schützt das Markup der `for_*`-Plugins (Klassen `for-*`/`media`, Attribute `data-for-*`) | kein Button – greift in `PastePreProcess` |
+| `mediapaste` | Erkennt beim Einfügen eingebettete Bilder aus der Zwischenablage und lädt sie in den Mediapool hoch | Auto-Upload beim Paste |
+| `snippets` | Fügt wiederverwendbare HTML-Bausteine aus der REDAXO-Snippet-Verwaltung ein | `snippets` (Menü-Eintrag) |
 
-Zusätzlich enthält das AddOn diese Kern-Helfer (ohne `for_`-Präfix, da älter):
-
-- `link_yform` – Verlinken von YForm-Datensätzen direkt aus dem Editor
-- `phonelink` – Telefonnummern als `tel:`-Links einfügen
-- `quote` – Formatierte Zitate einfügen
-- `cleanpaste` / `mediapaste` – intelligente Paste-Bereinigung und Medien-Erkennung
-- `snippets` – Wiederverwendbare HTML-Bausteine aus der Snippet-Verwaltung einfügen
+Die Plugins ohne `for_`-Präfix (`link_yform`, `phonelink`, `quote`, `cleanpaste`, `mediapaste`, `snippets`) sind Bestandteil dieses AddOns und werden dem gleichen Pflege-Standard wie die `for_*`-Plugins unterzogen. Ihre Namen bleiben aus Gründen der Rückwärtskompatibilität mit bestehenden Profilen erhalten; im Profil-Assistenten erscheinen sie identisch (gleiches blaues „REDAXO"-Badge) wie die `for_*`-Familie.
 
 ---
 
@@ -158,6 +158,64 @@ Unified Picker für Sonderzeichen, native Emojis und Typografie. Als **schwebend
 - **Shortcut:** `Strg/⌘ + Shift + I` öffnet den Picker.
 - **Locale:** `for_chars_symbols_locale` – `de` (Default), `de-ch`, `en`, `fr`.
 - **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
+
+---
+
+## Plugins ohne `for_`-Präfix
+
+Diese Plugins sind fester Bestandteil des AddOns, wurden aber vor Einführung des `for_*`-Namespaces entwickelt. Sie behalten ihre ursprünglichen Namen, damit bestehende Profile nicht umgeschrieben werden müssen – funktional und in der Pflege sind sie den `for_*`-Plugins gleichgestellt.
+
+### `link_yform` – YForm-Datensätze verlinken
+
+Erweitert den Link-Dialog um eine Auswahl über YForm-Tabellen.
+
+- Auswahl von **Tabelle + Datensatz + Feld** direkt im Link-Dialog
+- Optionales **Link-Schema** pro Tabelle (z. B. `index.php?article_id=5&news=[id]` oder `/produkt/[id]`) mit Platzhaltern `[id]` (Datensatz-ID) und `[field]` (Feldwert). Leer = es wird nur der reine Feldwert als Link-Text eingefügt.
+- Konfiguration der verfügbaren Tabellen/Felder/Schemata im Profil-Assistenten (Abschnitt *YForm Link-Konfiguration*)
+- Voraussetzung: YForm-AddOn installiert und aktiv
+
+### `phonelink` – Telefonnummern als `tel:`-Links
+
+Dialog zum Einfügen einer Telefonnummer als anklickbarer `tel:`-Link.
+
+- **Toolbar-Button / Menüeintrag:** `phonelink`
+- Normalisiert die Nummer auf RFC-3966-gültige Zeichen (`+`, Ziffern, `-.()`)
+- Anzeigetext bleibt wie vom Redakteur eingegeben
+- Ergänzt sich mit der *Typografie-Aktion* „Telefonnummer normalisieren" in `for_chars_symbols` (E.164/national als Text-Transform)
+
+### `quote` – Formatierte Zitate
+
+Fügt einen `<blockquote>`-Block mit optionalem `<footer>`/`<cite>` ein.
+
+- **Toolbar-Button / Menüeintrag:** `quote`
+- Dialog-Felder für Zitat-Text, Autor und Quelle
+- Sauberes, semantisches HTML5-Markup – keine Inline-Styles, keine Framework-Abhängigkeit
+
+### `cleanpaste` – Paste-Bereinigung
+
+Hook in den `PastePreProcess`-Handler. Entfernt Word-/Office-Rauschen und normalisiert Klassen/Attribute beim Einfügen.
+
+- Kein sichtbarer Button – wirkt automatisch, sobald das Plugin im Profil aktiv ist
+- **Konfigurierbare Whitelist** `paste_preserve_classes` für projekteigene Klassen-Präfixe
+- **Interne Schutzliste** (nicht überschreibbar) für `for_*`-Plugin-Markup: Klassen mit Präfix `for-*` sowie `media` bleiben immer erhalten, Attribute mit Präfix `data-for-*` sowie `data-mce-selected` werden nie entfernt – verhindert Kollisionen mit `for_oembed`, `for_video`, `for_images`, `for_checklist`, `for_toc` und `for_footnotes`
+- Ersetzt bei den meisten Anwendungen das kommerzielle `powerpaste`
+
+### `mediapaste` – Medien beim Paste automatisch hochladen
+
+Erkennt beim Einfügen eingebettete Bilder (z. B. aus der Zwischenablage, Word, Mails) und lädt sie in den REDAXO-Mediapool.
+
+- Greift in `paste_data_images` / `images_upload_handler`
+- Kategorie-Auswahl (Mediapool-Kategorie) über den Profil-Assistenten oder per Option `category_id`
+- Fortschritts-/Fehler-Anzeige als TinyMCE-Alertbanner
+- Unterstützte Formate orientieren sich an `images_file_types` (Default: `jpg,jpeg,png,gif,webp,svg,avif`)
+
+### `snippets` – Snippet-Verwaltung im Editor
+
+Bindet die REDAXO-*Snippet-Verwaltung* an TinyMCE an. Redakteure können wiederverwendbare HTML-Bausteine direkt aus dem Editor auswählen und einfügen.
+
+- **Menüeintrag:** `snippets` (Default im „Einfügen"-Menü)
+- Snippets werden zentral im Backend gepflegt – Änderungen wirken auf alle Editor-Instanzen
+- Nur-Lese-Ausgabe: das Plugin selbst ändert keine Snippet-Inhalte, es fügt sie ein
 
 ---
 
