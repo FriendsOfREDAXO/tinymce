@@ -21,7 +21,7 @@
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "chai": "^4.2.0",
-    "esbuild": "^0.18.0",
+    "esbuild": "^0.25.0",
     "eslint": "^7.0.0",
     "tinymce": "^8.2.2",
     "tslib": "^2.0.0",

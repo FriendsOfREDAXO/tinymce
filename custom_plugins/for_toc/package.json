@@ -9,7 +9,7 @@
   "keywords": ["tinymce", "toc", "table-of-contents", "redaxo"],
   "author": "FriendsOfREDAXO",
   "devDependencies": {
-    "esbuild": "^0.18.0",
+    "esbuild": "^0.25.0",
     "tinymce": "^8.2.2",
     "tslib": "^2.0.0",
     "typescript": "^4.0.0"
