@@ -8,17 +8,17 @@ Version 8.5.0
 
 Einheitlicher Picker für Sonderzeichen, native Emojis und Typografie-Helfer, umgesetzt als **schwebendes, draggable Panel**. Kein blockierendes Modal: das Panel bleibt offen, mehrere Zeichen können in Folge eingefügt werden, der Editor bleibt sichtbar und bedienbar.
 
-- **Drei Tabs:** *Zeichen*, *Emoji*, *Typografie*. Favoriten und Zuletzt verwendet erscheinen als angepinnte Sektionen oben im *Zeichen*-Tab (keine eigener Reiter mehr).
+- **Vier Tabs:** *★ Favoriten / ⏱ Zuletzt verwendet* (erster Tab), *Zeichen*, *Emoji*, *Typografie*.
 - **Live-Suche** pro Tab nach Name, Zeichen oder Codepoint (`U+…`).
 - **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`, max. 24 Einträge).
 - **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird doppelt escaped.
-- **Kontextmenü-Einträge** (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`) zum direkten Einfügen geschützter/weicher Trenner via Rechtsklick. Aktivierung über `contextmenu: 'link table for_chars_symbols'` im Profil.
+- **Direkt-Einfüge-Menu-Items** (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`, Sammelmenü `fcs_insert_invisibles`) für Einfügen-Menüs.
 - **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Die Marker sind `data-mce-bogus="1"` – werden nie gespeichert.
 - **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen-Vorschläge, Fehler-Highlight.
 - **Shortcut:** `Strg/⌘ + Shift + I`. Locale via `for_chars_symbols_locale` (`de`, `de-ch`, `en`, `fr`).
 - **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
 
-Das Demo-Profil aktiviert `for_chars_symbols` inkl. Toolbar-Buttons, Einfügen-Menü-Eintrag und Kontextmenü.
+Das Demo-Profil aktiviert `for_chars_symbols` inkl. Toolbar-Buttons und Einfügen-Menü-Einträgen.
 
 ### Neu: `for_rootstrip` – Ersatz für `forced_root_block: false`
 

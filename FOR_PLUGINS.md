@@ -148,11 +148,11 @@ Ersatz für `forced_root_block: false` unter TinyMCE 6/7/8 – dort ist diese Op
 
 Unified Picker für Sonderzeichen, native Emojis und Typografie. Als **schwebendes, draggable Panel** – kein blockierendes Modal, bleibt offen, damit mehrere Zeichen/Emojis in Folge eingefügt werden können.
 
-- **Drei Tabs:** „Zeichen" (mit angepinnten Sektionen „★ Favoriten" und „⏱ Zuletzt verwendet"), „Emoji" (kuratiert, nach Kategorien), „Typografie" (Aktionen auf der Markierung).
+- **Vier Tabs:** „★ Favoriten / ⏱ Zuletzt verwendet" (erster Tab), „Zeichen", „Emoji" (kuratiert, nach Kategorien), „Typografie" (Aktionen auf der Markierung).
 - **Live-Suche** pro Tab – Name, Zeichen oder Codepoint (`U+…`).
 - **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`), max. 24 Einträge.
 - **Echte Unicode-Zeichen** statt HTML-Entities (`\u00A0`, `\u00AD`, `\u202F` …) – nichts wird escaped.
-- **Kontextmenü-Einträge** für die Direkt-Einfügung geschützter/weicher Trenner (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`). In das Profil aufnehmen via `contextmenu: 'link table for_chars_symbols'`.
+- **Direkt-Einfüge-Menu-Items** für Einfügen-Menüs: `fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp` oder gesammelt via `fcs_insert_invisibles`.
 - **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker (`[nbsp]`, `[shy]`, …) sichtbar. Die Marker sind `data-mce-bogus="1"` – werden niemals gespeichert.
 - **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Fehler-Highlight.
 - **Shortcut:** `Strg/⌘ + Shift + I` öffnet den Picker.

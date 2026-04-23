@@ -741,7 +741,6 @@ menu: {
         items: '... for_chars_symbols charmap emoticons ...'
     }
 },
-contextmenu: 'link table for_chars_symbols',
 ```
 
 Das Plugin registriert zwei Toolbar-Buttons und mehrere Menu-Items:

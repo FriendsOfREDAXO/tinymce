@@ -57,7 +57,7 @@ menu: {
 quickbars_selection_toolbar: 'bold italic underline | forecolor | link',
 quickbars_insert_toolbar: 'for_images for_oembed for_video | for_checklist for_footnote_insert | hr',
 
-contextmenu: 'link table for_a11y for_chars_symbols',
+contextmenu: 'link table for_a11y',
 
 codesample_languages: [
     { text: 'HTML/XML', value: 'markup' },

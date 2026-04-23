@@ -473,11 +473,7 @@
     }
 
     function charsPanelHtml() {
-        // Favoriten + Zuletzt verwendet werden als kompakte Sektionen vor die Zeichen-Gruppen gesetzt.
-        return ''
-            + '<div data-fcs-favs-section>' + favsBlockHtml() + '</div>'
-            + '<div data-fcs-recent-section>' + recentBlockHtml() + '</div>'
-            + groupsHtml('char', CHAR_GROUPS);
+        return groupsHtml('char', CHAR_GROUPS);
     }
     function emojiPanelHtml() { return groupsHtml('emoji', EMOJI_GROUPS); }
 
@@ -503,9 +499,32 @@
         return html;
     }
 
+    function favsPanelHtml() {
+        var html = ''
+            + '<div data-fcs-favs-section>' + favsBlockHtml() + '</div>'
+            + '<div data-fcs-recent-section>' + recentBlockHtml() + '</div>';
+        if ('' === html.replace(/<div[^>]*><\/div>/g, '').trim()) {
+            html += '<div class="fcs-empty">Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen, um es als Favorit zu markieren.</div>';
+        }
+        return html;
+    }
+
     function refreshFavsAndRecent(root) {
         root.querySelectorAll('[data-fcs-favs-section]').forEach(function (el) { el.innerHTML = favsBlockHtml(); });
         root.querySelectorAll('[data-fcs-recent-section]').forEach(function (el) { el.innerHTML = recentBlockHtml(); });
+        // Wenn der Favoriten-Tab sichtbar ist und leer war, Empty-State aktualisieren.
+        var favPane = root.querySelector('[data-fcs-pane="favs"]');
+        if (favPane) {
+            var hasContent = !!favPane.querySelector('.fcs-group--pinned');
+            var empty = favPane.querySelector('.fcs-empty');
+            if (hasContent && empty) { empty.remove(); }
+            if (!hasContent && !empty) {
+                var div = document.createElement('div');
+                div.className = 'fcs-empty';
+                div.textContent = 'Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen, um es als Favorit zu markieren.';
+                favPane.appendChild(div);
+            }
+        }
         refreshFavsIndicators(root);
     }
 
@@ -576,6 +595,8 @@
 .fcs-pin-icon{color:#f6a623;margin-right:4px}\
 body.rex-theme-dark .fcs-group--pinned{background:rgba(246,166,35,.08);border-color:rgba(246,166,35,.28)}\
 body.rex-theme-dark .fcs-group--pinned .fcs-group-title{color:#f6c772}\
+.fcs-empty{padding:24px 16px;text-align:center;color:#888;font-size:13px;line-height:1.5;border:1px dashed rgba(0,0,0,.15);border-radius:6px;background:rgba(0,0,0,.02)}\
+body.rex-theme-dark .fcs-empty{color:#aaa;border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.03)}\
 .fcs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:4px}\
 .fcs-cell{position:relative;display:flex}\
 .fcs-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;min-height:60px;color:inherit;font:inherit;text-align:center;overflow:hidden}\
@@ -710,6 +731,7 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
     /* ---------------- Floating Panel (draggable, non-modal) ---------------- */
 
     var TABS = [
+        { id: 'favs',    title: 'Favoriten',   render: favsPanelHtml },
         { id: 'chars',   title: 'Zeichen',     render: charsPanelHtml },
         { id: 'emoji',   title: 'Emoji',       render: emojiPanelHtml },
         { id: 'helpers', title: 'Typografie',  render: helpersPanelHtml }
@@ -1047,12 +1069,5 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
         editor.addCommand('forCharsSymbolsOpen', function () { openPicker(editor); });
         editor.addCommand('forCharsSymbolsToggleInvisibles', function () { setInvisiblesState(editor, !editor.__fcsInvOn); });
         editor.addShortcut('meta+shift+i', 'Zeichen, Symbole & Emoji einfügen', 'forCharsSymbolsOpen');
-
-        // Kontextmenü-Eintrag (nur aktiv, wenn das Profil 'for_chars_symbols' in 'contextmenu' auflistet).
-        editor.ui.registry.addContextMenu('for_chars_symbols', {
-            update: function () {
-                return 'fcs_insert_nbsp fcs_insert_nnbsp fcs_insert_shy | for_chars_symbols_invisibles | for_chars_symbols';
-            }
-        });
     });
 })();
