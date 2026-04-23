@@ -132,6 +132,35 @@ Dialog-basierter Markdown → HTML Konverter. Redakteure öffnen bewusst den Dia
 
 ---
 
+### `for_rootstrip` – Root-Wrapper beim Speichern entfernen
+
+Ersatz für `forced_root_block: false` unter TinyMCE 6/7/8 – dort ist diese Option entfernt worden. Das Plugin lässt den `forced_root_block` (Default `div`) im Editor aktiv (damit Edits stabil bleiben) und entfernt den Wrapper erst beim Auslesen/Speichern.
+
+- Reines Content-Processing-Plugin – kein Button, kein Menüeintrag, keine Toolbar-Einträge
+- Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (`h2`, `h3`, `span`, …) vom Modul vorgegeben wird
+- Entfernt den Wrapper nur, wenn genau **ein** Root-Element vorhanden ist
+- Standardmäßig aktiv (`for_rootstrip: true`); deaktivierbar via Profil-Option `for_rootstrip: false`
+- **Muss vom Nutzer bewusst in die `plugins`-Liste des Profils aufgenommen werden** – die mitgelieferten Demo-Profile aktivieren es nicht automatisch, da es das Save-Verhalten verändert.
+
+---
+
+### `for_chars_symbols` – Zeichen, Symbole & Emoji
+
+Unified Picker für Sonderzeichen, native Emojis und Typografie. Als **schwebendes, draggable Panel** – kein blockierendes Modal, bleibt offen, damit mehrere Zeichen/Emojis in Folge eingefügt werden können.
+
+- **Drei Tabs:** „Zeichen" (mit angepinnten Sektionen „★ Favoriten" und „⏱ Zuletzt verwendet"), „Emoji" (kuratiert, nach Kategorien), „Typografie" (Aktionen auf der Markierung).
+- **Live-Suche** pro Tab – Name, Zeichen oder Codepoint (`U+…`).
+- **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`), max. 24 Einträge.
+- **Echte Unicode-Zeichen** statt HTML-Entities (`\u00A0`, `\u00AD`, `\u202F` …) – nichts wird escaped.
+- **Kontextmenü-Einträge** für die Direkt-Einfügung geschützter/weicher Trenner (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`). In das Profil aufnehmen via `contextmenu: 'link table for_chars_symbols'`.
+- **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker (`[nbsp]`, `[shy]`, …) sichtbar. Die Marker sind `data-mce-bogus="1"` – werden niemals gespeichert.
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Fehler-Highlight.
+- **Shortcut:** `Strg/⌘ + Shift + I` öffnet den Picker.
+- **Locale:** `for_chars_symbols_locale` – `de` (Default), `de-ch`, `en`, `fr`.
+- **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
+
+---
+
 ## Verwendung im Profil
 
 Alle FOR-Plugins werden im Profil wie normale TinyMCE-Plugins aktiviert:

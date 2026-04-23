@@ -714,6 +714,56 @@ Das Plugin ist nach dem Laden automatisch aktiv — `for_rootstrip: true` muss *
 
 - `for_rootstrip` (`boolean`): aktiviert/deaktiviert das Entfernen des TinyMCE-Root-Wrappers. Standard: `true`. Nur nötig, wenn das Verhalten explizit abgeschaltet werden soll (`for_rootstrip: false`).
 
+## FriendsOfREDAXO Zeichen, Symbole & Emoji (`for_chars_symbols`)
+
+Ein vereinter Picker für **Sonderzeichen, native Emojis und Typografie-Helfer** – als schwebendes, draggable Panel, das offen bleibt und mehrfaches Einfügen erlaubt.
+
+### Features
+
+- **Drei Tabs**: „Zeichen" (mit Favoriten + Zuletzt verwendet oben), „Emoji" (nach Kategorien), „Typografie" (Aktionen auf der Markierung).
+- **Schwebendes, draggable Panel** – kein blockierendes Modal, Editor bleibt sichtbar und bedienbar.
+- **Live-Suche** pro Tab (Name, Zeichen, Codepoint `U+…`).
+- **Favoriten + Zuletzt verwendet** pro Browser (`localStorage`), kompakt als „angepinnte" Sektionen im ersten Tab.
+- **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird escaped.
+- **Kontextmenü-Einträge** für geschützte und weiche Trenner: Rechtsklick im Editor → „Geschütztes Leerzeichen (nbsp)", „Schmales geschütztes Leerzeichen (nnbsp)", „Weiches Trennzeichen (shy)".
+- **Toggle-Button** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Steuerzeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Der Marker ist `data-mce-bogus="1"` – wird nie gespeichert.
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, Gedankenstrich-/en-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Fehler-Highlight.
+- **Shortcut**: `Strg/⌘ + Shift + I` öffnet das Panel.
+
+### Aktivierung im Profil
+
+```javascript
+plugins: 'for_chars_symbols ...',
+toolbar: '... for_chars_symbols for_chars_symbols_invisibles ...',
+menu: {
+    insert: {
+        title: 'Einfügen',
+        items: '... for_chars_symbols charmap emoticons ...'
+    }
+},
+contextmenu: 'link table for_chars_symbols',
+```
+
+Das Plugin registriert zwei Toolbar-Buttons und mehrere Menu-Items:
+
+| Item | Typ | Zweck |
+|---|---|---|
+| `for_chars_symbols` | Button/MenuItem | Picker-Panel öffnen |
+| `for_chars_symbols_invisibles` | Toggle-Button/MenuItem | Unsichtbare Zeichen im Editor sichtbar machen |
+| `fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp` | MenuItem | Direkt-Einfügen geschützter/weicher Trenner (ohne Dialog) |
+| `fcs_insert_invisibles` | NestedMenuItem | Gruppiert alle vier Direkt-Einfüger |
+
+### Optionen
+
+- `for_chars_symbols_locale` (`string`): `de` (Default), `de-ch`, `en`, `fr` – steuert Anführungszeichen und Quote-Normalisierung.
+
+### Command / API
+
+```javascript
+tinymce.activeEditor.execCommand('forCharsSymbolsOpen');
+tinymce.activeEditor.execCommand('forCharsSymbolsToggleInvisibles');
+```
+
 ## FriendsOfREDAXO Inhaltsverzeichnis-Styling (`for_toc.css`)
 
 Das `for_toc`-Plugin erzeugt ein semantisches `<nav class="for-toc">`-Markup. Das zugehörige Stylesheet `assets/css/for_toc.css` ist framework-agnostisch und steuert alles über CSS-Variablen.

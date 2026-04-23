@@ -257,6 +257,7 @@ class Assets
                     'for_toc'              => 'Inhaltsverzeichnis',
                     'for_markdown_paste'   => 'Markdown einfügen…',
                     'for_chars_symbols'    => 'Zeichen, Symbole & Emoji',
+                    'for_chars_symbols_invisibles' => 'Unsichtbare Zeichen anzeigen',
                 ],
                 'external_plugins' => [],
                 // Names of plugins registered by OTHER AddOns (not bundled with

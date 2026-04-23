@@ -472,8 +472,42 @@
         return html;
     }
 
-    function charsPanelHtml() { return groupsHtml('char', CHAR_GROUPS); }
+    function charsPanelHtml() {
+        // Favoriten + Zuletzt verwendet werden als kompakte Sektionen vor die Zeichen-Gruppen gesetzt.
+        return ''
+            + '<div data-fcs-favs-section>' + favsBlockHtml() + '</div>'
+            + '<div data-fcs-recent-section>' + recentBlockHtml() + '</div>'
+            + groupsHtml('char', CHAR_GROUPS);
+    }
     function emojiPanelHtml() { return groupsHtml('emoji', EMOJI_GROUPS); }
+
+    function favsBlockHtml() {
+        var favs = getFavs();
+        if (!favs.length) { return ''; }
+        var html = '<section class="fcs-group fcs-group--pinned" data-fcs-pinned="favs">';
+        html += '<h4 class="fcs-group-title"><span class="fcs-pin-icon" aria-hidden="true">★</span> Favoriten</h4>';
+        html += '<div class="fcs-grid">';
+        favs.forEach(function (f) { html += cellHtml(f.kind, f.value, f.label, { invisible: !!f.invisible, glyph: f.glyph, hint: f.hint }); });
+        html += '</div></section>';
+        return html;
+    }
+
+    function recentBlockHtml() {
+        var recent = getRecent();
+        if (!recent.length) { return ''; }
+        var html = '<section class="fcs-group fcs-group--pinned" data-fcs-pinned="recent">';
+        html += '<h4 class="fcs-group-title"><span class="fcs-pin-icon" aria-hidden="true">⏱</span> Zuletzt verwendet</h4>';
+        html += '<div class="fcs-grid">';
+        recent.forEach(function (f) { html += cellHtml(f.kind, f.value, f.label, { invisible: !!f.invisible, glyph: f.glyph, hint: f.hint }); });
+        html += '</div></section>';
+        return html;
+    }
+
+    function refreshFavsAndRecent(root) {
+        root.querySelectorAll('[data-fcs-favs-section]').forEach(function (el) { el.innerHTML = favsBlockHtml(); });
+        root.querySelectorAll('[data-fcs-recent-section]').forEach(function (el) { el.innerHTML = recentBlockHtml(); });
+        refreshFavsIndicators(root);
+    }
 
     function helpersPanelHtml() {
         var html = '<div class="fcs-helpers">';
@@ -514,28 +548,8 @@
     }
 
     function favsPanelHtml() {
-        var favs = getFavs();
-        var recent = getRecent();
-        var html = '';
-        html += '<section class="fcs-group"><h4 class="fcs-group-title">★ Favoriten</h4>';
-        if (!favs.length) {
-            html += '<p class="fcs-hint">Noch keine Favoriten. Klicke in den anderen Reitern auf das ☆-Icon, um Einträge hier zu sammeln.</p>';
-        } else {
-            html += '<div class="fcs-grid">';
-            favs.forEach(function (f) { html += cellHtml(f.kind, f.value, f.label, { invisible: !!f.invisible, glyph: f.glyph, hint: f.hint }); });
-            html += '</div>';
-        }
-        html += '</section>';
-        html += '<section class="fcs-group"><h4 class="fcs-group-title">Zuletzt verwendet</h4>';
-        if (!recent.length) {
-            html += '<p class="fcs-hint">Wird gefüllt, sobald du Zeichen einfügst.</p>';
-        } else {
-            html += '<div class="fcs-grid">';
-            recent.forEach(function (f) { html += cellHtml(f.kind, f.value, f.label, { invisible: !!f.invisible, glyph: f.glyph, hint: f.hint }); });
-            html += '</div>';
-        }
-        html += '</section>';
-        return html;
+        // Legacy – wird nicht mehr als eigener Tab verwendet. Favs/Recent leben jetzt im "Zeichen"-Tab.
+        return favsBlockHtml() + recentBlockHtml();
     }
 
     /* ---------------- CSS (einmalig in document.head) ---------------- */
@@ -557,6 +571,11 @@
 .fcs-searchbar{position:sticky;top:-10px;z-index:2;background:#fff;padding:8px 0;margin:-10px 0 8px;border-bottom:1px solid rgba(0,0,0,.06)}\
 .fcs-search{width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid rgba(0,0,0,.15);border-radius:4px;font:inherit}\
 .fcs-group-title{margin:14px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#666;font-weight:600}\
+.fcs-group--pinned{background:rgba(246,166,35,.06);border:1px solid rgba(246,166,35,.2);border-radius:6px;padding:6px 10px 8px;margin-bottom:10px}\
+.fcs-group--pinned .fcs-group-title{margin-top:2px;color:#b07a16}\
+.fcs-pin-icon{color:#f6a623;margin-right:4px}\
+body.rex-theme-dark .fcs-group--pinned{background:rgba(246,166,35,.08);border-color:rgba(246,166,35,.28)}\
+body.rex-theme-dark .fcs-group--pinned .fcs-group-title{color:#f6c772}\
 .fcs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:4px}\
 .fcs-cell{position:relative;display:flex}\
 .fcs-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;min-height:60px;color:inherit;font:inherit;text-align:center;overflow:hidden}\
@@ -602,6 +621,8 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
 
     var EDITOR_CSS = '\
 .fcs-warn{background:rgba(246,166,35,.25);outline:1px dashed rgba(246,166,35,.8);border-radius:2px}\
+.fcs-inv-mark{background:rgba(75,154,217,.18);border-radius:2px;color:#4b6fa5;font-weight:600;padding:0 1px;outline:1px dashed rgba(75,154,217,.4)}\
+.fcs-inv-mark::before{content:attr(data-fcs-inv-label);font-size:.75em;opacity:.9}\
 ';
 
     var cssInjected = false;
@@ -691,8 +712,7 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
     var TABS = [
         { id: 'chars',   title: 'Zeichen',     render: charsPanelHtml },
         { id: 'emoji',   title: 'Emoji',       render: emojiPanelHtml },
-        { id: 'helpers', title: 'Typografie',  render: helpersPanelHtml },
-        { id: 'favs',    title: '★ Favoriten', render: favsPanelHtml }
+        { id: 'helpers', title: 'Typografie',  render: helpersPanelHtml }
     ];
 
     // Ein Panel pro Editor (Instanzen nicht doppeln).
@@ -775,11 +795,9 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
                 root.querySelectorAll('[data-fcs-pane]').forEach(function (p) {
                     p.classList.toggle('is-active', p.getAttribute('data-fcs-pane') === id);
                 });
-                if (id === 'favs') {
-                    // Favoriten-/Recent-Inhalte bei jedem Öffnen frisch rendern.
-                    var pane = root.querySelector('[data-fcs-pane="favs"]');
-                    if (pane) { pane.innerHTML = favsPanelHtml(); }
-                    refreshFavsIndicators(root);
+                if (id === 'chars') {
+                    // Favs/Recent im Zeichen-Tab bei jedem Tab-Wechsel frisch rendern.
+                    refreshFavsAndRecent(root);
                 }
             });
         });
@@ -804,13 +822,7 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
                     hint: favBtn.getAttribute('data-fcs-hint') || undefined
                 };
                 toggleFav(item);
-                refreshFavsIndicators(root);
-                // Favoriten-Tab neu rendern, falls aktiv.
-                var favsPane = root.querySelector('[data-fcs-pane="favs"].is-active');
-                if (favsPane) {
-                    favsPane.innerHTML = favsPanelHtml();
-                    refreshFavsIndicators(root);
-                }
+                refreshFavsAndRecent(root);
                 return;
             }
             var insertBtn = e.target.closest('[data-fcs-insert]');
@@ -824,6 +836,8 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
                 try { editor.focus(); } catch (_e) {}
                 renderAndInsert(editor, val);
                 addRecent({ kind: kind, value: val, label: label, invisible: invisible || undefined, hint: hint });
+                // Recent-Sektion im Zeichen-Tab live aktualisieren.
+                refreshFavsAndRecent(root);
                 return;
             }
             var action = e.target.closest('[data-fcs-action]');
@@ -868,10 +882,82 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
             });
         } else {
             root.hidden = false;
-            // Favoriten-Pane refreshen, falls sichtbar.
-            var favsPane = root.querySelector('[data-fcs-pane="favs"].is-active');
-            if (favsPane) { favsPane.innerHTML = favsPanelHtml(); }
-            refreshFavsIndicators(root);
+            // Favs/Recent im Zeichen-Tab bei jedem Öffnen auffrischen.
+            refreshFavsAndRecent(root);
+        }
+    }
+
+    /* ---------------- Invisibles im Editor sichtbar machen ---------------- */
+
+    // Zeichen, die im WYSIWYG sichtbar gemacht werden sollen.
+    var INV_MAP = {
+        '\u00A0': 'nbsp',
+        '\u202F': 'nnbsp',
+        '\u2009': 'thin',
+        '\u00AD': 'shy',
+        '\u200B': 'zwsp',
+        '\u200C': 'zwnj',
+        '\u200D': 'zwj',
+        '\u200E': 'lrm',
+        '\u200F': 'rlm'
+    };
+    var INV_CHARS = Object.keys(INV_MAP).join('');
+    var INV_REGEX = new RegExp('[' + INV_CHARS.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ']', 'g');
+
+    function markInvisibles(editor) {
+        var body = editor.getBody();
+        if (!body) { return; }
+        var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+            acceptNode: function (n) {
+                if (n.parentNode && n.parentNode.nodeType === 1 && (n.parentNode.classList || { contains: function () { return false; } }).contains('fcs-inv-mark')) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return INV_REGEX.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+        });
+        var nodes = [];
+        var node;
+        while ((node = walker.nextNode())) { nodes.push(node); }
+        nodes.forEach(function (n) {
+            var text = n.nodeValue;
+            var frag = document.createDocumentFragment();
+            var last = 0;
+            INV_REGEX.lastIndex = 0;
+            var m;
+            while ((m = INV_REGEX.exec(text)) !== null) {
+                if (m.index > last) { frag.appendChild(document.createTextNode(text.slice(last, m.index))); }
+                var span = document.createElement('span');
+                span.className = 'fcs-inv-mark';
+                span.setAttribute('data-mce-bogus', '1');
+                span.setAttribute('data-fcs-inv-label', INV_MAP[m[0]] || 'inv');
+                span.setAttribute('contenteditable', 'false');
+                span.textContent = m[0];
+                frag.appendChild(span);
+                last = m.index + m[0].length;
+            }
+            if (last < text.length) { frag.appendChild(document.createTextNode(text.slice(last))); }
+            n.parentNode.replaceChild(frag, n);
+        });
+    }
+
+    function unmarkInvisibles(editor) {
+        var body = editor.getBody();
+        if (!body) { return; }
+        var marks = body.querySelectorAll('.fcs-inv-mark');
+        marks.forEach(function (m) {
+            var text = m.textContent || '';
+            m.parentNode.replaceChild(document.createTextNode(text), m);
+        });
+        // Normalisiere zusammenhängende Textknoten.
+        try { body.normalize(); } catch (_e) {}
+    }
+
+    function setInvisiblesState(editor, on) {
+        editor.__fcsInvOn = !!on;
+        if (on) {
+            markInvisibles(editor);
+        } else {
+            unmarkInvisibles(editor);
         }
     }
 
@@ -881,6 +967,24 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
     tinymce.PluginManager.add('for_chars_symbols', function (editor) {
         editor.on('init', function () {
             try { editor.dom.addStyle(EDITOR_CSS); } catch (_e) {}
+        });
+
+        // Vor dem Speichern: Marker entfernen (fallback falls data-mce-bogus versagt).
+        editor.on('PreProcess', function (e) {
+            if (!e || !e.node) { return; }
+            var marks = e.node.querySelectorAll('.fcs-inv-mark');
+            marks.forEach(function (m) {
+                var text = m.textContent || '';
+                m.parentNode.replaceChild(m.ownerDocument.createTextNode(text), m);
+            });
+        });
+
+        // Bei Edits im Invisibles-Modus neue invisibles nachträglich markieren.
+        editor.on('input SetContent', function () {
+            if (editor.__fcsInvOn) {
+                // defer, damit TinyMCE seine eigenen Mutationen abschließt
+                setTimeout(function () { if (editor.__fcsInvOn) { markInvisibles(editor); } }, 30);
+            }
         });
 
         editor.ui.registry.addButton('for_chars_symbols', {
@@ -895,11 +999,60 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
             onAction: function () { openPicker(editor); }
         });
 
+        // Schnell-Einfüge-Menu-Items für Kontextmenü und Einfügen-Menü.
+        editor.ui.registry.addMenuItem('fcs_insert_nbsp', {
+            text: 'Geschütztes Leerzeichen (nbsp)',
+            onAction: function () { editor.insertContent('\u00A0'); }
+        });
+        editor.ui.registry.addMenuItem('fcs_insert_nnbsp', {
+            text: 'Schmales geschütztes Leerzeichen (nnbsp)',
+            onAction: function () { editor.insertContent('\u202F'); }
+        });
+        editor.ui.registry.addMenuItem('fcs_insert_shy', {
+            text: 'Weiches Trennzeichen (shy)',
+            onAction: function () { editor.insertContent('\u00AD'); }
+        });
+        editor.ui.registry.addMenuItem('fcs_insert_zwsp', {
+            text: 'Nullbreites Leerzeichen (zwsp)',
+            onAction: function () { editor.insertContent('\u200B'); }
+        });
+        editor.ui.registry.addNestedMenuItem('fcs_insert_invisibles', {
+            text: 'Unsichtbare Trenner einfügen',
+            icon: 'character-count',
+            getSubmenuItems: function () {
+                return 'fcs_insert_nbsp fcs_insert_nnbsp fcs_insert_shy fcs_insert_zwsp';
+            }
+        });
+
+        // Toggle-Button: unsichtbare Zeichen im Editor sichtbar machen.
+        editor.ui.registry.addToggleButton('for_chars_symbols_invisibles', {
+            icon: 'visualchars',
+            tooltip: 'Unsichtbare Zeichen (nbsp, shy, zwsp …) sichtbar machen',
+            onAction: function (api) {
+                var next = !editor.__fcsInvOn;
+                setInvisiblesState(editor, next);
+                api.setActive(next);
+            },
+            onSetup: function (api) {
+                api.setActive(!!editor.__fcsInvOn);
+                return function () {};
+            }
+        });
+        editor.ui.registry.addMenuItem('for_chars_symbols_invisibles', {
+            icon: 'visualchars',
+            text: 'Unsichtbare Zeichen anzeigen',
+            onAction: function () { setInvisiblesState(editor, !editor.__fcsInvOn); }
+        });
+
         editor.addCommand('forCharsSymbolsOpen', function () { openPicker(editor); });
+        editor.addCommand('forCharsSymbolsToggleInvisibles', function () { setInvisiblesState(editor, !editor.__fcsInvOn); });
         editor.addShortcut('meta+shift+i', 'Zeichen, Symbole & Emoji einfügen', 'forCharsSymbolsOpen');
 
+        // Kontextmenü-Eintrag (nur aktiv, wenn das Profil 'for_chars_symbols' in 'contextmenu' auflistet).
         editor.ui.registry.addContextMenu('for_chars_symbols', {
-            update: function () { return 'for_chars_symbols'; }
+            update: function () {
+                return 'fcs_insert_nbsp fcs_insert_nnbsp fcs_insert_shy | for_chars_symbols_invisibles | for_chars_symbols';
+            }
         });
     });
 })();

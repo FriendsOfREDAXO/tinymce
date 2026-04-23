@@ -37,9 +37,9 @@ document_base_url: '/',
 convert_urls: true,
 entity_encoding: 'raw',
 
-plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_rootstrip for_chars_symbols cleanpaste mediapaste link_yform phonelink quote',
+plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_chars_symbols cleanpaste mediapaste link_yform phonelink quote',
 
-toolbar: 'styles | undo redo | bold italic underline strikethrough subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | for_images for_oembed for_video | link link_yform phonelink | quote for_htmlembed for_checklist for_checklist_feature | for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_markdown_paste | for_a11y | table for_chars_symbols charmap emoticons hr | snippets | fullscreen preview code help',
+toolbar: 'styles | undo redo | bold italic underline strikethrough subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | for_images for_oembed for_video | link link_yform phonelink | quote for_htmlembed for_checklist for_checklist_feature | for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_markdown_paste | for_a11y | table for_chars_symbols for_chars_symbols_invisibles charmap emoticons hr | snippets | fullscreen preview code help',
 
 menu: {
     file: { title: 'Datei', items: 'preview print' },
@@ -57,7 +57,7 @@ menu: {
 quickbars_selection_toolbar: 'bold italic underline | forecolor | link',
 quickbars_insert_toolbar: 'for_images for_oembed for_video | for_checklist for_footnote_insert | hr',
 
-contextmenu: 'link table for_a11y',
+contextmenu: 'link table for_a11y for_chars_symbols',
 
 codesample_languages: [
     { text: 'HTML/XML', value: 'markup' },
@@ -83,7 +83,6 @@ target_list: [
 
 /* FOR-Plugin-Konfigurationen */
 a11y_new_window_warning: true,
-for_rootstrip: true,
 
 for_images_presets: [
     { value: 'img-25',  text: '25 %' },

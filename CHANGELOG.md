@@ -1,6 +1,34 @@
 Changelog
 =========
 
+Version 8.5.0
+-------------------------------
+
+### Neu: `for_chars_symbols` – Zeichen, Symbole & Emoji Picker
+
+Einheitlicher Picker für Sonderzeichen, native Emojis und Typografie-Helfer, umgesetzt als **schwebendes, draggable Panel**. Kein blockierendes Modal: das Panel bleibt offen, mehrere Zeichen können in Folge eingefügt werden, der Editor bleibt sichtbar und bedienbar.
+
+- **Drei Tabs:** *Zeichen*, *Emoji*, *Typografie*. Favoriten und Zuletzt verwendet erscheinen als angepinnte Sektionen oben im *Zeichen*-Tab (keine eigener Reiter mehr).
+- **Live-Suche** pro Tab nach Name, Zeichen oder Codepoint (`U+…`).
+- **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`, max. 24 Einträge).
+- **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird doppelt escaped.
+- **Kontextmenü-Einträge** (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`) zum direkten Einfügen geschützter/weicher Trenner via Rechtsklick. Aktivierung über `contextmenu: 'link table for_chars_symbols'` im Profil.
+- **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Die Marker sind `data-mce-bogus="1"` – werden nie gespeichert.
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen-Vorschläge, Fehler-Highlight.
+- **Shortcut:** `Strg/⌘ + Shift + I`. Locale via `for_chars_symbols_locale` (`de`, `de-ch`, `en`, `fr`).
+- **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
+
+Das Demo-Profil aktiviert `for_chars_symbols` inkl. Toolbar-Buttons, Einfügen-Menü-Eintrag und Kontextmenü.
+
+### Neu: `for_rootstrip` – Ersatz für `forced_root_block: false`
+
+Unter TinyMCE 6/7/8 ist die Option `forced_root_block: false` entfallen. `for_rootstrip` liefert einen sauberen Ersatz: der `forced_root_block` (Default `div`) bleibt im Editor aktiv (damit Edits stabil arbeiten), der Wrapper wird aber beim Auslesen/Speichern wieder entfernt. Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (z. B. `h2`, `span`) vom Modul vorgegeben wird.
+
+- Reines Content-Processing-Plugin, kein Button, kein Menüeintrag.
+- Entfernt den Wrapper nur, wenn genau **ein** Root-Element vorhanden ist (Whitespace-toleriert).
+- Aktiv via `for_rootstrip: true` (Plugin-Default). Über `for_rootstrip: false` pro Profil abschaltbar.
+- **Nicht in den Demo-Profilen vorinstalliert** – muss vom Nutzer bewusst in die `plugins`-Liste aufgenommen werden, da es das Save-Verhalten verändert. Dank (PR [#147](https://github.com/FriendsOfREDAXO/tinymce/pull/147) von @alexwenz).
+
 Version 8.4.2
 -------------------------------
 
