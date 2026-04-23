@@ -9,7 +9,7 @@
     "tinymce-i18n": "^26.4.6"
   },
   "devDependencies": {
-    "esbuild": "^0.18.0",
+    "esbuild": "^0.25.0",
     "fast-glob": "^3.2.12"
   },
   "scripts": {
