@@ -58,6 +58,19 @@ try {
 // Set flag to regenerate profiles.js on next backend request
 $this->setConfig('update_profiles', true);
 
+// Klassen manuell laden: Beim Update ist der Composer-Classmap-Cache evtl.
+// noch auf dem alten Stand. Wir ziehen alle PHP-Klassendateien unter
+// lib/TinyMce/ rekursiv nach.
+$__tinymceClassIter = new \RecursiveIteratorIterator(
+    new \RecursiveDirectoryIterator(__DIR__ . '/lib/TinyMce', \FilesystemIterator::SKIP_DOTS)
+);
+foreach ($__tinymceClassIter as $__tinymceClassFile) {
+    if ($__tinymceClassFile->isFile() && str_ends_with($__tinymceClassFile->getFilename(), '.php')) {
+        require_once $__tinymceClassFile->getPathname();
+    }
+}
+unset($__tinymceClassIter, $__tinymceClassFile);
+
 // =============================================================================
 // Migration (v8.4.0): toolbar_sticky als Default in allen bestehenden Profilen
 // ergänzen, sofern noch nicht vorhanden. Das Demo-Profil wird unten separat

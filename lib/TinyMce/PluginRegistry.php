@@ -22,6 +22,16 @@ class PluginRegistry
      */
     public static function addPlugin(string $pluginName, string $pluginUrl, ?string $toolbarButton = null): void
     {
+        // Cache-Buster anhängen, damit Browser nach AddOn-Updates die neuen
+        // plugin.min.js laden. Ohne diesen Suffix hält der Browser die alte
+        // Datei beliebig lange im Cache (TinyMCE lädt externe Plugins direkt
+        // ohne REDAXOs Asset-Versionierung).
+        if ($pluginUrl !== '' && !str_contains($pluginUrl, '?')) {
+            $addon = \rex_addon::get('tinymce');
+            $version = $addon->isAvailable() ? (string) $addon->getVersion() : '0';
+            $pluginUrl .= '?v=' . rawurlencode($version);
+        }
+
         // Store plugin statically for profiles.js generation
         self::$plugins[$pluginName] = [
             'url' => $pluginUrl,

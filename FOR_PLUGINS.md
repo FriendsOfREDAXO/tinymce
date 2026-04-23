@@ -21,6 +21,7 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_footnote` | Fußnoten im Text mit automatischer Nummerierung & Rück-Verweisen | `for_footnote_insert`, `for_footnote_update` |
 | `for_toc` | **Inhaltsverzeichnis** aus den Überschriften – Live-Sync beim Bearbeiten | `for_toc_insert`, `for_toc_update` |
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
+| `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
 
 Zusätzlich enthält das AddOn diese Kern-Helfer (ohne `for_`-Präfix, da älter):
 
@@ -92,7 +93,8 @@ Beide produzieren semantisch sauberes, Frontend-CSS-freies Markup.
 - **Einstellungen pro TOC** (Dialog): Titel, Ab-/Bis-Ebene (h1–h6), nummeriert (`<ol>`) vs. unsortiert (`<ul>`). Werte werden als `data-for-toc-*` am Block gespeichert.
 - **Context-Toolbar** bei aktivem TOC-Block: Aktualisieren, Einstellungen, Entfernen.
 - Klick auf einen TOC-Link im Editor scrollt zum Ziel-Heading.
-- **Frontend-CSS** framework-agnostisch über CSS-Variablen (`--for-toc-*`) inkl. Dark-Mode und optionaler `.for-toc--sticky`-Variante für Sidebar-TOCs.
+- **Hierarchische Nummerierung** bei geordneten TOCs (`<ol>`) über CSS-Counters – Ausgabe `1` / `1.1` / `1.1.1` …, Filler-Einträge für übersprungene Heading-Ebenen zählen nicht mit. **Editor-Parität:** Die gleichen Counter-Regeln werden über `editor.dom.addStyle` direkt im Editor-Iframe angewendet, der Redakteur sieht also dasselbe Bild wie im Frontend.
+- **Frontend-CSS** framework-agnostisch über CSS-Variablen (`--for-toc-*`) inkl. Dark-Mode und optionaler `.for-toc--sticky`-Variante für Sidebar-TOCs. Nummerierung lässt sich pro Projekt anpassen (`--for-toc-number-separator`, `--for-toc-number-suffix`, `--for-toc-number-color`, `--for-toc-number-font-weight`, `--for-toc-number-min-width`, `--for-toc-number-gap`).
 - Optionales Frontend-JS `for_toc.js` für Active-Section-Highlighting via IntersectionObserver (setzt `for-toc__link--active` und `aria-current="true"`).
 
 ### `for_a11y` – Accessibility-Checker (on-demand)
@@ -114,6 +116,20 @@ Open-Source-Alternative zu TinyMCE Premium `a11ychecker`.
 
 ---
 
+### `for_markdown` – Markdown-Import per Dialog
+
+Dialog-basierter Markdown → HTML Konverter. Redakteure öffnen bewusst den Dialog, fügen Markdown ein, das Ergebnis wird als sauberes HTML an der Cursor-Position eingesetzt. Kein Autodetect, keine Paste-Interception, keine Kollision mit dem `markdowneditor`-AddOn.
+
+- **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebündelt – kein CDN, offline-fähig
+- **CommonMark + GFM:** Tables, Autolinks (`linkify`), SmartQuotes (`typographer`), harte Zeilenumbrüche (`breaks`), fenced Code
+- **Tasklisten → `for_checklist`:** `- [ ]` / `- [x]` → `<ul class="for-checklist for-checklist--feature"><li class="for-checklist__item" data-checked="…">…</li></ul>`
+- **Fenced Code → `codesample`:** ```` ```php …``` ```` → `<pre class="language-php"><code>…</code></pre>` (weiter editierbar per Core-`codesample`-Plugin)
+- **Toolbar/Menü:** `for_markdown_paste` – Label „Markdown einfügen…"
+- **Command:** `forMarkdownOpenDialog` – aus eigenen Buttons / Shortcuts auslösbar
+- **Namespace:** komplett `for_markdown*` / `for-markdown-*`
+
+---
+
 ## Verwendung im Profil
 
 Alle FOR-Plugins werden im Profil wie normale TinyMCE-Plugins aktiviert:
@@ -129,6 +145,7 @@ menu: {
 }
 ```
 
+| `markdowneditor` (als Toggle im Editor) | `for_markdown` (Dialog-Import) |
 Der **Profil-Assistent** übernimmt das für dich: Plugins per Klick hinzufügen, Toolbar und Einfügen-Menü per Drag & Drop sortieren.
 
 Für **Frontend-CSS-Einbindung** (`for_images.css`, `for_footnotes.css`, `for_checklist.css`) und die zugehörigen **CSS-Variablen** siehe die Hilfe-Seite (README).

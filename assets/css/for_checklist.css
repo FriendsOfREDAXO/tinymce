@@ -116,7 +116,10 @@ ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="tru
     background-color: var(--for-checklist-feature-checked-bg);
     border-color: var(--for-checklist-feature-checked-border-color);
 }
-ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="false"]::before {
+/* Unchecked-Default in der Feature-Variante = gestrichelter Rahmen.
+ * Greift auch, wenn das data-checked-Attribut (noch) fehlt – wichtig
+ * für frisch eingefügte <li>-Items und Legacy-Markup.              */
+ul.for-checklist.for-checklist--feature li.for-checklist__item:not([data-checked="true"])::before {
     border-style: var(--for-checklist-feature-unchecked-border-style);
 }
 

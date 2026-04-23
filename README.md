@@ -572,6 +572,86 @@ toolbar: 'for_htmlembed ...',
 
 Der Wrapper `<div class="for-htmlembed">` bleibt im Save-Output. Standardmäßig wird er im Frontend nicht gestylt. Falls gewünscht, kann das Frontend den Block visuell hervorheben (`display: contents;` für völlig unsichtbar, oder eigenes CSS).
 
+## FriendsOfREDAXO Markdown Plugin (`for_markdown`)
+
+Dialog-basierter Markdown → HTML Konverter. Kein Autodetect, keine Paste-Interception – der Redakteur öffnet bewusst den Dialog, fügt Markdown ein, das Ergebnis wird als sauberes HTML an der Cursor-Position eingesetzt. Kollisionsfrei zum `markdowneditor`-AddOn: komplett eigener Namespace `for_markdown*` / `for-markdown-*`.
+
+### Features
+
+* Toolbar-Button & Menüeintrag: `for_markdown_paste` (Label „Markdown einfügen…")
+* Command: `forMarkdownOpenDialog`
+* **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebündelt im Plugin-Bundle – kein CDN, offline-fähig
+* **CommonMark + GFM-Dialekte:** Tables, Autolinks (`linkify`), SmartQuotes (`typographer`), harte Zeilenumbrüche (`breaks`), fenced Code
+* **Tasklist-Interop → `for_checklist`:**
+  ```markdown
+  - [ ] offen
+  - [x] erledigt
+  ```
+  wird zu
+  ```html
+  <ul class="for-checklist for-checklist--feature">
+    <li class="for-checklist__item" data-checked="false">offen</li>
+    <li class="for-checklist__item" data-checked="true">erledigt</li>
+  </ul>
+  ```
+* **Fenced Code → `codesample`-kompatibel:** ```` ```php …``` ```` wird zu `<pre class="language-php"><code>…</code></pre>` und bleibt vom Core-Plugin `codesample` weiter editierbar.
+
+### Aktivierung im Profil
+
+```javascript
+plugins: 'for_markdown ...',
+toolbar: 'for_markdown_paste ...',
+menu: {
+    insert: {
+        title: 'Einfügen',
+        items: '... for_markdown_paste ...'
+    }
+}
+```
+
+Der Profil-Assistent listet `for_markdown` mit FOR-Badge sowohl in der Plugin-Liste als auch in den verfügbaren Toolbar-Buttons und Custom-Menu-Items.
+
+### Frontend-CSS
+
+`for_markdown` erzeugt ausschließlich Markup der anderen Plugins (`for-checklist`, `language-*`) und normales semantisches HTML. Es gibt **keine eigene CSS-Datei**; lade stattdessen bei Bedarf `css/for_checklist.css` (für Checklisten) und binde ein Prism/Highlight.js-Theme für die `language-*`-Codeblöcke ein.
+
+## FriendsOfREDAXO Inhaltsverzeichnis-Styling (`for_toc.css`)
+
+Das `for_toc`-Plugin erzeugt ein semantisches `<nav class="for-toc">`-Markup. Das zugehörige Stylesheet `assets/css/for_toc.css` ist framework-agnostisch und steuert alles über CSS-Variablen.
+
+**Einbinden:**
+
+```php
+echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_toc.css') . '">';
+```
+
+**Hierarchische Nummerierung** (greift automatisch, sobald die TOC als „ordered" eingefügt wurde → `<ol class="for-toc__list">`):
+
+```
+1. Hauptpunkt
+   1.1 Unterpunkt
+      1.1.1 Unter-Unterpunkt
+```
+
+Umgesetzt über `counter-reset` + `counters(for-toc-item, ".")` auf `li::before`. Bei `<ul>`-TOCs (unsortiert) bleibt der klassische Bullet-Look. Filler-Einträge für übersprungene Heading-Ebenen werden nicht mitgezählt.
+
+**Editor-Parität:** Die gleichen Counter-Regeln werden bei `editor.on('init', …)` über `editor.dom.addStyle()` zusätzlich in den Editor-Iframe injiziert. Der Redakteur sieht die Nummerierung also **direkt im TinyMCE**, nicht erst im Frontend. Im Editor gelten feste Werte (kein CSS-Variablen-Override möglich), im Frontend läuft die volle Variablen-Konfiguration.
+
+**Wichtige CSS-Variablen:**
+
+| Variable | Zweck |
+|---|---|
+| `--for-toc-bg`, `--for-toc-border-color` | Hintergrund & linke Akzent-Border |
+| `--for-toc-link-color` / `-hover-color` / `-active-color` | Link-Farben (inkl. `aria-current`) |
+| `--for-toc-list-indent` | Einrückung der Unter-Listen |
+| `--for-toc-number-separator` | Trennzeichen zwischen Ebenen (Default `.`) |
+| `--for-toc-number-suffix` | Zeichen nach der Nummer (Default Leerzeichen) |
+| `--for-toc-number-color`, `--for-toc-number-font-weight` | Styling der Nummern |
+| `--for-toc-number-min-width`, `--for-toc-number-gap` | Einrückungs-Spalte für die Nummer |
+| `--for-toc-sticky-top`, `--for-toc-sticky-max-height` | für `.for-toc--sticky` |
+
+Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist im Stylesheet enthalten.
+
 ## FriendsOfREDAXO oEmbed Plugin (`for_oembed`)
 
 Video-Einbettung per URL-Paste – YouTube & Vimeo werden sofort erkannt. Im Editor gibt es eine echte Live-Vorschau (iframe + Overlay, `contenteditable="false"`), gespeichert wird das **CKEditor-5-kompatible** Format:

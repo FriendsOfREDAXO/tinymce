@@ -52,18 +52,18 @@ $demoHtml = <<<'HTML'
 
 <h3>Checkliste</h3>
 <ul class="for-checklist">
-  <li class="for-checklist__item for-checklist__item--done">Profil anlegen</li>
-  <li class="for-checklist__item for-checklist__item--done">Plugins aktivieren</li>
-  <li class="for-checklist__item">Toolbar anpassen</li>
-  <li class="for-checklist__item">Snippets hinzufügen</li>
+  <li class="for-checklist__item" data-checked="true">Profil anlegen</li>
+  <li class="for-checklist__item" data-checked="true">Plugins aktivieren</li>
+  <li class="for-checklist__item" data-checked="false">Toolbar anpassen</li>
+  <li class="for-checklist__item" data-checked="false">Snippets hinzufügen</li>
 </ul>
 
 <h3>Feature-Liste</h3>
 <ul class="for-checklist for-checklist--feature">
-  <li class="for-checklist__item for-checklist__item--done">Open Source (MIT)</li>
-  <li class="for-checklist__item for-checklist__item--done">Keine Cloud-Abhängigkeit</li>
-  <li class="for-checklist__item for-checklist__item--done">Mediapool-Integration</li>
-  <li class="for-checklist__item for-checklist__item--done">Dark-Mode Backend</li>
+  <li class="for-checklist__item" data-checked="true">Open Source (MIT)</li>
+  <li class="for-checklist__item" data-checked="true">Keine Cloud-Abhängigkeit</li>
+  <li class="for-checklist__item" data-checked="true">Mediapool-Integration</li>
+  <li class="for-checklist__item" data-checked="true">Dark-Mode Backend</li>
 </ul>
 
 <h3>Tabelle</h3>

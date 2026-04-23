@@ -210,7 +210,8 @@ ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="tru
     background-color: #22c55e;
     border-color: #22c55e;
 }
-ul.for-checklist.for-checklist--feature li.for-checklist__item[data-checked="false"]::before {
+/* Unchecked-Default = gestrichelt (greift auch ohne data-checked) */
+ul.for-checklist.for-checklist--feature li.for-checklist__item:not([data-checked="true"])::before {
     border-style: dashed;
 }
 `;

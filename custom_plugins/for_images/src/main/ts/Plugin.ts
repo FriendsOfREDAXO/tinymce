@@ -383,22 +383,25 @@ const contentStyles = `
 
 const setup = (editor: Editor, _url: string): void => {
 
-  editor.options.register('imagewidth_presets', { processor: 'object[]', default: null });
-  editor.options.register('imagealign_presets', { processor: 'object[]', default: null });
-  editor.options.register('imageeffect_presets', { processor: 'object[]', default: null });
+  editor.options.register('imagewidth_presets', { processor: 'object[]', default: [] });
+  editor.options.register('imagealign_presets', { processor: 'object[]', default: [] });
+  editor.options.register('imageeffect_presets', { processor: 'object[]', default: [] });
 
   const getConfig = (): PluginConfig => {
     const getOption = (key: string): any => {
       let val = editor.options.get(key);
-      if (!val) val = (editor as any).settings?.[key];
-      if (!val) val = (editor as any).getParam?.(key, null);
+      if (!val || (Array.isArray(val) && val.length === 0)) val = (editor as any).settings?.[key];
+      if (!val || (Array.isArray(val) && val.length === 0)) val = (editor as any).getParam?.(key, null);
       return val;
     };
 
+    const pick = <T>(val: any, fallback: T[]): T[] =>
+      Array.isArray(val) && val.length > 0 ? val : fallback;
+
     return {
-      widthPresets: getOption('imagewidth_presets') || defaultWidthPresets,
-      alignPresets: getOption('imagealign_presets') || defaultAlignPresets,
-      effectPresets: getOption('imageeffect_presets') || defaultEffectPresets,
+      widthPresets: pick(getOption('imagewidth_presets'), defaultWidthPresets),
+      alignPresets: pick(getOption('imagealign_presets'), defaultAlignPresets),
+      effectPresets: pick(getOption('imageeffect_presets'), defaultEffectPresets),
     };
   };
 

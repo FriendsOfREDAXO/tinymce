@@ -46,6 +46,17 @@
     --for-toc-list-indent: 1.25rem;
     --for-toc-item-margin: 0.15rem 0;
 
+    /* Hierarchische Nummerierung (greift bei <ol class="for-toc__list">)
+       Beispiel:  1. Hauptpunkt
+                     1.1 Unterpunkt
+                        1.1.1 Unter-Unterpunkt                                   */
+    --for-toc-number-separator: ".";
+    --for-toc-number-suffix: " ";
+    --for-toc-number-color: var(--for-toc-link-active-color);
+    --for-toc-number-font-weight: 600;
+    --for-toc-number-min-width: 2.2em;
+    --for-toc-number-gap: 0.4em;
+
     --for-toc-sticky-top: 1rem;
     --for-toc-sticky-max-height: calc(100vh - 2rem);
 }
@@ -57,6 +68,7 @@
         --for-toc-link-color: #6cb3ff;
         --for-toc-link-hover-color: #a9d4ff;
         --for-toc-link-active-color: #fff;
+        --for-toc-number-color: #e4e4e4;
     }
 }
 
@@ -104,6 +116,45 @@ nav.for-toc li.for-toc__item {
 nav.for-toc li.for-toc__item--filler {
     list-style: none;
     margin-left: -1em;
+}
+
+/* =========================================================
+ * Hierarchische Nummerierung für <ol class="for-toc__list">
+ * 1. / 1.1 / 1.1.1 … – via CSS-Counters (keine JS-Pflege).
+ * Wirkt automatisch, sobald die TOC als „ordered" (<ol>)
+ * eingefügt ist. Bei <ul>-TOCs bleibt der Bullet-Look.
+ * ========================================================= */
+nav.for-toc ol.for-toc__list {
+    counter-reset: for-toc-item;
+    list-style: none;
+    padding-left: 0;
+}
+
+nav.for-toc ol.for-toc__list > li.for-toc__item {
+    counter-increment: for-toc-item;
+    position: relative;
+    padding-left: calc(var(--for-toc-number-min-width) + var(--for-toc-number-gap));
+}
+
+nav.for-toc ol.for-toc__list > li.for-toc__item::before {
+    content: counters(for-toc-item, var(--for-toc-number-separator)) var(--for-toc-number-suffix);
+    position: absolute;
+    left: 0;
+    top: 0;
+    min-width: var(--for-toc-number-min-width);
+    color: var(--for-toc-number-color);
+    font-weight: var(--for-toc-number-font-weight);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Filler-Einträge (übersprungene Ebenen, z. B. h2 → h4) nicht mitzählen
+   und keinen Nummerierungs-Präfix zeigen.                                   */
+nav.for-toc ol.for-toc__list > li.for-toc__item--filler {
+    counter-increment: none;
+    padding-left: 0;
+}
+nav.for-toc ol.for-toc__list > li.for-toc__item--filler::before {
+    content: none;
 }
 
 /* Links */

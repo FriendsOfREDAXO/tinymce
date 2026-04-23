@@ -68,6 +68,29 @@ function matchesPattern(value: string, patterns: string[]): boolean {
 }
 
 /* ================================================================== */
+/*  Hard-coded protections for FOR-plugin markup                       */
+/* ------------------------------------------------------------------- */
+/*  The FOR-plugins (for_oembed, for_video, for_images, for_checklist, */
+/*  for_toc, for_footnotes, …) transform pasted content inside their   */
+/*  own PastePreProcess handlers – they emit <figure class="for-…">    */
+/*  with data-for-…="…" attributes. cleanpaste must NEVER strip those, */
+/*  otherwise the preview inside the editor breaks immediately.        */
+/*                                                                     */
+/*  We also protect the CKE5-style <figure class="media"> wrapper and  */
+/*  <oembed url> which for_oembed uses as save-format.                 */
+/* ================================================================== */
+
+/** Class name is produced by a FOR-plugin (always preserve). */
+function isProtectedClass(cls: string): boolean {
+    return /^for-/.test(cls) || cls === 'media';
+}
+
+/** Attribute belongs to a FOR-plugin's internal state (always preserve). */
+function isProtectedDataAttr(name: string): boolean {
+    return /^data-for-/.test(name) || name === 'data-mce-selected';
+}
+
+/* ================================================================== */
 /*  MS Office string-level cleanup                                     */
 /* ================================================================== */
 
@@ -97,11 +120,37 @@ function stripGoogleDocsMarkup(html: string): string {
     return html;
 }
 
+/** Element is / sits inside a FOR-plugin figure – leave it completely alone. */
+function isInsideProtectedFigure(el: Element): boolean {
+    let cur: Element | null = el;
+    while (cur && cur.nodeType === 1) {
+        if (cur.tagName && cur.tagName.toLowerCase() === 'figure') {
+            const cls = cur.getAttribute('class') || '';
+            if (/\bfor-[\w-]+\b/.test(cls) || /\bmedia\b/.test(cls)) {
+                return true;
+            }
+        }
+        // oembed tag itself (save-format)
+        if (cur.tagName && cur.tagName.toLowerCase() === 'oembed') {
+            return true;
+        }
+        cur = cur.parentElement;
+    }
+    return false;
+}
+
 /* ================================================================== */
 /*  DOM-level element cleanup (recursive)                             */
 /* ================================================================== */
 
 function cleanElement(el: Element, config: CleanPasteConfig, doc: Document): void {
+    // Never touch elements inside a FOR-plugin figure (oEmbed, video, images,
+    // checklist, toc, …). Those carry data-for-* / class="for-…" markup that
+    // the plugin needs intact for its live preview.
+    if (isInsideProtectedFigure(el)) {
+        return;
+    }
+
     // Process children first so we can safely replace the element itself
     const children = Array.from(el.children);
     for (const child of children) {
@@ -132,7 +181,7 @@ function cleanElement(el: Element, config: CleanPasteConfig, doc: Document): voi
     if (config.remove_data_attrs) {
         const dataAttrs = Array.from(el.attributes)
             .map((a) => a.name)
-            .filter((n) => n.startsWith('data-'));
+            .filter((n) => n.startsWith('data-') && !isProtectedDataAttr(n));
         for (const attr of dataAttrs) {
             el.removeAttribute(attr);
         }
@@ -182,7 +231,7 @@ function cleanElement(el: Element, config: CleanPasteConfig, doc: Document): voi
     if (config.remove_classes && el.hasAttribute('class')) {
         const classStr = el.getAttribute('class') ?? '';
         const classes = classStr.split(/\s+/).filter(Boolean);
-        const kept = classes.filter((cls) => matchesPattern(cls, config.preserve_classes));
+        const kept = classes.filter((cls) => isProtectedClass(cls) || matchesPattern(cls, config.preserve_classes));
         if (kept.length > 0) {
             el.setAttribute('class', kept.join(' '));
         } else {

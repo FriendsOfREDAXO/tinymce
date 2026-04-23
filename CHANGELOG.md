@@ -1,6 +1,95 @@
 Changelog
 =========
 
+Version 8.4.1
+-------------------------------
+
+### Install/Update: `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` behoben
+
+Bei einer frischen Installation (und in manchen Update-Szenarien) ist Composers Classmap-Cache noch nicht (neu) aufgebaut, bevor `install.php`/`update.php` läuft – der REDAXO-Autoloader findet die AddOn-Klassen dann nicht, und das Demo-Profil-Setup bricht mit `Class "FriendsOfRedaxo\TinyMce\Utils\DemoProfile" not found` ab.
+
+* `install.php` und `update.php` laden jetzt alle PHP-Dateien unter `lib/TinyMce/` rekursiv via `RecursiveIteratorIterator` + `require_once` als Fallback. Funktioniert unabhängig vom Classmap-Status.
+
+### Cache-Busting für externe Plugin-URLs
+
+Bisher lud TinyMCE die `plugin.min.js` der FOR-Plugins unter statischen URLs (`/assets/addons/tinymce/scripts/tinymce/plugins/<name>/plugin.min.js`) – ohne Versions-Querystring. Folge: Nach AddOn-Updates blieben alte Plugin-Dateien beliebig lange im Browser-Cache hängen, und Bugfixes wie der heutige `cleanpaste`-Schutz griffen erst nach manuellem Hard-Reload.
+
+* `PluginRegistry::addPlugin()` hängt jetzt automatisch `?v={addon-version}` an jede Plugin-URL (sofern noch kein Querystring vorhanden). Browser lädt nach jedem AddOn-Update garantiert die neuen Plugin-Dateien.
+
+### `cleanpaste` – FOR-Plugin-Markup geschützt (**Root-Cause für defektes `for_oembed`-Rendering**)
+
+`cleanpaste` strippte per PastePreProcess alle `data-*`-Attribute und alle Klassen, die nicht in `preserve_classes` standen. Da `for_oembed` beim Einfügen einer YouTube/Vimeo-URL selbst im PastePreProcess die URL in seine Live-Preview-HTML (`<figure class="for-oembed …" data-for-oembed-url="…">…`) verwandelt, riss cleanpaste direkt danach alle `for-…` Klassen und `data-for-…` Attribute wieder raus – Ergebnis: rohes iframe ohne Overlay, Chrome oder Play-Button. Gleicher Konflikt potenziell auch mit `for_video`, `for_images`, `for_checklist`, `for_toc`, `for_footnotes`.
+
+* Neue interne Schutzliste (nicht konfigurierbar, nicht überschreibbar):
+    * Klassen mit Präfix `for-*` sowie `media` bleiben immer erhalten.
+    * Attribute mit Präfix `data-for-*` sowie `data-mce-selected` werden nie entfernt.
+* Elemente, die innerhalb eines geschützten FOR-Figures liegen (`<figure class="for-…">`, `<figure class="media">` oder `<oembed>`), werden komplett übersprungen – keine Klassen-/Style-/ID-/Data-Bereinigung, keine Tag-Whitelist-Anwendung.
+* User-seitige Konfiguration (`preserve_classes`, `preserve_styles`, etc.) bleibt unverändert – die Schutzliste wirkt zusätzlich.
+
+### Demo-Profil: Core-`image`/`media` entfernt – `for_oembed` funktioniert jetzt korrekt
+
+Das Demo-Profil aktivierte versehentlich sowohl die Core-Plugins `image` + `media` als auch deren FOR-Nachfolger `for_images` + `for_oembed`. Das Core-`media`-Plugin hängt sich an `<figure class="media"><oembed></oembed></figure>` und ersetzt den Block während der Initialisierung durch ein eigenes Live-iframe – damit verliert `for_oembed` seine Overlay-/Chrome-/Play-Struktur und der im Screenshot sichtbare Zustand entsteht (iframe läuft roh, „YouTube"-Title klebt an der URL, Play-Button bricht).
+
+* `image` und `media` aus der Demo-Plugins-Liste entfernt. `for_images` und `for_oembed` übernehmen die Aufgaben vollständig (siehe FOR_PLUGINS.md → Core-Plugins ersetzen).
+* Verwaiste Core-`image`-/`quickbars`-Optionen (`image_caption`, `image_advtab`, `image_uploadtab`, `quickbars_image_toolbar`) aus dem Demo-Profil entfernt und `image` aus `contextmenu` gestrichen – TinyMCE 8.2+ gibt dafür sonst Konsolen-Warnings aus („… is not a registered option").
+* `update.php` lief automatisch → Demo-Profil wurde überschrieben.
+* Empfehlung bleibt: wer `for_images`/`for_oembed` nutzt, sollte `image` und `media` aus dem eigenen Profil entfernen.
+
+### `for_images` – Option-Registrierung für TinyMCE 8.2+ gefixt
+
+TinyMCE 8.2 validiert Option-Defaults jetzt strikt. Die drei `for_images`-Optionen (`imagewidth_presets`, `imagealign_presets`, `imageeffect_presets`) waren mit `processor: 'object[]', default: null` registriert – ein typischer Fall, der früher stillschweigend akzeptiert wurde, jetzt aber mit `Invalid default value passed for the "<option>" option. The value must be a object[].` in der Konsole abbricht. Folge: die Plugin-Initialisierung lief nicht sauber durch, nachfolgende Plugins (`for_oembed` Chrome/Play, Styles) wirkten "halb geladen".
+
+* Defaults von `null` auf `[]` umgestellt (valide leere `object[]`-Arrays).
+* `getConfig()` prüft jetzt zusätzlich auf leere Arrays, damit trotz legitimer `[]`-Werte die internen Fallback-Presets greifen (`defaultWidthPresets`, `defaultAlignPresets`, `defaultEffectPresets`).
+* Plugin rebuilt + `assets:sync`.
+
+### `for_checklist` – Feature-Variante: Default = gestrichelter Rahmen
+
+Bisher griff die gestrichelte Rahmenoptik in der Feature-Liste nur bei explizit `data-checked="false"`. Bei frisch eingefügten `<li>`-Items oder Legacy-Markup ohne Attribut wurde kurzzeitig der solide Default-Rahmen gezeigt, erst beim zweiten Toggle-Klick wurde gestrichelt.
+
+* CSS-Regel (Frontend + Editor-Inline) umgestellt auf `li.for-checklist__item:not([data-checked="true"])::before` → unchecked ist jetzt **by default** gestrichelt, unabhängig davon, ob das Attribut (noch) fehlt.
+* Demo-Seite (`pages/main.php`) auf aktuelle Syntax (`data-checked="true|false"`) umgestellt – vorher veraltetes `for-checklist__item--done` Markup.
+
+### `for_toc` – Heading-IDs bleiben erhalten (Backlinks im Editor funktionieren wieder)
+
+Das `for_toc`-Plugin whitelistete in seinem `editor.schema.addValidElements()` nur ein minimales Set von Attributen für `<a>` (`a[href]`) und hatte `h1–h6` gar nicht erwähnt. Ergebnis: beim initialen `SetContent` (z. B. Demo-Seite im Backend) hat TinyMCE alle `id`-Attribute auf den Überschriften gestrippt – die Anker wie `#for-toc-beispiele` liefen ins Leere, Klicks im TOC taten im Editor nichts.
+
+* Schema erweitert um `h1[id|class]` bis `h6[id|class]` sowie `a[href|id|class|name|target|rel|title]`.
+* Heading-IDs werden jetzt zuverlässig durch `SetContent` und Re-Sync durchgereicht.
+* Keine Migration nötig – existierende Inhalte profitieren automatisch beim nächsten Laden.
+
+### `for_toc` – Hierarchische Nummerierung im Frontend-Stylesheet
+
+`assets/css/for_toc.css` nummeriert **geordnete** Inhaltsverzeichnisse (`<ol class="for-toc__list">`) jetzt automatisch hierarchisch über CSS-Counters:
+
+```
+1. Hauptpunkt
+   1.1 Unterpunkt
+      1.1.1 Unter-Unterpunkt
+```
+
+* Umsetzung ohne JS über `counter-reset: for-toc-item` + `counters(for-toc-item, ".")` auf `li.for-toc__item::before`.
+* **Editor-Parität:** Die gleichen Counter-Regeln werden zusätzlich via `editor.dom.addStyle()` beim Editor-Init im TinyMCE-Iframe angewendet. Redakteure sehen die Nummerierung **unmittelbar im Editor**, nicht erst im Frontend.
+* Neue CSS-Variablen zum Anpassen: `--for-toc-number-separator`, `--for-toc-number-suffix`, `--for-toc-number-color`, `--for-toc-number-font-weight`, `--for-toc-number-min-width`, `--for-toc-number-gap`.
+* `<ul>`-TOCs (unsortiert) bleiben unverändert beim klassischen Bullet-Look.
+* Filler-Einträge (übersprungene Heading-Ebenen, z. B. h2 → h4) werden nicht mitgezählt (`counter-increment: none`) und erzeugen auch kein Nummern-Präfix.
+* Dark-Mode-Override für `--for-toc-number-color` ergänzt.
+
+### Neues Plugin: `for_markdown` – Markdown → HTML Konverter (Dialog)
+
+Dialog-basierter Markdown-Import für TinyMCE. Kein Autodetect, keine Paste-Interception – der Redakteur öffnet bewusst den Dialog, fügt Markdown ein, das Ergebnis wird als sauberes HTML an der Cursor-Position eingesetzt.
+
+* **Plugin-Name:** `for_markdown`
+* **Toolbar-Button / Menüeintrag:** `for_markdown_paste` (Label „Markdown einfügen…")
+* **Command:** `forMarkdownOpenDialog`
+* **Kollisionsfrei** zum bestehenden `markdowneditor`-AddOn – komplett eigener Namespace `for_markdown*` / `for-markdown-*`.
+* **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebundelt im Plugin-Bundle (kein CDN, offline-fähig). Features: CommonMark + GFM-Dialekte, Tables, Autolinks (`linkify: true`), SmartQuotes (`typographer: true`), harte Zeilenumbrüche (`breaks: true`), fenced Code.
+* **Tasklist-Interop → `for_checklist`:** `- [ ]` und `- [x]` werden als Feature-Checkliste ausgegeben, d. h. `<ul class="for-checklist for-checklist--feature"><li class="for-checklist__item" data-checked="true|false">…</li></ul>`. Keine zusätzlichen Form-Inputs im Save-Output.
+* **Fenced Code → `codesample`-kompatibel:** ```` ```php ```` erzeugt `<pre class="language-php"><code>…</code></pre>` und wird damit vom Core-Plugin `codesample` korrekt gerendert und erneut editierbar.
+* **Registrierung:** `PluginRegistry::addPlugin('for_markdown', …, 'for_markdown_paste')` in `boot.php`. Menu-Item-Label zentral in `custom_menu_items` (Profil-Assistent, Einfügen-Menü-Builder).
+* **Demo-Profil:** In der mitgelieferten `demo`-Konfiguration (`lib/TinyMce/Utils/DemoProfile.php`) sowohl in der Plugin-Liste, der Toolbar als auch im Einfügen-Menü aktiviert.
+* **Build:** `custom_plugins/for_markdown/` – esbuild-IIFE, minified (`plugin.min.js`, ~150 KB inkl. markdown-it). `pnpm run build` kopiert automatisch nach `assets/scripts/tinymce/plugins/for_markdown/` und `assets/vendor/tinymce/plugins/for_markdown/`.
+
 Version 8.4.0
 -------------------------------
 

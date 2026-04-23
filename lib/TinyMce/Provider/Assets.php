@@ -62,7 +62,7 @@ class Assets
      * Load active Style-Sets from database.
      * Each Style-Set includes its profile assignment for client-side filtering.
      *
-     * @return array{content_css: list<array{url: string, profiles: list<string>}>, style_formats: list<array{format: array, profiles: list<string>}>}
+     * @return array{content_css: list<array{url: string, profiles: list<string>}>, style_formats: list<array{format: array<string, mixed>, profiles: list<string>}>}
      */
     private static function loadActiveStyleSets(): array
     {
@@ -71,6 +71,7 @@ class Assets
 
         try {
             $sql = \rex_sql::factory();
+            /** @var list<array<string, mixed>> $styleSets */
             $styleSets = $sql->getArray(
                 'SELECT content_css, style_formats, profiles FROM ' . \rex::getTable('tinymce_stylesets') . ' WHERE active = 1 ORDER BY prio ASC'
             );
@@ -78,24 +79,29 @@ class Assets
             foreach ($styleSets as $set) {
                 // Parse profile assignment (comma-separated, empty = all profiles)
                 $profiles = [];
-                if (!empty($set['profiles'])) {
-                    $profiles = array_map('trim', explode(',', $set['profiles']));
-                    $profiles = array_filter($profiles);
+                $profilesRaw = isset($set['profiles']) ? (string) $set['profiles'] : '';
+                if ('' !== $profilesRaw) {
+                    $profiles = array_values(array_filter(array_map('trim', explode(',', $profilesRaw)), static fn (string $v): bool => '' !== $v));
                 }
 
                 // Content CSS hinzufügen mit Profil-Info
-                if (!empty($set['content_css'])) {
+                $contentCssRaw = isset($set['content_css']) ? (string) $set['content_css'] : '';
+                if ('' !== $contentCssRaw) {
                     $contentCss[] = [
-                        'url' => $set['content_css'],
+                        'url' => $contentCssRaw,
                         'profiles' => $profiles,
                     ];
                 }
 
                 // Style Formats dekodieren und hinzufügen mit Profil-Info
-                if (!empty($set['style_formats'])) {
-                    $formats = json_decode($set['style_formats'], true);
+                $styleFormatsRaw = isset($set['style_formats']) ? (string) $set['style_formats'] : '';
+                if ('' !== $styleFormatsRaw) {
+                    $formats = json_decode($styleFormatsRaw, true);
                     if (is_array($formats)) {
                         foreach ($formats as $format) {
+                            if (!is_array($format)) {
+                                continue;
+                            }
                             $styleFormats[] = [
                                 'format' => $format,
                                 'profiles' => $profiles,
@@ -238,6 +244,7 @@ class Assets
                     'for_footnote'         => 'Fußnote',
                     'for_a11y'             => 'Barrierefreiheit prüfen…',
                     'for_toc'              => 'Inhaltsverzeichnis',
+                    'for_markdown_paste'   => 'Markdown einfügen…',
                 ],
                 'external_plugins' => []
             ];

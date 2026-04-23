@@ -37,9 +37,9 @@ document_base_url: '/',
 convert_urls: true,
 entity_encoding: 'raw',
 
-plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y cleanpaste mediapaste link_yform phonelink quote',
+plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown cleanpaste mediapaste link_yform phonelink quote',
 
-toolbar: 'styles | undo redo | bold italic underline strikethrough subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | for_images for_oembed for_video | link link_yform phonelink | quote for_htmlembed for_checklist for_checklist_feature | for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_a11y | table charmap emoticons hr | snippets | fullscreen preview code help',
+toolbar: 'styles | undo redo | bold italic underline strikethrough subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | for_images for_oembed for_video | link link_yform phonelink | quote for_htmlembed for_checklist for_checklist_feature | for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_markdown_paste | for_a11y | table charmap emoticons hr | snippets | fullscreen preview code help',
 
 menu: {
     file: { title: 'Datei', items: 'preview print' },
@@ -47,7 +47,7 @@ menu: {
     view: { title: 'Ansicht', items: 'visualaid visualchars visualblocks | preview fullscreen' },
     insert: {
         title: 'Einfügen',
-        items: 'for_images for_oembed for_video for_htmlembed | link anchor | for_checklist for_checklist_feature for_footnote for_toc | snippets | charmap emoticons codesample inserttable | hr pagebreak nonbreaking | insertdatetime'
+        items: 'for_images for_oembed for_video for_htmlembed | link anchor | for_checklist for_checklist_feature for_footnote for_toc | for_markdown_paste | snippets | charmap emoticons codesample inserttable | hr pagebreak nonbreaking | insertdatetime'
     },
     format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat' },
     tools: { title: 'Werkzeuge', items: 'wordcount for_a11y | code' },
@@ -56,13 +56,8 @@ menu: {
 
 quickbars_selection_toolbar: 'bold italic underline | forecolor | link',
 quickbars_insert_toolbar: 'for_images for_oembed for_video | for_checklist for_footnote_insert | hr',
-quickbars_image_toolbar: false,
 
-contextmenu: 'link image table for_a11y',
-
-image_caption: true,
-image_advtab: true,
-image_uploadtab: false,
+contextmenu: 'link table for_a11y',
 
 codesample_languages: [
     { text: 'HTML/XML', value: 'markup' },

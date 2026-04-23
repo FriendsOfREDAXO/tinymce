@@ -242,6 +242,20 @@ EXTRA;
 // Das Profil ist im Backend gesperrt (siehe pages/profiles.php) und versorgt
 // die Demo-Seite (pages/main.php) mit allen FOR-Plugins.
 // =============================================================================
+// Klassen manuell laden: Bei einer frischen Installation ist der Composer-
+// Classmap-Cache noch nicht (neu) aufgebaut, daher greift der Autoloader für
+// AddOn-Klassen hier noch nicht. Wir ziehen alle PHP-Klassendateien unter
+// lib/TinyMce/ rekursiv nach.
+$__tinymceClassIter = new \RecursiveIteratorIterator(
+    new \RecursiveDirectoryIterator(__DIR__ . '/lib/TinyMce', \FilesystemIterator::SKIP_DOTS)
+);
+foreach ($__tinymceClassIter as $__tinymceClassFile) {
+    if ($__tinymceClassFile->isFile() && str_ends_with($__tinymceClassFile->getFilename(), '.php')) {
+        require_once $__tinymceClassFile->getPathname();
+    }
+}
+unset($__tinymceClassIter, $__tinymceClassFile);
+
 try {
 	\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
 		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME,

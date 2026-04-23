@@ -418,13 +418,23 @@ const Plugin = (): void => {
         editor.on('KeyUp Undo Redo SetContent', scheduleSync);
 
         editor.on('PreInit', () => {
+            // id + class auf Headings sicherstellen, damit TOC-Anker (#for-toc-…)
+            // nach dem initialen SetContent erhalten bleiben. Ohne das würde
+            // TinyMCE id="…" auf h1-h6 strippen und die Backlinks aus dem TOC
+            // würden ins Leere laufen.
             editor.schema.addValidElements(
                 'nav[class|' + DATA_MIN + '|' + DATA_MAX + '|' + DATA_ORDERED + '|' + DATA_TITLE + '|contenteditable],' +
                 'p[class|contenteditable],' +
                 'ol[class],' +
                 'ul[class],' +
                 'li[class],' +
-                'a[href]'
+                'a[href|id|class|name|target|rel|title],' +
+                'h1[id|class],' +
+                'h2[id|class],' +
+                'h3[id|class],' +
+                'h4[id|class],' +
+                'h5[id|class],' +
+                'h6[id|class]'
             );
         });
 
@@ -450,6 +460,12 @@ nav.for-toc li.for-toc__item { margin: 0.1em 0; }
 nav.for-toc li.for-toc__item--filler { list-style: none; }
 nav.for-toc a { text-decoration: none; }
 nav.for-toc a:hover { text-decoration: underline; }
+/* Hierarchische Nummerierung (geordnete TOC, 1 / 1.1 / 1.1.1 …) */
+nav.for-toc ol.for-toc__list { counter-reset: for-toc-item; list-style: none; padding-left: 0; margin-left: 1.25em; }
+nav.for-toc ol.for-toc__list > li.for-toc__item { counter-increment: for-toc-item; position: relative; padding-left: 2.6em; }
+nav.for-toc ol.for-toc__list > li.for-toc__item::before { content: counters(for-toc-item, ".") " "; position: absolute; left: 0; top: 0; min-width: 2.2em; font-weight: 600; font-variant-numeric: tabular-nums; color: #333; }
+nav.for-toc ol.for-toc__list > li.for-toc__item--filler { counter-increment: none; padding-left: 0; }
+nav.for-toc ol.for-toc__list > li.for-toc__item--filler::before { content: none; }
 `;
             editor.dom.addStyle(css);
         });
