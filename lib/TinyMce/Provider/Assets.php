@@ -256,6 +256,7 @@ class Assets
                     'for_a11y'             => 'Barrierefreiheit prüfen…',
                     'for_toc'              => 'Inhaltsverzeichnis',
                     'for_markdown_paste'   => 'Markdown einfügen…',
+                    'for_chars_symbols'    => 'Zeichen, Symbole & Emoji',
                 ],
                 'external_plugins' => [],
                 // Names of plugins registered by OTHER AddOns (not bundled with

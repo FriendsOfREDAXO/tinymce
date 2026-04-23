@@ -43,6 +43,7 @@ $demoHtml = <<<'HTML'
     <tr><td><code>for_toc</code></td><td>Inhaltsverzeichnis mit Live-Sync (siehe oben ↑)</td></tr>
     <tr><td><code>for_a11y</code></td><td>Accessibility-Checker on demand (WCAG-nah)</td></tr>
     <tr><td><code>for_rootstrip</code></td><td>Entfernt beim Speichern automatisch den TinyMCE-Root-Wrapper</td></tr>
+    <tr><td><code>for_chars_symbols</code></td><td>Zeichen, Symbole, native Emojis &amp; Typografie-Helfer (Quotes, Dash, nbsp/shy, Favoriten)</td></tr>
   </tbody>
 </table>
 

@@ -39,6 +39,21 @@ Die Spalte **Link-Schema (opt.)** in der YForm-Link-Konfiguration war in der UI 
   * Leer lassen = es wird nur der reine Feldwert als Link-Text eingefügt.
 * Neuer i18n-Key `tinymce_link_schema_help` (de/en).
 
+### Profil-Assistent – Visuelle Unterscheidung nach Plugin-Herkunft
+
+Die Plugin- und Toolbar-Listen zeigen jetzt auf einen Blick, woher ein Eintrag kommt. Das ersetzt die bisherige rein textuelle „FOR“-Kennzeichnung, die nur am `for_`-Namenspräfix hing.
+
+* **Blau (#4b9ad9, REDAXO-Blau)** – in diesem AddOn mitgelieferte Plugins (die komplette `for_*`-Familie sowie Legacy-Plugins ohne `for_`-Präfix wie `mediapaste`, `snippets`, `cleanpaste`, `phonelink`, `quote`, `link_yform`). Die Erkennung basiert jetzt auf `PluginRegistry::getPlugins()` + URL-Abgleich gegen `rex_url::addonAssets('tinymce', '')`, nicht mehr auf dem Namen – dadurch werden auch Custom-Plugins korrekt markiert, die nicht dem `for_`-Schema folgen.
+* **Grün (#5bb585)** – Plugins, die von externen REDAXO-AddOns in die Registry eingehängt werden (z. B. `writeassist`). Server-seitige Liste (`addon_plugins` / `addon_toolbar_buttons`) wird nach JS übergeben.
+* Beide Farbschemata haben Varianten für Light- und Dark-Mode und wirken auf: Plugin-Reihe (Border/Background), Badge neben dem Namen, Toolbar-Button-Kachel, Hinzufügen-Button in der Verfügbar-Liste.
+* Plugin- **und** Toolbar-Listen werden jetzt alphabetisch sortiert ausgeliefert, damit das Scannen bei vielen Plugins einfacher wird.
+
+### Profil-Assistent – HTML in Hilfetexten wird korrekt gerendert
+
+Die Hilfetexte zu Höhe, Breite, Autoresize, Link-Schema und Bildbreite enthalten `<code>`/`<br>`-Markup. Bisher wurden die Tags durch `rex_i18n::msg()` escaped und als Literal-Text ausgegeben. Betroffene Keys laufen jetzt über `rex_i18n::rawMsg()` in [lib/TinyMce/Provider/Assets.php](public/redaxo/src/addons/tinymce/lib/TinyMce/Provider/Assets.php):
+
+* `tinymce_height_help`, `tinymce_width_help`, `tinymce_autoresize_help`, `tinymce_link_schema_help`, `tinymce_imagewidth_help`
+
 Version 8.4.1
 -------------------------------
 

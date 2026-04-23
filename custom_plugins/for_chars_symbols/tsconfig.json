@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "strict": true,
+        "noUnusedLocals": true,
+        "declaration": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    },
+    "include": ["src/main/ts"]
+}

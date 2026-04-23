@@ -23,6 +23,7 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
 | `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
 | `for_rootstrip` | Nutzt automatisch den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`) im Editor und entfernt ihn beim Speichern wieder. Aktivierbar über `for_rootstrip: true/false` (Default: `true`). | — |
+| `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), Favoriten + Zuletzt verwendet pro Browser | `for_chars_symbols` |
 
 Zusätzlich enthält das AddOn diese Kern-Helfer (ohne `for_`-Präfix, da älter):
 
