@@ -102,7 +102,7 @@ function initTinyMceProfileAssistant() {
     toolbarHtml += '</div></div>';
 
     // Selected Items (Sortable)
-    toolbarHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected Toolbar (Drag to reorder)') + '</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
+    toolbarHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected Toolbar (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body"><ul id="builder-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
     
     // Toolbar Input (Result)
     toolbarHtml += '<div class="form-group"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><input type="text" class="form-control builder-toolbar-input" readonly></div>';
@@ -124,7 +124,7 @@ function initTinyMceProfileAssistant() {
         insertMenuHtml += '<button type=\"button\" class=\"btn btn-info btn-xs builder-insert-item-btn builder-insert-item-btn--for\" data-value=\"' + key + '\" title=\"' + customMenuItems[key] + '\" style=\"margin-bottom: 4px;\"><span class=\"for-plugin-badge\">FOR</span> ' + key + '</button> ';
     });
     insertMenuHtml += '</div></div>';
-    insertMenuHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected (Drag to reorder)') + '</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-insert-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
+    insertMenuHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body"><ul id="builder-insert-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
     insertMenuHtml += '<div class="form-group"><label>' + (i18n.insert_menu_result || 'Insert menu items (result)') + '</label><input type="text" class="form-control builder-insert-menu-input" readonly></div>';
     toolbarHtml += insertMenuHtml;
 
@@ -159,7 +159,7 @@ function initTinyMceProfileAssistant() {
     settingsHtml += `<button type="button" class="btn btn-default btn-xs builder-context-toolbar-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (${i18n.separator || 'Separator'})</strong></button> `;
     settingsHtml += '</div></div>';
 
-    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected Toolbar (Drag to reorder)') + '</div><div class="panel-body" style="background-color: #f5f5f5;"><ul id="builder-context-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
+    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected Toolbar (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body"><ul id="builder-context-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
     
     settingsHtml += '<div class="form-group"><label>Selection Toolbar Result</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
     
@@ -390,11 +390,57 @@ function initTinyMceProfileAssistant() {
     // Styles for Sortable
     const style = document.createElement('style');
     style.innerHTML = `
-        #builder-selected-items, #builder-context-selected-items, #builder-insert-selected-items { min-height: 40px; border: 1px dashed #ccc; padding: 10px; border-radius: 4px; background: #fff; }
-        #builder-selected-items li, #builder-context-selected-items li, #builder-insert-selected-items li { cursor: move; margin-bottom: 5px; background: #324050; color: #fff; border: 1px solid #202b35; padding: 5px 10px; border-radius: 3px; display: inline-block; }
-        #builder-selected-items li:hover, #builder-context-selected-items li:hover, #builder-insert-selected-items li:hover { background: #283340; border-color: #000; }
-        #builder-selected-items li .remove-item, #builder-context-selected-items li .remove-item, #builder-insert-selected-items li .remove-item { margin-left: 8px; color: #ff9999; cursor: pointer; font-weight: bold; }
-        #builder-selected-items li.placeholder, #builder-context-selected-items li.placeholder, #builder-insert-selected-items li.placeholder { background: #dff0d8; border: 1px dashed #3c763d; height: 32px; width: 50px; }
+        /* CSS-Variablen: Light-Defaults auf dem Wrapper des Profile-Assistenten */
+        #tinymce-profile-assistant {
+            --tpa-panel-body-bg: #f5f5f5;
+            --tpa-dropzone-bg: #fff;
+            --tpa-dropzone-border: #ccc;
+            --tpa-chip-bg: #324050;
+            --tpa-chip-border: #202b35;
+            --tpa-chip-hover-bg: #283340;
+            --tpa-chip-hover-border: #000;
+            --tpa-chip-remove: #ff9999;
+            --tpa-placeholder-bg: #dff0d8;
+            --tpa-placeholder-border: #3c763d;
+            --tpa-help-muted: #999;
+            --tpa-context-border: #eee;
+        }
+        .builder-dropzone-panel-body {
+            background-color: var(--tpa-panel-body-bg);
+        }
+        #builder-selected-items, #builder-context-selected-items, #builder-insert-selected-items {
+            min-height: 40px;
+            border: 1px dashed var(--tpa-dropzone-border);
+            padding: 10px;
+            border-radius: 4px;
+            background: var(--tpa-dropzone-bg);
+        }
+        #builder-selected-items li, #builder-context-selected-items li, #builder-insert-selected-items li {
+            cursor: move;
+            margin-bottom: 5px;
+            background: var(--tpa-chip-bg);
+            color: #fff;
+            border: 1px solid var(--tpa-chip-border);
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        #builder-selected-items li:hover, #builder-context-selected-items li:hover, #builder-insert-selected-items li:hover {
+            background: var(--tpa-chip-hover-bg);
+            border-color: var(--tpa-chip-hover-border);
+        }
+        #builder-selected-items li .remove-item, #builder-context-selected-items li .remove-item, #builder-insert-selected-items li .remove-item {
+            margin-left: 8px;
+            color: var(--tpa-chip-remove);
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #builder-selected-items li.placeholder, #builder-context-selected-items li.placeholder, #builder-insert-selected-items li.placeholder {
+            background: var(--tpa-placeholder-bg);
+            border: 1px dashed var(--tpa-placeholder-border);
+            height: 32px;
+            width: 50px;
+        }
 
         /* FOR Plugin highlighting (FriendsOfREDAXO) */
         .for-plugin-badge, .for-plugin-badge-inline {
@@ -412,7 +458,7 @@ function initTinyMceProfileAssistant() {
             box-shadow: 0 1px 2px rgba(0,0,0,.1);
         }
         .for-plugin-badge-inline { margin-left: 6px; }
-        .for-plugin-legend-hint { margin-left: 8px; color: #999; font-weight: 400; }
+        .for-plugin-legend-hint { margin-left: 8px; color: var(--tpa-help-muted); font-weight: 400; }
         .builder-plugin-row--for label { font-weight: 600; }
         .builder-plugin-row--for label input { accent-color: #4b9ad9; }
         .builder-toolbar-btn--for {
@@ -429,12 +475,6 @@ function initTinyMceProfileAssistant() {
             font-weight: 600;
         }
         .builder-insert-item-btn--for:hover { filter: brightness(1.1); }
-        body.rex-theme-dark .builder-toolbar-btn--for {
-            background: linear-gradient(135deg, #2a2a2a 0%, #1e3a4f 100%) !important;
-            color: #8ec5ea !important;
-            border-color: #2c7cb8 !important;
-        }
-        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #1e3a4f !important; }
 
         /* AddOn Plugin highlighting (plugins registered by OTHER addons) */
         .for-plugin-badge--addon {
@@ -456,12 +496,74 @@ function initTinyMceProfileAssistant() {
             font-weight: 600;
         }
         .builder-insert-item-btn--addon:hover { filter: brightness(1.1); }
+
+        /* Context-toolbar options linke Border-Markierung – Variable nutzen */
+        #tinymce-profile-assistant .builder-context-toolbar-options {
+            border-left-color: var(--tpa-context-border) !important;
+        }
+
+        /* ================================================================
+           REDAXO Dark Mode: expliziter Dark-Mode
+           ================================================================ */
+        body.rex-theme-dark #tinymce-profile-assistant {
+            --tpa-panel-body-bg: #1f2933;
+            --tpa-dropzone-bg: #141a20;
+            --tpa-dropzone-border: #3a4654;
+            --tpa-chip-bg: #2a3744;
+            --tpa-chip-border: #111820;
+            --tpa-chip-hover-bg: #34455a;
+            --tpa-chip-hover-border: #000;
+            --tpa-chip-remove: #ff8080;
+            --tpa-placeholder-bg: #1e3a28;
+            --tpa-placeholder-border: #5a8a6a;
+            --tpa-help-muted: #8a98a6;
+            --tpa-context-border: #3a4654;
+        }
+        body.rex-theme-dark .builder-toolbar-btn--for {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1e3a4f 100%) !important;
+            color: #8ec5ea !important;
+            border-color: #2c7cb8 !important;
+        }
+        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #1e3a4f !important; }
         body.rex-theme-dark .builder-toolbar-btn--addon {
             background: linear-gradient(135deg, #2a2a2a 0%, #1e3a28 100%) !important;
             color: #8fd4a8 !important;
             border-color: #3e8c60 !important;
         }
         body.rex-theme-dark .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
+
+        /* ================================================================
+           REDAXO Auto-Dark-Mode (prefers-color-scheme)
+           Gleiche Werte wie explicit dark.
+           ================================================================ */
+        @media (prefers-color-scheme: dark) {
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant {
+                --tpa-panel-body-bg: #1f2933;
+                --tpa-dropzone-bg: #141a20;
+                --tpa-dropzone-border: #3a4654;
+                --tpa-chip-bg: #2a3744;
+                --tpa-chip-border: #111820;
+                --tpa-chip-hover-bg: #34455a;
+                --tpa-chip-hover-border: #000;
+                --tpa-chip-remove: #ff8080;
+                --tpa-placeholder-bg: #1e3a28;
+                --tpa-placeholder-border: #5a8a6a;
+                --tpa-help-muted: #8a98a6;
+                --tpa-context-border: #3a4654;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for {
+                background: linear-gradient(135deg, #2a2a2a 0%, #1e3a4f 100%) !important;
+                color: #8ec5ea !important;
+                border-color: #2c7cb8 !important;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for:hover { background: #1e3a4f !important; }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon {
+                background: linear-gradient(135deg, #2a2a2a 0%, #1e3a28 100%) !important;
+                color: #8fd4a8 !important;
+                border-color: #3e8c60 !important;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
+        }
     `;
     document.head.appendChild(style);
 

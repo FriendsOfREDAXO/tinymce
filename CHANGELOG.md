@@ -24,10 +24,26 @@ Das Demo-Profil aktiviert `for_chars_symbols` inkl. Toolbar-Buttons und Einfüge
 
 Unter TinyMCE 6/7/8 ist die Option `forced_root_block: false` entfallen. `for_rootstrip` liefert einen sauberen Ersatz: der `forced_root_block` (Default `div`) bleibt im Editor aktiv (damit Edits stabil arbeiten), der Wrapper wird aber beim Auslesen/Speichern wieder entfernt. Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (z. B. `h2`, `span`) vom Modul vorgegeben wird.
 
-- Reines Content-Processing-Plugin, kein Button, kein Menüeintrag.
-- Entfernt den Wrapper nur, wenn genau **ein** Root-Element vorhanden ist (Whitespace-toleriert).
-- Aktiv via `for_rootstrip: true` (Plugin-Default). Über `for_rootstrip: false` pro Profil abschaltbar.
-- **Nicht in den Demo-Profilen vorinstalliert** – muss vom Nutzer bewusst in die `plugins`-Liste aufgenommen werden, da es das Save-Verhalten verändert. Dank (PR [#147](https://github.com/FriendsOfREDAXO/tinymce/pull/147) von @alexwenz).
+Großer Dank an @alexwenz für die ursprüngliche Umsetzung ([PR #147](https://github.com/FriendsOfREDAXO/tinymce/pull/147)). Wir haben seine Lösung in zwei Punkten angepasst, damit sie sauber mit Paste- und Insert-Operationen zusammenspielt:
+
+- **Opt-in pro Profil:** `for_rootstrip` wird nur noch aktiv, wenn es explizit in der Profil-`plugins`-Liste eingetragen ist. Ohne Eintrag registriert das Plugin keinerlei Handler.
+- **Paste-/Insert-Guard im `BeforeSetContent`-Handler:** der Root-Wrapper wird nur auf den initialen Editor-Content angewendet. Events mit `selection`, `paste` oder `set === false` bleiben unberührt, damit keine ungültig verschachtelten Blöcke (`<p><p>…</p></p>` → leere `<p></p>`) entstehen.
+
+### `for_chars_symbols`: Deutlich erweiterte Zeichen- und Emoji-Kataloge
+
+Großer Dank an @alexwenz für das Feedback und die Anregungen – der Picker ist damit für den Alltag deutlich nützlicher geworden:
+
+- **Neue Zeichen-Gruppen** für branchenspezifische Anwendungen:
+  - *Einheiten & Messung* – Temperatur (`℃`, `℉`, `K`), Ångström, CJK-Kompakteinheiten (`㎜`, `㎝`, `㎞`, `㎡`, `㎥`, `㎏`, `㎖`, `㎐`, `㎑`, `㎒`, `㎓`, `㎾`, `㎅`, `㎆`, `㎇` …), Prime/Doppelprime, Promille/Pro-Zehntausend.
+  - *Maschinenbau & Technik* – Durchmesser `⌀`/`Ø`, Winkelzeichen (`∠`, `∡`, `⊾`), `⊥`, `∥`, Zahnrad `⚙`, Benzolring `⌬`, Tastensymbole (`⌘`, `⌥`, `⇧`, `⎋`, `⏎`, `⌫`, `⇥`), Power-Symbole (`⏻`, `⏼`, `⏽`, `⭘`), Strom (`⎓`, `⏦`, `⏚`).
+  - *Medizin & Biologie* – Äskulapstab `⚕`, Caduceus `☤`, Rezept `℞`, Gender-/Beziehungszeichen (`♀`, `♂`, `⚥`, `⚧`, `⚭`, `⚮`), Biohazard/Radioaktiv, medizinische Kreuze.
+  - *Musik* – Noten und Schlüssel (`♩`, `♪`, `♫`, `♬`, `♭`, `♮`, `♯`, `𝄞`, `𝄢`).
+  - *Recht & Verwaltung* – `§`, `¶`, `©`, `®`, `™`, `℗`, `℠`, `№`, `℅`, `℡`, `℻`, `☎`, `✉`, `✍`.
+  - *Aufzählungs-Symbole* – Bullets, Sterne, Haken (`✓`, `✔`, `✗`, `✘`), dekorative Pfeile.
+- **Typographie-Fehler-Erkennung** erweitert auf ~25 Muster: mehrfache Satzzeichen, Leerzeichen vor Satzzeichen, fehlende Abkürzungspunkte (`zB`, `dh`, `bzw` …), Abkürzungen ohne NNBSP (`z.B.`, `d.h.`, `i.d.R.`, `e.V.` …), ASCII-Arrows (`->`, `=>`, `-->`), gerade Apostrophe im Wort, Prozent-/Währungs-Abstände, Maßangaben (`10x20cm`), Telefonnummern-Muster, Uhrzeiten.
+- **Emoji-Katalog deutlich erweitert** (~1000 statt ~400 Einträge) inkl. Hautton-/Beruf-Varianten und deutschem Keyword-Mapping. Flaggen in **Europa** (alle EU-Staaten, Kleinstaaten, Territorien) und **Welt** aufgeteilt.
+- **Dark Mode** für den Profil-Assistenten: die Drag-&-Drop-Zonen des Toolbar-Builders nutzen jetzt CSS-Variablen und passen sich an `body.rex-theme-dark` bzw. `prefers-color-scheme: dark` an.
+- **Favoriten-Panel**: die Live-Aktualisierung beim Hinzufügen eines Favoriten wurde repariert (doppelte Funktionsdefinition entfernt, Section-Wrapper wiederhergestellt).
 
 Version 8.4.2
 -------------------------------

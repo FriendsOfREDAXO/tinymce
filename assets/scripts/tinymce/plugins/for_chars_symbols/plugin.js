@@ -114,6 +114,91 @@
                 ['Θ', 'Theta'], ['Λ', 'Lambda'], ['Π', 'Pi'], ['Σ', 'Sigma'],
                 ['Φ', 'Phi'], ['Ψ', 'Psi'], ['Ω', 'Omega']
             ]
+        },
+        {
+            name: 'Einheiten & Messung',
+            items: [
+                ['°', 'Grad'], ['℃', 'Grad Celsius'], ['℉', 'Grad Fahrenheit'], ['K', 'Kelvin'],
+                ['Å', 'Ångström'], ['µ', 'Mikro (µ)'], ['Ω', 'Ohm'], ['℧', 'Mho (Leitwert)'],
+                ['㎛', 'Mikrometer'], ['㎜', 'Millimeter'], ['㎝', 'Zentimeter'], ['㎞', 'Kilometer'],
+                ['㎡', 'Quadratmeter'], ['㎢', 'Quadratkilometer'], ['㎥', 'Kubikmeter'],
+                ['㎎', 'Milligramm'], ['㎏', 'Kilogramm'], ['㎍', 'Mikrogramm'], ['㎖', 'Milliliter'],
+                ['㎗', 'Deziliter'], ['㎘', 'Hektoliter (kl)'], ['㎐', 'Hertz'], ['㎑', 'Kilohertz'],
+                ['㎒', 'Megahertz'], ['㎓', 'Gigahertz'], ['㎾', 'Kilowatt'], ['㎿', 'Megawatt'],
+                ['㎸', 'Kilovolt'], ['㎹', 'Megavolt'], ['㎃', 'Milliampere'], ['㎂', 'Mikroampere'],
+                ['㎅', 'Kilobyte'], ['㎆', 'Megabyte'], ['㎇', 'Gigabyte'], ['㏄', 'Kubikzentimeter'],
+                ['㏎', 'Kilometer (km)'], ['㏑', 'Natürlicher Logarithmus'], ['㏒', 'Logarithmus'],
+                ['′', 'Minute / Fuß'], ['″', 'Sekunde / Zoll'], ['‰', 'Promille'], ['‱', 'Pro Zehntausend'],
+                ['№', 'Nummer']
+            ]
+        },
+        {
+            name: 'Maschinenbau & Technik',
+            items: [
+                ['⌀', 'Durchmesser'], ['Ø', 'Durchschnitt / Durchmesser'], ['⊥', 'Senkrecht (perpendicular)'],
+                ['∥', 'Parallel'], ['∡', 'Winkel (gemessen)'], ['∠', 'Winkel'], ['∢', 'Kugelwinkel'],
+                ['⊾', 'Rechter Winkel'], ['⌒', 'Kreisbogen'], ['⌓', 'Segment'], ['△', 'Dreieck'],
+                ['▽', 'Dreieck unten'], ['□', 'Quadrat'], ['▭', 'Rechteck'], ['○', 'Kreis'],
+                ['◯', 'Großer Kreis'], ['⬡', 'Hexagon'], ['⬢', 'Hexagon gefüllt'], ['⌘', 'Command'],
+                ['⌥', 'Option / Alt'], ['⇧', 'Shift'], ['⎋', 'Escape'], ['⏎', 'Return / Enter'],
+                ['⌫', 'Backspace / Delete'], ['⌦', 'Forward Delete'], ['⇥', 'Tab'], ['⇤', 'Home'],
+                ['⇥', 'End'], ['⏏', 'Eject'], ['⏻', 'Power'], ['⏼', 'Power Toggle'], ['⏽', 'Power On'],
+                ['⭘', 'Power Off'], ['⚡', 'Blitz'], ['⏱', 'Stoppuhr'], ['⏲', 'Timer'],
+                ['⚙', 'Zahnrad'], ['⚒', 'Hammer & Pickel'], ['⛭', 'Zahnrad (alt)'], ['⛮', 'Zahnrad groß'],
+                ['⌁', 'Spannung'], ['⎓', 'Gleichstrom (DC)'], ['⏦', 'Wechselstrom (AC)'],
+                ['⏚', 'Erdung'], ['⎔', 'Dodekaeder'], ['◉', 'Fisheye'], ['◎', 'Bullseye'],
+                ['⊕', 'Plus im Kreis'], ['⊖', 'Minus im Kreis'], ['⊗', 'Mal im Kreis'],
+                ['⊙', 'Punkt im Kreis'], ['⌬', 'Benzol-Ring'], ['⌭', 'Zylinder'], ['⌶', 'APL-Symbol I-Balken']
+            ]
+        },
+        {
+            name: 'Medizin & Biologie',
+            items: [
+                ['☤', 'Caduceus'], ['⚕', 'Äskulapstab / Medizinisches Zeichen'], ['☥', 'Ankh'],
+                ['♀', 'Weiblich'], ['♂', 'Männlich'], ['⚥', 'Inter / Männlich-Weiblich'],
+                ['⚧', 'Transgender'], ['⚦', 'Männlich-gestrichen'], ['⚨', 'Vertikal männlich-weiblich'],
+                ['⚩', 'Weiblich-horizontal'], ['⚭', 'Ehe-Zeichen'], ['⚮', 'Scheidungs-Zeichen'],
+                ['⚯', 'Unverheiratet'], ['☣', 'Biohazard'], ['☢', 'Radioaktiv'], ['☠', 'Gefahr (Totenkopf)'],
+                ['⚠', 'Warnung'], ['☤', 'Caduceus'], ['℞', 'Rezept (Rx)'], ['℟', 'Response'],
+                ['✚', 'Dickes griechisches Kreuz'], ['✛', 'Mittelblockkreuz'], ['✜', 'Offenes Kreuz'],
+                ['⊹', 'Plus-Kreuz dünn'], ['†', 'Dagger / Kreuz'],
+                ['α', 'alpha'], ['β', 'beta'], ['γ', 'gamma'], ['Δ', 'Delta (Differenz)'],
+                ['μ', 'mikro'], ['∅', 'Nullmenge / kein'], ['∞', 'unendlich']
+            ]
+        },
+        {
+            name: 'Musik',
+            items: [
+                ['♩', 'Viertelnote'], ['♪', 'Achtelnote'], ['♫', 'Zwei Achtelnoten'],
+                ['♬', 'Zwei Sechzehntel'], ['♭', 'Be (flat)'], ['♮', 'Auflösungszeichen'],
+                ['♯', 'Kreuz (sharp)'], ['𝄞', 'Violinschlüssel'], ['𝄢', 'Bassschlüssel'],
+                ['𝄐', 'Fermate'], ['𝄡', 'C-Schlüssel']
+            ]
+        },
+        {
+            name: 'Recht & Verwaltung',
+            items: [
+                ['§', 'Paragraph'], ['¶', 'Absatz'], ['※', 'Hinweis'], ['†', 'Gestorben'],
+                ['‡', 'Doppeldagger'], ['№', 'Nummer'], ['℗', 'Tonträger-Copyright'],
+                ['©', 'Copyright'], ['®', 'Registered'], ['™', 'Trademark'], ['℠', 'Service Mark'],
+                ['⁂', 'Asterismus'], ['❧', 'Hederae'], ['※', 'Anmerkung'], ['℀', 'Account of'],
+                ['℁', 'Addressed to'], ['℅', 'Care of (c/o)'], ['℆', 'Cada una'], ['℡', 'Telefon'],
+                ['℻', 'Fax'], ['☎', 'Telefon'], ['✆', 'Hörer'], ['✉', 'Brief'], ['✍', 'Unterschrift'],
+                ['✎', 'Bleistift'], ['✏', 'Bleistift gefüllt'], ['✂', 'Schere'], ['✄', 'Schneidezeichen']
+            ]
+        },
+        {
+            name: 'Aufzählungs-Symbole',
+            items: [
+                ['•', 'Bullet'], ['◦', 'Weißer Bullet'], ['▪', 'Schwarzes Quadrat klein'],
+                ['▫', 'Weißes Quadrat klein'], ['■', 'Quadrat schwarz'], ['□', 'Quadrat weiß'],
+                ['●', 'Kreis schwarz'], ['○', 'Kreis weiß'], ['◆', 'Raute schwarz'], ['◇', 'Raute weiß'],
+                ['▸', 'Pfeilspitze rechts'], ['▹', 'Pfeilspitze rechts weiß'], ['★', 'Stern'],
+                ['☆', 'Stern weiß'], ['✓', 'Haken'], ['✔', 'Haken fett'], ['✗', 'Kreuz'],
+                ['✘', 'Kreuz fett'], ['➤', 'Pfeil dreieckig'], ['➥', 'Pfeil nach unten-rechts'],
+                ['➔', 'Pfeil rechts'], ['❖', 'Vier Diamanten'], ['❯', 'Single Right-Pointing'],
+                ['❮', 'Single Left-Pointing']
+            ]
         }
     ];
 
@@ -124,31 +209,56 @@
             name: 'Smileys',
             items: [
                 ['😀','grinning'],['😃','smiley'],['😄','smile'],['😁','grin'],['😆','laughing'],
-                ['😅','sweat_smile'],['😂','joy'],['🤣','rofl'],['🙂','slight_smile'],['🙃','upside_down'],
-                ['😉','wink'],['😊','blush'],['😇','innocent'],['🥰','smiling_face_with_hearts'],
-                ['😍','heart_eyes'],['🤩','star_struck'],['😘','kissing_heart'],['😋','yum'],
-                ['😛','stuck_out_tongue'],['😜','stuck_out_tongue_winking_eye'],['🤪','zany'],
-                ['🤑','money_mouth'],['🤗','hugging'],['🤭','hand_over_mouth'],['🤫','shushing'],
-                ['🤔','thinking'],['🤨','raised_eyebrow'],['😐','neutral'],['😑','expressionless'],
-                ['😶','no_mouth'],['😏','smirk'],['😒','unamused'],['🙄','rolling_eyes'],
-                ['😬','grimacing'],['😌','relieved'],['😔','pensive'],['😴','sleeping'],
-                ['😷','mask'],['🤒','thermometer face'],['🤕','bandage'],['🤢','nauseated'],
-                ['🤮','vomiting'],['🤧','sneezing'],['🥵','hot'],['🥶','cold'],['😵','dizzy'],
-                ['🤯','exploding_head'],['🤠','cowboy'],['🥳','partying'],['😎','sunglasses'],
-                ['🤓','nerd'],['🧐','monocle'],['😭','crying'],['😢','tear'],['😤','triumph'],
-                ['😠','angry'],['😡','rage'],['🥺','pleading'],['🙏','pray'],['👻','ghost'],
-                ['💀','skull'],['👽','alien'],['🤖','robot'],['💩','poop'],['😈','devil']
+                ['😅','sweat_smile'],['🤣','rofl'],['😂','joy'],['🙂','slight_smile'],['🙃','upside_down'],
+                ['🫠','melting'],['😉','wink'],['😊','blush'],['😇','innocent'],
+                ['🥰','smiling_face_with_hearts'],['😍','heart_eyes'],['🤩','star_struck'],
+                ['😘','kissing_heart'],['😗','kissing'],['☺️','smiling'],['😚','kissing_closed_eyes'],
+                ['😙','kissing_smiling_eyes'],['🥲','smiling_tear'],['😋','yum'],['😛','stuck_out_tongue'],
+                ['😜','stuck_out_tongue_winking_eye'],['🤪','zany'],['😝','stuck_out_tongue_closed_eyes'],
+                ['🤑','money_mouth'],['🤗','hugging'],['🤭','hand_over_mouth'],['🫢','open_eyes_hand'],
+                ['🫣','peeking'],['🤫','shushing'],['🤔','thinking'],['🫡','saluting'],
+                ['🤐','zipper_mouth'],['🤨','raised_eyebrow'],['😐','neutral'],['😑','expressionless'],
+                ['😶','no_mouth'],['🫥','dotted_line_face'],['😶‍🌫️','face_in_clouds'],
+                ['😏','smirk'],['😒','unamused'],['🙄','rolling_eyes'],['😬','grimacing'],
+                ['😮‍💨','exhaling'],['🤥','lying'],['🫨','shaking'],['😌','relieved'],['😔','pensive'],
+                ['😪','sleepy'],['🤤','drooling'],['😴','sleeping'],['😷','mask'],
+                ['🤒','thermometer_face'],['🤕','bandage'],['🤢','nauseated'],['🤮','vomiting'],
+                ['🤧','sneezing'],['🥵','hot'],['🥶','cold'],['🥴','woozy'],['😵','dizzy'],
+                ['😵‍💫','spiral_eyes'],['🤯','exploding_head'],['🤠','cowboy'],['🥳','partying'],
+                ['🥸','disguised'],['😎','sunglasses'],['🤓','nerd'],['🧐','monocle'],
+                ['😕','confused'],['🫤','diagonal_mouth'],['😟','worried'],['🙁','slightly_frowning'],
+                ['☹️','frowning'],['😮','open_mouth'],['😯','hushed'],['😲','astonished'],
+                ['😳','flushed'],['🥺','pleading'],['🥹','holding_back_tears'],['😦','frowning_open'],
+                ['😧','anguished'],['😨','fearful'],['😰','cold_sweat'],['😥','disappointed_relieved'],
+                ['😢','tear'],['😭','crying'],['😱','scream'],['😖','confounded'],['😣','persevering'],
+                ['😞','disappointed'],['😓','sweat'],['😩','weary'],['😫','tired'],['🥱','yawning'],
+                ['😤','triumph'],['😡','rage'],['😠','angry'],['🤬','cursing'],['😈','devil'],
+                ['👿','imp'],['💀','skull'],['☠️','skull_crossbones'],['💩','poop'],['🤡','clown'],
+                ['👹','ogre'],['👺','goblin'],['👻','ghost'],['👽','alien'],['👾','space_invader'],
+                ['🤖','robot'],['😺','smiley_cat'],['😸','grinning_cat'],['😹','joy_cat'],
+                ['😻','heart_eyes_cat'],['😼','smirk_cat'],['😽','kissing_cat'],['🙀','scream_cat'],
+                ['😿','crying_cat'],['😾','pouting_cat']
             ]
         },
         {
-            name: 'Gesten',
+            name: 'Gesten & Körper',
             items: [
-                ['👍','thumbs_up daumen hoch'],['👎','thumbs_down daumen runter'],['👌','ok'],
-                ['🤏','pinch'],['✌️','victory'],['🤞','crossed_fingers'],['🤟','love_you'],
-                ['🤘','rock'],['🤙','call_me'],['👈','left'],['👉','right'],['👆','up'],
-                ['👇','down'],['☝️','index'],['✋','raised_hand'],['🤚','back_of_hand'],
-                ['🖐️','open_hand'],['🖖','vulcan'],['👋','wave'],['🤝','handshake'],
-                ['🙏','pray'],['💪','muscle'],['🙌','raising_hands'],['👏','clap'],['🫶','heart_hands']
+                ['👋','wave'],['🤚','back_of_hand'],['🖐️','open_hand'],['✋','raised_hand'],
+                ['🖖','vulcan'],['🫱','rightwards'],['🫲','leftwards'],['🫳','palm_down'],
+                ['🫴','palm_up'],['🫷','leftwards_pushing'],['🫸','rightwards_pushing'],
+                ['👌','ok'],['🤌','pinched_fingers'],['🤏','pinch'],['✌️','victory'],
+                ['🤞','crossed_fingers'],['🫰','finger_thumb'],['🤟','love_you'],['🤘','rock'],
+                ['🤙','call_me'],['👈','left'],['👉','right'],['👆','up'],['🖕','middle_finger'],
+                ['👇','down'],['☝️','index'],['🫵','pointing_at_you'],['👍','thumbs_up'],
+                ['👎','thumbs_down'],['✊','fist'],['👊','punch'],['🤛','left_facing_fist'],
+                ['🤜','right_facing_fist'],['👏','clap'],['🙌','raising_hands'],
+                ['🫶','heart_hands'],['👐','open_hands'],['🤲','palms_up_together'],
+                ['🤝','handshake'],['🙏','pray'],['✍️','writing'],['💅','nail_care'],
+                ['🤳','selfie'],['💪','muscle'],['🦾','mechanical_arm'],['🦵','leg'],
+                ['🦿','mechanical_leg'],['🦶','foot'],['👂','ear'],['🦻','ear_hearing_aid'],
+                ['👃','nose'],['🧠','brain'],['🫀','anatomical_heart'],['🫁','lungs'],
+                ['🦷','tooth'],['🦴','bone'],['👀','eyes'],['👁️','eye'],['👅','tongue'],
+                ['👄','mouth'],['🫦','biting_lip']
             ]
         },
         {
@@ -156,68 +266,243 @@
             items: [
                 ['👶','baby'],['🧒','child'],['👦','boy'],['👧','girl'],['🧑','person'],
                 ['👨','man'],['👩','woman'],['🧓','older'],['👴','grandpa'],['👵','grandma'],
+                ['👱','blonde'],['👨‍🦰','man_red_hair'],['👩‍🦰','woman_red_hair'],
+                ['👨‍🦱','man_curly'],['👩‍🦱','woman_curly'],['👨‍🦳','man_white_hair'],
+                ['👩‍🦳','woman_white_hair'],['👨‍🦲','man_bald'],['👩‍🦲','woman_bald'],
+                ['🧔','beard'],['🧔‍♂️','man_beard'],['🧔‍♀️','woman_beard'],
+                ['👨‍⚕️','man_doctor'],['👩‍⚕️','woman_doctor'],['👨‍🎓','man_student'],
+                ['👩‍🎓','woman_student'],['👨‍🏫','man_teacher'],['👩‍🏫','woman_teacher'],
+                ['👨‍⚖️','man_judge'],['👩‍⚖️','woman_judge'],['👨‍🌾','man_farmer'],
+                ['👩‍🌾','woman_farmer'],['👨‍🍳','man_cook'],['👩‍🍳','woman_cook'],
+                ['👨‍🔧','man_mechanic'],['👩‍🔧','woman_mechanic'],['👨‍🏭','man_factory'],
+                ['👩‍🏭','woman_factory'],['👨‍💼','man_office'],['👩‍💼','woman_office'],
+                ['👨‍🔬','man_scientist'],['👩‍🔬','woman_scientist'],['👨‍💻','man_tech'],
+                ['👩‍💻','woman_tech'],['👨‍🎤','man_singer'],['👩‍🎤','woman_singer'],
+                ['👨‍🎨','man_artist'],['👩‍🎨','woman_artist'],['👨‍✈️','man_pilot'],
+                ['👩‍✈️','woman_pilot'],['👨‍🚀','man_astronaut'],['👩‍🚀','woman_astronaut'],
+                ['👨‍🚒','man_firefighter'],['👩‍🚒','woman_firefighter'],['👮','police_officer'],
+                ['🕵️','detective'],['💂','guard'],['🥷','ninja'],['👷','construction_worker'],
+                ['🫅','royalty'],['🤴','prince'],['👸','princess'],['👳','turban'],
+                ['👲','skullcap'],['🧕','headscarf'],['🤵','tuxedo'],['👰','bride'],
+                ['🤱','breastfeeding'],['🧑‍🍼','person_baby'],['👼','angel'],['🎅','santa'],
+                ['🤶','mrs_claus'],['🦸','superhero'],['🦹','supervillain'],['🧙','mage'],
+                ['🧚','fairy'],['🧛','vampire'],['🧜','merperson'],['🧝','elf'],['🧞','genie'],
+                ['🧟','zombie'],['🧌','troll'],['💆','massage'],['💇','haircut'],
+                ['🚶','walking'],['🧍','standing'],['🧎','kneeling'],['🏃','running'],
+                ['💃','dancer'],['🕺','man_dancing'],['🕴️','levitate'],['👯','dancers'],
+                ['🧘','yoga'],['🛀','bath'],['🛌','sleeping_bed'],
                 ['🙋','raising_hand'],['🤷','shrug'],['🙅','no_good'],['🙆','ok_person'],
-                ['💁','tipping_hand'],['🙇','bowing'],['🤦','facepalm']
+                ['💁','tipping_hand'],['🙇','bowing'],['🤦','facepalm'],['👥','busts'],
+                ['👤','bust'],['👪','family'],['🧑‍🤝‍🧑','people_holding_hands']
             ]
         },
         {
-            name: 'Tiere',
+            name: 'Tiere & Natur',
             items: [
                 ['🐶','dog'],['🐱','cat'],['🐭','mouse'],['🐹','hamster'],['🐰','rabbit'],
-                ['🦊','fox'],['🐻','bear'],['🐼','panda'],['🐨','koala'],['🐯','tiger'],
-                ['🦁','lion'],['🐮','cow'],['🐷','pig'],['🐸','frog'],['🐵','monkey'],
-                ['🙈','see_no_evil'],['🐔','chicken'],['🐧','penguin'],['🦅','eagle'],
-                ['🦉','owl'],['🦇','bat'],['🐺','wolf'],['🐴','horse'],['🦓','zebra'],
-                ['🦒','giraffe'],['🐘','elephant'],['🐪','camel'],['🐝','bee'],['🐛','bug'],
-                ['🦋','butterfly'],['🐌','snail'],['🐞','ladybug'],['🐜','ant'],['🦂','scorpion'],
-                ['🐙','octopus'],['🦑','squid'],['🐠','fish'],['🐟','tropical_fish'],['🐬','dolphin'],
-                ['🐳','whale'],['🦈','shark']
+                ['🦊','fox'],['🐻','bear'],['🐻‍❄️','polar_bear'],['🐼','panda'],['🐨','koala'],
+                ['🐯','tiger'],['🦁','lion'],['🐮','cow'],['🐷','pig'],['🐽','pig_nose'],
+                ['🐸','frog'],['🐵','monkey'],['🙈','see_no_evil'],['🙉','hear_no_evil'],
+                ['🙊','speak_no_evil'],['🐒','monkey_full'],['🐔','chicken'],['🐧','penguin'],
+                ['🐦','bird'],['🐤','chick'],['🐣','hatching_chick'],['🐥','front_chick'],
+                ['🦆','duck'],['🦅','eagle'],['🦉','owl'],['🦇','bat'],['🐺','wolf'],
+                ['🐗','boar'],['🐴','horse'],['🦄','unicorn'],['🐝','bee'],['🪱','worm'],
+                ['🐛','bug'],['🦋','butterfly'],['🐌','snail'],['🐞','ladybug'],['🐜','ant'],
+                ['🪰','fly'],['🪲','beetle'],['🦂','scorpion'],['🕷️','spider'],['🕸️','web'],
+                ['🦟','mosquito'],['🦗','cricket'],['🐢','turtle'],['🐍','snake'],
+                ['🦎','lizard'],['🦖','t_rex'],['🦕','sauropod'],['🐙','octopus'],
+                ['🦑','squid'],['🦐','shrimp'],['🦞','lobster'],['🦀','crab'],['🐡','blowfish'],
+                ['🐠','tropical_fish'],['🐟','fish'],['🐬','dolphin'],['🐳','whale'],
+                ['🐋','whale2'],['🦈','shark'],['🐊','crocodile'],['🐅','tiger2'],
+                ['🐆','leopard'],['🦓','zebra'],['🦍','gorilla'],['🦧','orangutan'],
+                ['🐘','elephant'],['🦣','mammoth'],['🦛','hippo'],['🦏','rhino'],
+                ['🐪','camel'],['🐫','two_hump_camel'],['🦒','giraffe'],['🦘','kangaroo'],
+                ['🦬','bison'],['🐃','water_buffalo'],['🐂','ox'],['🐄','cow2'],
+                ['🐎','racehorse'],['🐖','pig2'],['🐏','ram'],['🐑','sheep'],['🦙','llama'],
+                ['🐐','goat'],['🦌','deer'],['🐕','dog2'],['🐩','poodle'],['🦮','guide_dog'],
+                ['🐕‍🦺','service_dog'],['🐈','cat2'],['🐈‍⬛','black_cat'],['🪶','feather'],
+                ['🐓','rooster'],['🦃','turkey'],['🦤','dodo'],['🦚','peacock'],
+                ['🦜','parrot'],['🦢','swan'],['🦩','flamingo'],['🕊️','dove'],
+                ['🐇','rabbit2'],['🦝','raccoon'],['🦨','skunk'],['🦡','badger'],
+                ['🦫','beaver'],['🦦','otter'],['🦥','sloth'],['🐁','mouse2'],
+                ['🐀','rat'],['🐿️','chipmunk'],['🦔','hedgehog'],
+                ['🌵','cactus'],['🎄','christmas_tree'],['🌲','evergreen'],['🌳','deciduous'],
+                ['🌴','palm_tree'],['🪵','wood'],['🌱','seedling'],['🌿','herb'],
+                ['☘️','shamrock'],['🍀','four_leaf'],['🎍','bamboo'],['🪴','potted_plant'],
+                ['🎋','tanabata'],['🍃','leaves'],['🍂','fallen_leaf'],['🍁','maple'],
+                ['🪺','nest_eggs'],['🪹','empty_nest'],['🍄','mushroom'],['🐚','shell'],
+                ['🪨','rock'],['🪸','coral'],['💐','bouquet'],['🌷','tulip'],
+                ['🌹','rose'],['🥀','wilted_flower'],['🪻','hyacinth'],['🪷','lotus'],
+                ['🌺','hibiscus'],['🌸','cherry_blossom'],['🌼','blossom'],['🌻','sunflower']
             ]
         },
         {
-            name: 'Essen',
+            name: 'Essen & Trinken',
             items: [
                 ['🍎','apple'],['🍐','pear'],['🍊','orange'],['🍋','lemon'],['🍌','banana'],
                 ['🍉','watermelon'],['🍇','grapes'],['🍓','strawberry'],['🫐','blueberries'],
                 ['🍒','cherries'],['🍑','peach'],['🥭','mango'],['🍍','pineapple'],['🥥','coconut'],
                 ['🥝','kiwi'],['🍅','tomato'],['🍆','eggplant'],['🥑','avocado'],['🥦','broccoli'],
-                ['🥕','carrot'],['🌽','corn'],['🌶️','chili'],['🥔','potato'],['🧄','garlic'],
-                ['🧅','onion'],['🍞','bread'],['🥐','croissant'],['🧀','cheese'],['🥚','egg'],
-                ['🍳','cooking'],['🥞','pancakes'],['🥩','steak'],['🍔','burger'],['🍟','fries'],
-                ['🍕','pizza'],['🌮','taco'],['🌯','burrito'],['🥗','salad'],['🍝','spaghetti'],
-                ['🍜','ramen'],['🍣','sushi'],['🍱','bento'],['🍪','cookie'],['🎂','birthday_cake'],
-                ['🍰','cake'],['🧁','cupcake'],['🍩','doughnut'],['🍿','popcorn'],['🍫','chocolate'],
-                ['☕','coffee'],['🫖','teapot'],['🍵','tea'],['🥤','drink'],['🧋','bubble_tea'],
-                ['🍺','beer'],['🍷','wine'],['🥂','clinking_glasses'],['🍾','champagne']
+                ['🥬','leafy_green'],['🥒','cucumber'],['🌶️','chili'],['🫑','bell_pepper'],
+                ['🌽','corn'],['🥕','carrot'],['🫒','olive'],['🧄','garlic'],['🧅','onion'],
+                ['🥔','potato'],['🍠','sweet_potato'],['🥐','croissant'],['🥯','bagel'],
+                ['🍞','bread'],['🥖','baguette'],['🫓','flatbread'],['🥨','pretzel'],
+                ['🧀','cheese'],['🥚','egg'],['🍳','cooking'],['🧈','butter'],['🥞','pancakes'],
+                ['🧇','waffle'],['🥓','bacon'],['🥩','steak'],['🍗','poultry_leg'],
+                ['🍖','meat_on_bone'],['🦴','bone'],['🌭','hot_dog'],['🍔','burger'],
+                ['🍟','fries'],['🍕','pizza'],['🥪','sandwich'],['🥙','stuffed_flatbread'],
+                ['🧆','falafel'],['🌮','taco'],['🌯','burrito'],['🫔','tamale'],
+                ['🥗','salad'],['🥘','shallow_pan'],['🫕','fondue'],['🍝','spaghetti'],
+                ['🍜','ramen'],['🍲','pot_of_food'],['🍛','curry'],['🍣','sushi'],
+                ['🍱','bento'],['🥟','dumpling'],['🦪','oyster'],['🍤','fried_shrimp'],
+                ['🍙','rice_ball'],['🍚','rice'],['🍘','rice_cracker'],['🥠','fortune_cookie'],
+                ['🥮','moon_cake'],['🍢','oden'],['🍡','dango'],['🍧','shaved_ice'],
+                ['🍨','ice_cream'],['🍦','soft_ice_cream'],['🥧','pie'],['🧁','cupcake'],
+                ['🍰','cake'],['🎂','birthday_cake'],['🍮','custard'],['🍭','lollipop'],
+                ['🍬','candy'],['🍫','chocolate'],['🍿','popcorn'],['🍩','doughnut'],
+                ['🍪','cookie'],['🌰','chestnut'],['🥜','peanuts'],['🫘','beans'],['🍯','honey'],
+                ['🥛','milk'],['🍼','baby_bottle'],['☕','coffee'],['🫖','teapot'],
+                ['🍵','tea'],['🧃','juice_box'],['🥤','drink'],['🧋','bubble_tea'],
+                ['🍶','sake'],['🍺','beer'],['🍻','beers'],['🥂','clinking_glasses'],
+                ['🍷','wine'],['🥃','whiskey'],['🍸','cocktail'],['🍹','tropical_drink'],
+                ['🍾','champagne'],['🧊','ice'],['🥄','spoon'],['🍴','fork_knife'],
+                ['🍽️','plate'],['🥢','chopsticks'],['🧂','salt']
             ]
         },
         {
-            name: 'Reisen',
+            name: 'Reisen & Orte',
             items: [
-                ['🚗','car'],['🚕','taxi'],['🚌','bus'],['🏎️','racing_car'],['🚓','police_car'],
-                ['🚑','ambulance'],['🚒','fire_engine'],['🚚','delivery_truck'],['🚜','tractor'],
-                ['🛴','scooter'],['🚲','bicycle'],['🛵','motor_scooter'],['🏍️','motorcycle'],
-                ['🚨','police_light'],['🚆','train'],['🚇','metro'],['🚊','tram'],['🚄','high_speed_train'],
-                ['✈️','airplane'],['🛫','takeoff'],['🛬','landing'],['🚀','rocket'],['🛸','ufo'],
-                ['🚁','helicopter'],['⛵','sailboat'],['🚤','speedboat'],['🛳️','cruise_ship'],
-                ['🚢','ship'],['⚓','anchor'],['⛽','fuel'],['🚧','construction'],['🚦','traffic_light'],
-                ['🏁','checkered_flag'],['🗺️','map']
+                ['🚗','car'],['🚕','taxi'],['🚙','suv'],['🚌','bus'],['🚎','trolleybus'],
+                ['🏎️','racing_car'],['🚓','police_car'],['🚑','ambulance'],['🚒','fire_engine'],
+                ['🚐','minibus'],['🛻','pickup'],['🚚','delivery_truck'],['🚛','articulated_lorry'],
+                ['🚜','tractor'],['🦯','white_cane'],['🦽','manual_wheelchair'],
+                ['🦼','motor_wheelchair'],['🛴','scooter'],['🚲','bicycle'],['🛵','motor_scooter'],
+                ['🏍️','motorcycle'],['🛺','auto_rickshaw'],['🛞','wheel'],['🚨','police_light'],
+                ['🚔','oncoming_police_car'],['🚍','oncoming_bus'],['🚘','oncoming_automobile'],
+                ['🚖','oncoming_taxi'],['🚡','aerial_tramway'],['🚠','mountain_cableway'],
+                ['🚟','suspension_railway'],['🚃','railway_car'],['🚋','tram_car'],
+                ['🚞','mountain_railway'],['🚝','monorail'],['🚄','high_speed_train'],
+                ['🚅','bullet_train'],['🚈','light_rail'],['🚂','steam_locomotive'],
+                ['🚆','train'],['🚇','metro'],['🚊','tram'],['🛤️','railway_track'],
+                ['🛣️','motorway'],['⛽','fuel'],['🛢️','oil_drum'],['🚧','construction'],
+                ['🚦','traffic_light'],['🚥','horizontal_traffic_light'],['🗺️','map'],
+                ['🗿','moai'],['🗽','statue_of_liberty'],['🗼','tokyo_tower'],
+                ['🏰','castle'],['🏯','japanese_castle'],['🏟️','stadium'],['🎡','ferris_wheel'],
+                ['🎢','roller_coaster'],['🎠','carousel'],['🛝','playground_slide'],
+                ['⛲','fountain'],['⛱️','umbrella_on_ground'],['🏖️','beach_umbrella'],
+                ['🏝️','desert_island'],['🏜️','desert'],['🌋','volcano'],['⛰️','mountain'],
+                ['🏔️','snowy_mountain'],['🗻','mount_fuji'],['🏕️','camping'],['⛺','tent'],
+                ['🛖','hut'],['🏠','house'],['🏡','house_garden'],['🏘️','houses'],
+                ['🏚️','derelict_house'],['🏗️','construction_building'],['🏭','factory'],
+                ['🏢','office'],['🏬','department_store'],['🏣','japanese_post_office'],
+                ['🏤','european_post_office'],['🏥','hospital'],['🏦','bank'],['🏨','hotel'],
+                ['🏪','convenience_store'],['🏫','school'],['🏩','love_hotel'],
+                ['💒','wedding'],['🏛️','classical_building'],['⛪','church'],['🕌','mosque'],
+                ['🕍','synagogue'],['🛕','hindu_temple'],['🕋','kaaba'],['⛩️','shinto_shrine'],
+                ['🛐','place_of_worship'],['✈️','airplane'],['🛫','takeoff'],['🛬','landing'],
+                ['🛩️','small_airplane'],['💺','seat'],['🚀','rocket'],['🛸','ufo'],
+                ['🚁','helicopter'],['🛶','canoe'],['⛵','sailboat'],['🚤','speedboat'],
+                ['🛥️','motor_boat'],['🛳️','cruise_ship'],['⛴️','ferry'],['🚢','ship'],
+                ['⚓','anchor'],['🪝','hook'],['⛽','fuel'],['🚏','bus_stop'],
+                ['🏁','checkered_flag'],['🚩','triangular_flag'],['🎌','crossed_flags'],
+                ['🏳️','white_flag'],['🏴','black_flag'],['🏳️‍🌈','rainbow_flag'],
+                ['🏳️‍⚧️','transgender_flag'],['🏴‍☠️','pirate_flag']
+            ]
+        },
+        {
+            name: 'Aktivitäten & Sport',
+            items: [
+                ['⚽','soccer'],['🏀','basketball'],['🏈','football'],['⚾','baseball'],
+                ['🥎','softball'],['🎾','tennis'],['🏐','volleyball'],['🏉','rugby'],
+                ['🥏','flying_disc'],['🎱','8ball'],['🪀','yo_yo'],['🏓','ping_pong'],
+                ['🏸','badminton'],['🏒','ice_hockey'],['🏑','field_hockey'],['🥍','lacrosse'],
+                ['🏏','cricket_game'],['🪃','boomerang'],['🥅','goal_net'],['⛳','flag_in_hole'],
+                ['🪁','kite'],['🏹','bow_and_arrow'],['🎣','fishing'],['🤿','diving_mask'],
+                ['🥊','boxing_glove'],['🥋','martial_arts'],['🎽','running_shirt'],['🛹','skateboard'],
+                ['🛼','roller_skate'],['🛷','sled'],['⛸️','ice_skate'],['🥌','curling'],
+                ['🎿','ski'],['⛷️','skier'],['🏂','snowboarder'],['🪂','parachute'],
+                ['🏋️','weight_lifting'],['🤼','wrestling'],['🤸','cartwheel'],['⛹️','person_bouncing'],
+                ['🤺','fencing'],['🤾','handball'],['🏌️','golf'],['🏇','horse_racing'],
+                ['🧘','yoga'],['🏄','surfing'],['🏊','swimming'],['🤽','water_polo'],
+                ['🚣','rowboat'],['🧗','climbing'],['🚵','mountain_biker'],['🚴','biker'],
+                ['🏆','trophy'],['🥇','gold_medal'],['🥈','silver_medal'],['🥉','bronze_medal'],
+                ['🏅','sports_medal'],['🎖️','military_medal'],['🏵️','rosette'],['🎗️','reminder_ribbon'],
+                ['🎫','ticket'],['🎟️','admission_ticket'],['🎪','circus'],['🤹','juggling'],
+                ['🎭','performing_arts'],['🩰','ballet'],['🎨','artist_palette'],['🎬','clapper'],
+                ['🎤','microphone'],['🎧','headphone'],['🎼','musical_score'],['🎹','piano'],
+                ['🥁','drum'],['🪘','long_drum'],['🎷','saxophone'],['🎺','trumpet'],
+                ['🎸','guitar'],['🪕','banjo'],['🎻','violin'],['🪗','accordion'],
+                ['🪇','maracas'],['🪈','flute'],['🎲','die'],['♟️','chess_pawn'],
+                ['🎯','dart'],['🎳','bowling'],['🎮','video_game'],['🎰','slot_machine'],
+                ['🧩','puzzle']
             ]
         },
         {
             name: 'Objekte',
             items: [
-                ['📱','phone'],['💻','laptop'],['⌨️','keyboard'],['🖥️','desktop'],['🖨️','printer'],
-                ['🖱️','mouse'],['💾','floppy'],['💿','cd'],['📀','dvd'],['📷','camera'],
-                ['📹','videocamera'],['🎥','movie_camera'],['🎞️','film_strip'],['📞','phone_receiver'],
-                ['📺','tv'],['📻','radio'],['🎙️','mic'],['⏰','alarm_clock'],['⌛','hourglass'],
-                ['⏳','hourglass_flowing'],['🔋','battery'],['🔌','plug'],['💡','bulb'],
-                ['🔦','flashlight'],['🕯️','candle'],['💸','money_with_wings'],['💵','dollar_banknote'],
-                ['💴','yen_banknote'],['💶','euro_banknote'],['💷','pound_banknote'],['🪙','coin'],
-                ['💰','money_bag'],['💳','credit_card'],['💎','diamond'],['⚖️','balance'],
-                ['🔧','wrench'],['🔨','hammer'],['🛠️','hammer_and_wrench'],['⛏️','pick'],
-                ['🔩','nut_and_bolt'],['⚙️','gear'],['🧲','magnet'],['🔭','telescope'],
-                ['🔬','microscope'],['💊','pill'],['💉','syringe'],['🩸','blood'],['🌡️','thermometer']
+                ['⌚','watch'],['📱','phone'],['📲','mobile_arrow'],['💻','laptop'],
+                ['⌨️','keyboard'],['🖥️','desktop'],['🖨️','printer'],['🖱️','mouse'],
+                ['🖲️','trackball'],['🕹️','joystick'],['🗜️','clamp'],['💽','minidisc'],
+                ['💾','floppy'],['💿','cd'],['📀','dvd'],['📼','videotape'],['📷','camera'],
+                ['📸','camera_flash'],['📹','videocamera'],['🎥','movie_camera'],
+                ['🎞️','film_strip'],['📽️','projector'],['🎬','clapper'],['📞','phone_receiver'],
+                ['☎️','telephone'],['📟','pager'],['📠','fax'],['📺','tv'],['📻','radio'],
+                ['🎙️','mic'],['🎚️','level_slider'],['🎛️','control_knobs'],['🧭','compass'],
+                ['⏱️','stopwatch'],['⏲️','timer'],['⏰','alarm_clock'],['🕰️','mantelpiece_clock'],
+                ['⌛','hourglass'],['⏳','hourglass_flowing'],['📡','satellite_antenna'],
+                ['🔋','battery'],['🪫','low_battery'],['🔌','plug'],['💡','bulb'],
+                ['🔦','flashlight'],['🕯️','candle'],['🪔','diya'],['🧯','fire_extinguisher'],
+                ['🛢️','oil_drum'],['💸','money_with_wings'],['💵','dollar_banknote'],
+                ['💴','yen_banknote'],['💶','euro_banknote'],['💷','pound_banknote'],
+                ['🪙','coin'],['💰','money_bag'],['💳','credit_card'],['💎','diamond'],
+                ['⚖️','balance'],['🪜','ladder'],['🧰','toolbox'],['🪛','screwdriver'],
+                ['🔧','wrench'],['🔨','hammer'],['⚒️','hammer_pick'],['🛠️','hammer_and_wrench'],
+                ['⛏️','pick'],['🪚','saw'],['🔩','nut_and_bolt'],['⚙️','gear'],
+                ['🪤','mouse_trap'],['🧱','bricks'],['⛓️','chains'],['🧲','magnet'],
+                ['🔫','water_pistol'],['💣','bomb'],['🧨','firecracker'],['🪓','axe'],
+                ['🔪','kitchen_knife'],['🗡️','dagger'],['⚔️','crossed_swords'],['🛡️','shield'],
+                ['🚬','cigarette'],['⚰️','coffin'],['🪦','headstone'],['⚱️','funeral_urn'],
+                ['🏺','amphora'],['🔮','crystal_ball'],['📿','prayer_beads'],['🧿','nazar_amulet'],
+                ['🪬','hamsa'],['💈','barber_pole'],['⚗️','alembic'],['🔭','telescope'],
+                ['🔬','microscope'],['🕳️','hole'],['🩹','adhesive_bandage'],['🩺','stethoscope'],
+                ['💊','pill'],['💉','syringe'],['🩸','blood'],['🧬','dna'],['🦠','microbe'],
+                ['🧫','petri_dish'],['🧪','test_tube'],['🌡️','thermometer'],['🧹','broom'],
+                ['🧺','basket'],['🧻','toilet_paper'],['🪣','bucket'],['🧼','soap'],
+                ['🪥','toothbrush'],['🪒','razor'],['🧽','sponge'],['🪡','sewing_needle'],
+                ['🧷','safety_pin'],['🧴','lotion_bottle'],['🛎️','bellhop_bell'],['🔑','key'],
+                ['🗝️','old_key'],['🔐','locked_with_key'],['🔒','locked'],['🔓','unlocked'],
+                ['🔏','locked_with_pen'],['✉️','envelope'],['📨','envelope_arrow'],
+                ['📧','email'],['💌','love_letter'],['📥','inbox'],['📤','outbox'],
+                ['📦','package'],['🏷️','label'],['🔖','bookmark'],['📑','bookmark_tabs'],
+                ['📒','ledger'],['📕','closed_book'],['📗','green_book'],['📘','blue_book'],
+                ['📙','orange_book'],['📚','books'],['📓','notebook'],['📔','notebook_decorative'],
+                ['📰','newspaper'],['🗞️','rolled_newspaper'],['📃','page_with_curl'],
+                ['📜','scroll'],['📄','page'],['📋','clipboard'],['📅','calendar'],
+                ['📆','tear_off_calendar'],['🗓️','spiral_calendar'],['📇','card_index'],
+                ['🗃️','card_file_box'],['🗳️','ballot_box'],['🗄️','file_cabinet'],
+                ['📁','file_folder'],['📂','open_file_folder'],['🗂️','card_index_dividers'],
+                ['📊','bar_chart'],['📈','chart_up'],['📉','chart_down'],['📌','pushpin'],
+                ['📍','round_pushpin'],['📎','paperclip'],['🖇️','linked_paperclips'],
+                ['📏','ruler'],['📐','triangular_ruler'],['✂️','scissors'],['🖊️','pen'],
+                ['🖋️','fountain_pen'],['✒️','black_nib'],['🖌️','paintbrush'],['🖍️','crayon'],
+                ['📝','memo'],['✏️','pencil']
+            ]
+        },
+        {
+            name: 'Kleidung',
+            items: [
+                ['👓','glasses'],['🕶️','sunglasses'],['🥽','goggles'],['🥼','lab_coat'],
+                ['🦺','safety_vest'],['👔','necktie'],['👕','t_shirt'],['👖','jeans'],
+                ['🧣','scarf'],['🧤','gloves'],['🧥','coat'],['🧦','socks'],['👗','dress'],
+                ['👘','kimono'],['🥻','sari'],['🩱','one_piece_swimsuit'],['🩲','swim_brief'],
+                ['🩳','shorts'],['👙','bikini'],['👚','womans_clothes'],['🪭','folding_fan'],
+                ['👛','purse'],['👜','handbag'],['👝','clutch'],['🛍️','shopping_bags'],
+                ['🎒','school_backpack'],['🩴','thong_sandal'],['👞','mans_shoe'],
+                ['👟','running_shoe'],['🥾','hiking_boot'],['🥿','flat_shoe'],['👠','high_heel'],
+                ['👡','womans_sandal'],['🩰','ballet_shoes'],['👢','boot'],['🪮','pick_comb'],
+                ['👑','crown'],['👒','womans_hat'],['🎩','top_hat'],['🎓','mortar_board'],
+                ['🧢','billed_cap'],['🪖','military_helmet'],['⛑️','rescue_helmet'],
+                ['💄','lipstick'],['💍','ring'],['💼','briefcase']
             ]
         },
         {
@@ -225,30 +510,86 @@
             items: [
                 ['❤️','red_heart'],['🧡','orange_heart'],['💛','yellow_heart'],['💚','green_heart'],
                 ['💙','blue_heart'],['💜','purple_heart'],['🖤','black_heart'],['🤍','white_heart'],
-                ['🤎','brown_heart'],['💔','broken_heart'],['💕','two_hearts'],['💞','revolving_hearts'],
-                ['💖','sparkling_heart'],['💘','heart_arrow'],['💝','heart_ribbon'],['💟','heart_decoration'],
-                ['☮️','peace'],['✝️','cross'],['☸️','dharma'],['✡️','star_of_david'],['☯️','yin_yang'],
-                ['⚛️','atom'],['☢️','radioactive'],['☣️','biohazard'],['❌','x'],['⭕','o'],['🛑','stop'],
-                ['⛔','no_entry'],['🚫','prohibited'],['💯','100'],['‼️','exclamation_double'],
-                ['⁉️','interrobang'],['⚠️','warning'],['🔰','beginner'],['♻️','recycling'],
-                ['✅','check_mark'],['✔️','heavy_check'],['☑️','ballot_check'],['⭐','star'],
-                ['🌟','glowing_star'],['🔥','fire'],['💥','boom'],['💢','anger'],['💤','zzz'],
-                ['🔔','bell'],['🔕','bell_off'],['🎵','note'],['🎶','notes'],['💬','speech'],
-                ['💭','thought'],['🗯️','anger_bubble']
+                ['🤎','brown_heart'],['🩷','pink_heart'],['🩵','light_blue_heart'],['🩶','grey_heart'],
+                ['💔','broken_heart'],['❤️‍🔥','heart_on_fire'],['❤️‍🩹','mending_heart'],
+                ['💕','two_hearts'],['💞','revolving_hearts'],['💖','sparkling_heart'],
+                ['💘','heart_arrow'],['💝','heart_ribbon'],['💟','heart_decoration'],
+                ['☮️','peace'],['✝️','cross'],['☪️','star_crescent'],['🕉️','om'],
+                ['☸️','dharma'],['✡️','star_of_david'],['🔯','dotted_star'],['🕎','menorah'],
+                ['☯️','yin_yang'],['☦️','orthodox_cross'],['🛐','worship'],['⛎','ophiuchus'],
+                ['♈','aries'],['♉','taurus'],['♊','gemini'],['♋','cancer'],['♌','leo'],
+                ['♍','virgo'],['♎','libra'],['♏','scorpio'],['♐','sagittarius'],
+                ['♑','capricorn'],['♒','aquarius'],['♓','pisces'],['⚛️','atom'],
+                ['🆔','id'],['⚠️','warning'],['🚸','children_crossing'],['⛔','no_entry'],
+                ['🚫','prohibited'],['🚳','no_bicycles'],['🚭','no_smoking'],['🚯','no_littering'],
+                ['🚱','non_potable_water'],['🚷','no_pedestrians'],['📵','no_mobile_phones'],
+                ['🔞','underage'],['☢️','radioactive'],['☣️','biohazard'],['⬆️','arrow_up'],
+                ['↗️','arrow_upper_right'],['➡️','arrow_right'],['↘️','arrow_lower_right'],
+                ['⬇️','arrow_down'],['↙️','arrow_lower_left'],['⬅️','arrow_left'],
+                ['↖️','arrow_upper_left'],['↕️','arrow_up_down'],['↔️','left_right'],
+                ['↩️','leftwards_curving'],['↪️','rightwards_curving'],['⤴️','arrow_heading_up'],
+                ['⤵️','arrow_heading_down'],['🔃','clockwise_arrows'],['🔄','counter_clockwise'],
+                ['🔙','back'],['🔚','end'],['🔛','on'],['🔜','soon'],['🔝','top'],
+                ['🆗','ok_button'],['🆕','new_button'],['🆓','free'],['🆙','up_button'],
+                ['🆒','cool'],['🆘','sos'],['🆚','vs'],['❌','x'],['❎','negative_squared_cross'],
+                ['✅','check_mark'],['✔️','heavy_check'],['☑️','ballot_check'],
+                ['🔀','shuffle'],['🔁','repeat'],['🔂','repeat_one'],['▶️','play'],
+                ['⏩','fast_forward'],['⏭️','next_track'],['⏯️','play_pause'],['◀️','reverse'],
+                ['⏪','rewind'],['⏮️','prev_track'],['🔼','up_button_filled'],['⏫','fast_up'],
+                ['🔽','down_button_filled'],['⏬','fast_down'],['⏸️','pause'],['⏹️','stop'],
+                ['⏺️','record'],['⏏️','eject'],['🎦','cinema'],['🔅','dim'],['🔆','bright'],
+                ['📶','signal'],['📳','vibration'],['📴','mobile_off'],['♀️','female'],
+                ['♂️','male'],['⚧️','transgender'],['✖️','heavy_multiplication'],
+                ['➕','plus'],['➖','minus'],['➗','division'],['🟰','heavy_equals'],
+                ['♾️','infinity'],['‼️','exclamation_double'],['⁉️','interrobang'],
+                ['❓','red_question'],['❔','white_question'],['❕','white_exclamation'],
+                ['❗','red_exclamation'],['〰️','wavy_dash'],['💱','currency_exchange'],
+                ['💲','dollar'],['⚕️','medical'],['♻️','recycling'],['⚜️','fleur_de_lis'],
+                ['🔱','trident'],['📛','name_badge'],['🔰','beginner'],['⭕','o'],
+                ['🛑','stop'],['💯','100'],['💢','anger'],['💥','boom'],['💫','dizzy2'],
+                ['💦','sweat_drops'],['💨','dash'],['🕳️','hole'],['💬','speech'],
+                ['👁️‍🗨️','eye_speech'],['🗨️','left_speech'],['🗯️','anger_bubble'],
+                ['💭','thought'],['💤','zzz'],['⭐','star'],['🌟','glowing_star'],
+                ['✨','sparkles'],['⚡','lightning'],['🔥','fire'],['🔔','bell'],
+                ['🔕','bell_off'],['🎵','note'],['🎶','notes']
             ]
         },
         {
-            name: 'Flaggen',
+            name: 'Flaggen Europa',
             items: [
-                ['🇩🇪','deutschland'],['🇦🇹','österreich'],['🇨🇭','schweiz'],['🇪🇺','eu'],
-                ['🇬🇧','uk'],['🇺🇸','usa'],['🇫🇷','frankreich'],['🇮🇹','italien'],['🇪🇸','spanien'],
-                ['🇳🇱','niederlande'],['🇧🇪','belgien'],['🇵🇱','polen'],['🇨🇿','tschechien'],
-                ['🇭🇺','ungarn'],['🇩🇰','dänemark'],['🇸🇪','schweden'],['🇳🇴','norwegen'],
-                ['🇫🇮','finnland'],['🇮🇸','island'],['🇮🇪','irland'],['🇵🇹','portugal'],
-                ['🇬🇷','griechenland'],['🇹🇷','türkei'],['🇺🇦','ukraine'],['🇯🇵','japan'],
-                ['🇨🇳','china'],['🇰🇷','korea'],['🇮🇳','indien'],['🇧🇷','brasilien'],['🇨🇦','kanada'],
-                ['🇦🇺','australien'],['🇲🇽','mexiko'],['🏳️','weiße_flagge'],['🏴','schwarze_flagge'],
-                ['🏳️‍🌈','regenbogen'],['🏴‍☠️','pirat']
+                ['🇪🇺','eu europa'],['🇩🇪','deutschland'],['🇦🇹','österreich'],['🇨🇭','schweiz'],
+                ['🇱🇮','liechtenstein'],['🇱🇺','luxemburg'],['🇫🇷','frankreich'],['🇮🇹','italien'],
+                ['🇪🇸','spanien'],['🇵🇹','portugal'],['🇳🇱','niederlande'],['🇧🇪','belgien'],
+                ['🇬🇧','uk vereinigtes_königreich'],['🏴󠁧󠁢󠁥󠁮󠁧󠁿','england'],['🏴󠁧󠁢󠁳󠁣󠁴󠁿','schottland'],
+                ['🏴󠁧󠁢󠁷󠁬󠁳󠁿','wales'],['🇮🇪','irland'],['🇮🇸','island'],['🇳🇴','norwegen'],
+                ['🇸🇪','schweden'],['🇩🇰','dänemark'],['🇫🇮','finnland'],['🇪🇪','estland'],
+                ['🇱🇻','lettland'],['🇱🇹','litauen'],['🇵🇱','polen'],['🇨🇿','tschechien'],
+                ['🇸🇰','slowakei'],['🇭🇺','ungarn'],['🇷🇴','rumänien'],['🇧🇬','bulgarien'],
+                ['🇬🇷','griechenland'],['🇨🇾','zypern'],['🇲🇹','malta'],['🇸🇮','slowenien'],
+                ['🇭🇷','kroatien'],['🇷🇸','serbien'],['🇧🇦','bosnien_herzegowina'],
+                ['🇲🇪','montenegro'],['🇽🇰','kosovo'],['🇦🇱','albanien'],['🇲🇰','nordmazedonien'],
+                ['🇲🇩','moldau moldawien'],['🇺🇦','ukraine'],['🇧🇾','belarus weißrussland'],
+                ['🇷🇺','russland'],['🇹🇷','türkei'],['🇦🇩','andorra'],['🇲🇨','monaco'],
+                ['🇸🇲','san_marino'],['🇻🇦','vatikan'],['🇫🇴','färöer'],['🇬🇮','gibraltar'],
+                ['🇬🇬','guernsey'],['🇯🇪','jersey'],['🇮🇲','isle_of_man'],['🇦🇽','åland'],
+                ['🇸🇯','svalbard'],['🇬🇪','georgien'],['🇦🇲','armenien'],['🇦🇿','aserbaidschan'],
+                ['🇰🇿','kasachstan']
+            ]
+        },
+        {
+            name: 'Flaggen Welt',
+            items: [
+                ['🇺🇸','usa'],['🇨🇦','kanada'],['🇲🇽','mexiko'],['🇯🇵','japan'],['🇨🇳','china'],
+                ['🇰🇷','südkorea'],['🇰🇵','nordkorea'],['🇹🇼','taiwan'],['🇭🇰','hongkong'],
+                ['🇸🇬','singapur'],['🇹🇭','thailand'],['🇻🇳','vietnam'],['🇮🇩','indonesien'],
+                ['🇵🇭','philippinen'],['🇲🇾','malaysia'],['🇮🇳','indien'],['🇵🇰','pakistan'],
+                ['🇦🇪','vae'],['🇸🇦','saudi_arabien'],['🇮🇱','israel'],['🇮🇷','iran'],
+                ['🇪🇬','ägypten'],['🇿🇦','südafrika'],['🇳🇬','nigeria'],['🇲🇦','marokko'],
+                ['🇧🇷','brasilien'],['🇦🇷','argentinien'],['🇨🇱','chile'],['🇨🇴','kolumbien'],
+                ['🇵🇪','peru'],['🇻🇪','venezuela'],['🇺🇾','uruguay'],['🇦🇺','australien'],
+                ['🇳🇿','neuseeland'],['🏳️','weiße_flagge'],['🏴','schwarze_flagge'],
+                ['🏁','zielflagge'],['🚩','dreieck_flagge'],['🎌','gekreuzte_flaggen'],
+                ['🏳️‍🌈','regenbogen'],['🏳️‍⚧️','transgender'],['🏴‍☠️','pirat']
             ]
         }
     ];
@@ -396,17 +737,73 @@
     function highlightWrongTypography(body) {
         if (!body) { return 0; }
         var html = body.innerHTML;
+        // Idempotent: vorhandene Markierungen entfernen, damit wiederholte Läufe
+        // keine verschachtelten Spans oder doppelten Treffer erzeugen.
+        html = html.replace(/<span class="fcs-warn"[^>]*>([^<]*)<\/span>/g, '$1');
         var count = 0;
+
+        // Patterns werden jeweils nur auf reine Text-Segmente (>…<) angewendet,
+        // damit wir keine HTML-Tags oder Attributnamen zerschießen.
         var patterns = [
-            { re: /(?<!class="[^"]*fcs-warn[^"]*")"[^"<>]{1,200}?"/g, msg: 'Gerade "Anführungszeichen"' },
-            { re: /'[^'<>\n]{1,80}'/g, msg: "Gerade 'Halbanführungszeichen'" },
-            { re: /\.{3}/g, msg: 'Dreipunkt statt Ellipse' },
-            { re: /--/g, msg: 'Doppelter Bindestrich statt Gedankenstrich' },
-            { re: / {2,}/g, msg: 'Doppelte Leerzeichen' }
+            // --- Anführungszeichen / Satzzeichen-Basis ---
+            { re: /"[^"<>\n]{1,200}?"/g,                msg: 'Gerade "Anführungszeichen"' },
+            { re: /'[^'<>\n]{1,80}'/g,                   msg: "Gerade 'Halbanführungszeichen'" },
+            { re: /\.{3,}/g,                             msg: 'Drei-Punkte statt Ellipse (…)' },
+            { re: /(?:^|[^-])--(?!-)/g,                  msg: 'Doppelter Bindestrich statt Gedankenstrich (– / —)' },
+            { re: / {2,}/g,                              msg: 'Doppelte Leerzeichen' },
+            { re: /[!?]{2,}/g,                           msg: 'Mehrfach-Satzzeichen (!!! ?!? …)' },
+            { re: / [,.;:!?](?=\s|$|<)/g,                msg: 'Leerzeichen vor Satzzeichen' },
+
+            // --- Abkürzungen ohne Punkt / ohne Leerzeichen ---
+            // Gängige DE-Abkürzungen müssen mit Punkten geschrieben werden.
+            { re: /\b(zB|dh|ua|uU|uE|sog|bzw|ggf|usw|etc|ca|bspw|inkl|exkl|evtl|vgl|Mio|Mrd|Nr|Abb|Tab|Kap|Jh|Jhd|Std|Std|Min|Sek)\b(?!\.)/g,
+              msg: 'Abkürzung ohne Punkt(e) – korrekt z. B., d. h., bzw., ggf.' },
+            // „z.B." ohne Leerzeichen zwischen den Punkten ist DIN-untypisch.
+            { re: /\b(z\.B\.|d\.h\.|u\.a\.|u\.U\.|u\.E\.|i\.d\.R\.|i\.A\.|i\.V\.|o\.Ä\.|e\.V\.|n\.Chr\.|v\.Chr\.)/g,
+              msg: 'Abkürzung ohne schmales Leerzeichen (korrekt: z. B. mit NNBSP)' },
+
+            // --- Urheberrechts-/Marken-Ersatzschreibungen ---
+            { re: /\((?:[cC])\)/g,                       msg: '(c)/(C) statt © · Copyright-Zeichen verwenden' },
+            { re: /\((?:[rR])\)/g,                       msg: '(r)/(R) statt ® · Registered-Zeichen verwenden' },
+            { re: /\((?:tm|TM|Tm|tM)\)/g,                msg: '(tm) statt ™ · Trademark-Zeichen verwenden' },
+
+            // --- ASCII-Pfeile statt typografischer Pfeile ---
+            { re: /-->/g,                                msg: 'ASCII-Pfeil --> statt → / ⟶' },
+            { re: /->/g,                                 msg: 'ASCII-Pfeil -> statt → / ⟶' },
+            { re: /=>/g,                                 msg: 'ASCII-Pfeil => statt ⇒' },
+
+            // --- Apostroph innerhalb eines Wortes (häufig gerade statt typografisch) ---
+            { re: /[A-Za-zÄÖÜäöüß]'[A-Za-zÄÖÜäöüß]/g,    msg: "Gerader Apostroph ' – korrekt ’ (U+2019)" },
+
+            // --- Mathezeichen-Ersatz ---
+            { re: /(?:\b|\s)x(?=\s?\d)/g,                msg: '„x" statt × für Multiplikation / Maße (nur wenn gemeint)' },
+            { re: /\b\d+\s*[-xX]\s*\d+\s*(?:cm|mm|m|px|Zoll|")\b/g,
+              msg: 'Maßangabe – korrekt mit × und NBSP (z. B. 10 × 20 cm)' },
+
+            // --- Zahlen & Einheiten ---
+            // Prozent ohne Leerzeichen vor dem Zeichen
+            { re: /\d%/g,                                msg: 'Prozent-Zeichen ohne schmales Leerzeichen (z. B. 50 %)' },
+            // Währung hinter der Zahl ohne Leerzeichen (Euro, Franken, Dollar-Abkürzung)
+            { re: /\d(?:€|EUR|CHF|USD|GBP)(?!\w)/g,      msg: 'Währung ohne Leerzeichen nach der Zahl (z. B. 99 €)' },
+
+            // --- Telefonnummern ---
+            // 0049 … statt +49 …
+            { re: /\b00\d{1,3}[\s\-\/]?\d{2,}/g,         msg: 'Telefonnummer mit 00-Präfix – korrekt international mit + (z. B. +49 30 …)' },
+            // Klammern um die Vorwahl – DIN 5008 / E.123 verwendet Leerzeichen statt Klammern.
+            { re: /\(\s*0\d{2,5}\s*\)\s*\d{2,}/g,        msg: 'Telefonnummer mit Klammer-Vorwahl – DIN 5008 empfiehlt Leerzeichen (z. B. 030 123456)' },
+            // Bindestriche / Slashes innerhalb einer deutschen Rufnummer.
+            { re: /\b0\d{2,5}[\-\/]\d{3,}/g,             msg: 'Telefonnummer mit Bindestrich/Slash – DIN 5008 empfiehlt Gruppen mit Leerzeichen' },
+
+            // --- Datum / Uhrzeit (DE) ---
+            // Uhrzeit ohne Leerzeichen vor „Uhr"
+            { re: /\b\d{1,2}[:.]\d{2}Uhr\b/g,            msg: 'Uhrzeit ohne Leerzeichen vor „Uhr"' },
+            // Uhrzeit mit Leerzeichen statt Doppelpunkt / Punkt zwischen Stunde und Minute
+            { re: /\b\d{1,2} \d{2}\s?Uhr\b/g,            msg: 'Uhrzeit-Trenner fehlt – korrekt 10:30 Uhr oder 10.30 Uhr' }
         ];
+
         // Primitive Ersetzung – wir kapseln passende Textpassagen in <span class="fcs-warn">.
         // Achtung: Das passiert im Dom des Editors (Save würde die Spans mitnehmen), deshalb
-        // fügen wir eine data-mce-temp Marker-Klasse nach, die beim Save wieder entfernt werden kann.
+        // fügen wir eine data-mce-bogus="1" Marker-Klasse nach, die beim Save entfernt wird.
         html = html.replace(/>([^<]+)</g, function (_m, textSeg) {
             var seg = textSeg;
             patterns.forEach(function (p) {
@@ -502,10 +899,12 @@
     }
 
     function favsPanelHtml() {
+        // Favs/Recent-Tab: Wrapper-Divs mit data-fcs-*-section, damit
+        // refreshFavsAndRecent() nach einem Toggle die Inhalte live ersetzen kann.
         var html = ''
             + '<div data-fcs-favs-section>' + favsBlockHtml() + '</div>'
             + '<div data-fcs-recent-section>' + recentBlockHtml() + '</div>';
-        if ('' === html.replace(/<div[^>]*><\/div>/g, '').trim()) {
+        if (!getFavs().length && !getRecent().length) {
             html += '<div class="fcs-empty">Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen, um es als Favorit zu markieren.</div>';
         }
         return html;
@@ -566,11 +965,6 @@
         html += '<p class="fcs-hint">Tipp: Text im Editor markieren, dann hier auf eine Aktion klicken. Das Ergebnis ist per „Rückgängig" umkehrbar.</p>';
         html += '</div>';
         return html;
-    }
-
-    function favsPanelHtml() {
-        // Legacy – wird nicht mehr als eigener Tab verwendet. Favs/Recent leben jetzt im "Zeichen"-Tab.
-        return favsBlockHtml() + recentBlockHtml();
     }
 
     /* ---------------- CSS (einmalig in document.head) ---------------- */
@@ -681,10 +1075,41 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
     /* ---------------- Insert-Helfer ---------------- */
 
     function renderAndInsert(editor, value) {
-        // Wie das offizielle charmap-Plugin: mceInsertContent dispatchen.
-        // Das nutzt die aktuelle (erhaltene) Selektion des Editors und erzeugt
-        // keine neuen Block-Elemente / leere <p>.
-        editor.execCommand('mceInsertContent', false, value);
+        // Direktes DOM-Range-Insert: NICHT execCommand('mceInsertContent') und NICHT insertContent(),
+        // weil die den Inhalt durch die TinyMCE Content-Parser-Pipeline schicken. Bei gewissen
+        // Konfigurationen (cleanpaste, paste-events, forced_root_block-Verhalten bei bestimmten
+        // Zeichen) entstehen dort leere <p>-Blöcke. Hier fügen wir einen reinen Text-Node am
+        // aktuellen Cursor ein – das ist sowohl für Sonderzeichen als auch für Emojis korrekt.
+        if (!value) { return; }
+        var sel = editor.selection;
+        if (!sel) { return; }
+        var rng = sel.getRng();
+        if (!rng) { return; }
+        // Falls der Cursor außerhalb des Editor-Body ist (kann bei Focus-Wechseln passieren),
+        // stellen wir ihn ans Ende des Body, aber ohne neuen Block zu erzeugen.
+        var body = editor.getBody();
+        if (body && !body.contains(rng.startContainer)) {
+            rng = editor.getDoc().createRange();
+            if (body.lastChild) {
+                rng.selectNodeContents(body.lastChild);
+                rng.collapse(false);
+            } else {
+                rng.selectNodeContents(body);
+                rng.collapse(false);
+            }
+        }
+        // Selektion löschen und Text einfügen.
+        try { rng.deleteContents(); } catch (_e) {}
+        var textNode = editor.getDoc().createTextNode(value);
+        rng.insertNode(textNode);
+        // Cursor hinter dem eingefügten Zeichen positionieren.
+        rng.setStartAfter(textNode);
+        rng.collapse(true);
+        sel.setRng(rng);
+        // TinyMCE informieren, damit Undo-Stack und Dirty-State korrekt sind.
+        try { editor.undoManager.add(); } catch (_e) {}
+        try { editor.setDirty(true); } catch (_e) {}
+        try { editor.nodeChanged(); } catch (_e) {}
     }
 
     /* ---------------- Telefonnummern-Normalisierung ---------------- */

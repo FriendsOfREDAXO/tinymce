@@ -102,6 +102,20 @@ const wrapWithRoot = (html: string, tagName: string): string => {
 
 const Plugin = (): void => {
   tinymce.PluginManager.add(PLUGIN_NAME, (editor: any) => {
+    // Nur aktiv, wenn das Plugin explizit in der Profil-Plugins-Liste
+    // eingetragen ist. TinyMCE lädt externe Plugins zwar global, aber die
+    // Aktivierung darf nur pro Profil erfolgen.
+    const pluginsRaw = editor.options.get("plugins");
+    const pluginsList =
+      typeof pluginsRaw === "string"
+        ? pluginsRaw
+        : Array.isArray(pluginsRaw)
+          ? pluginsRaw.join(" ")
+          : "";
+    if (!new RegExp(`(^|[\\s,])${PLUGIN_NAME}([\\s,]|$)`).test(pluginsList)) {
+      return;
+    }
+
     const enabledOption = editor.options.get("for_rootstrip");
     const legacyEnabledOption = editor.getParam("for_rootstrip", null);
     const enabled = parseBooleanOption(
@@ -120,6 +134,13 @@ const Plugin = (): void => {
 
     editor.on("BeforeSetContent", (event: any) => {
       if (!event || typeof event.content !== "string") {
+        return;
+      }
+      // Nur den initialen Editor-Inhalt wrappen. Paste-/insertContent-/
+      // Selection-Inserts NICHT wrappen, sonst entsteht ungültiges
+      // `<p><p>…</p><p>…</p></p>`, was der Browser in zusätzliche leere
+      // `<p></p>` aufspaltet.
+      if (event.selection || event.paste || event.set === false) {
         return;
       }
       event.content = wrapWithRoot(event.content, rootTag);
