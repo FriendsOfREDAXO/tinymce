@@ -976,6 +976,11 @@
 .fcs-panel__title{flex:1;font-weight:600;font-size:13px}\
 .fcs-panel__close{border:0;background:transparent;font-size:18px;line-height:1;cursor:pointer;width:24px;height:24px;border-radius:50%;color:#666}\
 .fcs-panel__close:hover{background:rgba(0,0,0,.08);color:#222}\
+.fcs-panel__collapse{border:0;background:transparent;font-size:16px;line-height:1;cursor:pointer;width:24px;height:24px;border-radius:50%;color:#666}\
+.fcs-panel__collapse:hover{background:rgba(0,0,0,.08);color:#222}\
+.fcs-panel.is-collapsed{max-height:none;height:auto;width:auto;min-width:260px}\
+.fcs-panel.is-collapsed .fcs-panel__head{border-bottom:0;border-radius:6px}\
+.fcs-panel.is-collapsed .fcs-panel__tabs,.fcs-panel.is-collapsed .fcs-panel__body{display:none}\
 .fcs-panel__tabs{display:flex;gap:2px;padding:6px 8px 0;border-bottom:1px solid rgba(0,0,0,.06);background:#f7f7f7}\
 .fcs-panel__tab{border:0;background:transparent;padding:6px 12px;cursor:pointer;font:inherit;color:#555;border-radius:4px 4px 0 0;border:1px solid transparent;border-bottom:0;margin-bottom:-1px}\
 .fcs-panel__tab:hover{background:rgba(0,0,0,.04)}\
@@ -1021,6 +1026,8 @@ body.rex-theme-dark .fcs-panel{background:#23272e;color:#e6e9ef;border-color:#3a
 body.rex-theme-dark .fcs-panel__head{background:linear-gradient(#2a2e36,#23272e);border-bottom-color:#3a3e47}\
 body.rex-theme-dark .fcs-panel__close{color:#a9b0bc}\
 body.rex-theme-dark .fcs-panel__close:hover{background:rgba(255,255,255,.08);color:#fff}\
+body.rex-theme-dark .fcs-panel__collapse{color:#a9b0bc}\
+body.rex-theme-dark .fcs-panel__collapse:hover{background:rgba(255,255,255,.08);color:#fff}\
 body.rex-theme-dark .fcs-panel__tabs{background:#1e2127;border-bottom-color:#3a3e47}\
 body.rex-theme-dark .fcs-panel__tab{color:#a9b0bc}\
 body.rex-theme-dark .fcs-panel__tab:hover{background:rgba(255,255,255,.05)}\
@@ -1038,6 +1045,8 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-panel{background:#23272e;color:#e6
 body.rex-has-theme:not(.rex-theme-light) .fcs-panel__head{background:linear-gradient(#2a2e36,#23272e);border-bottom-color:#3a3e47}\
 body.rex-has-theme:not(.rex-theme-light) .fcs-panel__close{color:#a9b0bc}\
 body.rex-has-theme:not(.rex-theme-light) .fcs-panel__close:hover{background:rgba(255,255,255,.08);color:#fff}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__collapse{color:#a9b0bc}\
+body.rex-has-theme:not(.rex-theme-light) .fcs-panel__collapse:hover{background:rgba(255,255,255,.08);color:#fff}\
 body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tabs{background:#1e2127;border-bottom-color:#3a3e47}\
 body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tab{color:#a9b0bc}\
 body.rex-has-theme:not(.rex-theme-light) .fcs-panel__tab:hover{background:rgba(255,255,255,.05)}\
@@ -1424,6 +1433,7 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         root.innerHTML = ''
             + '<div class="fcs-panel__head" data-fcs-drag>'
             +   '<span class="fcs-panel__title">Zeichen, Symbole &amp; Emoji</span>'
+            +   '<button type="button" class="fcs-panel__collapse" data-fcs-collapse aria-label="Einklappen" title="Einklappen">–</button>'
             +   '<button type="button" class="fcs-panel__close" data-fcs-close aria-label="Schließen">×</button>'
             + '</div>'
             + '<div class="fcs-panel__tabs" role="tablist">' + tabsHtml + '</div>'
@@ -1455,6 +1465,7 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
 
         head.addEventListener('mousedown', function (e) {
             if (e.target.closest('[data-fcs-close]')) { return; }
+            if (e.target.closest('[data-fcs-collapse]')) { return; }
             dragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -1497,6 +1508,15 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             if (e.target.closest('[data-fcs-close]')) {
                 e.preventDefault();
                 root.hidden = true;
+                return;
+            }
+            var collapseBtn = e.target.closest('[data-fcs-collapse]');
+            if (collapseBtn) {
+                e.preventDefault();
+                var collapsed = root.classList.toggle('is-collapsed');
+                collapseBtn.textContent = collapsed ? '▢' : '–';
+                collapseBtn.setAttribute('aria-label', collapsed ? 'Ausklappen' : 'Einklappen');
+                collapseBtn.setAttribute('title', collapsed ? 'Ausklappen' : 'Einklappen');
                 return;
             }
             var favBtn = e.target.closest('[data-fcs-fav-toggle]');
