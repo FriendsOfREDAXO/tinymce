@@ -574,7 +574,7 @@
     /* ---------------- CSS (einmalig in document.head) ---------------- */
 
     var CSS = '\
-.fcs-panel{position:fixed;z-index:100100;width:460px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;background:#fff;color:#222;border:1px solid rgba(0,0,0,.15);border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.25);font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}\
+.fcs-panel{position:fixed;z-index:100100;width:520px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;background:#fff;color:#222;border:1px solid rgba(0,0,0,.15);border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.25);font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}\
 .fcs-panel[hidden]{display:none!important}\
 .fcs-panel__head{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.08);cursor:move;user-select:none;background:linear-gradient(#fafafa,#f1f1f1);border-radius:6px 6px 0 0}\
 .fcs-panel__title{flex:1;font-weight:600;font-size:13px}\
@@ -597,13 +597,13 @@ body.rex-theme-dark .fcs-group--pinned{background:rgba(246,166,35,.08);border-co
 body.rex-theme-dark .fcs-group--pinned .fcs-group-title{color:#f6c772}\
 .fcs-empty{padding:24px 16px;text-align:center;color:#888;font-size:13px;line-height:1.5;border:1px dashed rgba(0,0,0,.15);border-radius:6px;background:rgba(0,0,0,.02)}\
 body.rex-theme-dark .fcs-empty{color:#aaa;border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.03)}\
-.fcs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:4px}\
+.fcs-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}\
 .fcs-cell{position:relative;display:flex}\
 .fcs-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;min-height:60px;color:inherit;font:inherit;text-align:center;overflow:hidden}\
 .fcs-btn:hover,.fcs-btn:focus-visible{background:rgba(75,154,217,.12);border-color:rgba(75,154,217,.4);outline:none}\
 .fcs-glyph{font-size:22px;line-height:1;min-height:22px;display:inline-block}\
 .fcs-glyph--invisible{color:#8a94a3;font-weight:400;opacity:.8}\
-.fcs-name{font-size:11px;line-height:1.25;color:#666;word-break:break-word}\
+.fcs-name{font-size:11px;line-height:1.25;color:#666;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}\
 .fcs-fav{position:absolute;top:2px;right:2px;width:20px;height:20px;border:0;background:transparent;color:#c0c4ca;cursor:pointer;padding:0;font-size:14px;line-height:20px;text-align:center;border-radius:50%}\
 .fcs-fav:hover{color:#f6a623;background:rgba(246,166,35,.12)}\
 .fcs-fav.is-fav{color:#f6a623}\
@@ -767,7 +767,7 @@ body.rex-theme-dark .fcs-action:hover{background:#33414f;border-color:#4b9ad9}\
         // Initiale Position: rechts oben in Editor-Nähe.
         var container = editor.getContainer();
         var rect = container ? container.getBoundingClientRect() : { top: 80, right: window.innerWidth - 20 };
-        var panelW = 460;
+        var panelW = 520;
         var left = Math.max(12, Math.min(window.innerWidth - panelW - 12, (rect.right || window.innerWidth) - panelW));
         var top = Math.max(12, (rect.top || 80));
         root.style.left = left + 'px';
