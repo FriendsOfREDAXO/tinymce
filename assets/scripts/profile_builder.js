@@ -105,7 +105,7 @@ function initTinyMceProfileAssistant() {
 
     // Common Settings
     let settingsHtml = '<br><legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="number" class="form-control builder-height" value="400"></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="text" class="form-control builder-height" value="400" placeholder="400, 400px, 50vh, 80%, auto"><p class="help-block" style="margin-top:4px;">' + (i18n.height_help || 'Zahl (px), oder CSS-Einheit (px, vh, vw, %, em, rem). <code>auto</code> bzw. <code>wachsend</code> = Editor wächst mit dem Inhalt (aktiviert das autoresize-Plugin).') + '</p></div></div>';
     settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.language || 'Language') + '</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
     settingsHtml += '<div class="col-md-4"><div class="checkbox" style="margin-top: 25px;"><label><input type="checkbox" class="builder-menubar" checked> ' + (i18n.menubar || 'Show Menubar') + '</label></div></div>';
     settingsHtml += '</div>';
@@ -150,12 +150,6 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.document_base_url || 'Document Base URL') + '</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
     settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.entity_encoding || 'Entity Encoding') + '</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
     
-    settingsHtml += '</div><div class="row">';
-    
-    // PowerPaste
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.powerpaste_word_import || 'PowerPaste Word Import') + '</label><select class="form-control builder-pp-word"><option value="clean" selected>clean</option><option value="merge">merge</option><option value="prompt">prompt</option></select></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.powerpaste_html_import || 'PowerPaste HTML Import') + '</label><select class="form-control builder-pp-html"><option value="merge" selected>merge</option><option value="clean">clean</option><option value="prompt">prompt</option></select></div></div>';
-
     settingsHtml += '</div>';
 
     // Extras (Codesample, RelList, TOC)
@@ -169,6 +163,7 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
     settingsHtml += '<div class="form-group"><label>Dropdown Title</label><input type="text" class="form-control builder-yform-title" value="YForm Datensätze"></div>';
     settingsHtml += '<table class="table table-striped" id="builder-yform-table"><thead><tr><th>Title</th><th>Table</th><th>Field</th><th>Link-Schema (opt.)</th><th></th></tr></thead><tbody></tbody></table>';
+    settingsHtml += '<p class="help-block" style="margin-top:4px;">' + (i18n.link_schema_help || '<strong>Link-Schema (optional):</strong> URL-Muster für den erzeugten Link. Platzhalter: <code>[id]</code> = ID des YForm-Datensatzes, <code>[field]</code> = gewählter Feldwert. Beispiele: <code>index.php?article_id=5&amp;news=[id]</code> oder <code>/produkt/[id]</code>. Leer lassen = es wird nur der Feldwert als Link-Text eingefügt.') + '</p>';
     settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-yform-add"><i class="rex-icon fa-plus"></i> Add Item</button>';
     settingsHtml += '</div></div>';
 
@@ -684,6 +679,28 @@ function escapeString(str) {
     return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
+/**
+ * Parst den Höhen-Input aus dem Profil-Assistenten.
+ *  - leer / ungültig  → { num: 400 }
+ *  - reine Zahl       → { num: 400 }
+ *  - Zahl + Einheit   → { css: "50vh" }      (px, vh, vw, %, em, rem)
+ *  - "auto"/"wachsend"→ { autoresize: true, min: 200 }
+ */
+function parseHeightValue(raw) {
+    const s = String(raw || '').trim().toLowerCase();
+    if (!s) return { num: 400 };
+    if (s === 'auto' || s === 'wachsend' || s === 'grow' || s === 'autoresize') {
+        return { autoresize: true, min: 200 };
+    }
+    const m = s.match(/^(\d+(?:\.\d+)?)(px|vh|vw|%|em|rem)?$/);
+    if (!m) return { num: 400 };
+    const n = parseFloat(m[1]);
+    if (!m[2] || m[2] === 'px') {
+        return { num: Math.round(n) };
+    }
+    return { css: m[1] + m[2] };
+}
+
 function generateConfig($textarea, $builderBody) {
     const i18n = rex.tinymceProfileI18n || {};
     const options = rex.tinymceProfileOptions || {};
@@ -709,9 +726,15 @@ function generateConfig($textarea, $builderBody) {
     }
 
     const toolbar = escapeString($builderBody.find('.builder-toolbar-input').val());
-    const height = parseInt($builderBody.find('.builder-height').val()) || 400;
+    const heightRaw = String($builderBody.find('.builder-height').val() || '').trim();
+    const height = parseHeightValue(heightRaw);
     const lang = escapeString($builderBody.find('.builder-lang').val() || 'de');
     const menubar = $builderBody.find('.builder-menubar').is(':checked');
+
+    // Autoresize: Editor wächst mit Inhalt
+    if (height && height.autoresize && !plugins.includes('autoresize')) {
+        plugins.push('autoresize');
+    }
 
     // Advanced Values
     const imageCaption = $builderBody.find('.builder-image-caption').is(':checked');
@@ -723,8 +746,6 @@ function generateConfig($textarea, $builderBody) {
     
     const baseUrl = escapeString($builderBody.find('.builder-base-url').val());
     const entityEncoding = escapeString($builderBody.find('.builder-entity-encoding').val());
-    const ppWord = escapeString($builderBody.find('.builder-pp-word').val());
-    const ppHtml = escapeString($builderBody.find('.builder-pp-html').val());
     
     const tocDepth = parseInt($builderBody.find('.builder-toc-depth').val()) || 3;
     const tocHeader = escapeString($builderBody.find('.builder-toc-header').val() || 'div');
@@ -845,13 +866,19 @@ function generateConfig($textarea, $builderBody) {
         configStr += `toolbar: '${finalToolbar}',\n`;
     }
     
-    configStr += `height: ${height},\n\n`;
+    // Height: number | 'px|vh|vw|%|em|rem' | autoresize (min_height)
+    if (height && height.autoresize) {
+        configStr += `min_height: ${height.min},\n`;
+        configStr += `autoresize_bottom_margin: 20,\n\n`;
+    } else if (height && height.css) {
+        configStr += `height: '${height.css}',\n\n`;
+    } else {
+        configStr += `height: ${(height && height.num) || 400},\n\n`;
+    }
     
     // Advanced
     configStr += `image_caption: ${imageCaption},\n`;
     configStr += `image_uploadtab: ${imageUploadTab},\n`;
-    configStr += `powerpaste_word_import: "${ppWord}",\n`;
-    configStr += `powerpaste_html_import: "${ppHtml}",\n`;
     configStr += `relative_urls: ${relativeUrls},\n`;
     configStr += `remove_script_host: ${removeScriptHost},\n`;
     configStr += `document_base_url: "${baseUrl}",\n`;
@@ -1012,6 +1039,15 @@ function loadFromConfig($textarea, $builderBody) {
     // Common
     if (typeof cfg.height === 'number') {
         $builderBody.find('.builder-height').val(cfg.height);
+    } else if (typeof cfg.height === 'string' && cfg.height.trim()) {
+        $builderBody.find('.builder-height').val(cfg.height.trim());
+    } else {
+        const pluginList = Array.isArray(cfg.plugins)
+            ? cfg.plugins
+            : (typeof cfg.plugins === 'string' ? cfg.plugins.split(/\s+/) : []);
+        if (typeof cfg.min_height === 'number' && pluginList.indexOf('autoresize') !== -1) {
+            $builderBody.find('.builder-height').val('auto');
+        }
     }
     if (typeof cfg.language === 'string') {
         $builderBody.find('.builder-lang').val(cfg.language);
@@ -1064,8 +1100,6 @@ function loadFromConfig($textarea, $builderBody) {
     const strMap = {
         document_base_url: '.builder-base-url',
         entity_encoding: '.builder-entity-encoding',
-        powerpaste_word_import: '.builder-pp-word',
-        powerpaste_html_import: '.builder-pp-html',
         tinymce_media_type: '.builder-media-type',
     };
     Object.keys(strMap).forEach((key) => {

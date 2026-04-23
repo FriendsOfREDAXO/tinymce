@@ -105,6 +105,8 @@ tinymce_selected_toolbar = Selected Toolbar (Drag to reorder)
 tinymce_toolbar_result = Toolbar String (Result)
 tinymce_common_settings = Common Settings
 tinymce_height = Height
+tinymce_height_help = Number (px), or CSS unit (px, vh, vw, %, em, rem). <code>auto</code> / <code>wachsend</code> = editor grows with its content (enables the autoresize plugin).
+tinymce_link_schema_help = <strong>Link schema (optional):</strong> URL pattern for the generated link. Placeholders: <code>[id]</code> = YForm record ID, <code>[field]</code> = selected field value. Examples: <code>index.php?article_id=5&amp;news=[id]</code> or <code>/product/[id]</code>. Leave empty to insert only the field value as link text.
 tinymce_menubar = Show Menubar
 tinymce_language = Language
 tinymce_advanced_settings = Advanced Settings
@@ -119,8 +121,6 @@ tinymce_remove_script_host = Remove Script Host
 tinymce_convert_urls = Convert URLs
 tinymce_document_base_url = Document Base URL
 tinymce_entity_encoding = Entity Encoding
-tinymce_powerpaste_word_import = PowerPaste Word Import
-tinymce_powerpaste_html_import = PowerPaste HTML Import
 tinymce_extras_defaults = Extras (Defaults)
 tinymce_default_codesample_languages = Default Codesample Languages
 tinymce_default_rellist = Default Rel List

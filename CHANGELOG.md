@@ -1,6 +1,40 @@
 Changelog
 =========
 
+Version 8.4.2
+-------------------------------
+
+### Profil-Assistent – Höhe akzeptiert jetzt px/vh/%/em/rem und `auto` (autoresize)
+
+Das Feld **Höhe** war bisher ein reines `<input type="number">`. Einträge wie `50vh`, `80%` oder `auto` wurden vom Browser gar nicht erst akzeptiert und beim Speichern landete immer nur `height: 400` in der generierten Konfiguration – die vom User eingestellte Höhe wurde also effektiv ignoriert.
+
+Jetzt:
+
+* Input ist `type="text"` mit Placeholder und Hilfetext.
+* Akzeptierte Werte: reine Zahl (→ `height: 400`), Zahl mit CSS-Einheit `px|vh|vw|%|em|rem` (→ `height: '50vh'`) oder `auto` bzw. `wachsend` (→ aktiviert das `autoresize`-Plugin und schreibt `min_height` + `autoresize_bottom_margin`, damit der Editor mit dem Inhalt mitwächst).
+* Beim Re-Import bestehender Konfigs werden Zahlen, CSS-Strings und `min_height + autoresize`-Kombis wieder korrekt in das Feld geladen.
+
+### PowerPaste-Einstellungen entfernt
+
+PowerPaste ist ein kostenpflichtiges TinyMCE-Cloud-Plugin und in diesem AddOn nicht enthalten (Paste-Handling läuft über `cleanpaste`/`smartpaste`). Die beiden Felder **PowerPaste Word Import** und **PowerPaste HTML Import** im Profil-Assistenten haben daher nichts bewirkt, außer unnötige `powerpaste_*`-Optionen in die generierte Config zu schreiben, die von der lokalen TinyMCE-Installation ohnehin ignoriert wurden.
+
+* UI-Felder entfernt (`profile_builder.js`).
+* Generator-Output produziert keine `powerpaste_*`-Zeilen mehr.
+* Re-Import-Mapping entfernt.
+* `install.php`: Default-Profile 1 (*full*) und 3 (*default*) enthalten die `powerpaste_*`-Zeilen nicht mehr.
+* i18n-Keys `tinymce_powerpaste_word_import` / `…_html_import` sowie die Einträge in `Provider/Assets.php` entfernt.
+
+### Link-Schema im YForm-Link-Config-Block ist jetzt erklärt
+
+Die Spalte **Link-Schema (opt.)** in der YForm-Link-Konfiguration war in der UI bisher ohne Erklärung. Nutzer wussten nicht, wofür das Feld gedacht ist und was sie dort eintragen sollen.
+
+* Direkt unter der Tabelle steht jetzt ein Hilfetext:
+  * Platzhalter `[id]` = ID des YForm-Datensatzes
+  * Platzhalter `[field]` = ausgewählter Feldwert
+  * Beispiele: `index.php?article_id=5&news=[id]` oder `/produkt/[id]`
+  * Leer lassen = es wird nur der reine Feldwert als Link-Text eingefügt.
+* Neuer i18n-Key `tinymce_link_schema_help` (de/en).
+
 Version 8.4.1
 -------------------------------
 

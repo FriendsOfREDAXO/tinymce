@@ -108,6 +108,8 @@ tinymce_selected_toolbar = Ausgewählte Toolbar (Ziehen zum Neuanordnen)
 tinymce_toolbar_result = Toolbar String (Ergebnis)
 tinymce_common_settings = Allgemeine Einstellungen
 tinymce_height = Höhe
+tinymce_height_help = Zahl (px), oder CSS-Einheit (px, vh, vw, %, em, rem). <code>auto</code> bzw. <code>wachsend</code> = Editor wächst mit dem Inhalt (aktiviert das autoresize-Plugin).
+tinymce_link_schema_help = <strong>Link-Schema (optional):</strong> URL-Muster für den erzeugten Link. Platzhalter: <code>[id]</code> = ID des YForm-Datensatzes, <code>[field]</code> = gewählter Feldwert. Beispiele: <code>index.php?article_id=5&amp;news=[id]</code> oder <code>/produkt/[id]</code>. Leer lassen = nur der Feldwert wird als Link-Text eingefügt.
 tinymce_menubar = Menüleiste anzeigen
 tinymce_language = Sprache
 tinymce_advanced_settings = Erweiterte Einstellungen
@@ -122,8 +124,6 @@ tinymce_remove_script_host = Script Host entfernen
 tinymce_convert_urls = URLs konvertieren
 tinymce_document_base_url = Dokument Basis URL
 tinymce_entity_encoding = Entity Encoding
-tinymce_powerpaste_word_import = PowerPaste Word Import
-tinymce_powerpaste_html_import = PowerPaste HTML Import
 tinymce_extras_defaults = Extras (Standards)
 tinymce_default_codesample_languages = Standard Codesample Sprachen
 tinymce_default_rellist = Standard Rel Liste
