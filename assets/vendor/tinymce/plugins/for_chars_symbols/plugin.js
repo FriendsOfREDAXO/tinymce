@@ -618,8 +618,7 @@
         { id: 'nbsp_units',   label: 'Geschütztes Leerzeichen vor Einheiten setzen (5 kg → 5 kg)' },
         { id: 'softhyphen',   label: 'Weiche Trennstellen in langen Wörtern vorschlagen' },
         { id: 'phone_intl',   label: 'Telefonnummer(n) → international (E.164, +49 …)' },
-        { id: 'phone_nat',    label: 'Telefonnummer(n) → national (0 …)' },
-        { id: 'find_wrong',   label: 'Typografische „Sünden" im Editor visuell markieren' }
+        { id: 'phone_nat',    label: 'Telefonnummer(n) → national (0 …)' }
     ];
 
     /* ---------------- Storage: Favoriten + Recent ---------------- */
@@ -732,90 +731,6 @@
             }
             return out;
         });
-    }
-
-    function highlightWrongTypography(body) {
-        if (!body) { return 0; }
-        var html = body.innerHTML;
-        // Idempotent: vorhandene Markierungen entfernen, damit wiederholte Läufe
-        // keine verschachtelten Spans oder doppelten Treffer erzeugen.
-        html = html.replace(/<span class="fcs-warn"[^>]*>([^<]*)<\/span>/g, '$1');
-        var count = 0;
-
-        // Patterns werden jeweils nur auf reine Text-Segmente (>…<) angewendet,
-        // damit wir keine HTML-Tags oder Attributnamen zerschießen.
-        var patterns = [
-            // --- Anführungszeichen / Satzzeichen-Basis ---
-            { re: /"[^"<>\n]{1,200}?"/g,                msg: 'Gerade "Anführungszeichen"' },
-            { re: /'[^'<>\n]{1,80}'/g,                   msg: "Gerade 'Halbanführungszeichen'" },
-            { re: /\.{3,}/g,                             msg: 'Drei-Punkte statt Ellipse (…)' },
-            { re: /(?:^|[^-])--(?!-)/g,                  msg: 'Doppelter Bindestrich statt Gedankenstrich (– / —)' },
-            { re: / {2,}/g,                              msg: 'Doppelte Leerzeichen' },
-            { re: /[!?]{2,}/g,                           msg: 'Mehrfach-Satzzeichen (!!! ?!? …)' },
-            { re: / [,.;:!?](?=\s|$|<)/g,                msg: 'Leerzeichen vor Satzzeichen' },
-
-            // --- Abkürzungen ohne Punkt / ohne Leerzeichen ---
-            // Gängige DE-Abkürzungen müssen mit Punkten geschrieben werden.
-            { re: /\b(zB|dh|ua|uU|uE|sog|bzw|ggf|usw|etc|ca|bspw|inkl|exkl|evtl|vgl|Mio|Mrd|Nr|Abb|Tab|Kap|Jh|Jhd|Std|Std|Min|Sek)\b(?!\.)/g,
-              msg: 'Abkürzung ohne Punkt(e) – korrekt z. B., d. h., bzw., ggf.' },
-            // „z.B." ohne Leerzeichen zwischen den Punkten ist DIN-untypisch.
-            { re: /\b(z\.B\.|d\.h\.|u\.a\.|u\.U\.|u\.E\.|i\.d\.R\.|i\.A\.|i\.V\.|o\.Ä\.|e\.V\.|n\.Chr\.|v\.Chr\.)/g,
-              msg: 'Abkürzung ohne schmales Leerzeichen (korrekt: z. B. mit NNBSP)' },
-
-            // --- Urheberrechts-/Marken-Ersatzschreibungen ---
-            { re: /\((?:[cC])\)/g,                       msg: '(c)/(C) statt © · Copyright-Zeichen verwenden' },
-            { re: /\((?:[rR])\)/g,                       msg: '(r)/(R) statt ® · Registered-Zeichen verwenden' },
-            { re: /\((?:tm|TM|Tm|tM)\)/g,                msg: '(tm) statt ™ · Trademark-Zeichen verwenden' },
-
-            // --- ASCII-Pfeile statt typografischer Pfeile ---
-            { re: /-->/g,                                msg: 'ASCII-Pfeil --> statt → / ⟶' },
-            { re: /->/g,                                 msg: 'ASCII-Pfeil -> statt → / ⟶' },
-            { re: /=>/g,                                 msg: 'ASCII-Pfeil => statt ⇒' },
-
-            // --- Apostroph innerhalb eines Wortes (häufig gerade statt typografisch) ---
-            { re: /[A-Za-zÄÖÜäöüß]'[A-Za-zÄÖÜäöüß]/g,    msg: "Gerader Apostroph ' – korrekt ’ (U+2019)" },
-
-            // --- Mathezeichen-Ersatz ---
-            { re: /(?:\b|\s)x(?=\s?\d)/g,                msg: '„x" statt × für Multiplikation / Maße (nur wenn gemeint)' },
-            { re: /\b\d+\s*[-xX]\s*\d+\s*(?:cm|mm|m|px|Zoll|")\b/g,
-              msg: 'Maßangabe – korrekt mit × und NBSP (z. B. 10 × 20 cm)' },
-
-            // --- Zahlen & Einheiten ---
-            // Prozent ohne Leerzeichen vor dem Zeichen
-            { re: /\d%/g,                                msg: 'Prozent-Zeichen ohne schmales Leerzeichen (z. B. 50 %)' },
-            // Währung hinter der Zahl ohne Leerzeichen (Euro, Franken, Dollar-Abkürzung)
-            { re: /\d(?:€|EUR|CHF|USD|GBP)(?!\w)/g,      msg: 'Währung ohne Leerzeichen nach der Zahl (z. B. 99 €)' },
-
-            // --- Telefonnummern ---
-            // 0049 … statt +49 …
-            { re: /\b00\d{1,3}[\s\-\/]?\d{2,}/g,         msg: 'Telefonnummer mit 00-Präfix – korrekt international mit + (z. B. +49 30 …)' },
-            // Klammern um die Vorwahl – DIN 5008 / E.123 verwendet Leerzeichen statt Klammern.
-            { re: /\(\s*0\d{2,5}\s*\)\s*\d{2,}/g,        msg: 'Telefonnummer mit Klammer-Vorwahl – DIN 5008 empfiehlt Leerzeichen (z. B. 030 123456)' },
-            // Bindestriche / Slashes innerhalb einer deutschen Rufnummer.
-            { re: /\b0\d{2,5}[\-\/]\d{3,}/g,             msg: 'Telefonnummer mit Bindestrich/Slash – DIN 5008 empfiehlt Gruppen mit Leerzeichen' },
-
-            // --- Datum / Uhrzeit (DE) ---
-            // Uhrzeit ohne Leerzeichen vor „Uhr"
-            { re: /\b\d{1,2}[:.]\d{2}Uhr\b/g,            msg: 'Uhrzeit ohne Leerzeichen vor „Uhr"' },
-            // Uhrzeit mit Leerzeichen statt Doppelpunkt / Punkt zwischen Stunde und Minute
-            { re: /\b\d{1,2} \d{2}\s?Uhr\b/g,            msg: 'Uhrzeit-Trenner fehlt – korrekt 10:30 Uhr oder 10.30 Uhr' }
-        ];
-
-        // Primitive Ersetzung – wir kapseln passende Textpassagen in <span class="fcs-warn">.
-        // Achtung: Das passiert im Dom des Editors (Save würde die Spans mitnehmen), deshalb
-        // fügen wir eine data-mce-bogus="1" Marker-Klasse nach, die beim Save entfernt wird.
-        html = html.replace(/>([^<]+)</g, function (_m, textSeg) {
-            var seg = textSeg;
-            patterns.forEach(function (p) {
-                seg = seg.replace(p.re, function (hit) {
-                    count++;
-                    return '<span class="fcs-warn" data-mce-bogus="1" title="' + p.msg.replace(/"/g,'&quot;') + '">' + hit + '</span>';
-                });
-            });
-            return '>' + seg + '<';
-        });
-        body.innerHTML = html;
-        return count;
     }
 
     /* ---------------- HTML-Panels (für TinyMCE Dialog) ---------------- */
@@ -1066,7 +981,6 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
 ';
 
     var EDITOR_CSS = '\
-.fcs-warn{background:rgba(246,166,35,.25);outline:1px dashed rgba(246,166,35,.8);border-radius:2px}\
 .fcs-inv-mark{background:rgba(75,154,217,.18);border-radius:2px;color:#4b6fa5;font-weight:600;padding:0 1px;outline:1px dashed rgba(75,154,217,.4)}\
 .fcs-inv-mark::before{content:attr(data-fcs-inv-label);font-size:.75em;opacity:.9}\
 ';
@@ -1353,14 +1267,9 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             case 'softhyphen':  selection.setContent(esc(suggestSoftHyphens(content || ''))); break;
             case 'phone_intl':  runPhoneAction(editor, 'intl', locale); return;
             case 'phone_nat':   runPhoneAction(editor, 'nat', locale); return;
-            case 'find_wrong':
-                var body = editor.getBody();
-                var n = highlightWrongTypography(body);
-                editor.windowManager.alert(n + ' typografische Hinweise markiert. Rückgängig über Strg+Z.');
-                break;
             default: break;
         }
-        if (actionId !== 'find_wrong' && !content) {
+        if (!content) {
             // Leichter Hinweis statt blockierender Alert – das Panel bleibt offen.
             try { editor.notificationManager.open({ text: 'Kein Text markiert.', type: 'info', timeout: 2500 }); } catch (_e) {}
         }

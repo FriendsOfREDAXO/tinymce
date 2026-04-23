@@ -14,7 +14,7 @@ Einheitlicher Picker für Sonderzeichen, native Emojis und Typografie-Helfer, um
 - **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird doppelt escaped.
 - **Direkt-Einfüge-Menu-Items** (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`, Sammelmenü `fcs_insert_invisibles`) für Einfügen-Menüs.
 - **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Die Marker sind `data-mce-bogus="1"` – werden nie gespeichert.
-- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen-Vorschläge, Fehler-Highlight.
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
 - **Shortcut:** `Strg/⌘ + Shift + I`. Locale via `for_chars_symbols_locale` (`de`, `de-ch`, `en`, `fr`).
 - **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
 
@@ -40,7 +40,7 @@ Großer Dank an @alexwenz für das Feedback und die Anregungen – der Picker is
   - *Musik* – Noten und Schlüssel (`♩`, `♪`, `♫`, `♬`, `♭`, `♮`, `♯`, `𝄞`, `𝄢`).
   - *Recht & Verwaltung* – `§`, `¶`, `©`, `®`, `™`, `℗`, `℠`, `№`, `℅`, `℡`, `℻`, `☎`, `✉`, `✍`.
   - *Aufzählungs-Symbole* – Bullets, Sterne, Haken (`✓`, `✔`, `✗`, `✘`), dekorative Pfeile.
-- **Typographie-Fehler-Erkennung** erweitert auf ~25 Muster: mehrfache Satzzeichen, Leerzeichen vor Satzzeichen, fehlende Abkürzungspunkte (`zB`, `dh`, `bzw` …), Abkürzungen ohne NNBSP (`z.B.`, `d.h.`, `i.d.R.`, `e.V.` …), ASCII-Arrows (`->`, `=>`, `-->`), gerade Apostrophe im Wort, Prozent-/Währungs-Abstände, Maßangaben (`10x20cm`), Telefonnummern-Muster, Uhrzeiten.
+- **Typographie-Fehler-Erkennung entfernt**: die Linter-Funktion „Typografische Sünden finden" zieht in das geplante `for_a11y`-Plugin um, wo sie konzeptionell besser aufgehoben ist (Content-/Accessibility-Linting). Die *Aktionen auf Markierung* (Anführungszeichen DE/CH/EN/FR, en-/em-Dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen, Telefonnummern) bleiben im Picker.
 - **Emoji-Katalog deutlich erweitert** (~1000 statt ~400 Einträge) inkl. Hautton-/Beruf-Varianten und deutschem Keyword-Mapping. Flaggen in **Europa** (alle EU-Staaten, Kleinstaaten, Territorien) und **Welt** aufgeteilt.
 - **Dark Mode** für den Profil-Assistenten: die Drag-&-Drop-Zonen des Toolbar-Builders nutzen jetzt CSS-Variablen und passen sich an `body.rex-theme-dark` bzw. `prefers-color-scheme: dark` an.
 - **Favoriten-Panel**: die Live-Aktualisierung beim Hinzufügen eines Favoriten wurde repariert (doppelte Funktionsdefinition entfernt, Section-Wrapper wiederhergestellt).
