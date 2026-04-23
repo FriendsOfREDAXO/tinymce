@@ -28,6 +28,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_toc', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_toc/plugin.min.js'), 'for_toc_insert');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_toc', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_toc/plugin.min.js'), 'for_toc_update');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_markdown', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_markdown/plugin.min.js'), 'for_markdown_paste');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_rootstrip', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_rootstrip/plugin.min.js'));
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

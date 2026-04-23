@@ -1,4 +1,5 @@
 .DS_Store
+.history/
 node_modules
 
 # staging / build directory for local builds
@@ -7,3 +8,4 @@ build/
 # lockfiles
 package-lock.json
 pnpm-lock.yaml
+

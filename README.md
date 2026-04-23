@@ -1,10 +1,10 @@
-# TinyMCE 8 - REDAXO-AddOn 
+# TinyMCE 8 - REDAXO-AddOn
 
-Stellt den TinyMCE 8 Editor im CMS REDAXO bereit. 
+Stellt den TinyMCE 8 Editor im CMS REDAXO bereit.
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/tinymce/blob/assets/screenshot.png?raw=true)
 
-## Anwendung: 
+## Anwendung:
 
 **Moduleingabe**
 
@@ -12,10 +12,10 @@ Stellt den TinyMCE 8 Editor im CMS REDAXO bereit.
  <textarea class="tiny-editor form-control" data-profile="full" name="REX_INPUT_VALUE[1]">REX_VALUE[1]</textarea>
 ```
 
-- `data-profile="full"`definiert das gewünschte Profil 
+- `data-profile="full"`definiert das gewünschte Profil
 - `data-lang="de"`legt die Sprache für den Editor fest
 
-> Wählt man als profil `data-profile="default"`, erhält man den Editor in der Grundkonfiguration. 
+> Wählt man als profil `data-profile="default"`, erhält man den Editor in der Grundkonfiguration.
 
 **Modulausgabe**
 
@@ -25,17 +25,17 @@ REX_VALUE[id=1 output=html]
 
 ### Verwendung in YForm
 
-- Im individuellen Attribute-Feld: ``` {"class":"tiny-editor","data-profile":"full"} ```
+- Im individuellen Attribute-Feld: `{"class":"tiny-editor","data-profile":"full"}`
 - Weitere Attribute kommagetrennt möglich
 
 ### Verwendung in MForm
 
 ```php
 $mform = new MForm();
-$mform->addTextAreaField(1, 
+$mform->addTextAreaField(1,
         array(
         'label'=>'Text',
-        'class'=>'tiny-editor', 
+        'class'=>'tiny-editor',
         'data-profile'=>'full')
         );
 echo $mform->show();
@@ -54,6 +54,7 @@ Bei der Aktualisierung von älteren Versionen (tinymce4, tinymce5, tinymce6) wer
 - Alle anderen Einstellungen bleiben erhalten
 
 **Wichtig für eigene/benutzerdefinierte Profile:**
+
 - Fügen Sie `license_key: 'gpl',` am Anfang der Konfiguration hinzu
 - Entfernen Sie das `template` Plugin aus der Plugin-Liste und Toolbar
 - Prüfen Sie die Dark-Mode Konfiguration (siehe unten)
@@ -88,10 +89,12 @@ Standardmäßig werden JPG, JPEG, PNG, GIF und WebP über den Media-Manager-Type
 ```
 
 **Welche Dateitypen nutzen den Media Manager?**
+
 - ✅ **Mit Media Manager:** JPG, JPEG, PNG, GIF, WebP
 - ❌ **Direkter Pfad:** SVG, TIFF, BMP, Videos, Audio-Dateien
 
 **Vorteile:**
+
 - Automatische Skalierung und Optimierung der Bilder
 - Funktioniert in Unterordner-Installationen (keine absoluten Pfade mehr)
 - Admin-Kontrolle über Bildeffekte (Größe, Kompression, etc.)
@@ -107,9 +110,11 @@ Erstelle im REDAXO-Backend unter "Media Manager" einen neuen Type mit dem Namen 
 Das Addon enthält ein Plugin zur Verwaltung und Nutzung von Textbausteinen (Snippets).
 
 ### Verwaltung
+
 Unter "TinyMCE" -> "Snippets" können Sie beliebige HTML-Schnipsel anlegen, bearbeiten und löschen.
 
 ### Nutzung im Editor
+
 1. Aktivieren Sie das Plugin `snippets` in Ihrem Profil (im Standard-Profil "full" bereits enthalten).
 2. Fügen Sie den Button `snippets` zur Toolbar hinzu.
 3. Im Editor erscheint nun ein Dropdown-Menü, über das Sie die angelegten Snippets in den Text einfügen können.
@@ -119,38 +124,55 @@ Unter "TinyMCE" -> "Snippets" können Sie beliebige HTML-Schnipsel anlegen, bear
 Style-Sets ermöglichen die zentrale Verwaltung von CSS-Framework-spezifischen Styles wie UIkit 3 oder Bootstrap 5.
 
 ### Verwaltung
+
 Unter "TinyMCE" -> "Style-Sets" können Sie:
+
 - Eigene Style-Sets anlegen und bearbeiten
 - Demo-Sets für UIkit 3 und Bootstrap 5 installieren
 - Style-Sets importieren und exportieren (JSON)
 
 ### Profil-Zuordnung
+
 Style-Sets können einzelnen Profilen zugewiesen werden:
+
 - **Leer** = Style-Set gilt für alle Profile
 - **Profilnamen** = Komma-getrennte Liste (z.B. `uikit, bootstrap-full`)
 
 So können UIkit-Styles nur im UIkit-Profil erscheinen und Bootstrap-Styles nur im Bootstrap-Profil.
 
 ### Aufbau eines Style-Sets
+
 - **Name**: Eindeutiger Bezeichner
 - **Content CSS**: URL zum CSS-Framework (z.B. CDN-Link zu UIkit oder Bootstrap)
 - **Style Formats**: JSON-Array mit TinyMCE style_formats Definitionen
 - **Profile**: Optionale Zuordnung zu bestimmten Profilen
 
 ### Beispiel Style Format (JSON)
+
 ```json
 [
-    {
-        "title": "Buttons",
-        "items": [
-            {"title": "Primary", "name": "uk-button-primary", "selector": "a", "classes": "uk-button uk-button-primary"},
-            {"title": "Secondary", "name": "uk-button-secondary", "selector": "a", "classes": "uk-button uk-button-secondary"}
-        ]
-    }
+  {
+    "title": "Buttons",
+    "items": [
+      {
+        "title": "Primary",
+        "name": "uk-button-primary",
+        "selector": "a",
+        "classes": "uk-button uk-button-primary"
+      },
+      {
+        "title": "Secondary",
+        "name": "uk-button-secondary",
+        "selector": "a",
+        "classes": "uk-button uk-button-secondary"
+      }
+    ]
+  }
 ]
 ```
 
 **Wichtige Format-Typen:**
+
 - `selector`: Wendet Klassen auf existierende Elemente an (z.B. `"selector": "a"` für Links)
 - `block`: Erstellt ein Block-Element (z.B. `"block": "div"`)
 - `inline`: Erstellt ein Inline-Element (z.B. `"inline": "span"`)
@@ -162,6 +184,7 @@ So können UIkit-Styles nur im UIkit-Profil erscheinen und Bootstrap-Styles nur 
 Das `for_images` Plugin bietet umfassende Bildformatierung mit CSS-Framework-Unterstützung.
 
 ### Features
+
 - **Preset-basierte Breiten:** Keine manuellen Pixel-Eingaben, nur vordefinierte CSS-Klassen
 - **Ausrichtung:** Links, Rechts, Zentriert mit Framework-spezifischen Float-Klassen
 - **Effekte:** Schatten, abgerundete Ecken, Rahmen als toggle-bare Optionen
@@ -211,15 +234,16 @@ imageeffect_presets: [
 
 Der Profil-Assistent bietet vorgefertigte Templates:
 
-| Template | Beschreibung |
-|----------|-------------|
-| UIkit 3 | `uk-width-*`, `uk-float-*`, `uk-box-shadow-*` Klassen |
-| Bootstrap 5 | `col-*`, `float-*`, `shadow-*` Klassen |
-| Allgemein | Generische CSS-Klassen (`img-width-small`, etc.) |
+| Template    | Beschreibung                                          |
+| ----------- | ----------------------------------------------------- |
+| UIkit 3     | `uk-width-*`, `uk-float-*`, `uk-box-shadow-*` Klassen |
+| Bootstrap 5 | `col-*`, `float-*`, `shadow-*` Klassen                |
+| Allgemein   | Generische CSS-Klassen (`img-width-small`, etc.)      |
 
 ### Context-Toolbar
 
 Bei Bildauswahl erscheint eine Toolbar mit:
+
 - **Breite:** Dropdown mit allen Breiten-Presets
 - **Ausrichtung:** Toggle-Buttons (Links, Zentriert, Rechts, Keine)
 - **Effekte:** Dialog zum Aktivieren/Deaktivieren von Effekten
@@ -229,9 +253,17 @@ Bei Bildauswahl erscheint eine Toolbar mit:
 ### HTML-Ausgabe
 
 ```html
-<figure class="uk-float-left uk-margin-right uk-margin-bottom uk-width-medium@m">
-    <img class="uk-width-1-1" src="/media/bild.jpg" alt="Beschreibung" width="800" height="600">
-    <figcaption>Optionale Bildunterschrift</figcaption>
+<figure
+  class="uk-float-left uk-margin-right uk-margin-bottom uk-width-medium@m"
+>
+  <img
+    class="uk-width-1-1"
+    src="/media/bild.jpg"
+    alt="Beschreibung"
+    width="800"
+    height="600"
+  />
+  <figcaption>Optionale Bildunterschrift</figcaption>
 </figure>
 ```
 
@@ -242,15 +274,17 @@ Bei Bildauswahl erscheint eine Toolbar mit:
 Wenn Sie **kein CSS-Framework** (UIkit, Bootstrap) verwenden und die "Allgemein"-Vorlage nutzen, benötigen Sie die mitgelieferte CSS-Datei im Frontend:
 
 ```html
-<link rel="stylesheet" href="/assets/addons/tinymce/css/for_images.css">
+<link rel="stylesheet" href="/assets/addons/tinymce/css/for_images.css" />
 ```
 
 Oder via REDAXO:
+
 ```php
 echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_images.css') . '">';
 ```
 
 Die CSS-Datei enthält:
+
 - **Breiten:** `img-width-small`, `img-width-medium`, `img-width-large`, `img-width-full`, `img-width-25`...`img-width-75`
 - **Ausrichtung:** `img-align-left`, `img-align-right`, `img-align-center`
 - **Effekte:** `img-shadow-small/medium/large`, `img-rounded`, `img-border`
@@ -285,19 +319,19 @@ link_yform_tables: {
 }
 ```
 
-| Key | Typ | Beschreibung |
-|---|---|---|
-| title | String | Name des Dropdown-Buttons |
-| items | Array | Liste der verlinkbaren Tabellen |
+| Key   | Typ    | Beschreibung                    |
+| ----- | ------ | ------------------------------- |
+| title | String | Name des Dropdown-Buttons       |
+| items | Array  | Liste der verlinkbaren Tabellen |
 
 **Item-Konfiguration:**
 
-| Key | Typ | Beschreibung |
-|---|---|---|
-| title | String | Titel im Menü (optional, sonst Tabellenname) |
-| table | String | Name der YForm-Tabelle |
-| field | String | Feldname, dessen Inhalt als Linktext übernommen wird |
-| url | String | Optional: Schema für den internen Platzhalter-Link. Standard ist `tabellenname://`. <br>Beispiel: Ist `url` nicht gesetzt, wird `rex_yf_project://123` gespeichert. Ist `url: '/event:'` gesetzt, wird `/event:123` gespeichert. <br>Dieser Wert dient nur als interner Platzhalter und muss via Output-Filter (siehe unten) ersetzt werden. |
+| Key   | Typ    | Beschreibung                                                                                                                                                                                                                                                                                                                                 |
+| ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| title | String | Titel im Menü (optional, sonst Tabellenname)                                                                                                                                                                                                                                                                                                 |
+| table | String | Name der YForm-Tabelle                                                                                                                                                                                                                                                                                                                       |
+| field | String | Feldname, dessen Inhalt als Linktext übernommen wird                                                                                                                                                                                                                                                                                         |
+| url   | String | Optional: Schema für den internen Platzhalter-Link. Standard ist `tabellenname://`. <br>Beispiel: Ist `url` nicht gesetzt, wird `rex_yf_project://123` gespeichert. Ist `url: '/event:'` gesetzt, wird `/event:123` gespeichert. <br>Dieser Wert dient nur als interner Platzhalter und muss via Output-Filter (siehe unten) ersetzt werden. |
 
 ### URL-Ersetzung (Output Filter)
 
@@ -310,7 +344,7 @@ rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
         function ($matches) {
             $table = $matches[1];
             $id = $matches[2];
-            
+
             // Beispiel für URL-Generierung
             if ($table === 'rex_yf_project') {
                 return rex_getUrl('', '', ['project_id' => $id]);
@@ -410,18 +444,25 @@ toolbar: 'for_footnote_insert for_footnote_update ...',
 ### HTML-Ausgabe
 
 ```html
-<p>Der Text<sup class="for-footnote-ref" data-for-fn-id="abc1z" id="for-fnref-abc1z">
+<p>
+  Der Text<sup
+    class="for-footnote-ref"
+    data-for-fn-id="abc1z"
+    id="for-fnref-abc1z"
+  >
     <a href="#for-fn-abc1z">[1]</a>
-</sup> mit Fußnote.</p>
+  </sup>
+  mit Fußnote.
+</p>
 
 <div class="for-footnotes">
-    <hr>
-    <ol>
-        <li id="for-fn-abc1z" data-for-fn-id="abc1z">
-            <a class="for-footnote-back" href="#for-fnref-abc1z">^</a>
-            <span class="for-footnote-text">Fußnoten-Text</span>
-        </li>
-    </ol>
+  <hr />
+  <ol>
+    <li id="for-fn-abc1z" data-for-fn-id="abc1z">
+      <a class="for-footnote-back" href="#for-fnref-abc1z">^</a>
+      <span class="for-footnote-text">Fußnoten-Text</span>
+    </li>
+  </ol>
 </div>
 ```
 
@@ -430,7 +471,7 @@ toolbar: 'for_footnote_insert for_footnote_update ...',
 Das mitgelieferte Stylesheet ist framework-agnostisch und nutzt CSS Custom Properties:
 
 ```html
-<link rel="stylesheet" href="/assets/addons/tinymce/css/for_footnotes.css">
+<link rel="stylesheet" href="/assets/addons/tinymce/css/for_footnotes.css" />
 ```
 
 Oder via REDAXO:
@@ -445,33 +486,33 @@ Im eigenen Theme einfach überschreiben:
 
 ```css
 :root {
-    --for-footnotes-margin-top: 3rem;
-    --for-footnotes-font-size: 0.9em;
-    --for-footnotes-hr-width: 40%;
-    --for-footnotes-hr-color: #ddd;
-    --for-footnote-ref-color: #e6007e;
-    --for-footnote-ref-hover-color: #a3005a;
-    --for-footnote-back-color: #999;
-    --for-footnote-back-hover-color: #000;
+  --for-footnotes-margin-top: 3rem;
+  --for-footnotes-font-size: 0.9em;
+  --for-footnotes-hr-width: 40%;
+  --for-footnotes-hr-color: #ddd;
+  --for-footnote-ref-color: #e6007e;
+  --for-footnote-ref-hover-color: #a3005a;
+  --for-footnote-back-color: #999;
+  --for-footnote-back-hover-color: #000;
 }
 ```
 
 Verfügbare Variablen (Auszug):
 
-| Variable | Zweck |
-|---|---|
-| `--for-footnotes-margin-top` | Abstand oberhalb der Fußnoten-Sektion |
-| `--for-footnotes-font-size` | Schriftgröße der gesamten Sektion |
-| `--for-footnotes-line-height` | Zeilenhöhe |
-| `--for-footnotes-color` | Textfarbe |
-| `--for-footnotes-hr-width` | Breite des Trenners |
-| `--for-footnotes-hr-color` | Farbe des Trenners |
-| `--for-footnotes-list-padding-left` | Einrückung der `<ol>` |
-| `--for-footnote-ref-color` | Farbe der hochgestellten Nummer |
-| `--for-footnote-ref-hover-color` | Hover-Farbe der Nummer |
-| `--for-footnote-ref-font-size` | Schriftgröße der Nummer |
-| `--for-footnote-back-color` | Farbe des `^` Rück-Links |
-| `--for-footnote-back-hover-color` | Hover-Farbe des Rück-Links |
+| Variable                            | Zweck                                 |
+| ----------------------------------- | ------------------------------------- |
+| `--for-footnotes-margin-top`        | Abstand oberhalb der Fußnoten-Sektion |
+| `--for-footnotes-font-size`         | Schriftgröße der gesamten Sektion     |
+| `--for-footnotes-line-height`       | Zeilenhöhe                            |
+| `--for-footnotes-color`             | Textfarbe                             |
+| `--for-footnotes-hr-width`          | Breite des Trenners                   |
+| `--for-footnotes-hr-color`          | Farbe des Trenners                    |
+| `--for-footnotes-list-padding-left` | Einrückung der `<ol>`                 |
+| `--for-footnote-ref-color`          | Farbe der hochgestellten Nummer       |
+| `--for-footnote-ref-hover-color`    | Hover-Farbe der Nummer                |
+| `--for-footnote-ref-font-size`      | Schriftgröße der Nummer               |
+| `--for-footnote-back-color`         | Farbe des `^` Rück-Links              |
+| `--for-footnote-back-hover-color`   | Hover-Farbe des Rück-Links            |
 
 Ein Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist bereits im Stylesheet enthalten.
 
@@ -481,16 +522,16 @@ Moderne Checkliste im Editor – ohne klassische Form-Checkbox. Das Plugin rende
 
 ### Features
 
-* **Zwei Varianten – zwei Buttons:**
-  * `for_checklist` – klassische **To-Do-Liste**: erledigte Einträge werden durchgestrichen und ausgegraut.
-  * `for_checklist_feature` – **Feature-/Benefit-Liste**: neue Einträge sind sofort als „erfüllt" markiert, **kein** Strikethrough, grüner Check, offene Einträge mit gestricheltem Rahmen. Ideal für Feature-Übersichten, Preis-Tabellen, Benefits.
-  * Klick auf den gleichen Button in einer bestehenden Liste hebt sie auf; Klick auf den anderen Button wechselt zur anderen Variante, ohne die Einträge zu verlieren.
-* Command: `forChecklistToggle` (mit Parameter `'todo'` oder `'feature'`)
-* Schlanke HTML-Ausgabe: `<ul class="for-checklist"><li class="for-checklist__item" data-checked="true|false">…</li></ul>`
-* **Automatischer CKEditor-5-Import:** `ul.todo-list` → `ul.for-checklist`, inkl. Übernahme des Checked-Zustands aus den versteckten `<input type="checkbox">`
-* Toggle per Klick auf die Checkbox-Zone (links vom Text), in einer `undoManager.transact`-Transaktion
-* Schema-Anpassung: `ul[class]` und `li[class|data-checked]` werden nicht mehr vom Editor gestrippt
-* Modernes Design: abgerundete Checkbox, Hover-/Checked-Zustand, SVG-Häkchen, Dark-Mode (`prefers-color-scheme`), Print-Variante
+- **Zwei Varianten – zwei Buttons:**
+  - `for_checklist` – klassische **To-Do-Liste**: erledigte Einträge werden durchgestrichen und ausgegraut.
+  - `for_checklist_feature` – **Feature-/Benefit-Liste**: neue Einträge sind sofort als „erfüllt" markiert, **kein** Strikethrough, grüner Check, offene Einträge mit gestricheltem Rahmen. Ideal für Feature-Übersichten, Preis-Tabellen, Benefits.
+  - Klick auf den gleichen Button in einer bestehenden Liste hebt sie auf; Klick auf den anderen Button wechselt zur anderen Variante, ohne die Einträge zu verlieren.
+- Command: `forChecklistToggle` (mit Parameter `'todo'` oder `'feature'`)
+- Schlanke HTML-Ausgabe: `<ul class="for-checklist"><li class="for-checklist__item" data-checked="true|false">…</li></ul>`
+- **Automatischer CKEditor-5-Import:** `ul.todo-list` → `ul.for-checklist`, inkl. Übernahme des Checked-Zustands aus den versteckten `<input type="checkbox">`
+- Toggle per Klick auf die Checkbox-Zone (links vom Text), in einer `undoManager.transact`-Transaktion
+- Schema-Anpassung: `ul[class]` und `li[class|data-checked]` werden nicht mehr vom Editor gestrippt
+- Modernes Design: abgerundete Checkbox, Hover-/Checked-Zustand, SVG-Häkchen, Dark-Mode (`prefers-color-scheme`), Print-Variante
 
 ### Aktivierung im Profil
 
@@ -504,7 +545,7 @@ toolbar: 'for_checklist for_checklist_feature ...',
 Die mitgelieferte CSS-Datei einbinden:
 
 ```html
-<link rel="stylesheet" href="/assets/addons/tinymce/css/for_checklist.css">
+<link rel="stylesheet" href="/assets/addons/tinymce/css/for_checklist.css" />
 ```
 
 oder in REDAXO:
@@ -515,29 +556,29 @@ echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('
 
 ### CSS-Variablen
 
-| Variable | Zweck |
-|---|---|
-| `--for-checklist-gap` | Abstand zwischen Checkbox und Text |
-| `--for-checklist-indent` | Linke Einrückung der Liste |
-| `--for-checklist-item-margin` | Abstand zwischen Items |
-| `--for-checkbox-size` | Kantenlänge der Checkbox |
-| `--for-checkbox-radius` | Eckenradius |
-| `--for-checkbox-border-width` | Rahmenbreite |
-| `--for-checkbox-border-color` | Rahmen im leeren Zustand |
-| `--for-checkbox-border-color-hover` | Rahmen beim Hover |
-| `--for-checkbox-bg` | Hintergrund im leeren Zustand |
-| `--for-checkbox-checked-bg` | Hintergrund im Checked-Zustand |
-| `--for-checkbox-checked-border-color` | Rahmen im Checked-Zustand |
-| `--for-checkbox-check-color` | Häkchen-Farbe (SVG wird entsprechend eingefärbt) |
-| `--for-checkbox-transition` | CSS-Transition |
-| `--for-checklist-text-color` | Textfarbe offene Einträge |
-| `--for-checklist-checked-text-color` | Textfarbe erledigter Einträge |
-| `--for-checklist-checked-decoration` | Text-Decoration (z. B. `line-through`) |
-| `--for-checklist-feature-checked-bg` | Hintergrund Check (Feature-Variante, Default Grün) |
-| `--for-checklist-feature-checked-border-color` | Rahmen Check (Feature-Variante) |
-| `--for-checklist-feature-checked-text-color` | Textfarbe erledigter Einträge (Feature) |
-| `--for-checklist-feature-checked-decoration` | Text-Decoration (Feature, Default `none`) |
-| `--for-checklist-feature-unchecked-border-style` | Rahmenstil offene Einträge (Default `dashed`) |
+| Variable                                         | Zweck                                              |
+| ------------------------------------------------ | -------------------------------------------------- |
+| `--for-checklist-gap`                            | Abstand zwischen Checkbox und Text                 |
+| `--for-checklist-indent`                         | Linke Einrückung der Liste                         |
+| `--for-checklist-item-margin`                    | Abstand zwischen Items                             |
+| `--for-checkbox-size`                            | Kantenlänge der Checkbox                           |
+| `--for-checkbox-radius`                          | Eckenradius                                        |
+| `--for-checkbox-border-width`                    | Rahmenbreite                                       |
+| `--for-checkbox-border-color`                    | Rahmen im leeren Zustand                           |
+| `--for-checkbox-border-color-hover`              | Rahmen beim Hover                                  |
+| `--for-checkbox-bg`                              | Hintergrund im leeren Zustand                      |
+| `--for-checkbox-checked-bg`                      | Hintergrund im Checked-Zustand                     |
+| `--for-checkbox-checked-border-color`            | Rahmen im Checked-Zustand                          |
+| `--for-checkbox-check-color`                     | Häkchen-Farbe (SVG wird entsprechend eingefärbt)   |
+| `--for-checkbox-transition`                      | CSS-Transition                                     |
+| `--for-checklist-text-color`                     | Textfarbe offene Einträge                          |
+| `--for-checklist-checked-text-color`             | Textfarbe erledigter Einträge                      |
+| `--for-checklist-checked-decoration`             | Text-Decoration (z. B. `line-through`)             |
+| `--for-checklist-feature-checked-bg`             | Hintergrund Check (Feature-Variante, Default Grün) |
+| `--for-checklist-feature-checked-border-color`   | Rahmen Check (Feature-Variante)                    |
+| `--for-checklist-feature-checked-text-color`     | Textfarbe erledigter Einträge (Feature)            |
+| `--for-checklist-feature-checked-decoration`     | Text-Decoration (Feature, Default `none`)          |
+| `--for-checklist-feature-unchecked-border-style` | Rahmenstil offene Einträge (Default `dashed`)      |
 
 Ein Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist im Stylesheet enthalten.
 
@@ -547,19 +588,19 @@ Geschützte HTML-/JS-Einbettung für Widgets, Tracking-Pixel, Social-Embeds, `<i
 
 ### Features
 
-* Toolbar-Button & Menüeintrag: `for_htmlembed`
-* Commands: `forHtmlEmbedInsert` (einfügen/bearbeiten), `forHtmlEmbedEdit` (nur bearbeiten)
-* **Doppelklick** auf den Embed-Block öffnet den Bearbeiten-Dialog
-* **Context-Toolbar** mit Edit- und Remove-Button
-* HTML-Format (bleibt unverändert im Save-Output):
+- Toolbar-Button & Menüeintrag: `for_htmlembed`
+- Commands: `forHtmlEmbedInsert` (einfügen/bearbeiten), `forHtmlEmbedEdit` (nur bearbeiten)
+- **Doppelklick** auf den Embed-Block öffnet den Bearbeiten-Dialog
+- **Context-Toolbar** mit Edit- und Remove-Button
+- HTML-Format (bleibt unverändert im Save-Output):
   ```html
   <div class="for-htmlembed" contenteditable="false">
     <!-- beliebiger HTML/JS/CSS-Code -->
   </div>
   ```
-* Editor-Chrome (dashed border + Badge) nur im Editor-Iframe sichtbar, im Frontend nur ein schlichtes `<div>`
-* Das Plugin setzt `xss_sanitization: false` und `allow_script_urls: true` auf den Editor, sobald es geladen ist – damit `<script>`, `<iframe>`, `<style>` & `on*`-Attribute nicht entfernt werden. **Nur aktivieren, wenn die Redakteure beliebigen Code einbetten dürfen sollen.**
-* Textarea im Dialog bekommt die CSS-Klasse `rex-js-code-editor` – das [code-AddOn](https://github.com/FriendsOfRedaxo/code) hängt sich automatisch an, falls installiert, sonst Fallback auf monospace.
+- Editor-Chrome (dashed border + Badge) nur im Editor-Iframe sichtbar, im Frontend nur ein schlichtes `<div>`
+- Das Plugin setzt `xss_sanitization: false` und `allow_script_urls: true` auf den Editor, sobald es geladen ist – damit `<script>`, `<iframe>`, `<style>` & `on*`-Attribute nicht entfernt werden. **Nur aktivieren, wenn die Redakteure beliebigen Code einbetten dürfen sollen.**
+- Textarea im Dialog bekommt die CSS-Klasse `rex-js-code-editor` – das [code-AddOn](https://github.com/FriendsOfRedaxo/code) hängt sich automatisch an, falls installiert, sonst Fallback auf monospace.
 
 ### Aktivierung im Profil
 
@@ -578,11 +619,11 @@ Dialog-basierter Markdown → HTML Konverter. Kein Autodetect, keine Paste-Inter
 
 ### Features
 
-* Toolbar-Button & Menüeintrag: `for_markdown_paste` (Label „Markdown einfügen…")
-* Command: `forMarkdownOpenDialog`
-* **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebündelt im Plugin-Bundle – kein CDN, offline-fähig
-* **CommonMark + GFM-Dialekte:** Tables, Autolinks (`linkify`), SmartQuotes (`typographer`), harte Zeilenumbrüche (`breaks`), fenced Code
-* **Tasklist-Interop → `for_checklist`:**
+- Toolbar-Button & Menüeintrag: `for_markdown_paste` (Label „Markdown einfügen…")
+- Command: `forMarkdownOpenDialog`
+- **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebündelt im Plugin-Bundle – kein CDN, offline-fähig
+- **CommonMark + GFM-Dialekte:** Tables, Autolinks (`linkify`), SmartQuotes (`typographer`), harte Zeilenumbrüche (`breaks`), fenced Code
+- **Tasklist-Interop → `for_checklist`:**
   ```markdown
   - [ ] offen
   - [x] erledigt
@@ -594,7 +635,7 @@ Dialog-basierter Markdown → HTML Konverter. Kein Autodetect, keine Paste-Inter
     <li class="for-checklist__item" data-checked="true">erledigt</li>
   </ul>
   ```
-* **Fenced Code → `codesample`-kompatibel:** ```` ```php …``` ```` wird zu `<pre class="language-php"><code>…</code></pre>` und bleibt vom Core-Plugin `codesample` weiter editierbar.
+- **Fenced Code → `codesample`-kompatibel:** ` ```php …``` ` wird zu `<pre class="language-php"><code>…</code></pre>` und bleibt vom Core-Plugin `codesample` weiter editierbar.
 
 ### Aktivierung im Profil
 
@@ -614,6 +655,64 @@ Der Profil-Assistent listet `for_markdown` mit FOR-Badge sowohl in der Plugin-Li
 ### Frontend-CSS
 
 `for_markdown` erzeugt ausschließlich Markup der anderen Plugins (`for-checklist`, `language-*`) und normales semantisches HTML. Es gibt **keine eigene CSS-Datei**; lade stattdessen bei Bedarf `css/for_checklist.css` (für Checklisten) und binde ein Prism/Highlight.js-Theme für die `language-*`-Codeblöcke ein.
+
+## FriendsOfREDAXO Root-Wrapper Strip Plugin (`for_rootstrip`)
+
+Entfernt den von TinyMCE intern erzwungenen Root-Wrapper (`forced_root_block`, Fallback `div`) beim Speichern bzw. Auslesen des Inhalts. Damit bleibt TinyMCE im Editor stabil, während im gespeicherten Output nur der eigentliche Inline-/Textinhalt landet.
+
+### Features
+
+- Kein eigener Button/Menüeintrag: reines Content-Processing-Plugin
+- Nutzt automatisch `forced_root_block`; falls leer/ungültig, wird `div` verwendet
+- Entfernt den Wrapper nur, wenn genau **ein** Root-Element vorhanden ist (inkl. Whitespace-Toleranz)
+- Verhindert doppelte Struktur-Tags, wenn das umgebende Markup bereits im Modul/Template definiert wird
+- Rückwärtskompatibel aktiv (`for_rootstrip` default `true`)
+
+### Typischer Einsatzfall
+
+`for_rootstrip` ist besonders sinnvoll für Felder, in denen TinyMCE nur den **Inhalt** liefern soll, das semantische HTML-Tag aber außerhalb festgelegt wird. Ein häufiges Beispiel sind editierbare Headlines in REDAXO-Modulen:
+
+- TinyMCE-Profil sehr klein halten (z. B. nur Fett + Sonderzeichen)
+- Headline-Tag (`h2`, `h3`, `h4`) und CSS-Klasse im Modul per Auswahl oder Logik bestimmen
+- Nur den nackten Text/Inline-Inhalt aus TinyMCE speichern, ohne zusätzliches `<p>`/`<div>`
+
+So kann das Modul die finale Struktur konsistent erzeugen (z. B. abhängig von der bereits vorhandenen Hauptüberschrift), ohne nachträgliches Strippen im Output-Filter.
+
+### Beispiel (Headline-Feld im Modul)
+
+**Eingabe in TinyMCE (intern mit Root-Wrapper):**
+
+```html
+<p>Produkt <strong>Highlights</strong> &amp; Preise</p>
+```
+
+**Gespeicherter Feldwert mit aktivem `for_rootstrip`:**
+
+```html
+Produkt <strong>Highlights</strong> &amp; Preise
+```
+
+**Ausgabe im Modul (Tag/Klasse zentral gesteuert):**
+
+```php
+$tag = in_array($headingTag, ['h2', 'h3', 'h4'], true) ? $headingTag : 'h2';
+$class = 'mod-headline mod-headline--' . $tag;
+echo '<' . $tag . ' class="' . rex_escape($class) . '">' . $headlineHtml . '</' . $tag . '>';
+```
+
+Damit bleibt die redaktionelle Bearbeitung flexibel, während Struktur und Designsystem-Regeln weiterhin im Modul kontrolliert werden.
+
+### Aktivierung im Profil
+
+```javascript
+plugins: 'for_rootstrip ...',
+```
+
+Das Plugin ist nach dem Laden automatisch aktiv — `for_rootstrip: true` muss **nicht** explizit gesetzt werden. Der Profil-Assistent trägt das Plugin korrekt in die `plugins`-Liste ein, ohne eine zusätzliche Option zu erzeugen.
+
+### Option
+
+- `for_rootstrip` (`boolean`): aktiviert/deaktiviert das Entfernen des TinyMCE-Root-Wrappers. Standard: `true`. Nur nötig, wenn das Verhalten explizit abgeschaltet werden soll (`for_rootstrip: false`).
 
 ## FriendsOfREDAXO Inhaltsverzeichnis-Styling (`for_toc.css`)
 
@@ -639,16 +738,16 @@ Umgesetzt über `counter-reset` + `counters(for-toc-item, ".")` auf `li::before`
 
 **Wichtige CSS-Variablen:**
 
-| Variable | Zweck |
-|---|---|
-| `--for-toc-bg`, `--for-toc-border-color` | Hintergrund & linke Akzent-Border |
-| `--for-toc-link-color` / `-hover-color` / `-active-color` | Link-Farben (inkl. `aria-current`) |
-| `--for-toc-list-indent` | Einrückung der Unter-Listen |
-| `--for-toc-number-separator` | Trennzeichen zwischen Ebenen (Default `.`) |
-| `--for-toc-number-suffix` | Zeichen nach der Nummer (Default Leerzeichen) |
-| `--for-toc-number-color`, `--for-toc-number-font-weight` | Styling der Nummern |
-| `--for-toc-number-min-width`, `--for-toc-number-gap` | Einrückungs-Spalte für die Nummer |
-| `--for-toc-sticky-top`, `--for-toc-sticky-max-height` | für `.for-toc--sticky` |
+| Variable                                                  | Zweck                                         |
+| --------------------------------------------------------- | --------------------------------------------- |
+| `--for-toc-bg`, `--for-toc-border-color`                  | Hintergrund & linke Akzent-Border             |
+| `--for-toc-link-color` / `-hover-color` / `-active-color` | Link-Farben (inkl. `aria-current`)            |
+| `--for-toc-list-indent`                                   | Einrückung der Unter-Listen                   |
+| `--for-toc-number-separator`                              | Trennzeichen zwischen Ebenen (Default `.`)    |
+| `--for-toc-number-suffix`                                 | Zeichen nach der Nummer (Default Leerzeichen) |
+| `--for-toc-number-color`, `--for-toc-number-font-weight`  | Styling der Nummern                           |
+| `--for-toc-number-min-width`, `--for-toc-number-gap`      | Einrückungs-Spalte für die Nummer             |
+| `--for-toc-sticky-top`, `--for-toc-sticky-max-height`     | für `.for-toc--sticky`                        |
 
 Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist im Stylesheet enthalten.
 
@@ -657,20 +756,22 @@ Dark-Mode-Fallback über `@media (prefers-color-scheme: dark)` ist im Stylesheet
 Video-Einbettung per URL-Paste – YouTube & Vimeo werden sofort erkannt. Im Editor gibt es eine echte Live-Vorschau (iframe + Overlay, `contenteditable="false"`), gespeichert wird das **CKEditor-5-kompatible** Format:
 
 ```html
-<figure class="media"><oembed url="https://www.youtube.com/watch?v=…"></oembed></figure>
+<figure class="media">
+  <oembed url="https://www.youtube.com/watch?v=…"></oembed>
+</figure>
 ```
 
 Damit lassen sich Inhalte 1:1 zwischen REDAXO/TinyMCE und CKE5-basierten Systemen austauschen.
 
 ### Features
 
-* **Paste-Erkennung:** Einfach eine YouTube- oder Vimeo-URL in den Editor pasten – wird automatisch in einen Video-Block umgewandelt.
-* **Toolbar-Button & Menü:** `for_oembed`, plus Context-Toolbar mit Edit-/Remove-Button, plus Doppelklick zum Bearbeiten.
-* **Commands:** `forOembedInsert`, `forOembedEdit`.
-* **Provider:** YouTube (watch/shorts/embed/youtu.be/nocookie), Vimeo (vimeo.com, player.vimeo.com). Erweiterbar im `parseUrl`-Modul.
-* **Live-Preview im Editor:** Echter iframe mit YouTube/Vimeo-Badge, Overlay fängt Klicks ab (Video spielt im Editor nicht ab, Cursor kann nicht reinrutschen).
-* **Save-Format:** CKE5-kompatibles `<figure class="media"><oembed url="…"></oembed></figure>` – wird beim Speichern automatisch aus der Preview zurückgebaut (`GetContent`-Event).
-* **Reverse-Import:** Vorhandene CKE5-Inhalte mit `<oembed>` werden beim Laden in die Preview entfaltet (`SetContent`-Event).
+- **Paste-Erkennung:** Einfach eine YouTube- oder Vimeo-URL in den Editor pasten – wird automatisch in einen Video-Block umgewandelt.
+- **Toolbar-Button & Menü:** `for_oembed`, plus Context-Toolbar mit Edit-/Remove-Button, plus Doppelklick zum Bearbeiten.
+- **Commands:** `forOembedInsert`, `forOembedEdit`.
+- **Provider:** YouTube (watch/shorts/embed/youtu.be/nocookie), Vimeo (vimeo.com, player.vimeo.com). Erweiterbar im `parseUrl`-Modul.
+- **Live-Preview im Editor:** Echter iframe mit YouTube/Vimeo-Badge, Overlay fängt Klicks ab (Video spielt im Editor nicht ab, Cursor kann nicht reinrutschen).
+- **Save-Format:** CKE5-kompatibles `<figure class="media"><oembed url="…"></oembed></figure>` – wird beim Speichern automatisch aus der Preview zurückgebaut (`GetContent`-Event).
+- **Reverse-Import:** Vorhandene CKE5-Inhalte mit `<oembed>` werden beim Laden in die Preview entfaltet (`SetContent`-Event).
 
 ### Aktivierung im Profil
 
@@ -708,9 +809,19 @@ echo OembedRenderer::registerFrontendAssets();
 ### HTML-Struktur im Editor
 
 ```html
-<figure class="media for-oembed for-oembed--youtube" contenteditable="false" data-for-oembed-url="https://www.youtube.com/watch?v=…">
+<figure
+  class="media for-oembed for-oembed--youtube"
+  contenteditable="false"
+  data-for-oembed-url="https://www.youtube.com/watch?v=…"
+>
   <div class="for-oembed__ratio">
-    <iframe src="https://www.youtube.com/embed/…" allow="…" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <iframe
+      src="https://www.youtube.com/embed/…"
+      allow="…"
+      allowfullscreen
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+    ></iframe>
     <div class="for-oembed__overlay"></div>
   </div>
 </figure>
@@ -754,6 +865,7 @@ pnpm run clean-build
 ```
 
 Der `build:staging` Task (intern):
+
 - `pnpm run vendor:build` → kopiert TinyMCE vendor nach `build/vendor/tinymce`
 - `pnpm run plugins:build -- --staging` → baut/copyt custom_plugins nach `build/plugins/<plugin>` und schreibt notwendige plugin files ebenfalls nach `build/vendor/tinymce/plugins/<plugin>`
 
@@ -765,8 +877,8 @@ Weitere Details / zusätzliche Änderungen:
 - `node_modules` ist in `.gitignore` aufgenommen (lokale Abhängigkeiten werden nicht committet).
 - `yarn.lock` entfernt: Wir benutzen `pnpm` als bevorzugten Paketmanager für deterministische Workspaces; entferne aus dem Repo bitte alte `yarn.lock` Dateien falls vorhanden.
 
-
 Empfohlene CI Integration:
+
 - In CI (GitHub Actions) `pnpm install && pnpm run build` ausführen und sicherstellen, dass `assets/scripts/tinymce/plugins` und `assets/vendor/tinymce/plugins` die erwarteten Artefakte enthalten. Ein schneller Node‑Smoke‑Check kann automatisiert werden, um die wichtigsten Dateien nach dem Build zu prüfen.
 - Versucht, fehlende Builds mit `esbuild` zu bündeln/minifizieren und in `assets/scripts/tinymce/plugins/<plugin>/<plugin>.min.js` zu schreiben.
 - Kopiert vorhandene Sprachdateien aus `langs/` mit.
@@ -781,10 +893,9 @@ Das erlaubt, die Plugins direkt per `plugins` Konfiguration zu nutzen, ohne `ext
 - AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md)
 - TinyMCE: [GPL v2+ LICENSE](https://github.com/tinymce/tinymce/blob/develop/license.md) (ab Version 8.0)
 
-
 ## Author
 
 **Friends Of REDAXO**
 
-* http://www.redaxo.org
-* https://github.com/FriendsOfREDAXO
+- http://www.redaxo.org
+- https://github.com/FriendsOfREDAXO

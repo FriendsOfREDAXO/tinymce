@@ -1,0 +1,16 @@
+{
+  "name": "for_rootstrip",
+  "version": "1.0.0",
+  "description": "TinyMCE plugin for_rootstrip: strips the forced_root_block wrapper on get/save content",
+  "private": true,
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_rootstrip/ ../../assets/scripts/tinymce/plugins/for_rootstrip/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_rootstrip/ ../../assets/vendor/tinymce/plugins/for_rootstrip/"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "tinymce": "^8.0.0",
+    "tslib": "^2.7.0",
+    "typescript": "^4.9.5"
+  }
+}
