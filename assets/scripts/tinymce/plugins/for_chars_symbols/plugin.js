@@ -276,6 +276,8 @@
         { id: 'dash_numbers', label: 'Bindestriche in Zahlenbereichen → en-dash (1990-2000 → 1990–2000)' },
         { id: 'nbsp_units',   label: 'Geschütztes Leerzeichen vor Einheiten setzen (5 kg → 5 kg)' },
         { id: 'softhyphen',   label: 'Weiche Trennstellen in langen Wörtern vorschlagen' },
+        { id: 'phone_intl',   label: 'Telefonnummer(n) → international (E.164, +49 …)' },
+        { id: 'phone_nat',    label: 'Telefonnummer(n) → national (0 …)' },
         { id: 'find_wrong',   label: 'Typografische „Sünden" im Editor visuell markieren' }
     ];
 
@@ -679,8 +681,226 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
     /* ---------------- Insert-Helfer ---------------- */
 
     function renderAndInsert(editor, value) {
-        // Echte Unicode-Zeichen einfügen (keine HTML-Entities, damit nichts escaped wird).
-        editor.insertContent(value);
+        // Wie das offizielle charmap-Plugin: mceInsertContent dispatchen.
+        // Das nutzt die aktuelle (erhaltene) Selektion des Editors und erzeugt
+        // keine neuen Block-Elemente / leere <p>.
+        editor.execCommand('mceInsertContent', false, value);
+    }
+
+    /* ---------------- Telefonnummern-Normalisierung ---------------- */
+
+    // Eine pragmatische Country-Code-Liste. „nat" = nationaler Trunk-Prefix
+    // (üblich „0"; USA/Kanada „1" innerhalb des NANP, in der Praxis aber leer).
+    var PHONE_COUNTRIES = [
+        { cc: '49',  name: 'Deutschland',       nat: '0' },
+        { cc: '43',  name: 'Österreich',        nat: '0' },
+        { cc: '41',  name: 'Schweiz',           nat: '0' },
+        { cc: '33',  name: 'Frankreich',        nat: '0' },
+        { cc: '39',  name: 'Italien',           nat: ''  },
+        { cc: '34',  name: 'Spanien',           nat: ''  },
+        { cc: '31',  name: 'Niederlande',       nat: '0' },
+        { cc: '32',  name: 'Belgien',           nat: '0' },
+        { cc: '352', name: 'Luxemburg',         nat: ''  },
+        { cc: '45',  name: 'Dänemark',          nat: ''  },
+        { cc: '46',  name: 'Schweden',          nat: '0' },
+        { cc: '47',  name: 'Norwegen',          nat: ''  },
+        { cc: '358', name: 'Finnland',          nat: '0' },
+        { cc: '48',  name: 'Polen',             nat: ''  },
+        { cc: '420', name: 'Tschechien',        nat: ''  },
+        { cc: '421', name: 'Slowakei',          nat: '0' },
+        { cc: '36',  name: 'Ungarn',            nat: '06' },
+        { cc: '30',  name: 'Griechenland',      nat: ''  },
+        { cc: '351', name: 'Portugal',          nat: ''  },
+        { cc: '353', name: 'Irland',            nat: '0' },
+        { cc: '44',  name: 'Großbritannien',    nat: '0' },
+        { cc: '1',   name: 'USA/Kanada',        nat: '1' }
+    ];
+
+    function countryByCc(cc) {
+        for (var i = 0; i < PHONE_COUNTRIES.length; i++) {
+            if (PHONE_COUNTRIES[i].cc === cc) { return PHONE_COUNTRIES[i]; }
+        }
+        return null;
+    }
+
+    function localeDefaultCc(locale) {
+        switch ((locale || '').toLowerCase()) {
+            case 'de-ch':
+            case 'ch':     return '41';
+            case 'at':     return '43';
+            case 'en':
+            case 'en-us':
+            case 'us':     return '1';
+            case 'en-gb':
+            case 'gb':     return '44';
+            case 'fr':     return '33';
+            case 'de':
+            default:       return '49';
+        }
+    }
+
+    // Normalisiert einen Rohstring zu { cc: '49', rest: '3012345678' } oder { cc: null, rest: '...' }.
+    function parsePhone(raw) {
+        var s = String(raw || '').trim();
+        if (!s) { return null; }
+        // Typische „(0)"-Zwischenschreibweise entfernen („+49 (0)30 …")
+        s = s.replace(/\((0)\)/g, '');
+        // Schreibtrenner entfernen: Leerzeichen, nbsp, /, -, en-dash, em-dash, ., Unterstrich
+        s = s.replace(/[\s\u00A0\u202F./_\-\u2013\u2014]/g, '');
+        // Reste-Klammern weg
+        s = s.replace(/[()\[\]]/g, '');
+        // 00-Prefix als internationale Vorwahl akzeptieren
+        if (/^00\d/.test(s)) { s = '+' + s.substring(2); }
+        // Doppelte „+" killen
+        s = s.replace(/^\++/, '+');
+        // Nur Ziffern (und ggf. führendes +) beibehalten
+        if (s.charAt(0) === '+') {
+            var rest = s.substring(1).replace(/\D/g, '');
+            // Länger-zuerst-Match auf Country-Codes
+            for (var len = 3; len >= 1; len--) {
+                var cand = rest.substring(0, len);
+                if (countryByCc(cand)) {
+                    return { cc: cand, rest: rest.substring(len), hadPlus: true };
+                }
+            }
+            return { cc: null, rest: rest, hadPlus: true };
+        }
+        return { cc: null, rest: s.replace(/\D/g, ''), hadPlus: false };
+    }
+
+    // Entfernt führenden nationalen Trunk-Prefix (meist „0") aus dem Subscriber-Part.
+    function stripNationalPrefix(rest, country) {
+        if (!country) { return rest; }
+        if (country.nat && rest.indexOf(country.nat) === 0) {
+            return rest.substring(country.nat.length);
+        }
+        // Fallback: führende 0 wegschneiden für die meisten europäischen Länder
+        if ('' === country.nat && /^0\d/.test(rest)) {
+            return rest.substring(1);
+        }
+        return rest;
+    }
+
+    // Gruppiert die Teilnehmernummer locker in 2er-Blöcke von hinten (zur besseren Lesbarkeit).
+    function groupDigits(digits) {
+        var out = '';
+        for (var i = digits.length; i > 0; i -= 2) {
+            var start = Math.max(0, i - 2);
+            out = digits.substring(start, i) + (out ? ' ' + out : '');
+        }
+        return out;
+    }
+
+    function formatIntl(cc, rest) {
+        var country = countryByCc(cc);
+        var local = stripNationalPrefix(rest, country);
+        if (!local) { return '+' + cc; }
+        // Grobe Vorwahl-Abtrennung: für DE/AT/CH/NL typische 2–4-stellige Ortsvorwahl
+        var area = '', subscriber = local;
+        if (cc === '49' && local.length >= 8) { area = local.substring(0, local.length > 10 ? 4 : 3); subscriber = local.substring(area.length); }
+        else if (cc === '41' && local.length >= 8) { area = local.substring(0, 2); subscriber = local.substring(2); }
+        else if (cc === '43' && local.length >= 7) { area = local.substring(0, local.length > 9 ? 3 : 2); subscriber = local.substring(area.length); }
+        else if (cc === '1' && local.length === 10) { area = local.substring(0, 3); subscriber = local.substring(3); }
+        else if (cc === '44' && local.length >= 9) { area = local.substring(0, local.length > 9 ? 4 : 3); subscriber = local.substring(area.length); }
+        if (area) {
+            return '+' + cc + ' ' + area + ' ' + groupDigits(subscriber);
+        }
+        return '+' + cc + ' ' + groupDigits(local);
+    }
+
+    function formatNat(cc, rest) {
+        var country = countryByCc(cc);
+        var local = stripNationalPrefix(rest, country);
+        if (!local) { return ''; }
+        var prefix = (country && country.nat) || '0';
+        // Formatierung: prefix + Ortsvorwahl + „ " + Rest
+        var area = '', subscriber = local;
+        if (cc === '49' && local.length >= 8) { area = local.substring(0, local.length > 10 ? 4 : 3); subscriber = local.substring(area.length); }
+        else if (cc === '41' && local.length >= 8) { area = local.substring(0, 2); subscriber = local.substring(2); }
+        else if (cc === '43' && local.length >= 7) { area = local.substring(0, local.length > 9 ? 3 : 2); subscriber = local.substring(area.length); }
+        else if (cc === '1' && local.length === 10) { area = local.substring(0, 3); subscriber = local.substring(3); }
+        else if (cc === '44' && local.length >= 9) { area = local.substring(0, local.length > 9 ? 4 : 3); subscriber = local.substring(area.length); }
+        if (area) {
+            return prefix + area + ' ' + groupDigits(subscriber);
+        }
+        return prefix + groupDigits(local);
+    }
+
+    // Erkennt „telefon-artige" Tokens im Text (muss mindestens 6 Ziffern enthalten).
+    var PHONE_TOKEN_REGEX = /(\+?\s*\d[\d\s.()\/\-\u2013\u2014\u00A0\u202F]{5,}\d)/g;
+
+    function transformPhonesInText(text, mode, defaultCc) {
+        return text.replace(PHONE_TOKEN_REGEX, function (match) {
+            // Mindestens 6 Ziffern?
+            var digitCount = (match.match(/\d/g) || []).length;
+            if (digitCount < 6) { return match; }
+            var parsed = parsePhone(match);
+            if (!parsed || !parsed.rest) { return match; }
+            var cc = parsed.cc || defaultCc;
+            if (!cc) { return match; }
+            return mode === 'intl' ? formatIntl(cc, parsed.rest) : formatNat(cc, parsed.rest);
+        });
+    }
+
+    // Prüft, ob für die Aktion ein Länder-Dialog nötig ist (keine eindeutige Country-Info im Text).
+    function phoneNeedsPrompt(text, defaultCc) {
+        // Wenn ein Token ohne „+"/„00"-Prefix erkannt wird und kein Default gesetzt ist → Prompt
+        if (defaultCc) { return false; }
+        var m = text.match(PHONE_TOKEN_REGEX);
+        if (!m) { return false; }
+        for (var i = 0; i < m.length; i++) {
+            var p = parsePhone(m[i]);
+            if (p && p.rest && !p.cc) { return true; }
+        }
+        return false;
+    }
+
+    function promptCountry(editor, cb) {
+        var options = PHONE_COUNTRIES.map(function (c) {
+            return { text: '+' + c.cc + ' – ' + c.name, value: c.cc };
+        });
+        editor.windowManager.open({
+            title: 'Landesvorwahl wählen',
+            body: {
+                type: 'panel',
+                items: [
+                    { type: 'alertbanner', level: 'info', icon: 'info', text: 'Für diese Nummer(n) konnte keine Landesvorwahl erkannt werden. Bitte wählen:' },
+                    { type: 'selectbox', name: 'cc', label: 'Land', items: options }
+                ]
+            },
+            buttons: [
+                { type: 'cancel', text: 'Abbrechen' },
+                { type: 'submit', text: 'Übernehmen', primary: true }
+            ],
+            initialData: { cc: '49' },
+            onSubmit: function (api) {
+                var data = api.getData();
+                api.close();
+                cb(data.cc);
+            }
+        });
+    }
+
+    function runPhoneAction(editor, mode, locale) {
+        var selection = editor.selection;
+        var content = selection.getContent({ format: 'text' }) || '';
+        if (!content) {
+            try { editor.notificationManager.open({ text: 'Kein Text markiert.', type: 'info', timeout: 2500 }); } catch (_e) {}
+            return;
+        }
+        // Default aus Editor-Param, sonst aus Locale ableiten
+        var defaultCc = editor.getParam('for_chars_symbols_phone_default') || '';
+        if (!defaultCc && locale) { defaultCc = localeDefaultCc(locale); }
+
+        // Für international: Prompt nur, wenn gar nichts mit + erkannt wird UND defaultCc leer ist.
+        var needsPrompt = phoneNeedsPrompt(content, defaultCc);
+        if (needsPrompt) {
+            promptCountry(editor, function (cc) {
+                selection.setContent(esc(transformPhonesInText(content, mode, cc)));
+            });
+            return;
+        }
+        selection.setContent(esc(transformPhonesInText(content, mode, defaultCc)));
     }
 
     function performAction(editor, actionId) {
@@ -697,6 +917,8 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             case 'dash_numbers':selection.setContent(esc(enDashNumberRanges(content || ''))); break;
             case 'nbsp_units':  selection.setContent(esc(insertNbspBeforeUnits(content || ''))); break;
             case 'softhyphen':  selection.setContent(esc(suggestSoftHyphens(content || ''))); break;
+            case 'phone_intl':  runPhoneAction(editor, 'intl', locale); return;
+            case 'phone_nat':   runPhoneAction(editor, 'nat', locale); return;
             case 'find_wrong':
                 var body = editor.getBody();
                 var n = highlightWrongTypography(body);
@@ -875,37 +1097,26 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
                 var label = insertBtn.getAttribute('data-fcs-label') || val;
                 var invisible = insertBtn.getAttribute('data-fcs-invisible') === '1';
                 var hint = insertBtn.getAttribute('data-fcs-hint') || undefined;
-                try {
-                    editor.focus();
-                    if (editor.__fcsBm) { editor.selection.moveToBookmark(editor.__fcsBm); }
-                } catch (_e) {}
+                // Kein editor.focus() hier – mousedown preventDefault hält den Editor-Focus,
+                // mceInsertContent nutzt die bestehende Selektion.
                 renderAndInsert(editor, val);
-                try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
                 addRecent({ kind: kind, value: val, label: label, invisible: invisible || undefined, hint: hint });
-                // Recent-Sektion im Zeichen-Tab live aktualisieren.
                 refreshFavsAndRecent(root);
                 return;
             }
             var action = e.target.closest('[data-fcs-action]');
             if (action) {
                 e.preventDefault();
-                try {
-                    editor.focus();
-                    if (editor.__fcsBm) { editor.selection.moveToBookmark(editor.__fcsBm); }
-                } catch (_e) {}
                 performAction(editor, action.getAttribute('data-fcs-action'));
-                try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
                 return;
             }
         });
 
-        // Mousedown im Panel darf dem Editor nicht den Fokus klauen (sonst verliert die Selektion ihren Anchor).
-        // Zusätzlich: aktuelle Editor-Selektion als Bookmark sichern, damit wir sie vor dem Einfügen/Aktionen
-        // zuverlässig wiederherstellen können (sonst landen Zeichen manchmal am Body-Ende im neuen Block).
+        // Mousedown im Panel darf dem Editor nicht den Fokus klauen –
+        // sonst verliert die Selektion ihren Anchor und neue <p>-Blöcke werden erzeugt.
         root.addEventListener('mousedown', function (e) {
             if (!e.target.closest('input, textarea, [contenteditable="true"]')) {
                 e.preventDefault();
-                try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
             }
         });
 
@@ -924,8 +1135,6 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
 
     function openPicker(editor) {
         ensureCss();
-        // Selektion sichern, bevor der Fokus eventuell ans Panel wandert.
-        try { editor.__fcsBm = editor.selection.getBookmark(2, true); } catch (_e) {}
         var root = panelsByEditor.get(editor);
         if (!root || !root.isConnected) {
             root = buildPanel(editor);
