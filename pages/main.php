@@ -42,6 +42,7 @@ $demoHtml = <<<'HTML'
     <tr><td><code>for_footnote</code></td><td>Fußnoten mit Live-Sync und Rück-Verweisen</td></tr>
     <tr><td><code>for_toc</code></td><td>Inhaltsverzeichnis mit Live-Sync (siehe oben ↑)</td></tr>
     <tr><td><code>for_a11y</code></td><td>Accessibility-Checker on demand (WCAG-nah)</td></tr>
+    <tr><td><code>for_rootstrip</code></td><td>Entfernt beim Speichern automatisch den TinyMCE-Root-Wrapper</td></tr>
   </tbody>
 </table>
 

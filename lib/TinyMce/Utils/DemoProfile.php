@@ -37,7 +37,7 @@ document_base_url: '/',
 convert_urls: true,
 entity_encoding: 'raw',
 
-plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown cleanpaste mediapaste link_yform phonelink quote',
+plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_rootstrip cleanpaste mediapaste link_yform phonelink quote',
 
 toolbar: 'styles | undo redo | bold italic underline strikethrough subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | for_images for_oembed for_video | link link_yform phonelink | quote for_htmlembed for_checklist for_checklist_feature | for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_markdown_paste | for_a11y | table charmap emoticons hr | snippets | fullscreen preview code help',
 
@@ -83,6 +83,7 @@ target_list: [
 
 /* FOR-Plugin-Konfigurationen */
 a11y_new_window_warning: true,
+for_rootstrip: true,
 
 for_images_presets: [
     { value: 'img-25',  text: '25 %' },

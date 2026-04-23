@@ -22,6 +22,7 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_toc` | **Inhaltsverzeichnis** aus den Überschriften – Live-Sync beim Bearbeiten | `for_toc_insert`, `for_toc_update` |
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
 | `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
+| `for_rootstrip` | Nutzt automatisch den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`) im Editor und entfernt ihn beim Speichern wieder. Aktivierbar über `for_rootstrip: true/false` (Default: `true`). | — |
 
 Zusätzlich enthält das AddOn diese Kern-Helfer (ohne `for_`-Präfix, da älter):
 
