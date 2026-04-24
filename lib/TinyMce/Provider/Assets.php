@@ -77,11 +77,16 @@ class Assets
             );
 
             foreach ($styleSets as $set) {
-                // Parse profile assignment (comma-separated, empty = all profiles)
+                // Parse profile assignment (comma- or pipe-separated, empty = all profiles).
+                // Pipe kommt vor, falls der rex_form-Multi-Select seinen Default-Separator
+                // genutzt hat; Komma ist der aktuell bevorzugte Separator.
                 $profiles = [];
-                $profilesRaw = isset($set['profiles']) ? (string) $set['profiles'] : '';
+                $profilesRaw = trim(isset($set['profiles']) ? (string) $set['profiles'] : '', " ,|\t\n\r\0\x0B");
                 if ('' !== $profilesRaw) {
-                    $profiles = array_values(array_filter(array_map('trim', explode(',', $profilesRaw)), static fn (string $v): bool => '' !== $v));
+                    $parts = preg_split('/[,|]/', $profilesRaw);
+                    if (is_array($parts)) {
+                        $profiles = array_values(array_filter(array_map('trim', $parts), static fn (string $v): bool => '' !== $v));
+                    }
                 }
 
                 // Content CSS hinzufügen mit Profil-Info

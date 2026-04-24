@@ -8,6 +8,7 @@
  */
 
 use FriendsOfRedaxo\TinyMce\StyleSets\DefaultSets;
+use FriendsOfRedaxo\TinyMce\Utils\Cke5Converter;
 
 $func = rex_request('func', 'string');
 $id = rex_request('id', 'int');
@@ -220,6 +221,135 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
     $func = '';
 }
 
+// CKE5 Converter: Bestehende CKEditor-5-JSON (custom_styles / link_decorators / heading.options)
+// in TinyMCE-style_formats umwandeln und optional direkt als neues Style-Set speichern.
+if ('cke5_convert' === $func) {
+    $sourceJson = rex_post('cke5_source', 'string', '');
+    $saveAsSet = (bool) rex_post('cke5_save', 'int', 0);
+    $newName = trim((string) rex_post('cke5_name', 'string', ''));
+    $newDescription = trim((string) rex_post('cke5_description', 'string', ''));
+    $newContentCss = trim((string) rex_post('cke5_content_css', 'string', ''));
+
+    $converted = null;
+    $convWarnings = [];
+    $convFormatsJson = '';
+
+    if ('' !== $sourceJson) {
+        if (!$csrfToken->isValid()) {
+            echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+        } else {
+            // Styleset-Namen als Gruppen-Titel verwenden, damit im TinyMCE-Dropdown
+            // nicht bei jedem Set 'CKE5 Migrated' erscheint.
+            $groupTitle = '' !== $newName ? $newName : 'CKE5 Migrated';
+            $result = Cke5Converter::convert($sourceJson, $groupTitle);
+            $convWarnings = $result['warnings'];
+            if ([] !== $result['formats']) {
+                $convFormatsJson = (string) json_encode($result['formats'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+                if ($saveAsSet && '' !== $newName) {
+                    // Prüfen, ob Name bereits existiert
+                    $check = rex_sql::factory();
+                    $check->setQuery('SELECT id FROM ' . rex::getTable('tinymce_stylesets') . ' WHERE name = :n LIMIT 1', ['n' => $newName]);
+
+                    if ($check->getRows() > 0) {
+                        echo rex_view::error(rex_i18n::msg('tinymce_stylesets_cke5_name_exists', $newName));
+                    } else {
+                        $prioSql = rex_sql::factory();
+                        $prioSql->setQuery('SELECT MAX(prio) as max_prio FROM ' . rex::getTable('tinymce_stylesets'));
+                        $maxPrio = (int) $prioSql->getValue('max_prio');
+
+                        $now = date('Y-m-d H:i:s');
+                        $user = rex::requireUser()->getLogin();
+
+                        $ins = rex_sql::factory();
+                        $ins->setTable(rex::getTable('tinymce_stylesets'));
+                        $ins->setValue('name', $newName);
+                        $ins->setValue('description', '' !== $newDescription ? $newDescription : 'Aus CKEditor 5 migriert');
+                        $ins->setValue('content_css', $newContentCss);
+                        $ins->setValue('style_formats', $convFormatsJson);
+                        $ins->setValue('active', 0);
+                        $ins->setValue('prio', $maxPrio + 1);
+                        $ins->setValue('createdate', $now);
+                        $ins->setValue('updatedate', $now);
+                        $ins->setValue('createuser', $user);
+                        $ins->setValue('updateuser', $user);
+                        $ins->insert();
+
+                        rex_addon::get('tinymce')->setConfig('update_profiles', true);
+                        echo rex_view::success(rex_i18n::msg('tinymce_stylesets_cke5_saved', $newName));
+                        // Zurück zur Liste
+                        $func = '';
+                    }
+                }
+            } else {
+                echo rex_view::error(rex_i18n::msg('tinymce_stylesets_cke5_nothing'));
+            }
+        }
+    }
+
+    if ('cke5_convert' === $func) {
+        $formAction = rex_url::currentBackendPage(['func' => 'cke5_convert']);
+
+        $warnHtml = '';
+        if ([] !== $convWarnings) {
+            $warnHtml = '<div class="alert alert-warning"><ul style="margin:0;padding-left:18px;">';
+            foreach ($convWarnings as $w) {
+                $warnHtml .= '<li>' . rex_escape($w) . '</li>';
+            }
+            $warnHtml .= '</ul></div>';
+        }
+
+        $previewHtml = '';
+        if ('' !== $convFormatsJson) {
+            $previewHtml = '<label><strong>' . rex_i18n::msg('tinymce_stylesets_cke5_preview') . '</strong></label>'
+                . '<textarea class="form-control rex-code" rows="12" readonly>' . rex_escape($convFormatsJson) . '</textarea>';
+        }
+
+        $body = '<form action="' . $formAction . '" method="post">'
+            . $csrfToken->getHiddenField()
+            . '<p>' . rex_i18n::msg('tinymce_stylesets_cke5_intro') . '</p>'
+            . '<div class="form-group">'
+            .   '<label for="cke5_source"><strong>' . rex_i18n::msg('tinymce_stylesets_cke5_source') . '</strong></label>'
+            .   '<textarea id="cke5_source" name="cke5_source" class="form-control rex-code" rows="12" placeholder=\'[{"buttonlink": {"mode": "manual", "label": "Primary Button", "attributes": {"class": "uk-button uk-button-primary"}}}]\'>' . rex_escape($sourceJson) . '</textarea>'
+            . '</div>'
+            . $warnHtml
+            . $previewHtml
+            . '<hr>'
+            . '<div class="row">'
+            .   '<div class="col-md-6"><div class="form-group">'
+            .     '<label for="cke5_name">' . rex_i18n::msg('tinymce_stylesets_name') . '</label>'
+            .     '<input type="text" id="cke5_name" name="cke5_name" class="form-control" value="' . rex_escape($newName) . '" placeholder="z. B. UIkit Buttons (CKE5)">'
+            .   '</div></div>'
+            .   '<div class="col-md-6"><div class="form-group">'
+            .     '<label for="cke5_description">' . rex_i18n::msg('tinymce_stylesets_description') . '</label>'
+            .     '<input type="text" id="cke5_description" name="cke5_description" class="form-control" value="' . rex_escape($newDescription) . '">'
+            .   '</div></div>'
+            . '</div>'
+            . '<div class="form-group">'
+            .   '<label for="cke5_content_css">' . rex_i18n::msg('tinymce_stylesets_content_css') . '</label>'
+            .   '<input type="text" id="cke5_content_css" name="cke5_content_css" class="form-control" value="' . rex_escape($newContentCss) . '" placeholder="/assets/addons/project/frontend.css">'
+            .   '<p class="help-block">' . rex_i18n::rawMsg('tinymce_stylesets_content_css_notice') . '</p>'
+            . '</div>'
+            . '<div class="form-group">'
+            .   '<button type="submit" name="cke5_save" value="0" class="btn btn-default">'
+            .     '<i class="rex-icon fa-search"></i> ' . rex_i18n::msg('tinymce_stylesets_cke5_convert')
+            .   '</button> '
+            .   '<button type="submit" name="cke5_save" value="1" class="btn btn-save">'
+            .     '<i class="rex-icon fa-save"></i> ' . rex_i18n::msg('tinymce_stylesets_cke5_save')
+            .   '</button> '
+            .   '<a href="' . rex_url::currentBackendPage() . '" class="btn btn-default">' . rex_i18n::msg('cancel') . '</a>'
+            . '</div>'
+            . '</form>';
+
+        $fragment = new rex_fragment();
+        $fragment->setVar('class', 'edit', false);
+        $fragment->setVar('title', rex_i18n::msg('tinymce_stylesets_cke5_title'));
+        $fragment->setVar('body', $body, false);
+        echo $fragment->parse('core/page/section.php');
+        return;
+    }
+}
+
 // Formular (Add/Edit)
 if ('add' === $func || 'edit' === $func) {
     $form = rex_form::factory(rex::getTable('tinymce_stylesets'), '', 'id=' . $id);
@@ -249,12 +379,28 @@ if ('add' === $func || 'edit' === $func) {
     $field->setAttribute('class', 'form-control rex-code');
     $field->setAttribute('rows', 20);
 
-    // Profile-Zuordnung
-    $field = $form->addTextField('profiles');
+    // Profile-Zuordnung: Mehrfach-Select mit allen vorhandenen Profilen.
+    // Leere Auswahl = in allen Profilen aktiv. Separator bleibt Komma,
+    // damit die bisherige Speicherung (comma-separated) kompatibel bleibt.
+    $profileOptions = rex_sql::factory()->getArray(
+        'SELECT name FROM ' . rex::getTable('tinymce_profiles') . ' ORDER BY name ASC'
+    );
+    $field = $form->addSelectField('profiles');
     $field->setLabel(rex_i18n::msg('tinymce_stylesets_profiles'));
     $field->setNotice(rex_i18n::msg('tinymce_stylesets_profiles_notice'));
-    $field->setAttribute('class', 'form-control');
-    $field->setAttribute('placeholder', 'z.B. uikit, bootstrap (leer = alle Profile)');
+    $field->setAttribute('class', 'form-control selectpicker');
+    $field->setAttribute('multiple', 'multiple');
+    $field->setAttribute('data-live-search', 'true');
+    $field->setAttribute('title', rex_i18n::msg('tinymce_stylesets_profiles_all'));
+    $field->setSeparator(',');
+    $select = $field->getSelect();
+    $select->setSize(6);
+    foreach ($profileOptions as $row) {
+        $profileName = (string) ($row['name'] ?? '');
+        if ('' !== $profileName) {
+            $select->addOption($profileName, $profileName);
+        }
+    }
 
     // Aktiv
     $field = $form->addCheckboxField('active');
@@ -288,7 +434,7 @@ if ('add' === $func || 'edit' === $func) {
 } else {
     // Liste
     $query = sprintf(
-        'SELECT id, name, description, content_css, active, prio FROM %s ORDER BY prio ASC, name ASC',
+        'SELECT id, name, description, content_css, profiles, active, prio FROM %s ORDER BY prio ASC, name ASC',
         rex::getTable('tinymce_stylesets')
     );
     $list = rex_list::factory($query);
@@ -324,6 +470,18 @@ if ('add' === $func || 'edit' === $func) {
         return rex_escape($css);
     });
 
+    // Profile-Zuordnung als Badges anzeigen (leer = alle Profile).
+    $list->setColumnLabel('profiles', rex_i18n::msg('tinymce_stylesets_profiles'));
+    $list->setColumnFormat('profiles', 'custom', static function ($params) {
+        $raw = trim((string) $params['value'], " ,|\t\n\r\0\x0B");
+        if ('' === $raw) {
+            return '<span class="label label-default">' . rex_escape(rex_i18n::msg('tinymce_stylesets_profiles_all')) . '</span>';
+        }
+        $names = array_values(array_filter(array_map('trim', preg_split('/[,|]/', $raw) ?: []), static fn (string $v): bool => '' !== $v));
+        $badges = array_map(static fn (string $n): string => '<span class="label label-info" style="margin-right:3px;">' . rex_escape($n) . '</span>', $names);
+        return implode('', $badges);
+    });
+
     // Prio
     $list->setColumnLabel('prio', rex_i18n::msg('tinymce_stylesets_prio'));
 
@@ -356,44 +514,39 @@ if ('add' === $func || 'edit' === $func) {
     $exportAllUrl = rex_url::currentBackendPage(['func' => 'export_all']);
     $exportAllButton = '<a href="' . $exportAllUrl . '" class="btn btn-default"><i class="rex-icon fa-download"></i> ' . rex_i18n::msg('tinymce_stylesets_export_all') . '</a>';
 
-    // Import Form
+    // CKE5-Konverter Button
+    $cke5Url = rex_url::currentBackendPage(['func' => 'cke5_convert']);
+    $cke5Button = '<a href="' . $cke5Url . '" class="btn btn-default"><i class="rex-icon fa-magic"></i> ' . rex_i18n::msg('tinymce_stylesets_cke5_title') . '</a>';
+
+    // Import Form (kompakt)
     $importForm = '
-    <form action="' . rex_url::currentBackendPage(['func' => 'import'] + $csrfToken->getUrlParams()) . '" method="post" enctype="multipart/form-data" class="form-inline">
-        <div class="input-group">
+    <form action="' . rex_url::currentBackendPage(['func' => 'import'] + $csrfToken->getUrlParams()) . '" method="post" enctype="multipart/form-data" class="form-inline" style="display:inline-block;">
+        <div class="input-group input-group-sm">
             <input type="file" name="import_file" accept=".json" class="form-control" required>
             <span class="input-group-btn">
-                <button type="submit" class="btn btn-default"><i class="rex-icon fa-upload"></i> ' . rex_i18n::msg('tinymce_stylesets_import') . '</button>
+                <button type="submit" class="btn btn-default btn-sm" title="' . rex_i18n::msg('tinymce_stylesets_import') . '"><i class="rex-icon fa-upload"></i> ' . rex_i18n::msg('tinymce_stylesets_import') . '</button>
             </span>
         </div>
     </form>';
 
-    // Info-Box
-    $infoContent = '
-    <p>' . rex_i18n::msg('tinymce_stylesets_info') . '</p>
-    <p><strong>' . rex_i18n::msg('tinymce_stylesets_info_merge') . '</strong></p>
-    <hr>
-    <p>' . rex_i18n::msg('tinymce_stylesets_demo_info') . '</p>
-    <p>' . $demoButton . '</p>
-    <hr>
-    <h4>' . rex_i18n::msg('tinymce_stylesets_import_export') . '</h4>
-    <p>' . rex_i18n::msg('tinymce_stylesets_import_export_info') . '</p>
-    <div class="row">
-        <div class="col-md-6">
-            <h5>' . rex_i18n::msg('tinymce_stylesets_export') . '</h5>
-            <p>' . $exportAllButton . '</p>
-        </div>
-        <div class="col-md-6">
-            <h5>' . rex_i18n::msg('tinymce_stylesets_import') . '</h5>
-            ' . $importForm . '
-        </div>
-    </div>
-    ';
-    $infoFragment = new rex_fragment();
-    $infoFragment->setVar('class', 'info', false);
-    $infoFragment->setVar('title', rex_i18n::msg('tinymce_stylesets_info_title'));
-    $infoFragment->setVar('body', $infoContent, false);
-    $infoFragment->setVar('collapse', true);
-    echo $infoFragment->parse('core/page/section.php');
+    // Kompakte Tool-Leiste: alle Aktionen nebeneinander.
+    $toolbar = '<div class="btn-toolbar" role="toolbar" style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">'
+        . $demoButton
+        . ' ' . $cke5Button
+        . ' ' . $exportAllButton
+        . ' ' . $importForm
+        . '</div>';
+
+    $actionsContent = '<p class="text-muted" style="margin:0 0 10px;">'
+        . rex_i18n::msg('tinymce_stylesets_info') . ' '
+        . '<strong>' . rex_i18n::msg('tinymce_stylesets_info_merge') . '</strong>'
+        . '</p>'
+        . $toolbar;
+
+    $actionsFragment = new rex_fragment();
+    $actionsFragment->setVar('title', rex_i18n::msg('tinymce_stylesets_actions_title'));
+    $actionsFragment->setVar('body', $actionsContent, false);
+    echo $actionsFragment->parse('core/page/section.php');
 
     // Liste ausgeben
     $content = $list->get();
