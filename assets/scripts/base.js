@@ -82,7 +82,7 @@ function saveTinyEditorContent() {
         return;
     }
     
-    // Simply save all current content to their textareas
+    // Simply save all current content to their textareas or divs
     // This way it's preserved when DOM is reorganized
     try {
         tinymce.editors.forEach(function(editor) {
@@ -91,7 +91,7 @@ function saveTinyEditorContent() {
                 let content = editor.getContent();
                 
                 // ============================================
-                // FIX: Unterscheide zwischen textarea und div
+                // FIX: Universelle LÃ¶sung fÃ¼r textarea UND div
                 // ============================================
                 if ($elm.is('textarea')) {
                     $elm.val(content);
@@ -144,7 +144,7 @@ function tiny_init(container) {
 
         // ============================================
         // FIX: Content VOR Init bereinigen
-        // Entferne äußere <p>-Tags, die durch vorheriges Speichern entstanden sind
+        // Entferne Ã¤uÃŸere <p>-Tags und leere <p> am Anfang/Ende
         // ============================================
         let currentContent = '';
         if ($this.is('textarea')) {
@@ -153,10 +153,16 @@ function tiny_init(container) {
             currentContent = $this.html();
         }
         
-        // Trimme Whitespace
+        // Trimme Whitespace am Anfang und Ende
         currentContent = currentContent.trim();
         
-        // Entferne NUR die äußersten <p>-Tags wenn der ganze Content darin ist
+        // Entferne mehrere aufeinanderfolgende leere <p>-Tags am Anfang
+        currentContent = currentContent.replace(/^(<p[^>]*>\s*<\/p>)+/i, '');
+        
+        // Entferne mehrere aufeinanderfolgende leere <p>-Tags am Ende
+        currentContent = currentContent.replace(/(<p[^>]*>\s*<\/p>)+$/i, '');
+        
+        // Entferne NUR die Ã¤uÃŸersten <p>-Tags wenn der ganze Content darin ist
         // Pattern: ^<p...>content</p>$ aber NICHT wenn mehrere <p> mit Content existieren
         let pTagMatch = currentContent.match(/^<p[^>]*>(.*)<\/p>$/is);
         
@@ -164,15 +170,17 @@ function tiny_init(container) {
             // Es ist ein einzelner <p>-Tag um alles
             let innerContent = pTagMatch[1];
             
-            // Prüfe, ob der innere Content nicht mit <p> beginnt/endet
-            // Wenn nicht, dann waren die äußeren Tags redundant
+            // PrÃ¼fe, ob der innere Content nicht mit <p> beginnt/endet
+            // Wenn nicht, dann waren die Ã¤uÃŸeren Tags redundant
             if (!innerContent.match(/^<p/i) && !innerContent.match(/<\/p>$/i)) {
-                // Nicht mehrstöckig - entferne die äußeren Tags
+                // Nicht mehrstÃ¶ckig - entferne die Ã¤uÃŸeren Tags
                 currentContent = innerContent;
             }
         }
         
-        // Speichere bereinigten Content zurück
+        // ============================================
+        // FIX: Speichere zurÃ¼ck - universell fÃ¼r textarea und div
+        // ============================================
         if ($this.is('textarea')) {
             $this.val(currentContent);
         } else {
@@ -417,7 +425,7 @@ function tiny_init(container) {
                 });
                 
                 // Register all formats so they work when applied.
-                // Only include defined properties in the spec – passing undefined values
+                // Only include defined properties in the spec â€“ passing undefined values
                 // can confuse TinyMCE's internal format detection logic.
                 editor.on('init', function() {
                     function registerFormats(formats) {
@@ -442,22 +450,24 @@ function tiny_init(container) {
             
             // ============================================
             // FIX: Set up correct change handler
-            // WICHTIG: .val() für textarea, .html() für div!
+            // Universelle LÃ¶sung fÃ¼r TEXTAREA und DIV
             // ============================================
             editor.on('change', function(e) {
                 let $elm = $(editor.targetElm);
                 let content = editor.getContent();
                 
-                // Unterscheide zwischen textarea und div/contenteditable
+                // Speichere den Content im richtigen Format
                 if ($elm.is('textarea')) {
+                    // FÃ¼r textarea: .val() verwenden
                     $elm.val(content);
                 } else {
+                    // FÃ¼r div/contenteditable: .html() verwenden
                     $elm.html(content);
                 }
             });
 
             // Fix: TinyMCE setzt overflow:hidden auf <html> bei Dialogen und entfernt es nicht
-            // zuverlässig – das blockiert window.scroll-Events und damit die REDAXO-Nav (Issue #139)
+            // zuverlÃ¤ssig â€“ das blockiert window.scroll-Events und damit die REDAXO-Nav (Issue #139)
             editor.on('CloseWindow', function() {
                 document.documentElement.style.removeProperty('overflow');
                 document.documentElement.style.removeProperty('overflow-y');
