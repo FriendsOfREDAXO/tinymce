@@ -282,7 +282,7 @@ $formUrl = rex_url::currentBackendPage([], false);
                                     <?= $addon->i18n('mediapaste_category_ask') ?>
                                 </option>
                                 <option value="0"<?= ((int) $uploadCfg['upload_default_category']) === 0 ? ' selected' : '' ?>>
-                                    <?= rex_escape(rex_i18n::msg('pool_kats_no_category')) ?>
+                                    <?= rex_escape(rex_i18n::hasMsg('pool_kats_no_category') ? rex_i18n::msg('pool_kats_no_category') : rex_i18n::msg('tinymce_media_no_category')) ?>
                                 </option>
                                 <?= $renderCategoryOptions(rex_media_category::getRootCategories(), (int) $uploadCfg['upload_default_category']) ?>
                             </select>

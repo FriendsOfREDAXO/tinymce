@@ -190,16 +190,9 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
 }
 
 if ('clone' === $func) {
-    $sql = rex_sql::factory();
-    $sql->setTable($profileTable);
-    $sql->setWhere(['id' => $id]);
-    $sql->select('name');
-    if ($sql->getRows() > 0 && $sql->getValue('name') === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
-        echo rex_view::error(rex_i18n::msg('tinymce_profile_demo_locked'));
-    } else {
-        $message = TinyMceListHelper::cloneData($profileTable, $id);
-        rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
-    }
+    // Demo-Profil darf dupliziert werden (Edit/Delete bleiben gesperrt), damit es als Startpunkt für ein eigenes Profil dienen kann.
+    $message = TinyMceListHelper::cloneData($profileTable, $id);
+    rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
     $func = '';
 }
 
@@ -287,9 +280,8 @@ if ('' === $func) {
             . '<li><a href="' . $exportUrl . '">' . rex_i18n::msg('tinymce_profile_export') . '</a></li>';
 
         $isDemo = $list->getValue('name') === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME;
-        if (!$isDemo) {
-            $dropdown .= '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>';
-        }
+        // Clone ist auch für das Demo-Profil erlaubt (als Start-Template für eigene Profile).
+        $dropdown .= '<li><a href="' . $cloneUrl . '" data-confirm="' . rex_i18n::msg('tinymce_clone') . ' ?">' . rex_i18n::msg('tinymce_clone') . '</a></li>';
 
         if ($list->getValue('name') !== 'full' && !$isDemo) {
             $dropdown .= '<li><a href="' . $deleteUrl . '" data-confirm="' . rex_i18n::msg('delete') . ' ?">' . rex_i18n::msg('delete') . '</a></li>';

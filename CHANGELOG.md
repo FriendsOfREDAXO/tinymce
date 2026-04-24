@@ -1,127 +1,94 @@
 Changelog
 =========
 
-Version 8.5.4
+Version 8.5.0 – 8.6.0
 -------------------------------
 
-### Bugfix: for_chars_symbols Autoreplace griff nur bei Pattern-Enden mit Trigger-Zeichen
+### Neue Plugins
 
-- **Problem:** Die Live-Ersetzung wurde durch Leerzeichen / Satzzeichen getriggert, aber beim Lookback wurde das Trigger-Zeichen selbst mitverglichen. Dadurch funktionierten nur Regeln, deren Muster *selbst* auf einem Trigger-Char enden: `(c)`, `(tm)`, `...` (Ende auf `)` bzw. `.`). Regeln wie `-->`, `1/2`, `!=`, `<=`, `+/-`, `~=` oder Custom-Regeln endend auf Buchstaben/Ziffern matchten nicht, sobald der User ein Leerzeichen danach tippte.
-- **Fix:** Das trailende Trigger-Zeichen (Space, Tab, `.,;:!?)]"'/`, nbsp) wird beim Matching abgeschnitten und beim Ersetzen erhalten — aus `1/2 ` wird `½ ` statt `½`. Alle Default-Regeln (`-->`, `<--`, `->`, `<-`, `==>`, `<==`, `<=>`, `+/-`, `!=`, `<=`, `>=`, `~=`, `1/2`, `1/3`, `1/4`, `2/3`, `3/4`, `2^0…2^9`) funktionieren jetzt verlässlich. Eigene Custom-Regeln ebenfalls.
+#### `for_chars_symbols` – Zeichen, Symbole, Emoji & Typografie-Helfer
 
-### Demo-Seite mit Feature-Sidebar
+Einheitlicher Picker als **schwebendes, draggable Panel** (non-modal). Kein blockierendes Modal: offen lassen, mehrere Zeichen in Folge einfügen, Editor bleibt voll bedienbar.
 
-- Die Demo-Seite unter *TinyMCE → Demo* zeigt jetzt rechts neben dem Editor eine sticky Sidebar mit konkreten Eingabevorschlägen pro Feature-Bereich (Autoreplace, Barrierefreiheit, Bilder, Embeds, Struktur, Zeichen-Picker, Paste). Dark-Mode-fähig, unter 991px responsiv untereinander.
-
-
-Version 8.5.3
--------------------------------
-
-### Demo-Profil: „alle coolen Features" aktiviert
-
-- **Autoreplace live an:** `for_chars_symbols_autoreplace: true` → beim Tippen werden `(c)` zu ©, `(tm)` zu ™, `...` zu …, `->` zu →, `+/-` zu ±, Brüche wie `1/2` zu ½ uvm. ersetzt (32 Default-Regeln).
-- **Eigene Demo-Regeln** als Beispiele in `for_chars_symbols_autoreplace_rules`: `(r)` → ®, `-->` → →, `<--` → ←, Regex `(kw12)` → „KW 12" (Backreferences), `(tel)` → „+49 (0) …".
-- **for_a11y-Konfiguration:** alle Einzel-Checks (`a11y_rules`) explizit auf `true` gesetzt – so sieht man im Demo-Profil direkt alle Warnungstypen. `a11y_generic_link_texts` mit deutscher und englischer Blacklist („hier klicken", „mehr erfahren", „read more" …).
-- **for_images-Presets korrigiert:** Die bisherige `for_images_presets`-Option wurde vom Plugin *nie gelesen* (falscher Name). Jetzt korrekt via `imagewidth_presets` (Original, Klein/Mittel/Groß, Volle Breite), `imagealign_presets` (Keine, Links, Zentriert, Rechts) und `imageeffect_presets` (Runde Ecken, Schatten, Rahmen, Graustufen).
-
-### Profil-Assistent: Typografie-Autoreplace konfigurierbar
-
-- **Neuer Block „Typografie-Autoreplace (for_chars_symbols)"** im Assistenten zwischen Sprach-Menü und Extras: Checkbox *Autoreplace aktivieren* (`for_chars_symbols_autoreplace`), Checkbox *Default-Regeln nutzen* (`for_chars_symbols_autoreplace_defaults`, vorbelegt aktiv).
-- **Eigene Regeln als Repeater-Tabelle:** Typ-Auswahl `Text | Regex`, Spalten *Von* und *Nach*, Add-Button und *Beispiele einfügen* (legt `(tel)` → `+49 (0) …`, `-->` → →, `<--` → ←, Regex `\(kw(\d{1,2})\)` → `KW $1` an).
-- **Edit-Modus:** hydriert aus bestehenden Configs sowohl Kurzform `["from","to"]`, Objektform `{ from, to }` als auch Regex-Form `{ re, to }`.
-- Deutsche + englische i18n-Keys ergänzt (`tinymce_autoreplace*`).
-
-### `for_chars_symbols`: Geschützter Bindestrich (U+2011)
-
-- **Neues Zeichen:** „Geschützter Bindestrich (nbhyphen)" – Unicode `U+2011` / HTML `&#8209;`. Sieht aus wie ein normaler Bindestrich, verhindert aber, dass der Browser an dieser Stelle umbricht (z. B. Telefonnummern, Produktcodes, Namen wie „Baden-Baden"). Ergänzung zum bereits vorhandenen weichen Trennzeichen (shy, `U+00AD`).
-- Eingebunden in **drei Stellen**: Zeichen-Picker (Tab *Zeichen* → Gruppe *Unsichtbar / Steuerzeichen*), Typografie-Helpers (`HELPER_INSERTS` → Insert-Menü unter *Unsichtbare einfügen*) und Invisibles-Mode (`for_chars_symbols_invisibles`-Toggle-Button markiert den geschützten Bindestrich mit Label `nbhy` sichtbar im Editor).
-
-### Cache-Buster-Bump für ausgelieferte Icons
-
-- Versions-Bump auf 8.5.3, damit der in `PluginRegistry` gesetzte `?v=…`-Cache-Buster sich ändert und Browser die neue `for_images/plugin.min.js` mit dem eigenen `for_imagedialog`-Icon (Bildrahmen + Schieberegler statt des Standard-`image`-Icons) zuverlässig nachladen.
-
-Version 8.5.2
--------------------------------
-
-### Neues Plugin: `for_abbr` – Abkürzungen & Fremdwörter (abbr-Element)
-
-- **Neues FOR-Plugin `for_abbr`** für das semantisch korrekte `<abbr title="…">`-Element (Abkürzungen, Fachbegriffe, Fremdwörter). Wichtig für Screenreader und SEO: Hilfstechnologien können die Langform vorlesen, Browser zeigen sie beim Hovern als Tooltip an.
-- **UI:** Toolbar-Button `for_abbr` (mit Active-State auf bestehenden `<abbr>`), Menü-Eintrag `for_abbr` (im Insert-Menü oder als Custom-Menu-Entry einbindbar) und **Context-Toolbar** direkt am selektierten `<abbr>`. Tastaturkürzel: <kbd>Ctrl/Cmd + Alt + A</kbd>.
-- **Dialog:** Anzeigetext, Langform/Erklärung (→ `title`), optionales `lang`-Attribut (z. B. `en` für Fremdwörter → Screenreader wechselt die Aussprache). Bestehende `<abbr>`-Elemente werden beim Öffnen erkannt (Edit-Modus mit *Entfernen*-Button, das unwrappt das Element und behält den Textinhalt).
-- **Optionales Glossar** via Editor-Option `for_abbr_glossary: [{ term: 'HTML', title: 'Hypertext Markup Language', lang: 'en' }, …]` — schlägt beim Öffnen des Dialogs passende Langform + Sprache vor, sobald der Anzeigetext einer Glossar-Term entspricht (case-insensitive).
-- **Im Profil-Assistenten** erscheint `for_abbr` wie andere FOR-Plugins grün markiert in der Plugin-Liste; der Button-Name ist `for_abbr`, der Menu-Item-Key ebenfalls `for_abbr`.
-- **Demo-Profil** lädt `for_abbr` standardmäßig (Plugin, Toolbar-Button im Typografie-Block, Eintrag im Insert- und Quickbars-Selection-Toolbar) inkl. Beispiel-`for_abbr_glossary` (HTML, CSS, WCAG, DSGVO, „z. B.“ …).
-### Demo-Profil: aufgeräumte, logisch gruppierte Toolbar
-
-- **Barrierefreiheits-Buttons (`for_a11y`, `for_abbr`, `language`) stehen jetzt ganz vorne** – noch vor Undo/Redo. Damit ist visuell klar, dass A11y im Demo-Profil zuerst kommt. Der `language`-Button erhält eine vorkonfigurierte `content_langs`-Liste (Deutsch, Englisch UK/US, Französisch, Italienisch, Spanisch); im Format-Menü ist der Eintrag „Sprache" ebenfalls verfügbar.
-- **TinyMCE-Core-Plugin `image` aktiviert + im Toolbar-/Insert-/Quickbars-Block** – nutzt automatisch den Mediapool-Picker (`file_picker_callback` ist bereits im Profil gesetzt) und ergänzt `imagewidthdialog` (Bildformatierung von `for_images`) für direkte Bild-Insertion.
-- **Logische Gruppierung der Toolbar:** A11y → Verlauf → Stile → Textformatierung → hoch/tief → Farbe/Cleanup → Listen/Einzug → Ausrichtung → Links (`link`, `link_yform`, `phonelink`, `anchor`) → Medien & Einbettungen (`image`, `imagewidthdialog`, `for_oembed`, `for_video`, `for_htmlembed`) → semantische Bausteine (`quote`, `for_checklist*`, `for_footnote*`, `for_toc*`) → Markdown-Paste → Tabelle → Typografie (`for_chars_symbols`, `charmap`, `emoticons`, `hr`, `pagebreak`) → Snippets → Suchen/Ersetzen → Ansicht (`fullscreen`, `preview`, `code`, `help`).
-### `for_images`: einzelne Toolbar-Buttons im Profil-Assistenten
-
-- **`for_images` registrierte bisher den Plugin-Namen `for_images` als Toolbar-Button** – TinyMCE kennt diesen Button aber gar nicht, das Plugin stellt stattdessen die Buttons `imagewidthdialog` (Dialog *Bildformatierung*: Breite, Ausrichtung, Effekte), `imagewidth` (Menubutton mit Breiten-Presets), `imagealignleft / imagealigncenter / imagealignright / imagealignnone`, `imageeffect` (Effekt-Presets), `imagealt` (Dialog *Alt-Text bearbeiten*) und `imagecaption` (Bildunterschrift) bereit, dazu eine Context-Toolbar `for_imagestoolbar` direkt am selektierten Bild. Diese Buttons sind jetzt **alle einzeln im Profil-Assistenten auswählbar** (grün als FOR-Plugin markiert).
-- **Eigenes Icon `for_imagedialog`** für den `imagewidthdialog`-Button: Bildrahmen mit Schiebereglern darunter – grenzt sich klar vom Standard-`image`-Icon (Bild einfügen) ab und signalisiert „bestehendes Bild bearbeiten/formatieren".
-- **Demo-Profil** verwendet `imagewidthdialog` (statt des fehlerhaften `for_images`) in Toolbar, Insert-Menü und Quickbars.
-
-### Profil-Assistent: Plugins ohne Toolbar-Button bereinigt
-
-- `cleanpaste` und `mediapaste` sind reine Paste-Pre-Processor-Plugins (kein UI, kein Dialog) und tauchen jetzt **nicht mehr in der Toolbar-Button-Auswahl** auf. Sie bleiben weiterhin im Plugin-Block aktivierbar.
-
-### Profil-Assistent: Toolbar-Buttons vervollständigt + Sprach-Menü (`content_langs`)
-
-- **Neue Toolbar-Buttons auswählbar:** `language`, `lineheight`, `ltr`, `rtl`, `searchreplace`, `charmap`, `emoticons`, `anchor`, `hr`, `pagebreak`, `nonbreaking`, `insertdatetime`, `visualblocks`, `visualchars`. Alle zugehörigen Plugins sind seit jeher im Vendor-Build enthalten; bisher tauchten die Buttons im Assistenten aber nicht in der Auswahl-Liste auf.
-- **Neuer Repeater „Sprach-Menü (content_langs)“** im Assistenten (vor „Extras“): Titel, BCP-47-Code (`de`, `en-GB`, `de-CH` …), optionaler Custom-Code (→ `data-mce-lang`) und Standard-Radio (überschreibt beim Speichern zusätzlich `language`). Button „Standard-Set einfügen“ befüllt die Tabelle in einem Klick mit `de/en/fr/es/it`. Erzeugt die TinyMCE-Option `content_langs: [...]`; erst damit wird der `language`-Toolbar-Button / Format-Menü-Eintrag „Sprache“ aktiv. Edit-Modus hydriert den Repeater aus einer bestehenden Config.
-- **Hinweis:** `language` ist kein Plugin, sondern ein Silver-Theme-Controller – er taucht daher nicht in der Plugin-Liste des Assistenten auf. Der gleichnamige TinyMCE-Premium-Plugin `language` (Kontextmenü + Dialog) ist nicht Teil des OSS-Builds und wird nicht ausgeliefert.
-
-Version 8.5.1
--------------------------------
-
-### `for_chars_symbols` – Aktions-Favoriten + Autoreplace
-
-- **Aktions-Favoriten:** jede Typografie-Aktion (Anführungszeichen DE/EN/FR, Normalisierung, NBSP-vor-Einheiten, en-Dash-Ranges, Soft-Hyphen, Telefonnummern …) besitzt einen Stern-Toggle ☆. Favorisierte Aktionen erscheinen gebündelt oben im Favoriten-Tab (getrennt von Zeichen-Favoriten) und persistieren pro Browser (`localStorage: forCharsSymbols.actionFavs`).
-- **Autoreplace (optional, opt-in):** `for_chars_symbols_autoreplace: true` aktiviert Live-Ersetzungen beim Tippen, getriggert durch Space/Enter/Satzzeichen (`. , ; : ! ? ) ] " ' /`). Eingebaute Regeln (32): `(c)`→©, `(C)`→©, `(r)`→®, `(R)`→®, `(tm)`→™, `(TM)`→™, `(p)`→℗, `(sm)`→℠, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `<==`→⇐, `<=>`→⇔, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `1/3`→⅓, `2/3`→⅔, sowie Ziffer+`^`+0–9 → Superscript (`2^3`→2³). Greift nicht in `<code>`, `<pre>`, `<kbd>`, `<samp>`, `<tt>`.
-- **Individuelle Ersetzungsregeln** per `for_chars_symbols_autoreplace_rules` im Profil-YAML: Kurzform (`["(tel)", "+49 …"]`), Objektform (`{ from, to }`) und Regex mit Backreferences (`{ re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }`) – mischbar. `for_chars_symbols_autoreplace_defaults: false` deaktiviert die Standardregeln (nur Custom aktiv). Custom-Regeln überschreiben Defaults bei identischem `from`. Alle Ersetzungen sind Undo-Stack-integriert (`editor.undoManager.transact`).
-- **Quote-Wrap-Fix:** führender/schließender Whitespace aus der Selektion (z. B. durch Doppelklick-Wortwahl) landet nicht mehr innerhalb der Anführungszeichen; französische Preset-NBSPs entfernt.
-
-Version 8.5.0
--------------------------------
-
-### Neu: `for_chars_symbols` – Zeichen, Symbole & Emoji Picker
-
-Einheitlicher Picker für Sonderzeichen, native Emojis und Typografie-Helfer, umgesetzt als **schwebendes, draggable Panel**. Kein blockierendes Modal: das Panel bleibt offen, mehrere Zeichen können in Folge eingefügt werden, der Editor bleibt sichtbar und bedienbar.
-
-- **Vier Tabs:** *★ Favoriten / ⏱ Zuletzt verwendet* (erster Tab), *Zeichen*, *Emoji*, *Typografie*.
-- **Live-Suche** pro Tab nach Name, Zeichen oder Codepoint (`U+…`).
-- **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`, max. 24 Einträge).
+- **Vier Tabs:** *★ Favoriten / ⏱ Zuletzt verwendet*, *Zeichen*, *Emoji*, *Typografie*. Live-Suche pro Tab nach Name, Zeichen oder Codepoint (`U+…`).
+- **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`, max. 24 Einträge). **Aktions-Favoriten** (Stern ☆ pro Typografie-Aktion) getrennt von Zeichen-Favoriten.
 - **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird doppelt escaped.
-- **Direkt-Einfüge-Menu-Items** (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`, Sammelmenü `fcs_insert_invisibles`) für Einfügen-Menüs.
-- **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Die Marker sind `data-mce-bogus="1"` – werden nie gespeichert.
-- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
-- **Einklapp-Button** im Panel-Header: blendet Tabs und Inhalt aus, der Header bleibt als schmaler, verschiebbarer Streifen sichtbar – praktisch, um kurz freie Sicht auf den Editor zu bekommen, ohne das Panel ganz zu schließen.
+- **Direkt-Einfüge-Menu-Items** (`fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp`, Sammelmenü `fcs_insert_invisibles`).
+- **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht nbsp, nnbsp, shy, nbhyphen, zwsp, zwj, zwnj, lrm, rlm im WYSIWYG mit dezentem Label-Marker sichtbar (`data-mce-bogus="1"` – wird nie gespeichert).
+- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten, Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national). Quote-Wrap-Fix: führender/schließender Whitespace aus der Selektion landet nicht mehr innerhalb der Anführungszeichen.
+- **Geschützter Bindestrich (U+2011)** `&#8209;` in Picker, Insert-Menü und Invisibles-Mode (Label `nbhy`) – verhindert Zeilenumbruch an Bindestrichen (Telefonnummern, „Baden-Baden", Produktcodes).
+- **Einklapp-Button** im Panel-Header: blendet Tabs und Inhalt aus, der Header bleibt als schmaler Streifen sichtbar.
 - **Shortcut:** `Strg/⌘ + Shift + I`. Locale via `for_chars_symbols_locale` (`de`, `de-ch`, `en`, `fr`).
 - **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
+- **Zeichen-Kataloge** mit typischen Redaktions- und Fach­anwendungen: Einheiten & Messung (Temperatur, CJK-Einheiten, Prime), Maschinenbau & Technik (⌀, Winkel, Tasten, Power), Medizin & Biologie (⚕, ☤, ℞, Gender-Zeichen), Musik (♩ … 𝄞), Recht & Verwaltung (§, ©, ®, ™, №, ℅ …), Aufzählungs-Symbole. Emoji-Katalog mit rund 1000 kuratierten Einträgen inkl. Hautton-/Beruf-Varianten und deutschem Keyword-Mapping; Flaggen in *Europa* und *Welt* getrennt.
 
-Zeichen-Gruppen für typische Redaktions- und Fachanwendungen:
+**Autoreplace (opt-in)** – `for_chars_symbols_autoreplace: true` aktiviert Live-Ersetzungen beim Tippen, getriggert durch Space/Enter/Satzzeichen.
 
-- *Einheiten & Messung* – Temperatur (`℃`, `℉`, `K`), Ångström, CJK-Kompakteinheiten (`㎜`, `㎝`, `㎞`, `㎡`, `㎥`, `㎏`, `㎖`, `㎐`, `㎑`, `㎒`, `㎓`, `㎾`, `㎅`, `㎆`, `㎇` …), Prime/Doppelprime, Promille/Pro-Zehntausend.
-- *Maschinenbau & Technik* – Durchmesser `⌀`/`Ø`, Winkelzeichen (`∠`, `∡`, `⊾`), `⊥`, `∥`, Zahnrad `⚙`, Benzolring `⌬`, Tastensymbole (`⌘`, `⌥`, `⇧`, `⎋`, `⏎`, `⌫`, `⇥`), Power-Symbole (`⏻`, `⏼`, `⏽`, `⭘`), Strom (`⎓`, `⏦`, `⏚`).
-- *Medizin & Biologie* – Äskulapstab `⚕`, Caduceus `☤`, Rezept `℞`, Gender-/Beziehungszeichen (`♀`, `♂`, `⚥`, `⚧`, `⚭`, `⚮`), Biohazard/Radioaktiv, medizinische Kreuze.
-- *Musik* – Noten und Schlüssel (`♩`, `♪`, `♫`, `♬`, `♭`, `♮`, `♯`, `𝄞`, `𝄢`).
-- *Recht & Verwaltung* – `§`, `¶`, `©`, `®`, `™`, `℗`, `℠`, `№`, `℅`, `℡`, `℻`, `☎`, `✉`, `✍`.
-- *Aufzählungs-Symbole* – Bullets, Sterne, Haken (`✓`, `✔`, `✗`, `✘`), dekorative Pfeile.
+- **32 Default-Regeln:** `(c)`→©, `(r)`→®, `(tm)`→™, `(p)`→℗, `(sm)`→℠, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `<==`→⇐, `<=>`→⇔, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `1/3`→⅓, `2/3`→⅔, Superscript `2^3`→2³ usw. Greift nicht in `<code>`, `<pre>`, `<kbd>`, `<samp>`, `<tt>`. Alle Ersetzungen sind Undo-Stack-integriert.
+- **Individuelle Regeln** per `for_chars_symbols_autoreplace_rules`: Kurzform (`["(tel)", "+49 …"]`), Objektform (`{ from, to }`) und Regex mit Backreferences (`{ re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }`). `for_chars_symbols_autoreplace_defaults: false` deaktiviert die Standardregeln. Custom-Regeln überschreiben Defaults bei identischem `from`.
+- **Fix (8.5.4):** Bei Regeln, die nicht selbst auf einem Trigger-Zeichen enden (`-->`, `1/2`, `!=`, `<=`, `+/-`, `~=`, eigene Custom-Regeln), wurde das trailende Trigger-Char beim Lookback mitverglichen und so der Match verhindert. Trigger-Char wird jetzt beim Matching abgeschnitten und beim Ersetzen erhalten — aus `1/2 ` wird `½ ` statt `½`.
 
-Emoji-Katalog mit rund 1000 kuratierten Einträgen inkl. Hautton-/Beruf-Varianten und deutschem Keyword-Mapping. Flaggen sind in zwei Gruppen aufgeteilt: **Flaggen Europa** (alle EU-Staaten, Kleinstaaten und Territorien wie Färöer, Gibraltar, Guernsey, Jersey, Isle of Man, Åland, Svalbard, Kaukasus-Anrainer) und **Flaggen Welt**.
+#### `for_rootstrip` – Ersatz für `forced_root_block: false`
 
-Der Profil-Assistent ist dark-mode-tauglich: die Drag-&-Drop-Zonen des Toolbar-Builders nutzen CSS-Variablen und folgen `body.rex-theme-dark` bzw. `prefers-color-scheme: dark`. Das Demo-Profil aktiviert `for_chars_symbols` inkl. Toolbar-Buttons und Einfügen-Menü-Einträgen.
+Unter TinyMCE 6/7/8 ist `forced_root_block: false` entfallen. `for_rootstrip` ist ein sauberer Ersatz: der `forced_root_block` (Default `div`) bleibt im Editor aktiv (Edits stabil), der Wrapper wird aber beim Auslesen/Speichern wieder entfernt. Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (`h2`, `span` …) vom Modul kommt.
 
-### Neu: `for_rootstrip` – Ersatz für `forced_root_block: false`
+- **Opt-in pro Profil** – ohne Eintrag in der `plugins`-Liste keinerlei Handler. Ein versehentliches globales Umbiegen des Save-Verhaltens ist ausgeschlossen. Demo-Profile aktivieren `for_rootstrip` bewusst **nicht**.
+- **Content-Processing-only** – keine Buttons, keine Menüeinträge. Der Root-Wrapper wird nur entfernt, wenn genau **ein** Root-Element mit Inline-Inhalt vorliegt.
+- **Paste-/Insert-sicher** – keine zusätzlichen Wrapper beim Hereinkopieren, keine `<p><p>…</p></p>`-Verschachtelungen.
 
-Unter TinyMCE 6/7/8 ist die Option `forced_root_block: false` entfallen. `for_rootstrip` liefert einen sauberen Ersatz: der `forced_root_block` (Default `div`) bleibt im Editor aktiv (damit Edits stabil arbeiten), der Wrapper wird aber beim Auslesen/Speichern wieder entfernt. Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (z. B. `h2`, `span`) vom Modul vorgegeben wird.
+Dank an @alexwenz für die ursprüngliche Umsetzung ([PR #147](https://github.com/FriendsOfREDAXO/tinymce/pull/147)) sowie für das umfangreiche Feedback zu Picker, Zeichen-Katalogen und Emoji-Gruppen.
 
-- **Opt-in pro Profil:** `for_rootstrip` wird nur dann aktiv, wenn es explizit in der Profil-`plugins`-Liste eingetragen ist. Ohne Eintrag registriert das Plugin keinerlei Handler – ein versehentliches, globales Umbiegen des Save-Verhaltens ist damit ausgeschlossen. Die mitgelieferten Demo-Profile aktivieren `for_rootstrip` bewusst **nicht**.
-- **Content-Processing-only:** keine Buttons, keine Menüeinträge, keine Toolbar-Einträge. Der Root-Wrapper wird nur dann entfernt, wenn genau **ein** Root-Element mit nur darin enthaltenem Inline-Inhalt vorliegt – bei mehreren Blöcken bleibt der Inhalt unverändert.
-- **Paste-/Insert-sicher:** beim Hereinkopieren oder programmatischen Einfügen von Content werden keine zusätzlichen Wrapper erzwungen. Dadurch entstehen keine ungültig verschachtelten Blöcke (`<p><p>…</p></p>` → leeres `<p></p>`).
+#### `for_abbr` – Abkürzungen & Fremdwörter (`<abbr>`)
 
-Großer Dank an @alexwenz für die ursprüngliche Umsetzung ([PR #147](https://github.com/FriendsOfREDAXO/tinymce/pull/147)) sowie für das umfangreiche Feedback zu Picker, Zeichen-Katalogen und Emoji-Gruppen.
+Neues FOR-Plugin für das semantisch korrekte `<abbr title="…">`-Element. Wichtig für Screenreader und SEO: Hilfstechnologien können die Langform vorlesen, Browser zeigen sie beim Hovern als Tooltip an.
+
+- **UI:** Toolbar-Button `for_abbr` (mit Active-State auf bestehenden `<abbr>`), Menü-Eintrag und **Context-Toolbar** direkt am selektierten `<abbr>`. Shortcut: <kbd>Ctrl/Cmd + Alt + A</kbd>.
+- **Dialog:** Anzeigetext, Langform/Erklärung (→ `title`), optionales `lang`-Attribut (z. B. `en` für Fremdwörter → Screenreader wechselt die Aussprache). Bestehende `<abbr>` werden im Edit-Modus mit *Entfernen*-Button erkannt (unwrappt und behält den Textinhalt).
+- **Optionales Glossar** via `for_abbr_glossary: [{ term: 'HTML', title: 'Hypertext Markup Language', lang: 'en' }, …]` — schlägt passende Langform + Sprache beim Öffnen des Dialogs vor (case-insensitive).
+- **Profil-Assistent** listet `for_abbr` in der Plugin-Liste (grün, FOR). **Demo-Profil** lädt `for_abbr` standardmäßig inkl. Beispiel-Glossar (HTML, CSS, WCAG, DSGVO, „z. B." …).
+
+### for_a11y: 11 neue redakteursfreundliche Regeln
+
+Der Accessibility-Checker prüft zusätzlich typische Redakteurs-Stolperfallen, die sich alle mit den bestehenden Editor-Funktionen (Format-/Block-Dropdown, Listen-Button, Bild-/Link-Dialog) direkt beheben lassen:
+
+**Bilder (`alt`-Qualität)**
+- `img-alt-too-long` – alt-Text länger als 150 Zeichen (Warnung). *Fix: Bild-Dialog → alt kürzen.*
+- `img-alt-filename` – alt wirkt wie ein Dateiname (`IMG_1234.jpg`, `DSC00012`, `screenshot-…`, `bild.png`). *Fix: beschreibenden Text eingeben.*
+- `img-alt-redundant` – alt beginnt mit „Bild von …", „Foto von …", „Grafik mit …" (Hinweis). *Fix: Präfix entfernen; Screenreader kündigen Bilder selbst als „Grafik" an.*
+
+**Links**
+- `link-raw-url` – Linktext ist eine rohe URL wie `https://example.com/…` (Warnung). *Fix: Link-Dialog → beschreibenden Text eintragen.*
+- `link-duplicate-text` – gleicher Linktext, aber unterschiedliche Ziele im selben Text (Hinweis). *Fix: Linktexte präzisieren, damit sie aus dem Kontext gerissen eindeutig sind.*
+- `link-file-no-format` – Link zeigt auf `.pdf`, `.doc(x)`, `.xls(x)`, `.ppt(x)`, `.zip` etc., aber der Linktext / aria-label / title nennt das Format nicht (Hinweis). *Fix: „(PDF)" oder „(DOC, 1 MB)" im Linktext ergänzen.*
+
+**Überschriften & Textstruktur**
+- `heading-allcaps` – ganze Überschrift in VERSALIEN eingetippt (Warnung). *Fix: normale Groß-/Kleinschreibung; Versalien-Optik gehört ins Frontend-CSS.*
+- `text-bold-as-heading` – kurzer Absatz, komplett mit `<strong>`/`<b>` gefettet, ohne Satzzeichen am Ende (Warnung). *Fix: Format-/Block-Dropdown → echte Überschrift (h2/h3/…).*
+- `list-fake` – Absatz beginnt mit „-", „*", „•", „1.", „a)" etc., ist aber keine HTML-Liste (Hinweis). *Fix: Absatz markieren → Listen-Button (Aufzählung/Nummerierung) drücken.*
+- `list-single-item` – `<ul>`/`<ol>` mit genau einem `<li>` (Hinweis). *Fix: Liste in Absatz umwandeln oder einen weiteren Punkt ergänzen.*
+- `blank-paragraphs` – mindestens zwei leere `<p>`-Absätze (auch `<p>&nbsp;</p>`) hintereinander (Hinweis). *Fix: leere Zeilen entfernen; Abstände erzeugen statt mit Leer-Absätzen – das Template sollte margins via CSS regeln.*
+
+Alle neuen Regeln sind in `DEFAULT_RULES` aktiv und einzeln via `a11y_rules` abschaltbar.
+
+### Profil-Assistent
+
+- **Neuer Button „Generieren & Speichern"** direkt neben *Konfiguration generieren*: schreibt die Builder-Config ins YAML-Feld **und** submittet das Profil-Formular in einem Klick. Spart den separaten Klick auf den Speichern-Button am Seitenende.
+- **Neuer Block „Link-Defaults":** drei Schalter für sichere und editor­freundliche Link-Vorgaben – (a) klare `target_list`-Labels auf Deutsch (erster Eintrag „— Kein Ziel (gleiches Fenster)" entfernt wieder ein zuvor gesetztes `target="_blank"`), (b) automatisches `rel="noopener noreferrer"` bei `target="_blank"` (TinyMCE-Core ergänzt von Haus aus nur `noopener`; `noreferrer` schließt die Lücke), (c) `link_default_protocol: 'https'` für Eingaben ohne Protokoll.
+- **Typografie-Autoreplace-Block** (`for_chars_symbols`): Checkbox *Autoreplace aktivieren* und *Default-Regeln nutzen*, Repeater-Tabelle mit Typ-Auswahl `Text | Regex`, Spalten *Von* / *Nach*, Beispiele-Button (`(tel)` → `+49 (0) …`, `-->` → →, `<--` → ←, Regex `\(kw(\d{1,2})\)` → `KW $1`). Edit-Modus hydriert aus Kurzform, Objektform und Regex-Form.
+- **Sprach-Menü-Repeater (`content_langs`)** vor dem Extras-Block: Titel, BCP-47-Code (`de`, `en-GB`, `de-CH` …), optionaler Custom-Code (→ `data-mce-lang`), Standard-Radio (überschreibt `language`). Button *Standard-Set einfügen* befüllt `de/en/fr/es/it`. Erzeugt die TinyMCE-Option `content_langs: [...]`; erst damit ist der `language`-Toolbar-Button / das Format-Menü „Sprache" aktiv. Edit-Modus hydriert aus bestehender Config.
+- **Vervollständigte Toolbar-Button-Auswahl:** `language`, `lineheight`, `ltr`, `rtl`, `searchreplace`, `charmap`, `emoticons`, `anchor`, `hr`, `pagebreak`, `nonbreaking`, `insertdatetime`, `visualblocks`, `visualchars` – alle zugehörigen Plugins waren längst im Vendor-Build, tauchten aber bisher nicht in der Auswahl auf.
+- **`for_images`-Einzelbuttons statt fehlerhaftem `for_images`-Toolbar-Eintrag:** Das Plugin stellt in Wahrheit `imagewidthdialog`, `imagewidth`, `imagealignleft/center/right/none`, `imageeffect`, `imagealt`, `imagecaption` sowie die Context-Toolbar `for_imagestoolbar` bereit. Diese Buttons sind jetzt alle einzeln im Assistenten auswählbar (grün als FOR-Plugin markiert). Eigenes Icon `for_imagedialog` (Bildrahmen + Schieberegler) grenzt sich klar vom Standard-`image`-Icon ab.
+- **Plugins ohne UI ausgeblendet:** `cleanpaste` und `mediapaste` sind reine Paste-Pre-Processor-Plugins und tauchen nicht mehr in der Toolbar-Button-Auswahl auf. Sie bleiben im Plugin-Block aktivierbar.
+
+### Demo-Profil & Demo-Seite
+
+- **Aufgeräumte, logisch gruppierte Toolbar:** A11y-Buttons (`for_a11y`, `for_abbr`, `language`) stehen ganz vorne – vor Undo/Redo. Logische Gruppierung: A11y → Verlauf → Stile → Textformatierung → hoch/tief → Farbe/Cleanup → Listen/Einzug → Ausrichtung → Links → Medien & Einbettungen → semantische Bausteine → Markdown-Paste → Tabelle → Typografie → Snippets → Suchen/Ersetzen → Ansicht.
+- **TinyMCE-Core-Plugin `image` aktiviert** (nutzt den Mediapool-Picker über `file_picker_callback`) + `imagewidthdialog` für direkte Bild-Insertion. `imagewidthdialog` ersetzt den fehlerhaften `for_images`-Eintrag auch in Insert-Menü und Quickbars.
+- **Alle „coolen Features" per Default aktiv:** `for_chars_symbols_autoreplace: true` mit 32 Defaults; Demo-Regeln (`(r)` → ®, `-->` → →, Regex `(kw12)` → „KW 12", `(tel)` → „+49 (0) …"); alle `a11y_rules` explizit `true` (inkl. der 11 neuen editorialen Regeln); `a11y_generic_link_texts` mit deutscher + englischer Blacklist.
+- **for_images-Presets korrigiert:** Die bisher genutzte Option `for_images_presets` wurde vom Plugin nie gelesen (falscher Name). Jetzt korrekt über `imagewidth_presets` (Original, Klein/Mittel/Groß, Volle Breite), `imagealign_presets` (Keine, Links, Zentriert, Rechts) und `imageeffect_presets` (Runde Ecken, Schatten, Rahmen, Graustufen).
+- **Feature-Sidebar auf der Demo-Seite** (*TinyMCE → Demo*): rechts neben dem Editor eine sticky Sidebar mit konkreten Eingabevorschlägen pro Feature-Bereich (Autoreplace, Barrierefreiheit, Bilder, Embeds, Struktur, Zeichen-Picker, Paste). Dark-Mode-fähig, unter 991px responsiv untereinander.
+- **Sichere Links by default:** Demo-Profil und die drei Standard-Profile aus `install.php` nutzen jetzt die offiziellen TinyMCE-Optionsnamen (`link_target_list` + `link_rel_list` statt der veralteten `target_list`/`rel_list`, die in TinyMCE 6/7/8 ignoriert wurden – Folge: das „Open link in…"-Dropdown zeigte Default-Englisch und ließ sich teils nicht öffnen). Zusätzlich: `link_default_protocol: 'https'`, `link_assume_external_targets: 'https'` (URLs ohne Protokoll werden automatisch `https://`) und `link_attributes_postprocess`, das `rel="noopener noreferrer"` für `target="_blank"` ergänzt (TinyMCE-Core setzt von sich aus nur `noopener`). Erster Dropdown-Eintrag „— Kein Ziel (gleiches Fenster)" entfernt ein zuvor gesetztes `_blank` wieder.
+
 
 Version 8.4.2
 -------------------------------

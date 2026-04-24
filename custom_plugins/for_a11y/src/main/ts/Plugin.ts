@@ -7,11 +7,22 @@
  *    img-missing-alt        – <img> ohne alt-Attribut               (error)
  *    img-alt-in-text-link   – nicht-leeres alt, obwohl Link-Text da  (warn)
  *    img-empty-alt-nondeco  – alt="" ohne Link-Text-Kontext          (warn)
+ *    img-alt-too-long       – alt > 150 Zeichen                      (warn)
+ *    img-alt-filename       – alt sieht wie Dateiname aus            (warn)
+ *    img-alt-redundant      – alt beginnt mit „Bild von …" etc.      (info)
  *    link-generic-text      – "hier", "weiterlesen", "klick hier"…  (warn)
  *    link-no-accname        – <a> ohne erkennbaren accessible name  (error)
  *    link-new-window        – target="_blank" ohne Hinweis          (info)
+ *    link-raw-url           – Linktext ist eine URL                 (warn)
+ *    link-duplicate-text    – gleicher Linktext, anderes Ziel       (info)
+ *    link-file-no-format    – PDF/Doc-Link ohne Format-Hinweis      (info)
  *    heading-empty          – leere Überschrift                     (warn)
  *    heading-skip           – Heading-Hierarchie-Sprung             (warn)
+ *    heading-allcaps        – Überschrift komplett in VERSALIEN     (warn)
+ *    text-bold-as-heading   – fetter Absatz als Pseudo-Überschrift  (warn)
+ *    list-fake              – Absatz beginnt wie Listeneintrag      (info)
+ *    list-single-item       – Liste mit nur einem Eintrag           (info)
+ *    blank-paragraphs       – mehrere leere Absätze hintereinander  (info)
  *    table-no-th            – Tabelle ohne <th>                     (warn)
  *    table-no-caption       – Tabelle ohne <caption>                (info)
  *    table-th-no-scope      – <th> ohne scope in Matrix-Tabelle     (info)
@@ -47,11 +58,22 @@ const DEFAULT_RULES: Record<string, boolean> = {
     'img-missing-alt':       true,
     'img-alt-in-text-link':  true,
     'img-empty-alt-nondeco': true,
+    'img-alt-too-long':      true,
+    'img-alt-filename':      true,
+    'img-alt-redundant':     true,
     'link-generic-text':     true,
     'link-no-accname':       true,
     'link-new-window':       true,
+    'link-raw-url':          true,
+    'link-duplicate-text':   true,
+    'link-file-no-format':   true,
     'heading-empty':         true,
     'heading-skip':          true,
+    'heading-allcaps':       true,
+    'text-bold-as-heading':  true,
+    'list-fake':             true,
+    'list-single-item':      true,
+    'blank-paragraphs':      true,
     'table-no-th':           true,
     'table-no-caption':      true,
     'table-th-no-scope':     true,
@@ -218,6 +240,44 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
                 preview: shortHtml(img)
             });
         }
+
+        // Nur prüfen, wenn alt gefüllt (leerer + fehlender alt wird oben abgehandelt)
+        const altTrim = alt.trim();
+        if (hasAlt && altTrim.length > 0) {
+            // Zu langer alt-Text
+            if (rules['img-alt-too-long'] && altTrim.length > 150) {
+                findings.push({
+                    id: 'img-alt-too-long',
+                    severity: 'warn',
+                    title: `alt-Text zu lang (${altTrim.length} Zeichen)`,
+                    message: 'Halte alt-Texte prägnant (Faustregel: < 150 Zeichen). Sehr lange Beschreibungen gehören in den Fließtext oder in eine Bildunterschrift.',
+                    element: img,
+                    preview: shortHtml(img)
+                });
+            }
+            // alt = Dateiname: IMG_1234.jpg, DSC00012, bild-001.png, screenshot-2024-01-01.jpg …
+            if (rules['img-alt-filename'] && /^(img[_-]?\d+|dsc[_-]?\d+|dscn?\d+|p\d{6,}|screenshot[\s_-]|bild[_\s-]?\d+|foto[_\s-]?\d+|image[_\s-]?\d+|[a-z0-9_-]+\.(jpe?g|png|gif|webp|svg|avif))$/i.test(altTrim)) {
+                findings.push({
+                    id: 'img-alt-filename',
+                    severity: 'warn',
+                    title: 'alt-Text sieht wie ein Dateiname aus',
+                    message: `Der alt-Text „${truncate(altTrim, 50)}" wirkt wie ein Dateiname. Beschreibe stattdessen, was auf dem Bild zu sehen ist.`,
+                    element: img,
+                    preview: shortHtml(img)
+                });
+            }
+            // Redundante Präfixe: „Bild von …", „Foto von …", „Grafik mit …"
+            if (rules['img-alt-redundant'] && /^(bild|foto|grafik|abbildung|image|picture|photo)\s+(von|mit|eines?|einer|der|des|the|of)\b/i.test(altTrim)) {
+                findings.push({
+                    id: 'img-alt-redundant',
+                    severity: 'info',
+                    title: 'Redundanter Präfix im alt-Text',
+                    message: `Screenreader kündigen Bilder bereits als „Grafik" an. Ein Präfix wie „Bild von …" ist doppelt. Entferne ihn im Bild-Dialog.`,
+                    element: img,
+                    preview: shortHtml(img)
+                });
+            }
+        }
     });
 
     /* --- Links --- */
@@ -269,7 +329,70 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
                 }
             }
         }
+
+        // Linktext ist eine URL
+        if (rules['link-raw-url'] && text && /^(https?:\/\/|www\.)\S+$/i.test(text)) {
+            findings.push({
+                id: 'link-raw-url',
+                severity: 'warn',
+                title: 'URL als Linktext',
+                message: 'Screenreader lesen URLs Zeichen für Zeichen vor. Ersetze den Linktext durch eine kurze Beschreibung des Ziels (z. B. „Pressemitteilung vom 12.3.2024").',
+                element: a,
+                preview: shortHtml(a)
+            });
+        }
+
+        // Link auf Datei (PDF/DOC/XLS/ZIP) ohne Format-Hinweis im Linktext
+        if (rules['link-file-no-format'] && text) {
+            const href = (a.getAttribute('href') || '').toLowerCase();
+            const m = href.match(/\.(pdf|docx?|xlsx?|pptx?|odt|ods|odp|zip|rar|7z|epub|csv)(?:$|[?#])/);
+            if (m) {
+                const fmt = m[1].toUpperCase().replace(/^DOCX?$/, 'DOC').replace(/^XLSX?$/, 'XLS').replace(/^PPTX?$/, 'PPT');
+                // Erwähnt der Linktext/aria-label/title das Format?
+                const aria = (a.getAttribute('aria-label') || '') + ' ' + (a.getAttribute('title') || '');
+                const haystack = (text + ' ' + aria).toLowerCase();
+                if (haystack.indexOf(fmt.toLowerCase()) === -1 && haystack.indexOf(m[1].toLowerCase()) === -1) {
+                    findings.push({
+                        id: 'link-file-no-format',
+                        severity: 'info',
+                        title: `Download-Link ohne Format-Hinweis (${fmt})`,
+                        message: `Der Link zeigt auf eine .${m[1]}-Datei. Ergänze das Format im Linktext (z. B. „Jahresbericht 2023 (${fmt})"), damit Nutzer:innen wissen, was sie herunterladen.`,
+                        element: a,
+                        preview: shortHtml(a)
+                    });
+                }
+            }
+        }
     });
+
+    // Duplikate: gleicher Linktext, verschiedene href → irritiert Screenreader-Linkliste
+    if (rules['link-duplicate-text']) {
+        const textMap = new Map<string, Set<string>>();
+        const firstEl = new Map<string, HTMLAnchorElement>();
+        links.forEach((a) => {
+            const t = (a.textContent || '').trim().toLowerCase().replace(/\s+/g, ' ');
+            const href = (a.getAttribute('href') || '').trim();
+            if (!t || !href) return;
+            if (!textMap.has(t)) {
+                textMap.set(t, new Set());
+                firstEl.set(t, a);
+            }
+            textMap.get(t)!.add(href);
+        });
+        textMap.forEach((hrefs, t) => {
+            if (hrefs.size > 1) {
+                const a = firstEl.get(t)!;
+                findings.push({
+                    id: 'link-duplicate-text',
+                    severity: 'info',
+                    title: `Gleicher Linktext – ${hrefs.size} verschiedene Ziele`,
+                    message: `Der Linktext „${truncate(t, 40)}" zeigt an ${hrefs.size} Stellen auf unterschiedliche Seiten. Formuliere die Linktexte so, dass sie auch aus dem Kontext gerissen eindeutig sind.`,
+                    element: a,
+                    preview: shortHtml(a)
+                });
+            }
+        });
+    }
 
     /* --- Überschriften --- */
     const headings = Array.from(body.querySelectorAll('h1, h2, h3, h4, h5, h6')) as HTMLElement[];
@@ -296,8 +419,111 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
                 preview: shortHtml(h)
             });
         }
+        // Überschrift komplett in Großbuchstaben eingetippt
+        if (rules['heading-allcaps']) {
+            const txt = (h.textContent || '').trim();
+            const letters = txt.replace(/[^\p{L}]/gu, '');
+            if (letters.length >= 6 && letters === letters.toUpperCase() && letters !== letters.toLowerCase()) {
+                findings.push({
+                    id: 'heading-allcaps',
+                    severity: 'warn',
+                    title: `${h.tagName} komplett in VERSALIEN`,
+                    message: 'Schreibe die Überschrift in normaler Gross-/Kleinschreibung. Großbuchstaben werden von manchen Screenreadern Buchstabe für Buchstabe vorgelesen. Für eine Versalien-Optik nutze besser CSS (`text-transform: uppercase`) im Frontend.',
+                    element: h,
+                    preview: shortHtml(h)
+                });
+            }
+        }
         prevLevel = level;
     });
+
+    /* --- Absätze / Pseudo-Überschriften / Fake-Listen / Leer-Absätze --- */
+    if (rules['text-bold-as-heading'] || rules['list-fake'] || rules['blank-paragraphs']) {
+        const paragraphs = Array.from(body.querySelectorAll('p')) as HTMLElement[];
+        let blankRun: HTMLElement[] = [];
+        const flushBlankRun = () => {
+            if (rules['blank-paragraphs'] && blankRun.length >= 2) {
+                findings.push({
+                    id: 'blank-paragraphs',
+                    severity: 'info',
+                    title: `${blankRun.length} leere Absätze hintereinander`,
+                    message: 'Leere Absätze werden von Screenreadern als „leer" angekündigt. Entferne sie und erzeuge Abstände lieber über CSS (margin) statt <p>&nbsp;</p>.',
+                    element: blankRun[0],
+                    preview: shortHtml(blankRun[0])
+                });
+            }
+            blankRun = [];
+        };
+        paragraphs.forEach((p) => {
+            const plain = (p.textContent || '').replace(/\u00A0/g, ' ').trim();
+
+            // Leerer Absatz?
+            if (plain.length === 0) {
+                blankRun.push(p);
+                return;
+            }
+            flushBlankRun();
+
+            // Fetter Pseudo-Heading: ganzer Absatz ist strong/b, Text kurz, kein Fließtext
+            if (rules['text-bold-as-heading'] && plain.length <= 120) {
+                const hasNonBoldText = Array.from(p.childNodes).some((n) => {
+                    if (n.nodeType === 3) return (n.nodeValue || '').trim().length > 0;
+                    if (n.nodeType !== 1) return false;
+                    const el = n as Element;
+                    const tag = el.tagName.toLowerCase();
+                    if (tag === 'strong' || tag === 'b') return false;
+                    // br, wbr etc. ignorieren
+                    if (tag === 'br' || tag === 'wbr') return false;
+                    return (el.textContent || '').trim().length > 0;
+                });
+                if (!hasNonBoldText && p.querySelector('strong, b') && !/[.!?…]$/.test(plain)) {
+                    findings.push({
+                        id: 'text-bold-as-heading',
+                        severity: 'warn',
+                        title: 'Fetter Absatz als Pseudo-Überschrift',
+                        message: 'Ein fett gesetzter Absatz ohne Satzzeichen wirkt wie eine Überschrift, ist für Screenreader aber Fließtext. Markiere den Absatz und wandle ihn über das Format-/Block-Dropdown in eine echte Überschrift (h2/h3/…) um.',
+                        element: p,
+                        preview: shortHtml(p)
+                    });
+                }
+            }
+
+            // Fake-Liste: Absatz beginnt mit Aufzählungs-Zeichen
+            if (rules['list-fake'] && /^\s*([-*•·●○►▶→]|\d{1,2}[.\)]|[a-z][.\)])\s+/i.test(plain)) {
+                // in echter Liste drin? dann ok
+                if (!p.closest('ul, ol')) {
+                    findings.push({
+                        id: 'list-fake',
+                        severity: 'info',
+                        title: 'Absatz beginnt wie ein Listeneintrag',
+                        message: 'Der Absatz beginnt mit „-", „*", „•" oder einer Nummerierung. Markiere ihn und nutze den Listen-Button (Aufzählung/Nummerierung), damit Screenreader die Liste als solche erkennen.',
+                        element: p,
+                        preview: shortHtml(p)
+                    });
+                }
+            }
+        });
+        flushBlankRun();
+    }
+
+    /* --- Listen: nur ein Eintrag → meist keine echte Liste --- */
+    if (rules['list-single-item']) {
+        const lists = Array.from(body.querySelectorAll('ul, ol')) as HTMLElement[];
+        lists.forEach((l) => {
+            // Nested-Lists ausschließen (innerste Ebene zählen wir nur, wenn sie alleine stehen)
+            const items = Array.from(l.children).filter((c) => c.tagName.toLowerCase() === 'li');
+            if (items.length === 1) {
+                findings.push({
+                    id: 'list-single-item',
+                    severity: 'info',
+                    title: `${l.tagName.toLowerCase()}-Liste mit nur einem Eintrag`,
+                    message: 'Eine Liste mit einem einzigen Eintrag ist semantisch unnötig. Wandle sie in einen normalen Absatz um oder ergänze weitere Punkte.',
+                    element: l,
+                    preview: shortHtml(l)
+                });
+            }
+        });
+    }
 
     /* --- Tabellen --- */
     const tables = Array.from(body.querySelectorAll('table')) as HTMLElement[];

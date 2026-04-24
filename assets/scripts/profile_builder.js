@@ -227,6 +227,13 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-rellist" checked> ' + (i18n.default_rellist || 'Default Rel List') + '</label></div></div>';
     settingsHtml += '</div>';
 
+    // Link-Defaults (target_list, noreferrer, https)
+    settingsHtml += '<br><legend>' + (i18n.link_defaults || 'Link-Defaults') + '</legend><div class="row">';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-target-list" checked> ' + (i18n.link_target_list_label || 'Klare Link-Ziele (target_list, dt.)') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-noreferrer" checked> ' + (i18n.link_noreferrer_label || 'Bei target="_blank" automatisch rel="noopener noreferrer"') + '</label></div></div>';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-default-https" checked> ' + (i18n.link_default_https_label || 'Standard-Protokoll: https') + '</label></div></div>';
+    settingsHtml += '</div>';
+
     // YForm Link Configuration
     settingsHtml += '<br><legend>Link YForm Configuration</legend>';
     settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
@@ -280,8 +287,11 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_class || 'TOC Class') + '</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
     settingsHtml += '</div>';
 
-    // Apply Button
-    let actionsHtml = '<hr><button type="button" class="btn btn-save builder-apply"><i class="rex-icon fa-check"></i> ' + (i18n.generate_config || 'Generate Configuration') + '</button> <span class="text-muted">' + (i18n.overwrites_existing_config || 'Overwrites existing configuration!') + '</span>';
+    // Apply Button(s): Generieren und Generieren+Speichern
+    let actionsHtml = '<hr>'
+        + '<button type="button" class="btn btn-save builder-apply"><i class="rex-icon fa-check"></i> ' + (i18n.generate_config || 'Generate Configuration') + '</button> '
+        + '<button type="button" class="btn btn-save builder-apply-save"><i class="rex-icon fa-save"></i> ' + (i18n.generate_and_save || 'Generate & Save') + '</button> '
+        + '<span class="text-muted">' + (i18n.overwrites_existing_config || 'Overwrites existing configuration!') + '</span>';
 
     $builderBody.html(presetsHtml + pluginsHtml + toolbarHtml + settingsHtml + actionsHtml);
 
@@ -839,6 +849,20 @@ function initTinyMceProfileAssistant() {
         generateConfig($textarea, $builderBody);
     });
 
+    // Generate + unmittelbar das Profil speichern (Form-Submit)
+    $builderBody.find('.builder-apply-save').on('click', function() {
+        generateConfig($textarea, $builderBody);
+        const $form = $textarea.closest('form');
+        if (!$form.length) return;
+        // Submit-Button des Formulars finden – bevorzugt YForm-Submit, sonst erster submit
+        const $submit = $form.find('button[type="submit"][name="btn_save"], input[type="submit"][name="btn_save"], button[type="submit"], input[type="submit"]').first();
+        if ($submit.length) {
+            $submit.trigger('click');
+        } else {
+            $form.trigger('submit');
+        }
+    });
+
     // YForm Builder Logic
     const $yformTable = $builderBody.find('#builder-yform-table tbody');
     
@@ -1061,6 +1085,9 @@ function generateConfig($textarea, $builderBody) {
 
     const defaultCodesample = $builderBody.find('.builder-default-codesample').is(':checked');
     const defaultRelList = $builderBody.find('.builder-default-rellist').is(':checked');
+    const linkTargetList = $builderBody.find('.builder-link-target-list').is(':checked');
+    const linkNoreferrer = $builderBody.find('.builder-link-noreferrer').is(':checked');
+    const linkDefaultHttps = $builderBody.find('.builder-link-default-https').is(':checked');
 
     // Image Width (preset-based)
     const imagewidthEnabled = $builderBody.find('.builder-imagewidth-enable').is(':checked');
@@ -1305,10 +1332,32 @@ function generateConfig($textarea, $builderBody) {
     }
 
     if (defaultRelList) {
-        configStr += `rel_list: [
+        configStr += `link_rel_list: [
  {title: '${i18n.none || 'Keine'}', value: ''},
  {title: 'Nofollow', value: 'nofollow'}
 ],\n`;
+    }
+
+    if (linkTargetList) {
+        configStr += `link_target_list: [
+ {title: '— ${i18n.link_target_none || 'Kein Ziel (gleiches Fenster)'}', value: ''},
+ {title: '${i18n.link_target_blank || 'Neues Fenster'}', value: '_blank'}
+],\n`;
+    }
+
+    if (linkDefaultHttps) {
+        configStr += `link_default_protocol: 'https',\n`;
+        configStr += `link_assume_external_targets: 'https',\n`;
+    }
+
+    if (linkNoreferrer) {
+        configStr += `link_attributes_postprocess: function (attrs) {
+    if (!attrs || attrs.target !== '_blank') { return; }
+    var rel = (attrs.rel || '').toLowerCase().split(/\\s+/).filter(Boolean);
+    if (rel.indexOf('noopener') === -1) { rel.push('noopener'); }
+    if (rel.indexOf('noreferrer') === -1) { rel.push('noreferrer'); }
+    attrs.rel = rel.join(' ');
+},\n`;
     }
 
     configStr += `toc_depth: ${tocDepth},\n`;

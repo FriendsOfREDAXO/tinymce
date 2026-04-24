@@ -102,10 +102,23 @@ codesample_languages: [
  {text: 'C#', value: 'csharp'},
  {text: 'C++', value: 'cpp'}
 ],
-rel_list: [
+link_rel_list: [
  {title: 'Keine', value: ''},
  {title: 'Nofollow', value: 'nofollow'}
 ],
+link_target_list: [
+ {title: '— Kein Ziel (gleiches Fenster)', value: ''},
+ {title: 'Neues Fenster', value: '_blank'}
+],
+link_default_protocol: 'https',
+link_assume_external_targets: 'https',
+link_attributes_postprocess: function (attrs) {
+ if (!attrs || attrs.target !== '_blank') { return; }
+ var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
+ if (rel.indexOf('noopener') === -1) { rel.push('noopener'); }
+ if (rel.indexOf('noreferrer') === -1) { rel.push('noreferrer'); }
+ attrs.rel = rel.join(' ');
+},
 
 skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",
 content_css: redaxo.theme.current === "dark" ? "dark" : "default",
@@ -125,10 +138,23 @@ relative_urls : false,
 remove_script_host : true,
 document_base_url : '/',
 convert_urls : true,
-rel_list: [
+link_rel_list: [
  {title: 'Keine', value: ''},
  {title: 'Nofollow', value: 'nofollow'}
 ],
+link_target_list: [
+ {title: '— Kein Ziel (gleiches Fenster)', value: ''},
+ {title: 'Neues Fenster', value: '_blank'}
+],
+link_default_protocol: 'https',
+link_assume_external_targets: 'https',
+link_attributes_postprocess: function (attrs) {
+ if (!attrs || attrs.target !== '_blank') { return; }
+ var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
+ if (rel.indexOf('noopener') === -1) { rel.push('noopener'); }
+ if (rel.indexOf('noreferrer') === -1) { rel.push('noreferrer'); }
+ attrs.rel = rel.join(' ');
+},
 language: 'de',
 allow_script_urls: true,
 branding: false,
@@ -176,11 +202,24 @@ relative_urls : false,
 remove_script_host : true,
 document_base_url : "/",
 convert_urls : true,
-rel_list: [
+link_rel_list: [
  {title: 'Keine', value: ''},
  {title: 'Nofollow', value: 'nofollow'},
  {title: 'Sponsored', value: 'sponsored'}
 ],
+link_target_list: [
+ {title: '— Kein Ziel (gleiches Fenster)', value: ''},
+ {title: 'Neues Fenster', value: '_blank'}
+],
+link_default_protocol: 'https',
+link_assume_external_targets: 'https',
+link_attributes_postprocess: function (attrs) {
+ if (!attrs || attrs.target !== '_blank') { return; }
+ var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
+ if (rel.indexOf('noopener') === -1) { rel.push('noopener'); }
+ if (rel.indexOf('noreferrer') === -1) { rel.push('noreferrer'); }
+ attrs.rel = rel.join(' ');
+},
 file_picker_callback: function (callback, value, meta) {
  rex5_picker_function(callback, value, meta);
 },

@@ -137,6 +137,12 @@ tinymce_entity_encoding = Entity Encoding
 tinymce_extras_defaults = Extras (Standards)
 tinymce_default_codesample_languages = Standard Codesample Sprachen
 tinymce_default_rellist = Standard Rel Liste
+tinymce_link_defaults = Link-Defaults
+tinymce_link_target_list_label = Klare Link-Ziele (target_list, Deutsch)
+tinymce_link_noreferrer_label = Bei target="_blank" automatisch rel="noopener noreferrer"
+tinymce_link_default_https_label = Standard-Protokoll: https
+tinymce_link_target_none = Kein Ziel (gleiches Fenster)
+tinymce_link_target_blank = Neues Fenster
 tinymce_content_langs = Sprach-Menü (content_langs)
 tinymce_content_langs_help = Liste der Sprachen für den <code>language</code>-Toolbar-Button bzw. das Format-Menü. Markiert Textabschnitte mit einem <code>lang</code>-Attribut (wichtig für Screenreader/SEO).
 tinymce_content_langs_title = Titel
@@ -163,6 +169,7 @@ tinymce_toc_depth = Inhaltsverzeichnis Tiefe
 tinymce_toc_header_tag = Inhaltsverzeichnis Header Tag
 tinymce_toc_class = Inhaltsverzeichnis Klasse
 tinymce_generate_config = Konfiguration generieren
+tinymce_generate_and_save = Generieren & Speichern
 tinymce_overwrites_existing_config = Überschreibt vorhandene Konfiguration!
 tinymce_none = Keine
 

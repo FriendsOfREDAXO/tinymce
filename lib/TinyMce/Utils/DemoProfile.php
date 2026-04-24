@@ -60,7 +60,7 @@ menu: {
 quickbars_selection_toolbar: 'bold italic underline | forecolor | link for_abbr',
 quickbars_insert_toolbar: 'image imagewidthdialog for_oembed for_video | for_checklist for_footnote_insert | hr',
 
-contextmenu: 'link table for_a11y',
+contextmenu: 'link table for_a11y | for_chars_symbols for_abbr',
 
 codesample_languages: [
     { text: 'HTML/XML', value: 'markup' },
@@ -72,17 +72,36 @@ codesample_languages: [
     { text: 'SQL', value: 'sql' }
 ],
 
-rel_list: [
+link_rel_list: [
     { title: 'Keine', value: '' },
     { title: 'Nofollow', value: 'nofollow' },
     { title: 'Sponsored', value: 'sponsored' },
     { title: 'UGC', value: 'ugc' }
 ],
 
-target_list: [
-    { title: 'Gleiches Fenster', value: '' },
+link_target_list: [
+    { title: '— Kein Ziel (gleiches Fenster)', value: '' },
     { title: 'Neues Fenster', value: '_blank' }
 ],
+
+/* Protokoll, wenn Redakteur*innen nur "example.com" eingeben.
+   Verhindert scheinbar "leere" Links und mixed-content-Warnungen. */
+link_default_protocol: 'https',
+/* URLs ohne Protokoll beim Einfügen automatisch mit https:// versehen. */
+link_assume_external_targets: 'https',
+
+/* Sicherheits-Hardening für Links:
+   Bei target="_blank" automatisch rel="noopener noreferrer" ergänzen.
+   TinyMCE-Core setzt nur `noopener` – `noreferrer` verhindert zusätzlich,
+   dass der Referrer übertragen wird. Offizieller Hook laut TinyMCE-Doku.
+   TinyMCE ruft den Callback mit einem einzigen Objekt (linkAttrs) auf. */
+link_attributes_postprocess: function (attrs) {
+    if (!attrs || attrs.target !== '_blank') { return; }
+    var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
+    if (rel.indexOf('noopener') === -1) { rel.push('noopener'); }
+    if (rel.indexOf('noreferrer') === -1) { rel.push('noreferrer'); }
+    attrs.rel = rel.join(' ');
+},
 
 /* FOR-Plugin-Konfigurationen */
 
@@ -91,18 +110,29 @@ target_list: [
 a11y_new_window_warning: true,
 /* Einzelne A11y-Checks lassen sich gezielt deaktivieren. */
 a11y_rules: {
-    'img-missing-alt':     true,
-    'img-alt-in-text-link':true,
+    'img-missing-alt':       true,
+    'img-alt-in-text-link':  true,
     'img-empty-alt-nondeco': true,
-    'link-generic-text':   true,
-    'link-no-accname':     true,
-    'link-new-window':     true,
-    'heading-empty':       true,
-    'heading-skip':        true,
-    'table-no-th':         true,
-    'table-no-caption':    true,
-    'table-th-no-scope':   true,
-    'iframe-no-title':     true
+    'img-alt-too-long':      true,
+    'img-alt-filename':      true,
+    'img-alt-redundant':     true,
+    'link-generic-text':     true,
+    'link-no-accname':       true,
+    'link-new-window':       true,
+    'link-raw-url':          true,
+    'link-duplicate-text':   true,
+    'link-file-no-format':   true,
+    'heading-empty':         true,
+    'heading-skip':          true,
+    'heading-allcaps':       true,
+    'text-bold-as-heading':  true,
+    'list-fake':             true,
+    'list-single-item':      true,
+    'blank-paragraphs':      true,
+    'table-no-th':           true,
+    'table-no-caption':      true,
+    'table-th-no-scope':     true,
+    'iframe-no-title':       true
 },
 /* Zusätzliche nichtssagende Linktexte (werden angemeckert). */
 a11y_generic_link_texts: [

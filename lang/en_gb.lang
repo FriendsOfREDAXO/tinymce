@@ -156,10 +156,17 @@ tinymce_autoreplace_examples = Insert examples
 tinymce_autoreplace_hint = <strong>Type</strong>: <code>Text</code> = literal replacement, <code>Regex</code> = regular expression with backreferences (<code>$1</code>, <code>$2</code>). <strong>To</strong>: Unicode escapes like <code>\u00A0</code> (nbsp) or <code>\u2011</code> (non-breaking hyphen) are allowed. Examples: text <code>(tel)</code> → <code>+49 …</code>; regex <code>\(kw(\d{1,2})\)</code> → <code>KW $1</code>.
 tinymce_default_codesample_languages = Default Codesample Languages
 tinymce_default_rellist = Default Rel List
+tinymce_link_defaults = Link defaults
+tinymce_link_target_list_label = Clear link target labels (target_list)
+tinymce_link_noreferrer_label = Automatically add rel="noopener noreferrer" on target="_blank"
+tinymce_link_default_https_label = Default protocol: https
+tinymce_link_target_none = No target (same window)
+tinymce_link_target_blank = New window
 tinymce_toc_depth = TOC Depth
 tinymce_toc_header_tag = TOC Header Tag
 tinymce_toc_class = TOC Class
 tinymce_generate_config = Generate Configuration
+tinymce_generate_and_save = Generate & Save
 tinymce_overwrites_existing_config = Overwrites existing configuration!
 tinymce_none = None
 

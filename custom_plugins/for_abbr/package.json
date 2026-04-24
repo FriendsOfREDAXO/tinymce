@@ -1,0 +1,16 @@
+{
+  "name": "for_abbr",
+  "version": "1.0.0",
+  "description": "TinyMCE plugin for_abbr: semantic <abbr> markup with optional glossary",
+  "private": true,
+  "scripts": {
+    "build": "node build.js && pnpm build-copy",
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_abbr/ ../../assets/scripts/tinymce/plugins/for_abbr/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_abbr/ ../../assets/vendor/tinymce/plugins/for_abbr/"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "tinymce": "^8.0.0",
+    "tslib": "^2.7.0",
+    "typescript": "^4.9.5"
+  }
+}
