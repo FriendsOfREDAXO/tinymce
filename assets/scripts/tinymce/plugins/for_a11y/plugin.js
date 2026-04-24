@@ -60,7 +60,7 @@
 
 .for-a11y-dlg__msg { margin: 0 0 12px; font-size: 13px; line-height: 1.55; }
 .for-a11y-dlg__preview-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; opacity: .6; margin-bottom: 4px; }
-.for-a11y-dlg__preview { margin: 0; font-family: Menlo, Consolas, monospace; font-size: 11px; background: #f6f6f6; padding: 8px 10px; border-radius: 4px; white-space: pre-wrap; word-break: break-all; border-left: 3px solid #bbb; }
+.for-a11y-dlg__preview { margin: 0; font-family: Menlo, Consolas, monospace; font-size: 11px; background: #f6f6f6; color: #222; font-style: normal; padding: 8px 10px; border-radius: 4px; white-space: pre-wrap; word-break: break-all; border-left: 3px solid #bbb; }
 .for-a11y-dlg__preview--error { border-left-color: #e53935; }
 .for-a11y-dlg__preview--warn  { border-left-color: #fb8c00; }
 .for-a11y-dlg__preview--info  { border-left-color: #1e88e5; }
@@ -76,13 +76,13 @@ body.tox-dialog__body-iframe-dark .for-a11y-panel { background: #2d2d2d; color: 
 body.rex-theme-dark .for-a11y-panel__foot { background: #222; border-top-color: #3a3a3a; }
 body.rex-theme-dark .for-a11y-panel__foot .for-a11y-btn { background: #3a3a3a; color: #eee; border-color: #4a4a4a; }
 body.rex-theme-dark .for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #4a4a4a; }
-body.rex-theme-dark .for-a11y-dlg__preview { background: #222; }
+body.rex-theme-dark .for-a11y-dlg__preview { background: #222; color: #eee; }
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel { background: #2d2d2d; color: #eee; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot { background: #222; border-top-color: #3a3a3a; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot .for-a11y-btn { background: #3a3a3a; color: #eee; border-color: #4a4a4a; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #4a4a4a; }
-    body.rex-has-theme:not(.rex-theme-light) .for-a11y-dlg__preview { background: #222; }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-dlg__preview { background: #222; color: #eee; }
 }
 `,te=`
 [data-a11y-mark] {
