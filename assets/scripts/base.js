@@ -87,9 +87,17 @@ function saveTinyEditorContent() {
     try {
         tinymce.editors.forEach(function(editor) {
             if (editor && editor.targetElm) {
-                let $textarea = $(editor.targetElm);
+                let $elm = $(editor.targetElm);
                 let content = editor.getContent();
-                $textarea.val(content);
+                
+                // ============================================
+                // FIX: Unterscheide zwischen textarea und div
+                // ============================================
+                if ($elm.is('textarea')) {
+                    $elm.val(content);
+                } else {
+                    $elm.html(content);
+                }
             }
         });
     } catch (e) {
@@ -134,6 +142,43 @@ function tiny_init(container) {
 
         profiles.push($this.data('profile'));
 
+        // ============================================
+        // FIX: Content VOR Init bereinigen
+        // Entferne äußere <p>-Tags, die durch vorheriges Speichern entstanden sind
+        // ============================================
+        let currentContent = '';
+        if ($this.is('textarea')) {
+            currentContent = $this.val();
+        } else {
+            currentContent = $this.html();
+        }
+        
+        // Trimme Whitespace
+        currentContent = currentContent.trim();
+        
+        // Entferne NUR die äußersten <p>-Tags wenn der ganze Content darin ist
+        // Pattern: ^<p...>content</p>$ aber NICHT wenn mehrere <p> mit Content existieren
+        let pTagMatch = currentContent.match(/^<p[^>]*>(.*)<\/p>$/is);
+        
+        if (pTagMatch) {
+            // Es ist ein einzelner <p>-Tag um alles
+            let innerContent = pTagMatch[1];
+            
+            // Prüfe, ob der innere Content nicht mit <p> beginnt/endet
+            // Wenn nicht, dann waren die äußeren Tags redundant
+            if (!innerContent.match(/^<p/i) && !innerContent.match(/<\/p>$/i)) {
+                // Nicht mehrstöckig - entferne die äußeren Tags
+                currentContent = innerContent;
+            }
+        }
+        
+        // Speichere bereinigten Content zurück
+        if ($this.is('textarea')) {
+            $this.val(currentContent);
+        } else {
+            $this.html(currentContent);
+        }
+
         // Remove existing TinyMCE instance if it exists
         if(tinymce.get(e_id)) {
             $this.removeClass('mce-initialized');
@@ -165,6 +210,19 @@ function tiny_init(container) {
                 branding: false,
                 plugins: 'autoresize'
             }
+        }
+
+        // ============================================
+        // FIX: Verhindere forced_root_block 'p'
+        // ============================================
+        if (options.forced_root_block === 'p' || options.forced_root_block === undefined) {
+            options.forced_root_block = false;
+        }
+        if (!options.hasOwnProperty('convert_newlines_to_brs')) {
+            options.convert_newlines_to_brs = false;
+        }
+        if (!options.hasOwnProperty('remove_trailing_brs')) {
+            options.remove_trailing_brs = true;
         }
 
         // IMPORTANT: Merge global options FIRST before any other processing
@@ -382,9 +440,20 @@ function tiny_init(container) {
                 });
             }
             
-            // Set up default change handler
+            // ============================================
+            // FIX: Set up correct change handler
+            // WICHTIG: .val() für textarea, .html() für div!
+            // ============================================
             editor.on('change', function(e) {
-                $(editor.targetElm).html(editor.getContent());
+                let $elm = $(editor.targetElm);
+                let content = editor.getContent();
+                
+                // Unterscheide zwischen textarea und div/contenteditable
+                if ($elm.is('textarea')) {
+                    $elm.val(content);
+                } else {
+                    $elm.html(content);
+                }
             });
 
             // Fix: TinyMCE setzt overflow:hidden auf <html> bei Dialogen und entfernt es nicht
@@ -413,6 +482,9 @@ function tiny_init(container) {
 }
 
 function tiny_restart(container) {
+    // Speichere Content vor dem Restart
+    saveTinyEditorContent();
+    
     // Don't restart during content restoration to avoid conflicts
     if (tinyRestoringContent) {
         return;
@@ -472,7 +544,7 @@ function validateTinyEditors() {
 
 
 
-function openMyLinkMap(id, param,value)
+function openMyLinkMap(id, param, value)
 {
     if (typeof(id) == 'undefined') {
         id = '';
