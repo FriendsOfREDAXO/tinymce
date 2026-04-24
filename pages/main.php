@@ -42,7 +42,8 @@ $demoHtml = <<<'HTML'
     <tr><td><code>for_footnote</code></td><td>Fußnoten mit Live-Sync und Rück-Verweisen</td></tr>
     <tr><td><code>for_toc</code></td><td>Inhaltsverzeichnis mit Live-Sync (siehe oben ↑)</td></tr>
     <tr><td><code>for_a11y</code></td><td>Accessibility-Checker on demand (WCAG-nah)</td></tr>
-    <tr><td><code>for_chars_symbols</code></td><td>Zeichen, Symbole, native Emojis &amp; Typografie-Helfer (Quotes, Dash, nbsp/shy, Favoriten)</td></tr>
+    <tr><td><code>for_rootstrip</code></td><td>Entfernt beim Speichern automatisch den TinyMCE-Root-Wrapper</td></tr>
+    <tr><td><code>for_chars_symbols</code></td><td>Zeichen, Symbole, native Emojis &amp; Typografie-Helfer (Quotes, Dash, nbsp/shy, Favoriten) – plus <strong>Autoreplace</strong> beim Tippen ((c)→©, (tm)→™, …→…, Pfeile, Brüche) mit eigenen Text-/Regex-Regeln, komplett im Profil-Assistenten pflegbar</td></tr>
   </tbody>
 </table>
 
@@ -83,13 +84,36 @@ $demoHtml = <<<'HTML'
 <h2 id="for-toc-profil-assistent">Profil-Assistent</h2>
 <p>Der <strong>Profil-Assistent</strong> unter <em>TinyMCE → Editor Profile → bearbeiten</em> erlaubt das Zusammenklicken von Plugins, Toolbar-Buttons, Menüs, Quickbars und Image-Width-Presets – ohne JavaScript-Konfiguration von Hand. Eigene FOR-Plugins werden mit „FOR"-Badge markiert, damit auf einen Blick sichtbar ist, was von hier kommt.</p>
 <blockquote>
-  <p><strong>Tipp:</strong> Probier den <code>for_a11y</code>-Button in der Toolbar – er öffnet ein schwebendes, verschiebbares Panel und zeigt Accessibility-Befunde direkt im Editor (z. B. den leeren Link hier im Demo-Text).</p>
+  <p><strong>Tipp:</strong> Probier den <code>for_a11y</code>-Button in der Toolbar – er öffnet ein schwebendes, verschiebbares Panel und zeigt Accessibility-Befunde direkt im Editor (z.&nbsp;B. den leeren Link hier im Demo-Text).</p>
 </blockquote>
 <p>Links:
   <a href="#">leerer Anker ohne Ziel</a> ·
   <a href="https://github.com/FriendsOfREDAXO/tinymce" target="_blank" rel="noopener">GitHub-Repository</a> ·
   <a href="https://www.tiny.cloud/docs/tinymce/latest/" target="_blank" rel="noreferrer noopener">TinyMCE-Dokumentation</a>
 </p>
+
+<h2 id="for-toc-a11y-spielwiese">A11y-Spielwiese <small>(absichtliche Fehler)</small></h2>
+<p>Dieser Abschnitt enthält bewusst typische Barrierefreiheits-Probleme, damit der <code>for_a11y</code>-Button in der Toolbar beim Demo-Aufruf wirklich etwas findet. Klick auf <strong>A11y</strong> und lass dich durch die Befunde führen – jeder Befund enthält einen konkreten Hinweis, wie er im Editor zu beheben wäre.</p>
+
+<h3>WICHTIGER HINWEIS IN VERSALIEN</h3>
+<p>Links zum Testen: <a href="https://example.com/docs">hier klicken</a>, <a href="https://example.com/more">mehr erfahren</a>, <a href="https://example.com/">https://example.com/</a> und <a href="/downloads/jahresbericht.pdf">Jahresbericht 2025</a>.</p>
+<p>Zwei Links mit gleichem Text, aber verschiedenen Zielen: <a href="/produkt/a">Details</a> und <a href="/produkt/b">Details</a>.</p>
+<p>Link öffnet neues Fenster ohne Hinweis: <a href="https://redaxo.org" target="_blank" rel="noopener">REDAXO</a>.</p>
+
+<p><strong>Fettgedruckter Pseudo-Heading</strong></p>
+<p>Darunter ein normaler Absatz – der fettgedruckte Satz oben sollte eigentlich eine echte Überschrift (h3) sein.</p>
+
+<p>- Punkt eins als Fake-Liste</p>
+<p>- Punkt zwei ebenfalls nur ein Absatz mit Bindestrich</p>
+<p>1. Erstens, auch keine echte Nummerierung</p>
+
+<ul>
+  <li>Einzige Position – eine Liste mit nur einem Eintrag</li>
+</ul>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Zwischen diesem Satz und dem vorigen sind zwei leere Absätze – die werden von Screenreadern als „leer, leer" angesagt.</p>
 
 <div class="for-footnotes" contenteditable="true">
   <hr>
@@ -102,9 +126,83 @@ HTML;
 
 $content = '
 <div class="tinymce-demo">
-    <div name="content" class="tiny-editor" data-profile="demo" data-lang="' . Lang::getUserLang() . '">'
-    . $demoHtml .
-    '</div>
+    <div class="row">
+        <div class="col-md-9">
+            <div name="content" class="tiny-editor" data-profile="demo" data-lang="' . Lang::getUserLang() . '">'
+            . $demoHtml .
+            '</div>
+        </div>
+        <div class="col-md-3">
+            <aside class="tinymce-demo-sidebar" aria-label="Feature-Tipps">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><i class="rex-icon fa-magic"></i> <strong>Zum Ausprobieren</strong></div>
+                    <div class="panel-body">
+                        <p class="help-block" style="margin-top:0">Alle Funktionen dieser Demo sind im mitgelieferten <strong>„demo"-Profil</strong> aktiv. Kopiere die Beispiele in den Editor links (oder tippe sie einfach ab) und schau, was passiert.</p>
+                        <p class="help-block" style="margin-top:0; font-size:90%;"><i class="rex-icon fa-lightbulb-o"></i> <strong>Wichtig bei Autoreplace:</strong> Nach dem Einfügen / Tippen muss <em>noch ein Leerzeichen</em> (oder Enter / Satzzeichen) folgen – erst dadurch wird die Ersetzung ausgelöst. Reines Einfügen reicht nicht.</p>
+
+                        <h5><i class="rex-icon fa-magic"></i> Autoreplace</h5>
+                        <p class="help-block">Tippen <em>oder</em> einfügen &rarr; danach <strong>Leertaste</strong> drücken, dann wird ersetzt:</p>
+                        <ul class="tinymce-demo-tips">
+                            <li><code>(c) </code> &rarr; ©</li>
+                            <li><code>(tm) </code> &rarr; ™</li>
+                            <li><code>... </code> &rarr; …</li>
+                            <li><code>--&gt; </code> &rarr; →</li>
+                            <li><code>+/- </code> &rarr; ±</li>
+                            <li><code>1/2 </code> &rarr; ½</li>
+                            <li><code>!= </code> &rarr; ≠ · <code>&lt;= </code> &rarr; ≤</li>
+                            <li><code>(kw12) </code> &rarr; KW 12 <em>(Demo-Regex)</em></li>
+                            <li><code>(tel) </code> &rarr; <em>Telefonnummer</em></li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-universal-access"></i> Barrierefreiheit</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li>Toolbar-Button <strong>A11y</strong> &rarr; findet leere Links, fehlende Alt-Texte, generische Linktexte.</li>
+                            <li>Absatz markieren &rarr; Menü <em>Format &rarr; Sprache</em> setzt <code>lang=""</code>.</li>
+                            <li>Abkürzung markieren &rarr; <strong>abbr</strong>-Button (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>).</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-picture-o"></i> Bilder</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li>Bild einfügen &rarr; Context-Toolbar mit Breiten-/Ausrichtungs-/Effekt-Presets.</li>
+                            <li><strong>Alt-Text</strong>-Dialog direkt am Bild.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-youtube-play"></i> Medien &amp; Embeds</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li><em>Einfügen &rarr; oEmbed</em>: YouTube-/Vimeo-URL einfügen &rarr; Live-Vorschau.</li>
+                            <li><em>Einfügen &rarr; HTML Embed</em>: beliebiges HTML einbinden.</li>
+                            <li><em>Einfügen &rarr; Video</em>: lokales MP4 aus Mediapool.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-list-ol"></i> Struktur</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li><strong>ToC</strong>: Headlines anlegen &rarr; Inhaltsverzeichnis synchronisiert sich live.</li>
+                            <li><strong>Fußnote</strong>: Button <em>Fußnote</em> in der Toolbar fügt Ref+Eintrag ein.</li>
+                            <li><strong>Checkliste</strong>: Menü <em>Einfügen &rarr; Checkliste</em>.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-font"></i> Zeichen &amp; Symbole</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> öffnet Picker (Zeichen / Emoji / Typografie).</li>
+                            <li>Text markieren &rarr; Tab <em>Typografie</em> &rarr; Anführungszeichen, en-Dash, NBSP vor Einheiten.</li>
+                            <li>Toggle <strong>Unsichtbares anzeigen</strong> &rarr; nbsp, shy, zwsp werden sichtbar.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-clipboard"></i> Paste-Helfer</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li>Aus Word/Google&nbsp;Docs einfügen &rarr; automatische Bereinigung.</li>
+                            <li>Bild aus Zwischenablage &rarr; landet im Mediapool.</li>
+                            <li>Markdown einfügen: Menü <em>Einfügen &rarr; Markdown einfügen…</em>.</li>
+                        </ul>
+
+                        <p class="help-block" style="margin-top:12px; border-top:1px solid var(--rex-panel-border-color,#ddd); padding-top:8px;">
+                            <i class="rex-icon fa-cog"></i> Die Features dieses Demos werden vom „demo"-Profil geliefert (nicht bearbeitbar). Lege unter <em>TinyMCE &rarr; Editor Profile</em> ein neues Profil an – oder dupliziere das Demo-Profil – und nutze den Profil-Assistenten. Er kennt inzwischen auch die Autoreplace-Regeln.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
 </div>
 ';
 
