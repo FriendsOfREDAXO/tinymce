@@ -55,7 +55,6 @@ tinymce/
 │   ├── for_images/                 # Media Manager Bilder
 │   ├── for_markdown/
 │   ├── for_oembed/                 # YouTube/Vimeo/… Embeds
-│   ├── for_rootstrip/              # Opt-in: strippt Root-Tags beim Paste
 │   ├── for_toc/
 │   ├── for_video/                  # Mediapool-Video
 │   ├── cleanpaste/                 # Legacy-Name (Word/Office-Clean)
@@ -152,7 +151,6 @@ Generierte Profile landen in `assets/generated/profiles.js` und werden zusätzli
 ## Bundled Plugins – wichtige Besonderheiten
 
 - **for_a11y** ist das Flaggschiff-Feature. In `lib/TinyMce/Utils/DemoProfile.php` steht `for_a11y` deshalb als erster Toolbar-Button.
-- **for_rootstrip** ist **Opt-in**: Muss explizit in der Profil-`plugins`-Liste stehen, greift also nur wenn aktiviert.
 - **for_chars_symbols** ersetzt den alten typo-finder; inkl. Invisibles-Toggle und Locale-abhängiger Zeichen-Gruppen.
 - Legacy-Plugins ohne `for_`-Präfix (`cleanpaste`, `mediapaste`, `link_yform`, `phonelink`, `quote`, `snippets`) bleiben aus Kompatibilitätsgründen so benannt.
 - Quote/Phonelink/link_yform erzeugen ihren Output HTML-escaped; `phonelink` filtert die `href` auf RFC-3966-Zeichen.

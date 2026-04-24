@@ -22,7 +22,6 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_toc` | **Inhaltsverzeichnis** aus den Überschriften – Live-Sync beim Bearbeiten | `for_toc_insert`, `for_toc_update` |
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
 | `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
-| `for_rootstrip` | Entfernt beim Speichern/Auslesen den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`). Für Felder gedacht, in denen das äußere Tag vom Modul vorgegeben wird. **Opt-in:** muss explizit in der Profil-`plugins`-Liste stehen. | — |
 | `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), **Aktions-Favoriten** pro Typografie-Aktion, Zeichen- und Aktions-Favoriten + Zuletzt verwendet pro Browser, optionales **Autoreplace** beim Tippen (`(c)`→©, `->`→→, `1/2`→½, eigene Regeln inkl. Regex) | `for_chars_symbols` |
 | `for_abbr` | **Abkürzungen & Fremdwörter** als `<abbr title="…">` auszeichnen – wichtig für Screenreader und SEO. Dialog mit Anzeigetext, Langform und optionalem `lang`-Attribut. Erkennt bestehende `<abbr>` für Edit/Remove. Optionales **Glossar** via `for_abbr_glossary` schlägt passende Langform automatisch vor. Context-Toolbar + Shortcut <kbd>Ctrl/Cmd + Alt + A</kbd> | `for_abbr` |
 | `link_yform` | Verlinkt YForm-Datensätze direkt aus dem Editor – Tabellen-/Feldauswahl und konfigurierbares Link-Schema im Profil-Assistenten | Erweiterung des Link-Dialogs |
@@ -133,7 +132,6 @@ Dialog-basierter Markdown → HTML Konverter. Redakteure öffnen bewusst den Dia
 
 ---
 
-### `for_rootstrip` – Root-Wrapper beim Speichern entfernen
 
 Ersatz für `forced_root_block: false` unter TinyMCE 6/7/8 – dort ist diese Option entfernt worden. Das Plugin lässt den `forced_root_block` (Default `div`) im Editor aktiv (damit Edits stabil bleiben) und entfernt den Wrapper erst beim Auslesen/Speichern.
 
@@ -141,7 +139,6 @@ Ersatz für `forced_root_block: false` unter TinyMCE 6/7/8 – dort ist diese Op
 - Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (`h2`, `h3`, `span`, …) vom Modul vorgegeben wird
 - Entfernt den Wrapper nur, wenn genau **ein** Root-Element mit reinem Inline-Inhalt vorhanden ist – bei mehreren Blöcken bleibt der Content unangetastet
 - Paste-/Insert-sicher: programmatisches `setContent`, Zwischenablage-Inhalte und Auswahl-Operationen werden nicht zusätzlich umhüllt
-- **Aktivierung ausschließlich über die Profil-`plugins`-Liste.** Ohne Eintrag registriert das Plugin keinerlei Handler. Es gibt keine zusätzliche `for_rootstrip: true/false`-Option, die global etwas einschaltet – das Listen-Mitglied ist die einzige Wahrheitsquelle. Die mitgelieferten Demo-Profile nehmen das Plugin bewusst **nicht** auf, da es das Save-Verhalten verändert.
 
 ---
 

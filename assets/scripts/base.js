@@ -220,12 +220,6 @@ function tiny_init(container) {
             }
         }
 
-        // ============================================
-        // FIX: Verhindere forced_root_block 'p'
-        // ============================================
-        if (options.forced_root_block === 'p' || options.forced_root_block === undefined) {
-            options.forced_root_block = false;
-        }
         if (!options.hasOwnProperty('convert_newlines_to_brs')) {
             options.convert_newlines_to_brs = false;
         }
@@ -472,7 +466,14 @@ function tiny_init(container) {
                 document.documentElement.style.removeProperty('overflow');
                 document.documentElement.style.removeProperty('overflow-y');
             });
-            
+            // Filter padding nodes (leere <p>-Tags) beim Speichern und für den Quelltext-Dialog.
+            // TinyMCE fügt intern leere <p> an den Rändern für den Cursor ein.
+            editor.on('GetContent', function (e) {
+                // Betrifft standard html format, source_view (code plugin) etc.
+                // Ersetzt <p></p>, <p>&nbsp;</p>, <p><br></p> und Whitespace.
+                e.content = e.content.replace(/^(\s*<p[^>]*>\s*(?:&nbsp;|\u00a0|<br\/?>)?\s*<\/p>\s*)+/gi, '');
+                e.content = e.content.replace(/(\s*<p[^>]*>\s*(?:&nbsp;|\u00a0|<br\/?>)?\s*<\/p>\s*)+$/gi, '');
+            });            
             // Call original setup if it existed
             if (originalSetup && typeof originalSetup === 'function') {
                 originalSetup(editor);

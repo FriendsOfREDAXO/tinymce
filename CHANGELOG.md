@@ -28,11 +28,8 @@ Einheitlicher Picker als **schwebendes, draggable Panel** (non-modal). Kein bloc
 - **Individuelle Regeln** per `for_chars_symbols_autoreplace_rules`: Kurzform (`["(tel)", "+49 …"]`), Objektform (`{ from, to }`) und Regex mit Backreferences (`{ re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }`). `for_chars_symbols_autoreplace_defaults: false` deaktiviert die Standardregeln. Custom-Regeln überschreiben Defaults bei identischem `from`.
 - **Fix (8.5.4):** Bei Regeln, die nicht selbst auf einem Trigger-Zeichen enden (`-->`, `1/2`, `!=`, `<=`, `+/-`, `~=`, eigene Custom-Regeln), wurde das trailende Trigger-Char beim Lookback mitverglichen und so der Match verhindert. Trigger-Char wird jetzt beim Matching abgeschnitten und beim Ersetzen erhalten — aus `1/2 ` wird `½ ` statt `½`.
 
-#### `for_rootstrip` – Ersatz für `forced_root_block: false`
 
-Unter TinyMCE 6/7/8 ist `forced_root_block: false` entfallen. `for_rootstrip` ist ein sauberer Ersatz: der `forced_root_block` (Default `div`) bleibt im Editor aktiv (Edits stabil), der Wrapper wird aber beim Auslesen/Speichern wieder entfernt. Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (`h2`, `span` …) vom Modul kommt.
 
-- **Opt-in pro Profil** – ohne Eintrag in der `plugins`-Liste keinerlei Handler. Ein versehentliches globales Umbiegen des Save-Verhaltens ist ausgeschlossen. Demo-Profile aktivieren `for_rootstrip` bewusst **nicht**.
 - **Content-Processing-only** – keine Buttons, keine Menüeinträge. Der Root-Wrapper wird nur entfernt, wenn genau **ein** Root-Element mit Inline-Inhalt vorliegt.
 - **Paste-/Insert-sicher** – keine zusätzlichen Wrapper beim Hereinkopieren, keine `<p><p>…</p></p>`-Verschachtelungen.
 

@@ -37,7 +37,7 @@ document_base_url: '/',
 convert_urls: true,
 entity_encoding: 'raw',
 
-plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_chars_symbols for_abbr cleanpaste mediapaste link_yform phonelink quote',
+plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_chars_symbols for_abbr cleanpaste mediapaste link_yform phonelink quote code',
 
 /* Logisch gruppierte Toolbar – Barrierefreiheit zuerst, danach Verlauf,
    Stile, Textformatierung, Listen/Ausrichtung, Links, Medien & Einbettungen,

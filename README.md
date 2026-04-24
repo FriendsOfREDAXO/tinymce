@@ -717,7 +717,6 @@ Der Profil-Assistent listet `for_markdown` mit FOR-Badge sowohl in der Plugin-Li
 
 `for_markdown` erzeugt ausschließlich Markup der anderen Plugins (`for-checklist`, `language-*`) und normales semantisches HTML. Es gibt **keine eigene CSS-Datei**; lade stattdessen bei Bedarf `css/for_checklist.css` (für Checklisten) und binde ein Prism/Highlight.js-Theme für die `language-*`-Codeblöcke ein.
 
-## FriendsOfREDAXO Root-Wrapper Strip Plugin (`for_rootstrip`)
 
 Entfernt den von TinyMCE intern erzwungenen Root-Wrapper (`forced_root_block`, Fallback `div`) beim Speichern bzw. Auslesen des Inhalts. Damit bleibt TinyMCE im Editor stabil, während im gespeicherten Output nur der eigentliche Inline-/Textinhalt landet.
 
@@ -728,11 +727,9 @@ Entfernt den von TinyMCE intern erzwungenen Root-Wrapper (`forced_root_block`, F
 - Entfernt den Wrapper nur, wenn genau **ein** Root-Element mit reinem Inline-Inhalt vorhanden ist (inkl. Whitespace-Toleranz) – mehrere Blöcke bleiben unangetastet
 - Paste-/Insert-sicher: Zwischenablage-Inhalte, programmatisches `setContent` und Auswahl-Operationen werden nicht zusätzlich umhüllt
 - Verhindert doppelte Struktur-Tags, wenn das umgebende Markup bereits im Modul/Template definiert wird
-- **Opt-in pro Profil:** nur aktiv, wenn `for_rootstrip` in der `plugins`-Liste des Profils steht
 
 ### Typischer Einsatzfall
 
-`for_rootstrip` ist besonders sinnvoll für Felder, in denen TinyMCE nur den **Inhalt** liefern soll, das semantische HTML-Tag aber außerhalb festgelegt wird. Ein häufiges Beispiel sind editierbare Headlines in REDAXO-Modulen:
 
 - TinyMCE-Profil sehr klein halten (z. B. nur Fett + Sonderzeichen)
 - Headline-Tag (`h2`, `h3`, `h4`) und CSS-Klasse im Modul per Auswahl oder Logik bestimmen
@@ -748,7 +745,6 @@ So kann das Modul die finale Struktur konsistent erzeugen (z. B. abhängig von d
 <p>Produkt <strong>Highlights</strong> &amp; Preise</p>
 ```
 
-**Gespeicherter Feldwert mit aktivem `for_rootstrip`:**
 
 ```html
 Produkt <strong>Highlights</strong> &amp; Preise
@@ -767,12 +763,9 @@ Damit bleibt die redaktionelle Bearbeitung flexibel, während Struktur und Desig
 ### Aktivierung im Profil
 
 ```javascript
-plugins: 'for_rootstrip ...',
 ```
 
-`for_rootstrip` ist **Opt-in pro Profil**: das Plugin wird nur aktiv, wenn es in der `plugins`-Liste des jeweiligen TinyMCE-Profils eingetragen ist. Ohne Eintrag registriert es keinerlei Content-Handler – es lässt sich also nicht versehentlich global einschalten. Es gibt keine zusätzliche `for_rootstrip: true/false`-Option, die aus der Plugin-Liste herausgeschaltet werden müsste; die Listen-Mitgliedschaft ist die einzige Wahrheitsquelle.
 
-Die mitgelieferten Demo-Profile nehmen `for_rootstrip` bewusst **nicht** auf, weil es das Save-Verhalten verändert. Der Profil-Assistent trägt das Plugin beim manuellen Hinzufügen sauber in die `plugins`-Liste ein, ohne eine zusätzliche Option zu erzeugen.
 
 ## FriendsOfREDAXO Zeichen, Symbole & Emoji (`for_chars_symbols`)
 
