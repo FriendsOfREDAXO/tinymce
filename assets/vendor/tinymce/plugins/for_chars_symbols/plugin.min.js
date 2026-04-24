@@ -17,6 +17,15 @@
  *  Optionale Editor-Parameter:
  *      for_chars_symbols_locale: 'de' | 'de-ch' | 'en' | 'fr'   (default: 'de')
  *      for_chars_symbols_autoreplace: true|false                (default: false)
+ *      for_chars_symbols_autoreplace_defaults: true|false       (default: true)
+ *          false deaktiviert die eingebauten Standardregeln
+ *          ((c)→©, (r)→®, (tm)→™, ...→…, ->→→, +/-→±, 1/2→½, 2^3→2³ usw.)
+ *      for_chars_symbols_autoreplace_rules: Array               (default: [])
+ *          zusätzliche Regeln. Formate (gemischt erlaubt):
+ *              ['(tel)', '+49 2843 999999']         ← einfache Ersetzung
+ *              { from: '(tel)', to: '02843/999999' }
+ *              { re: '\\(kw(\\d{1,2})\\)', to: 'KW $1' }   ← Regex (wird am
+ *                  Caret-Ende geprüft; Trigger: Space/Enter/Punct)
  *
  *  Save-Strategie: Es werden echte Unicode-Zeichen eingefügt
  *  (—, „, ", …), außer bei sonst unsichtbaren Steuerzeichen:
@@ -94,6 +103,7 @@
                 ['\u2009', 'Schmales Leerzeichen (thinsp)',             { invisible: true, glyph: '\u2423', hint: 'thin' }],
                 ['\u202F', 'Schmales geschütztes Leerzeichen (nnbsp)',  { invisible: true, glyph: '\u2423', hint: 'nnbsp' }],
                 ['\u00AD', 'Weiches Trennzeichen (shy)',                { invisible: true, glyph: '\u00AC', hint: 'shy' }],
+                ['\u2011', 'Geschützter Bindestrich (nbhyphen)',        { invisible: true, glyph: '\u2011', hint: 'nbhy' }],
                 ['\u200B', 'Zero-width space',                          { invisible: true, glyph: '\u25CC', hint: 'zwsp' }],
                 ['\u200D', 'Zero-width joiner',                         { invisible: true, glyph: '\u25CC', hint: 'zwj' }],
                 ['\u200C', 'Zero-width non-joiner',                     { invisible: true, glyph: '\u25CC', hint: 'zwnj' }],
@@ -600,6 +610,7 @@
         { label: 'Geschütztes Leerzeichen (nbsp)', value: '\u00A0', invisible: true, glyph: '\u2423' },
         { label: 'Schmales geschütztes Leerzeichen (nnbsp)', value: '\u202F', invisible: true, glyph: '\u2423' },
         { label: 'Weiches Trennzeichen (shy)', value: '\u00AD', invisible: true, glyph: '\u00AC' },
+        { label: 'Geschützter Bindestrich (nbhyphen)', value: '\u2011', invisible: true, glyph: '\u2011' },
         { label: 'Halbgeviertstrich (en-dash)', value: '\u2013' },
         { label: 'Geviertstrich (em-dash)', value: '\u2014' },
         { label: 'Auslassungspunkte', value: '\u2026' },
@@ -625,6 +636,7 @@
 
     var LS_FAV = 'forCharsSymbols.favs';
     var LS_RECENT = 'forCharsSymbols.recent';
+    var LS_ACTION_FAV = 'forCharsSymbols.actionFavs';
     var RECENT_MAX = 24;
 
     function readLs(key) {
@@ -663,21 +675,50 @@
         writeLs(LS_RECENT, list);
     }
 
+    // --- Action-Favoriten (Typografie-Aktionen) -----------------------
+    function getActionFavs() { return readLs(LS_ACTION_FAV); }
+    function isActionFav(id) {
+        var list = getActionFavs();
+        for (var i = 0; i < list.length; i++) { if (list[i] === id) { return true; } }
+        return false;
+    }
+    function toggleActionFav(id) {
+        var list = getActionFavs();
+        var idx = list.indexOf(id);
+        if (idx >= 0) { list.splice(idx, 1); } else { list.unshift(id); }
+        writeLs(LS_ACTION_FAV, list);
+        return idx < 0;
+    }
+    function getActionById(id) {
+        for (var i = 0; i < HELPER_ACTIONS.length; i++) {
+            if (HELPER_ACTIONS[i].id === id) { return HELPER_ACTIONS[i]; }
+        }
+        return null;
+    }
+
     /* ---------------- Typografie-Transformationen ---------------- */
 
     var QUOTE_PRESETS = {
         de:    { open: '\u201E', close: '\u201C', innerOpen: '\u201A', innerClose: '\u2018' },
         'de-ch': { open: '\u00AB', close: '\u00BB', innerOpen: '\u2039', innerClose: '\u203A' },
         en:    { open: '\u201C', close: '\u201D', innerOpen: '\u2018', innerClose: '\u2019' },
-        fr:    { open: '\u00AB\u00A0', close: '\u00A0\u00BB', innerOpen: '\u2039\u00A0', innerClose: '\u00A0\u203A' }
+        fr:    { open: '\u00AB', close: '\u00BB', innerOpen: '\u2039', innerClose: '\u203A' }
     };
 
     function wrapQuotes(text, locale) {
         var q = QUOTE_PRESETS[locale] || QUOTE_PRESETS.de;
+        // Leading/Trailing-Whitespace (inkl. NBSP) aus dem markierten Bereich
+        // herauslösen — sonst steht er INNERHALB der Anführungszeichen.
+        // Selection-APIs liefern bei Doppelklick auf ein Wort häufig einen
+        // Trailing-Space mit; der würde sonst als „ Markierung " erscheinen.
+        var m = /^([\s\u00A0]*)([\s\S]*?)([\s\u00A0]*)$/.exec(text);
+        var leading = m ? m[1] : '';
+        var core = m ? m[2] : text;
+        var trailing = m ? m[3] : '';
         // Innere gerade Quotes hochleveln.
-        var inner = text.replace(/"([^"]*)"/g, q.innerOpen + '$1' + q.innerClose)
+        var inner = core.replace(/"([^"]*)"/g, q.innerOpen + '$1' + q.innerClose)
                         .replace(/'([^']*)'/g, q.innerOpen + '$1' + q.innerClose);
-        return q.open + inner + q.close;
+        return leading + q.open + inner + q.close + trailing;
     }
 
     // Unit-Liste für NBSP vor Einheiten.
@@ -817,17 +858,43 @@
         // Favs/Recent-Tab: Wrapper-Divs mit data-fcs-*-section, damit
         // refreshFavsAndRecent() nach einem Toggle die Inhalte live ersetzen kann.
         var html = ''
+            + '<div data-fcs-action-favs-section>' + actionFavsBlockHtml() + '</div>'
             + '<div data-fcs-favs-section>' + favsBlockHtml() + '</div>'
             + '<div data-fcs-recent-section>' + recentBlockHtml() + '</div>';
-        if (!getFavs().length && !getRecent().length) {
-            html += '<div class="fcs-empty">Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen, um es als Favorit zu markieren.</div>';
+        if (!getFavs().length && !getRecent().length && !getActionFavs().length) {
+            html += '<div class="fcs-empty">Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen oder einer Typografie-Aktion, um es als Favorit zu markieren.</div>';
         }
+        return html;
+    }
+
+    function actionFavsBlockHtml() {
+        var ids = getActionFavs();
+        if (!ids.length) { return ''; }
+        var html = '<section class="fcs-group fcs-group--pinned" data-fcs-pinned="action-favs">';
+        html += '<h4 class="fcs-group-title"><span class="fcs-pin-icon" aria-hidden="true">★</span> Aktionen · Favoriten</h4>';
+        html += '<div class="fcs-actions">';
+        ids.forEach(function (id) {
+            var a = getActionById(id);
+            if (!a) { return; }
+            html += '<span class="fcs-action-wrap">'
+                + '<button type="button" class="fcs-action" data-fcs-action="' + esc(a.id) + '">' + esc(a.label) + '</button>'
+                + '<button type="button" class="fcs-fav is-fav fcs-fav--action" aria-label="Favorit umschalten" title="Aus Favoriten entfernen"'
+                + ' data-fcs-action-fav-toggle="' + esc(a.id) + '"></button>'
+                + '</span>';
+        });
+        html += '</div></section>';
         return html;
     }
 
     function refreshFavsAndRecent(root) {
         root.querySelectorAll('[data-fcs-favs-section]').forEach(function (el) { el.innerHTML = favsBlockHtml(); });
         root.querySelectorAll('[data-fcs-recent-section]').forEach(function (el) { el.innerHTML = recentBlockHtml(); });
+        root.querySelectorAll('[data-fcs-action-favs-section]').forEach(function (el) { el.innerHTML = actionFavsBlockHtml(); });
+        // Sterne an den Typografie-Aktionen synchronisieren.
+        root.querySelectorAll('[data-fcs-action-fav-toggle]').forEach(function (btn) {
+            var id = btn.getAttribute('data-fcs-action-fav-toggle');
+            btn.classList.toggle('is-fav', isActionFav(id));
+        });
         // Wenn der Favoriten-Tab sichtbar ist und leer war, Empty-State aktualisieren.
         var favPane = root.querySelector('[data-fcs-pane="favs"]');
         if (favPane) {
@@ -837,7 +904,7 @@
             if (!hasContent && !empty) {
                 var div = document.createElement('div');
                 div.className = 'fcs-empty';
-                div.textContent = 'Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen, um es als Favorit zu markieren.';
+                div.textContent = 'Noch keine Favoriten oder zuletzt verwendeten Zeichen. Nutze den Stern ☆ neben einem Zeichen oder einer Typografie-Aktion, um es als Favorit zu markieren.';
                 favPane.appendChild(div);
             }
         }
@@ -873,8 +940,12 @@
         html += '<h4 class="fcs-group-title">Aktionen auf der Markierung</h4>';
         html += '<div class="fcs-actions">';
         HELPER_ACTIONS.forEach(function (a) {
-            html += '<button type="button" class="fcs-action" data-fcs-action="' + esc(a.id) + '">'
-                + esc(a.label) + '</button>';
+            var favCls = isActionFav(a.id) ? ' is-fav' : '';
+            html += '<span class="fcs-action-wrap">'
+                + '<button type="button" class="fcs-action" data-fcs-action="' + esc(a.id) + '">' + esc(a.label) + '</button>'
+                + '<button type="button" class="fcs-fav fcs-fav--action' + favCls + '" aria-label="Favorit umschalten" title="Als Favorit markieren"'
+                + ' data-fcs-action-fav-toggle="' + esc(a.id) + '"></button>'
+                + '</span>';
         });
         html += '</div>';
         html += '<p class="fcs-hint">Tipp: Text im Editor markieren, dann hier auf eine Aktion klicken. Das Ergebnis ist per „Rückgängig" umkehrbar.</p>';
@@ -933,8 +1004,10 @@ body.rex-theme-dark .fcs-empty{color:#aaa;border-color:rgba(255,255,255,.15);bac
 .fcs-row-btn .fcs-name{font-size:12px;color:#333;flex:1}\
 .fcs-row .fcs-fav{top:50%;transform:translateY(-50%);right:6px}\
 .fcs-actions{display:flex;flex-wrap:wrap;gap:6px}\
-.fcs-action{padding:6px 10px;border:1px solid rgba(0,0,0,.15);background:#fafafa;border-radius:4px;cursor:pointer;font:inherit;color:inherit}\
+.fcs-action-wrap{position:relative;display:inline-flex}\
+.fcs-action{padding:6px 28px 6px 10px;border:1px solid rgba(0,0,0,.15);background:#fafafa;border-radius:4px;cursor:pointer;font:inherit;color:inherit}\
 .fcs-action:hover{background:#eef4fb;border-color:#4b9ad9}\
+.fcs-fav--action{position:absolute;top:50%;right:4px;transform:translateY(-50%);width:20px;height:20px}\
 .fcs-hint{color:#666;font-size:12px;margin:8px 0 0}\
 .fcs-hide{display:none!important}\
 body.rex-theme-dark .fcs-panel{background:#23272e;color:#e6e9ef;border-color:#3a3e47}\
@@ -1443,6 +1516,14 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
                 refreshFavsAndRecent(root);
                 return;
             }
+            var actionFavBtn = e.target.closest('[data-fcs-action-fav-toggle]');
+            if (actionFavBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleActionFav(actionFavBtn.getAttribute('data-fcs-action-fav-toggle'));
+                refreshFavsAndRecent(root);
+                return;
+            }
             var insertBtn = e.target.closest('[data-fcs-insert]');
             if (insertBtn) {
                 e.preventDefault();
@@ -1505,6 +1586,183 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         }
     }
 
+    /* ---------------- Autoreplace (konfigurierbar) ---------------- */
+
+    // Trigger-Zeichen: nach diesen Zeichen wird geprüft, ob das Wort
+    // davor einer Regel entspricht. Enter/Space sind dabei – Satzzeichen
+    // ebenfalls, damit z. B. „(c)." sofort ersetzt wird.
+    // (Ein Regex auf die Taste, nicht das Zeichen im Text.)
+    var AR_TRIGGER_RE = /^( |Enter|Tab|\.|,|;|:|!|\?|\)|\]|"|'|\/)$/;
+    // Zeichen im Text, die beim Lookback als „Trigger am Ende" übersprungen
+    // werden (damit `1/2<space>`, `--><space>`, `!=<space>` etc. matchen, obwohl
+    // die Patterns nicht selbst auf einem Trigger-Zeichen enden).
+    var AR_TRAILING_TRIGGER_RE = /[ \t\u00A0.,;:!?)\]"'\/]$/;
+
+    // Default-Regeln. Reihenfolge: längste Pattern zuerst, damit "-->" vor "->"
+    // und "==>" vor "=>" matcht.
+    var AUTOREPLACE_DEFAULTS = [
+        // Copyright / Marken
+        { from: '(c)',  to: '\u00A9' },   // ©
+        { from: '(C)',  to: '\u00A9' },
+        { from: '(r)',  to: '\u00AE' },   // ®
+        { from: '(R)',  to: '\u00AE' },
+        { from: '(tm)', to: '\u2122' },   // ™
+        { from: '(TM)', to: '\u2122' },
+        { from: '(p)',  to: '\u2117' },   // ℗
+        { from: '(P)',  to: '\u2117' },
+        { from: '(sm)', to: '\u2120' },   // ℠
+        { from: '(SM)', to: '\u2120' },
+        // Typografie
+        { from: '...',  to: '\u2026' },   // …
+        { from: '-->',  to: '\u2192' },   // →
+        { from: '<--',  to: '\u2190' },   // ←
+        { from: '->',   to: '\u2192' },
+        { from: '<-',   to: '\u2190' },
+        { from: '==>',  to: '\u21D2' },   // ⇒
+        { from: '<==',  to: '\u21D0' },   // ⇐
+        { from: '<=>',  to: '\u21D4' },   // ⇔
+        // Mathematik
+        { from: '+/-',  to: '\u00B1' },   // ±
+        { from: '!=',   to: '\u2260' },   // ≠
+        { from: '<=',   to: '\u2264' },   // ≤
+        { from: '>=',   to: '\u2265' },   // ≥
+        { from: '~=',   to: '\u2248' },   // ≈
+        // Brüche
+        { from: '1/2',  to: '\u00BD' },   // ½
+        { from: '1/4',  to: '\u00BC' },   // ¼
+        { from: '3/4',  to: '\u00BE' },   // ¾
+        { from: '1/3',  to: '\u2153' },
+        { from: '2/3',  to: '\u2154' },
+        // Potenzen 2^0 .. 2^9  →  Digit+Superscript (Regex-basiert)
+        { re: '\\d\\^0', rep: function (m) { return m.charAt(0) + '\u2070'; } },
+        { re: '\\d\\^1', rep: function (m) { return m.charAt(0) + '\u00B9'; } },
+        { re: '\\d\\^2', rep: function (m) { return m.charAt(0) + '\u00B2'; } },
+        { re: '\\d\\^3', rep: function (m) { return m.charAt(0) + '\u00B3'; } },
+        { re: '\\d\\^4', rep: function (m) { return m.charAt(0) + '\u2074'; } },
+        { re: '\\d\\^5', rep: function (m) { return m.charAt(0) + '\u2075'; } },
+        { re: '\\d\\^6', rep: function (m) { return m.charAt(0) + '\u2076'; } },
+        { re: '\\d\\^7', rep: function (m) { return m.charAt(0) + '\u2077'; } },
+        { re: '\\d\\^8', rep: function (m) { return m.charAt(0) + '\u2078'; } },
+        { re: '\\d\\^9', rep: function (m) { return m.charAt(0) + '\u2079'; } }
+    ];
+
+    // Normalisiert eine Regel aus User-Config in ein einheitliches Format.
+    // Akzeptiert: ['(c)', '©'] | {from,to} | {re,to} | {re,rep: fnString}.
+    function normalizeRule(r) {
+        if (!r) { return null; }
+        if (Array.isArray(r) && r.length >= 2) {
+            return { from: String(r[0]), to: String(r[1]) };
+        }
+        if (typeof r === 'object') {
+            if (r.from != null && r.to != null) { return { from: String(r.from), to: String(r.to) }; }
+            if (r.re != null && r.to != null)   { return { re: String(r.re), to: String(r.to) }; }
+            if (r.re != null && r.rep != null)  { return { re: String(r.re), rep: r.rep }; }
+        }
+        return null;
+    }
+
+    function buildAutoreplaceRules(editor) {
+        var param = editor.getParam('for_chars_symbols_autoreplace_rules');
+        var custom = [];
+        if (Array.isArray(param)) {
+            for (var i = 0; i < param.length; i++) {
+                var n = normalizeRule(param[i]);
+                if (n) { custom.push(n); }
+            }
+        }
+        var useDefaults = editor.getParam('for_chars_symbols_autoreplace_defaults');
+        if (useDefaults === false) { return custom; }
+        // Custom-Regeln zuerst (sie überschreiben Defaults bei gleicher from).
+        return custom.concat(AUTOREPLACE_DEFAULTS);
+    }
+
+    function tryAutoreplaceAtCaret(editor, rules) {
+        var sel = editor.selection;
+        if (!sel) { return false; }
+        var rng = sel.getRng();
+        if (!rng || !rng.collapsed) { return false; }
+        var node = rng.startContainer;
+        if (!node || node.nodeType !== 3) { return false; }
+        // Innerhalb von <code>, <pre>, <kbd> nicht ersetzen.
+        var p = node.parentNode;
+        while (p && p.nodeType === 1) {
+            var tag = p.nodeName;
+            if (tag === 'CODE' || tag === 'PRE' || tag === 'KBD' || tag === 'SAMP' || tag === 'TT') { return false; }
+            p = p.parentNode;
+        }
+        var offset = rng.startOffset;
+        var text = node.nodeValue || '';
+        var before = text.substring(0, offset);
+        if (!before) { return false; }
+        // Falls der zuletzt eingefügte Trigger-Char (Space, Punkt, Komma, …)
+        // am Ende steht, ihn beim Matching ignorieren – aber NICHT mitersetzen,
+        // damit z. B. „1/2 " zu „½ " wird und nicht zu „½".
+        var trailing = '';
+        var matchEnd = before.length;
+        if (AR_TRAILING_TRIGGER_RE.test(before)) {
+            trailing = before.charAt(before.length - 1);
+            matchEnd = before.length - 1;
+            before = before.substring(0, matchEnd);
+            if (!before) { return false; }
+        }
+        // Längeres Pattern zuerst.
+        for (var i = 0; i < rules.length; i++) {
+            var r = rules[i];
+            var matchLen = 0;
+            var replacement = null;
+            if (r.re) {
+                try {
+                    var re = new RegExp('(?:' + r.re + ')$');
+                    var m = re.exec(before);
+                    if (m) {
+                        matchLen = m[0].length;
+                        if (typeof r.rep === 'function') {
+                            replacement = r.rep.apply(null, m);
+                        } else {
+                            // String.replace für $1..$9-Backreferences.
+                            replacement = m[0].replace(new RegExp(r.re), r.to);
+                        }
+                    }
+                } catch (_e) { /* ungültiges Regex – überspringen */ }
+            } else if (r.from) {
+                var flen = r.from.length;
+                if (before.length >= flen && before.substring(before.length - flen) === r.from) {
+                    matchLen = flen;
+                    replacement = r.to;
+                }
+            }
+            if (matchLen > 0 && replacement != null) {
+                // Selection über den Match legen und via insertContent ersetzen
+                // (sauber im Undo-Stack). Der Trigger-Char (falls vorhanden) bleibt
+                // stehen, weil wir nur bis `matchEnd` ersetzen.
+                try {
+                    var selRng = editor.dom.createRng();
+                    selRng.setStart(node, matchEnd - matchLen);
+                    selRng.setEnd(node, matchEnd);
+                    sel.setRng(selRng);
+                    editor.undoManager.transact(function () {
+                        editor.insertContent(replacement);
+                    });
+                } catch (_err) { return false; }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function installAutoreplace(editor) {
+        if (!editor.getParam('for_chars_symbols_autoreplace')) { return; }
+        var rules = buildAutoreplaceRules(editor);
+        if (!rules.length) { return; }
+        editor.on('keyup', function (e) {
+            if (!e || !e.key) { return; }
+            if (!AR_TRIGGER_RE.test(e.key)) { return; }
+            // IME-Composition: nicht eingreifen.
+            if (e.isComposing || e.keyCode === 229) { return; }
+            tryAutoreplaceAtCaret(editor, rules);
+        });
+    }
+
     /* ---------------- Invisibles im Editor sichtbar machen ---------------- */
 
     // Zeichen, die im WYSIWYG sichtbar gemacht werden sollen.
@@ -1513,6 +1771,7 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         '\u202F': 'nnbsp',
         '\u2009': 'thin',
         '\u00AD': 'shy',
+        '\u2011': 'nbhy',
         '\u200B': 'zwsp',
         '\u200C': 'zwnj',
         '\u200D': 'zwj',
@@ -1585,6 +1844,8 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
     tinymce.PluginManager.add('for_chars_symbols', function (editor) {
         editor.on('init', function () {
             try { editor.dom.addStyle(EDITOR_CSS); } catch (_e) {}
+            // Autoreplace-Regeln installieren (wenn per Param aktiviert).
+            try { installAutoreplace(editor); } catch (_e) {}
         });
 
         // Vor dem Speichern: Marker entfernen (fallback falls data-mce-bogus versagt).

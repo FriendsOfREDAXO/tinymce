@@ -783,12 +783,14 @@ Ein vereinter Picker für **Sonderzeichen, native Emojis und Typografie-Helfer**
 - **Drei Tabs**: „Zeichen" (mit Favoriten + Zuletzt verwendet oben), „Emoji" (nach Kategorien), „Typografie" (Aktionen auf der Markierung).
 - **Schwebendes, draggable Panel** – kein blockierendes Modal, Editor bleibt sichtbar und bedienbar.
 - **Live-Suche** pro Tab (Name, Zeichen, Codepoint `U+…`).
-- **Favoriten + Zuletzt verwendet** pro Browser (`localStorage`), kompakt als „angepinnte" Sektionen im ersten Tab.
+- **Favoriten + Zuletzt verwendet** pro Browser (`localStorage`), kompakt als „angepinnte" Sektionen im ersten Tab. Zusätzlich **Aktions-Favoriten**: jede Typografie-Aktion besitzt einen Stern ☆ und erscheint als Favorit separat oben im Favoriten-Tab.
 - **Echte Unicode-Zeichen** werden eingefügt (`\u00A0`, `\u00AD`, `\u202F` …) – keine HTML-Entities, nichts wird escaped.
 - **Kontextmenü-Einträge** für geschützte und weiche Trenner: Rechtsklick im Editor → „Geschütztes Leerzeichen (nbsp)", „Schmales geschütztes Leerzeichen (nnbsp)", „Weiches Trennzeichen (shy)".
 - **Toggle-Button** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Steuerzeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker sichtbar. Der Marker ist `data-mce-bogus="1"` – wird nie gespeichert.
 - **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, Gedankenstrich-/en-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
 - **Shortcut**: `Strg/⌘ + Shift + I` öffnet das Panel.
+- **Autoreplace (opt-in)**: Live-Ersetzungen beim Tippen – `(c)`→©, `(r)`→®, `(tm)`→™, `...`→…, `->`→→, `+/-`→±, `1/2`→½, `2^3`→2³ u. v. m. Eigene Regeln (inkl. Regex mit `$1`-Backreferences) per Profil konfigurierbar; nicht aktiv in `<code>`, `<pre>`, `<kbd>`, `<samp>`. Siehe *Optionen*.
+- **Konfigurierbar per Profil-Assistent** (seit 8.5.3): Autoreplace kann im Editor-Profil ohne YAML-Handarbeit an-/ausgeschaltet werden – inklusive Pflege eigener Text- und Regex-Regeln über eine Repeater-Tabelle „Typografie-Autoreplace (for_chars_symbols)".
 
 ### Aktivierung im Profil
 
@@ -815,6 +817,35 @@ Das Plugin registriert zwei Toolbar-Buttons und mehrere Menu-Items:
 ### Optionen
 
 - `for_chars_symbols_locale` (`string`): `de` (Default), `de-ch`, `en`, `fr` – steuert Anführungszeichen und Quote-Normalisierung.
+- `for_chars_symbols_autoreplace` (`boolean`, Default `false`): aktiviert Live-Ersetzungen beim Tippen (getriggert durch Space/Enter/Satzzeichen). Eingebaute Regeln: `(c)`→©, `(r)`→®, `(tm)`→™, `(p)`→℗, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `2^3`→2³. Greift nicht in `<code>`, `<pre>`, `<kbd>`, `<samp>`.
+- `for_chars_symbols_autoreplace_defaults` (`boolean`, Default `true`): auf `false` setzen, um die eingebauten Standardregeln zu deaktivieren (nur eigene Regeln aktiv).
+- `for_chars_symbols_autoreplace_rules` (`array`, Default `[]`): eigene Ersetzungsregeln. Unterstützte Formate (mischbar):
+  - Array-Kurzform: `["(tel)", "+49 2843 999999"]`
+  - Objekt: `{ from: "(zvk)", to: "Zahlung per Vorkasse" }`
+  - Regex mit Backreferences: `{ re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }`
+  Custom-Regeln überschreiben Defaults bei gleichem `from`. YAML-Beispiel im `extra`-Feld des Profils:
+
+  ```yaml
+  for_chars_symbols_autoreplace: true
+  for_chars_symbols_autoreplace_rules:
+    - ["(tel)",  "+49 2843 999999"]
+    - ["(mail)", "info@example.com"]
+    - { re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }
+  ```
+
+### Pflege im Profil-Assistent
+
+Seit **8.5.3** ist Autoreplace komplett im **Profil-Assistent** konfigurierbar (Editor-Profil bearbeiten → Block *Typografie-Autoreplace (for_chars_symbols)*) – keine YAML-/JS-Handarbeit mehr nötig:
+
+- Checkbox **Autoreplace aktivieren** → setzt `for_chars_symbols_autoreplace`.
+- Checkbox **Default-Regeln nutzen** → setzt `for_chars_symbols_autoreplace_defaults` (Standard: `true`).
+- Repeater-Tabelle **Eigene Regeln** mit den Spalten *Typ* (`Text` oder `Regex`), *Von* (Muster) und *Nach* (Ziel). Der Button *Beispiele einfügen* füllt `(tel)`, `-->`, `<--` sowie die Regex `\(kw(\d{1,2})\)` → `KW $1` vor.
+
+Der Assistent serialisiert die Tabelle beim Speichern automatisch in `for_chars_symbols_autoreplace_rules` als Objekte (`{from, to}` für Text-Regeln, `{re, to}` für Regex-Regeln). Beim erneuten Öffnen eines Profils werden bestehende Regeln – auch in der Kurzform `["from","to"]` – zurück in die Tabelle geladen.
+
+### Aktions-Favoriten
+
+Jede Typografie-Aktion (Anführungszeichen DE/EN/FR, Normalisierung, NBSP-vor-Einheiten, en-Dash-Ranges, Soft-Hyphen, Telefonnummern …) besitzt einen Stern ☆, über den sie als Favorit markiert wird. Favorisierte Aktionen erscheinen gebündelt oben im Favoriten-Tab, getrennt von den Zeichen-Favoriten, und sind pro Browser (`localStorage`) persistent.
 
 ### Command / API
 
@@ -822,6 +853,29 @@ Das Plugin registriert zwei Toolbar-Buttons und mehrere Menu-Items:
 tinymce.activeEditor.execCommand('forCharsSymbolsOpen');
 tinymce.activeEditor.execCommand('forCharsSymbolsToggleInvisibles');
 ```
+
+## FriendsOfREDAXO Abkürzungen / Fremdwörter (`for_abbr`)
+
+Das Plugin `for_abbr` fügt semantisches `<abbr title="…">`-Markup für Abkürzungen, Fachbegriffe und Fremdwörter ein — wichtig für Screenreader (WCAG 3.1.4) und SEO. Hovern zeigt in Browsern zusätzlich den `title`-Tooltip.
+
+- **Dialog** mit Anzeigetext, Langform (→ `title`) und optionalem `lang`-Attribut für Fremdwörter.
+- **Edit-Modus:** Cursor in/auf einem bestehenden `<abbr>` → beim Öffnen werden die Felder aus dem Element befüllt. Zusätzlicher *Entfernen*-Button unwrappt das Element.
+- **Context-Toolbar** erscheint direkt am selektierten `<abbr>` für schnellen Zugriff.
+- **Tastaturkürzel:** <kbd>Ctrl/Cmd + Alt + A</kbd>.
+- **Optionales Glossar** über die Editor-Option `for_abbr_glossary`:
+
+  ```yaml
+  plugins: 'for_abbr ...',
+  toolbar: '... for_abbr ...',
+  for_abbr_glossary:
+    - { term: HTML,  title: 'Hypertext Markup Language',             lang: en }
+    - { term: CSS,   title: 'Cascading Style Sheets',                lang: en }
+    - { term: WCAG,  title: 'Web Content Accessibility Guidelines',  lang: en }
+    - { term: DSGVO, title: 'Datenschutz-Grundverordnung' }
+    - { term: z. B., title: 'zum Beispiel' }
+  ```
+
+  Sobald der eingegebene Anzeigetext (case-insensitive) einer Glossar-Term entspricht, werden `title` und `lang` im Dialog automatisch vorgeschlagen.
 
 ## FriendsOfREDAXO Inhaltsverzeichnis-Styling (`for_toc.css`)
 

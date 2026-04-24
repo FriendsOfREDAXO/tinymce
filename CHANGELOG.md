@@ -1,6 +1,87 @@
 Changelog
 =========
 
+Version 8.5.4
+-------------------------------
+
+### Bugfix: for_chars_symbols Autoreplace griff nur bei Pattern-Enden mit Trigger-Zeichen
+
+- **Problem:** Die Live-Ersetzung wurde durch Leerzeichen / Satzzeichen getriggert, aber beim Lookback wurde das Trigger-Zeichen selbst mitverglichen. Dadurch funktionierten nur Regeln, deren Muster *selbst* auf einem Trigger-Char enden: `(c)`, `(tm)`, `...` (Ende auf `)` bzw. `.`). Regeln wie `-->`, `1/2`, `!=`, `<=`, `+/-`, `~=` oder Custom-Regeln endend auf Buchstaben/Ziffern matchten nicht, sobald der User ein Leerzeichen danach tippte.
+- **Fix:** Das trailende Trigger-Zeichen (Space, Tab, `.,;:!?)]"'/`, nbsp) wird beim Matching abgeschnitten und beim Ersetzen erhalten — aus `1/2 ` wird `½ ` statt `½`. Alle Default-Regeln (`-->`, `<--`, `->`, `<-`, `==>`, `<==`, `<=>`, `+/-`, `!=`, `<=`, `>=`, `~=`, `1/2`, `1/3`, `1/4`, `2/3`, `3/4`, `2^0…2^9`) funktionieren jetzt verlässlich. Eigene Custom-Regeln ebenfalls.
+
+### Demo-Seite mit Feature-Sidebar
+
+- Die Demo-Seite unter *TinyMCE → Demo* zeigt jetzt rechts neben dem Editor eine sticky Sidebar mit konkreten Eingabevorschlägen pro Feature-Bereich (Autoreplace, Barrierefreiheit, Bilder, Embeds, Struktur, Zeichen-Picker, Paste). Dark-Mode-fähig, unter 991px responsiv untereinander.
+
+
+Version 8.5.3
+-------------------------------
+
+### Demo-Profil: „alle coolen Features" aktiviert
+
+- **Autoreplace live an:** `for_chars_symbols_autoreplace: true` → beim Tippen werden `(c)` zu ©, `(tm)` zu ™, `...` zu …, `->` zu →, `+/-` zu ±, Brüche wie `1/2` zu ½ uvm. ersetzt (32 Default-Regeln).
+- **Eigene Demo-Regeln** als Beispiele in `for_chars_symbols_autoreplace_rules`: `(r)` → ®, `-->` → →, `<--` → ←, Regex `(kw12)` → „KW 12" (Backreferences), `(tel)` → „+49 (0) …".
+- **for_a11y-Konfiguration:** alle Einzel-Checks (`a11y_rules`) explizit auf `true` gesetzt – so sieht man im Demo-Profil direkt alle Warnungstypen. `a11y_generic_link_texts` mit deutscher und englischer Blacklist („hier klicken", „mehr erfahren", „read more" …).
+- **for_images-Presets korrigiert:** Die bisherige `for_images_presets`-Option wurde vom Plugin *nie gelesen* (falscher Name). Jetzt korrekt via `imagewidth_presets` (Original, Klein/Mittel/Groß, Volle Breite), `imagealign_presets` (Keine, Links, Zentriert, Rechts) und `imageeffect_presets` (Runde Ecken, Schatten, Rahmen, Graustufen).
+
+### Profil-Assistent: Typografie-Autoreplace konfigurierbar
+
+- **Neuer Block „Typografie-Autoreplace (for_chars_symbols)"** im Assistenten zwischen Sprach-Menü und Extras: Checkbox *Autoreplace aktivieren* (`for_chars_symbols_autoreplace`), Checkbox *Default-Regeln nutzen* (`for_chars_symbols_autoreplace_defaults`, vorbelegt aktiv).
+- **Eigene Regeln als Repeater-Tabelle:** Typ-Auswahl `Text | Regex`, Spalten *Von* und *Nach*, Add-Button und *Beispiele einfügen* (legt `(tel)` → `+49 (0) …`, `-->` → →, `<--` → ←, Regex `\(kw(\d{1,2})\)` → `KW $1` an).
+- **Edit-Modus:** hydriert aus bestehenden Configs sowohl Kurzform `["from","to"]`, Objektform `{ from, to }` als auch Regex-Form `{ re, to }`.
+- Deutsche + englische i18n-Keys ergänzt (`tinymce_autoreplace*`).
+
+### `for_chars_symbols`: Geschützter Bindestrich (U+2011)
+
+- **Neues Zeichen:** „Geschützter Bindestrich (nbhyphen)" – Unicode `U+2011` / HTML `&#8209;`. Sieht aus wie ein normaler Bindestrich, verhindert aber, dass der Browser an dieser Stelle umbricht (z. B. Telefonnummern, Produktcodes, Namen wie „Baden-Baden"). Ergänzung zum bereits vorhandenen weichen Trennzeichen (shy, `U+00AD`).
+- Eingebunden in **drei Stellen**: Zeichen-Picker (Tab *Zeichen* → Gruppe *Unsichtbar / Steuerzeichen*), Typografie-Helpers (`HELPER_INSERTS` → Insert-Menü unter *Unsichtbare einfügen*) und Invisibles-Mode (`for_chars_symbols_invisibles`-Toggle-Button markiert den geschützten Bindestrich mit Label `nbhy` sichtbar im Editor).
+
+### Cache-Buster-Bump für ausgelieferte Icons
+
+- Versions-Bump auf 8.5.3, damit der in `PluginRegistry` gesetzte `?v=…`-Cache-Buster sich ändert und Browser die neue `for_images/plugin.min.js` mit dem eigenen `for_imagedialog`-Icon (Bildrahmen + Schieberegler statt des Standard-`image`-Icons) zuverlässig nachladen.
+
+Version 8.5.2
+-------------------------------
+
+### Neues Plugin: `for_abbr` – Abkürzungen & Fremdwörter (abbr-Element)
+
+- **Neues FOR-Plugin `for_abbr`** für das semantisch korrekte `<abbr title="…">`-Element (Abkürzungen, Fachbegriffe, Fremdwörter). Wichtig für Screenreader und SEO: Hilfstechnologien können die Langform vorlesen, Browser zeigen sie beim Hovern als Tooltip an.
+- **UI:** Toolbar-Button `for_abbr` (mit Active-State auf bestehenden `<abbr>`), Menü-Eintrag `for_abbr` (im Insert-Menü oder als Custom-Menu-Entry einbindbar) und **Context-Toolbar** direkt am selektierten `<abbr>`. Tastaturkürzel: <kbd>Ctrl/Cmd + Alt + A</kbd>.
+- **Dialog:** Anzeigetext, Langform/Erklärung (→ `title`), optionales `lang`-Attribut (z. B. `en` für Fremdwörter → Screenreader wechselt die Aussprache). Bestehende `<abbr>`-Elemente werden beim Öffnen erkannt (Edit-Modus mit *Entfernen*-Button, das unwrappt das Element und behält den Textinhalt).
+- **Optionales Glossar** via Editor-Option `for_abbr_glossary: [{ term: 'HTML', title: 'Hypertext Markup Language', lang: 'en' }, …]` — schlägt beim Öffnen des Dialogs passende Langform + Sprache vor, sobald der Anzeigetext einer Glossar-Term entspricht (case-insensitive).
+- **Im Profil-Assistenten** erscheint `for_abbr` wie andere FOR-Plugins grün markiert in der Plugin-Liste; der Button-Name ist `for_abbr`, der Menu-Item-Key ebenfalls `for_abbr`.
+- **Demo-Profil** lädt `for_abbr` standardmäßig (Plugin, Toolbar-Button im Typografie-Block, Eintrag im Insert- und Quickbars-Selection-Toolbar) inkl. Beispiel-`for_abbr_glossary` (HTML, CSS, WCAG, DSGVO, „z. B.“ …).
+### Demo-Profil: aufgeräumte, logisch gruppierte Toolbar
+
+- **Barrierefreiheits-Buttons (`for_a11y`, `for_abbr`, `language`) stehen jetzt ganz vorne** – noch vor Undo/Redo. Damit ist visuell klar, dass A11y im Demo-Profil zuerst kommt. Der `language`-Button erhält eine vorkonfigurierte `content_langs`-Liste (Deutsch, Englisch UK/US, Französisch, Italienisch, Spanisch); im Format-Menü ist der Eintrag „Sprache" ebenfalls verfügbar.
+- **TinyMCE-Core-Plugin `image` aktiviert + im Toolbar-/Insert-/Quickbars-Block** – nutzt automatisch den Mediapool-Picker (`file_picker_callback` ist bereits im Profil gesetzt) und ergänzt `imagewidthdialog` (Bildformatierung von `for_images`) für direkte Bild-Insertion.
+- **Logische Gruppierung der Toolbar:** A11y → Verlauf → Stile → Textformatierung → hoch/tief → Farbe/Cleanup → Listen/Einzug → Ausrichtung → Links (`link`, `link_yform`, `phonelink`, `anchor`) → Medien & Einbettungen (`image`, `imagewidthdialog`, `for_oembed`, `for_video`, `for_htmlembed`) → semantische Bausteine (`quote`, `for_checklist*`, `for_footnote*`, `for_toc*`) → Markdown-Paste → Tabelle → Typografie (`for_chars_symbols`, `charmap`, `emoticons`, `hr`, `pagebreak`) → Snippets → Suchen/Ersetzen → Ansicht (`fullscreen`, `preview`, `code`, `help`).
+### `for_images`: einzelne Toolbar-Buttons im Profil-Assistenten
+
+- **`for_images` registrierte bisher den Plugin-Namen `for_images` als Toolbar-Button** – TinyMCE kennt diesen Button aber gar nicht, das Plugin stellt stattdessen die Buttons `imagewidthdialog` (Dialog *Bildformatierung*: Breite, Ausrichtung, Effekte), `imagewidth` (Menubutton mit Breiten-Presets), `imagealignleft / imagealigncenter / imagealignright / imagealignnone`, `imageeffect` (Effekt-Presets), `imagealt` (Dialog *Alt-Text bearbeiten*) und `imagecaption` (Bildunterschrift) bereit, dazu eine Context-Toolbar `for_imagestoolbar` direkt am selektierten Bild. Diese Buttons sind jetzt **alle einzeln im Profil-Assistenten auswählbar** (grün als FOR-Plugin markiert).
+- **Eigenes Icon `for_imagedialog`** für den `imagewidthdialog`-Button: Bildrahmen mit Schiebereglern darunter – grenzt sich klar vom Standard-`image`-Icon (Bild einfügen) ab und signalisiert „bestehendes Bild bearbeiten/formatieren".
+- **Demo-Profil** verwendet `imagewidthdialog` (statt des fehlerhaften `for_images`) in Toolbar, Insert-Menü und Quickbars.
+
+### Profil-Assistent: Plugins ohne Toolbar-Button bereinigt
+
+- `cleanpaste` und `mediapaste` sind reine Paste-Pre-Processor-Plugins (kein UI, kein Dialog) und tauchen jetzt **nicht mehr in der Toolbar-Button-Auswahl** auf. Sie bleiben weiterhin im Plugin-Block aktivierbar.
+
+### Profil-Assistent: Toolbar-Buttons vervollständigt + Sprach-Menü (`content_langs`)
+
+- **Neue Toolbar-Buttons auswählbar:** `language`, `lineheight`, `ltr`, `rtl`, `searchreplace`, `charmap`, `emoticons`, `anchor`, `hr`, `pagebreak`, `nonbreaking`, `insertdatetime`, `visualblocks`, `visualchars`. Alle zugehörigen Plugins sind seit jeher im Vendor-Build enthalten; bisher tauchten die Buttons im Assistenten aber nicht in der Auswahl-Liste auf.
+- **Neuer Repeater „Sprach-Menü (content_langs)“** im Assistenten (vor „Extras“): Titel, BCP-47-Code (`de`, `en-GB`, `de-CH` …), optionaler Custom-Code (→ `data-mce-lang`) und Standard-Radio (überschreibt beim Speichern zusätzlich `language`). Button „Standard-Set einfügen“ befüllt die Tabelle in einem Klick mit `de/en/fr/es/it`. Erzeugt die TinyMCE-Option `content_langs: [...]`; erst damit wird der `language`-Toolbar-Button / Format-Menü-Eintrag „Sprache“ aktiv. Edit-Modus hydriert den Repeater aus einer bestehenden Config.
+- **Hinweis:** `language` ist kein Plugin, sondern ein Silver-Theme-Controller – er taucht daher nicht in der Plugin-Liste des Assistenten auf. Der gleichnamige TinyMCE-Premium-Plugin `language` (Kontextmenü + Dialog) ist nicht Teil des OSS-Builds und wird nicht ausgeliefert.
+
+Version 8.5.1
+-------------------------------
+
+### `for_chars_symbols` – Aktions-Favoriten + Autoreplace
+
+- **Aktions-Favoriten:** jede Typografie-Aktion (Anführungszeichen DE/EN/FR, Normalisierung, NBSP-vor-Einheiten, en-Dash-Ranges, Soft-Hyphen, Telefonnummern …) besitzt einen Stern-Toggle ☆. Favorisierte Aktionen erscheinen gebündelt oben im Favoriten-Tab (getrennt von Zeichen-Favoriten) und persistieren pro Browser (`localStorage: forCharsSymbols.actionFavs`).
+- **Autoreplace (optional, opt-in):** `for_chars_symbols_autoreplace: true` aktiviert Live-Ersetzungen beim Tippen, getriggert durch Space/Enter/Satzzeichen (`. , ; : ! ? ) ] " ' /`). Eingebaute Regeln (32): `(c)`→©, `(C)`→©, `(r)`→®, `(R)`→®, `(tm)`→™, `(TM)`→™, `(p)`→℗, `(sm)`→℠, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `<==`→⇐, `<=>`→⇔, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `1/3`→⅓, `2/3`→⅔, sowie Ziffer+`^`+0–9 → Superscript (`2^3`→2³). Greift nicht in `<code>`, `<pre>`, `<kbd>`, `<samp>`, `<tt>`.
+- **Individuelle Ersetzungsregeln** per `for_chars_symbols_autoreplace_rules` im Profil-YAML: Kurzform (`["(tel)", "+49 …"]`), Objektform (`{ from, to }`) und Regex mit Backreferences (`{ re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }`) – mischbar. `for_chars_symbols_autoreplace_defaults: false` deaktiviert die Standardregeln (nur Custom aktiv). Custom-Regeln überschreiben Defaults bei identischem `from`. Alle Ersetzungen sind Undo-Stack-integriert (`editor.undoManager.transact`).
+- **Quote-Wrap-Fix:** führender/schließender Whitespace aus der Selektion (z. B. durch Doppelklick-Wortwahl) landet nicht mehr innerhalb der Anführungszeichen; französische Preset-NBSPs entfernt.
+
 Version 8.5.0
 -------------------------------
 

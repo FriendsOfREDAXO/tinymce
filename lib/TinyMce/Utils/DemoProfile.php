@@ -37,9 +37,12 @@ document_base_url: '/',
 convert_urls: true,
 entity_encoding: 'raw',
 
-plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_chars_symbols cleanpaste mediapaste link_yform phonelink quote',
+plugins: 'preview searchreplace autolink directionality visualblocks visualchars fullscreen image link codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons code save accordion autoresize importcss quickbars snippets for_images for_oembed for_video for_htmlembed for_checklist for_footnotes for_toc for_a11y for_markdown for_chars_symbols for_abbr cleanpaste mediapaste link_yform phonelink quote',
 
-toolbar: 'for_a11y | styles | undo redo | bold italic underline strikethrough subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | for_images for_oembed for_video | link link_yform phonelink | quote for_htmlembed for_checklist for_checklist_feature | for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_markdown_paste | table for_chars_symbols for_chars_symbols_invisibles charmap emoticons hr | snippets | fullscreen preview code help',
+/* Logisch gruppierte Toolbar – Barrierefreiheit zuerst, danach Verlauf,
+   Stile, Textformatierung, Listen/Ausrichtung, Links, Medien & Einbettungen,
+   semantische Bausteine, Tabelle, Typografie, Snippets, Ansicht. */
+toolbar: 'for_a11y for_abbr language | undo redo | styles | bold italic underline strikethrough | subscript superscript | forecolor backcolor removeformat | bullist numlist outdent indent | alignleft aligncenter alignright alignjustify | link link_yform phonelink anchor | image imagewidthdialog for_oembed for_video for_htmlembed | quote for_checklist for_checklist_feature for_footnote_insert for_footnote_update for_toc_insert for_toc_update | for_markdown_paste | table | for_chars_symbols for_chars_symbols_invisibles charmap emoticons hr pagebreak | snippets | searchreplace | fullscreen preview code help',
 
 menu: {
     file: { title: 'Datei', items: 'preview print' },
@@ -47,15 +50,15 @@ menu: {
     view: { title: 'Ansicht', items: 'visualaid visualchars visualblocks | preview fullscreen' },
     insert: {
         title: 'Einfügen',
-        items: 'for_images for_oembed for_video for_htmlembed | link anchor | for_checklist for_checklist_feature for_footnote for_toc | for_markdown_paste | snippets | for_chars_symbols charmap emoticons codesample inserttable | hr pagebreak nonbreaking | insertdatetime'
+        items: 'image imagewidthdialog for_oembed for_video for_htmlembed | link anchor for_abbr | for_checklist for_checklist_feature for_footnote for_toc | for_markdown_paste | snippets | for_chars_symbols charmap emoticons codesample inserttable | hr pagebreak nonbreaking | insertdatetime'
     },
-    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat' },
+    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
     tools: { title: 'Werkzeuge', items: 'wordcount for_a11y | code' },
     table: { title: 'Tabelle', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' }
 },
 
-quickbars_selection_toolbar: 'bold italic underline | forecolor | link',
-quickbars_insert_toolbar: 'for_images for_oembed for_video | for_checklist for_footnote_insert | hr',
+quickbars_selection_toolbar: 'bold italic underline | forecolor | link for_abbr',
+quickbars_insert_toolbar: 'image imagewidthdialog for_oembed for_video | for_checklist for_footnote_insert | hr',
 
 contextmenu: 'link table for_a11y',
 
@@ -82,14 +85,105 @@ target_list: [
 ],
 
 /* FOR-Plugin-Konfigurationen */
-a11y_new_window_warning: true,
 
-for_images_presets: [
-    { value: 'img-25',  text: '25 %' },
-    { value: 'img-33',  text: '33 %' },
-    { value: 'img-50',  text: '50 %' },
-    { value: 'img-66',  text: '66 %' },
-    { value: 'img-100', text: '100 %' }
+/* --- for_a11y: A11y-Linter --- */
+/* Warnung bei target="_blank" ohne Hinweistext (Default: true). */
+a11y_new_window_warning: true,
+/* Einzelne A11y-Checks lassen sich gezielt deaktivieren. */
+a11y_rules: {
+    'img-missing-alt':     true,
+    'img-alt-in-text-link':true,
+    'img-empty-alt-nondeco': true,
+    'link-generic-text':   true,
+    'link-no-accname':     true,
+    'link-new-window':     true,
+    'heading-empty':       true,
+    'heading-skip':        true,
+    'table-no-th':         true,
+    'table-no-caption':    true,
+    'table-th-no-scope':   true,
+    'iframe-no-title':     true
+},
+/* Zusätzliche nichtssagende Linktexte (werden angemeckert). */
+a11y_generic_link_texts: [
+    'hier', 'hier klicken', 'mehr', 'mehr erfahren', 'mehr lesen', 'weiter',
+    'weiterlesen', 'mehr infos', 'link', 'diese seite', 'read more', 'click here',
+    'more', 'here', 'learn more', 'details'
+],
+
+/* --- for_images: Breite / Ausrichtung / Effekte ---
+   Die echten Option-Namen lauten imagewidth_presets / imagealign_presets /
+   imageeffect_presets (das frühere `for_images_presets` wurde vom Plugin nie
+   gelesen und hatte keinen Effekt). */
+imagewidth_presets: [
+    { label: 'Original',       class: '' },
+    { label: 'Klein (25 %)',   class: 'img-width-small' },
+    { label: 'Mittel (50 %)',  class: 'img-width-medium' },
+    { label: 'Groß (75 %)',    class: 'img-width-large' },
+    { label: 'Volle Breite',   class: 'img-width-full' }
+],
+imagealign_presets: [
+    { label: 'Keine',     class: '' },
+    { label: 'Links',     class: 'img-align-left' },
+    { label: 'Zentriert', class: 'img-align-center' },
+    { label: 'Rechts',    class: 'img-align-right' }
+],
+imageeffect_presets: [
+    { label: 'Kein Effekt',    class: '' },
+    { label: 'Runde Ecken',    class: 'img-rounded' },
+    { label: 'Schatten',       class: 'img-shadow' },
+    { label: 'Rahmen',         class: 'img-border' },
+    { label: 'Graustufen',     class: 'img-grayscale' }
+],
+
+/* Glossar für das for_abbr-Plugin: Wenn der Anzeigetext im
+   Abbr-Dialog einer dieser Terms entspricht (case-insensitive),
+   werden Langform und ggf. Sprache automatisch vorgeschlagen. */
+for_abbr_glossary: [
+    { term: 'HTML',  title: 'Hypertext Markup Language',            lang: 'en' },
+    { term: 'CSS',   title: 'Cascading Style Sheets',               lang: 'en' },
+    { term: 'JS',    title: 'JavaScript',                           lang: 'en' },
+    { term: 'WCAG',  title: 'Web Content Accessibility Guidelines', lang: 'en' },
+    { term: 'SEO',   title: 'Search Engine Optimization',           lang: 'en' },
+    { term: 'CMS',   title: 'Content-Management-System' },
+    { term: 'DSGVO', title: 'Datenschutz-Grundverordnung' },
+    { term: 'z. B.', title: 'zum Beispiel' },
+    { term: 'd. h.', title: 'das heißt' },
+    { term: 'u. a.', title: 'unter anderem' }
+],
+
+/* Sprach-Menü (Silver-Theme-Controller `language`).
+   Markiert die Auswahl mit dem `lang`-Attribut – wichtig für
+   Screenreader (Aussprachewechsel) und SEO. */
+content_langs: [
+    { title: 'Deutsch',           code: 'de' },
+    { title: 'Englisch (UK)',     code: 'en-GB' },
+    { title: 'Englisch (USA)',    code: 'en-US' },
+    { title: 'Französisch',       code: 'fr' },
+    { title: 'Italienisch',       code: 'it' },
+    { title: 'Spanisch',          code: 'es' }
+],
+
+/* Autoreplace: Live-Ersetzung beim Tippen (für_chars_symbols).
+   Ausgelöst durch Space, Enter und Satzzeichen. Greift nicht in
+   <code>/<pre>/<kbd>/<samp>/<tt>. Alle Ersetzungen sind Undo-fähig. */
+for_chars_symbols_autoreplace: true,
+/* Defaults (32 Regeln) sind aktiv: (c)→©, (r)→®, (tm)→™, (p)→℗,
+   ...→…, ->→→, <-→←, ==>→⇒, <=>→⇔, +/-→±, !=→≠, <=→≤, >=→≥, ~=→≈,
+   1/2→½, 1/4→¼, 3/4→¾, 1/3→⅓, 2/3→⅔, Ziffer^Ziffer → Superscript … */
+for_chars_symbols_autoreplace_defaults: true,
+/* Eigene Beispiel-Regeln für die Demo – dürfen beliebig erweitert werden.
+   Kurzform, Objektform und Regex (mit Backrefs) sind mischbar. */
+for_chars_symbols_autoreplace_rules: [
+    /* Kurzform: [from, to] */
+    ['(r)', '®'],
+    /* Objektform */
+    { from: '-->', to: '→' },
+    { from: '<--', to: '←' },
+    /* Regex mit Backreference: (KW1) … (KW52) → „KW 1" … „KW 52" */
+    { re: '\\(kw(\\d{1,2})\\)', to: 'KW $1' },
+    /* Telefon-Kurzschreibweise */
+    { from: '(tel)', to: '+49\u00A0(0)\u00A0…' }
 ],
 
 skin: redaxo.theme.current === 'dark' ? 'oxide-dark' : 'oxide',

@@ -387,6 +387,20 @@ const setup = (editor: Editor, _url: string): void => {
   editor.options.register('imagealign_presets', { processor: 'object[]', default: [] });
   editor.options.register('imageeffect_presets', { processor: 'object[]', default: [] });
 
+  /* Eigenes Icon für den Bildformatierungs-Dialog – grenzt sich klar
+     vom Standard-„image"-Icon (Bild einfügen) ab: Bildrahmen mit
+     Schiebereglern darunter, signalisiert „bestehendes Bild bearbeiten". */
+  editor.ui.registry.addIcon('for_imagedialog',
+    '<svg width="24" height="24" viewBox="0 0 24 24">' +
+    '<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+    '<rect x="3" y="3" width="18" height="12" rx="1.5"/>' +
+    '<circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"/>' +
+    '<path d="M3 13l4-4 3 3 4-5 7 6"/>' +
+    '<path d="M3 19h6M15 19h6"/>' +
+    '<circle cx="12" cy="19" r="1.8" fill="currentColor" stroke="none"/>' +
+    '</g></svg>'
+  );
+
   const getConfig = (): PluginConfig => {
     const getOption = (key: string): any => {
       let val = editor.options.get(key);
@@ -591,7 +605,7 @@ const setup = (editor: Editor, _url: string): void => {
 
   /* DIALOG BUTTON */
   editor.ui.registry.addButton('imagewidthdialog', {
-    icon: 'image',
+    icon: 'for_imagedialog',
     tooltip: 'Bildformatierung',
     onAction: () => {
       const img = getSelectedImg(editor);

@@ -23,7 +23,8 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 | `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
 | `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
 | `for_rootstrip` | Entfernt beim Speichern/Auslesen den TinyMCE-Root-Wrapper (`forced_root_block`, Fallback `div`). Für Felder gedacht, in denen das äußere Tag vom Modul vorgegeben wird. **Opt-in:** muss explizit in der Profil-`plugins`-Liste stehen. | — |
-| `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), Favoriten + Zuletzt verwendet pro Browser | `for_chars_symbols` |
+| `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), **Aktions-Favoriten** pro Typografie-Aktion, Zeichen- und Aktions-Favoriten + Zuletzt verwendet pro Browser, optionales **Autoreplace** beim Tippen (`(c)`→©, `->`→→, `1/2`→½, eigene Regeln inkl. Regex) | `for_chars_symbols` |
+| `for_abbr` | **Abkürzungen & Fremdwörter** als `<abbr title="…">` auszeichnen – wichtig für Screenreader und SEO. Dialog mit Anzeigetext, Langform und optionalem `lang`-Attribut. Erkennt bestehende `<abbr>` für Edit/Remove. Optionales **Glossar** via `for_abbr_glossary` schlägt passende Langform automatisch vor. Context-Toolbar + Shortcut <kbd>Ctrl/Cmd + Alt + A</kbd> | `for_abbr` |
 | `link_yform` | Verlinkt YForm-Datensätze direkt aus dem Editor – Tabellen-/Feldauswahl und konfigurierbares Link-Schema im Profil-Assistenten | Erweiterung des Link-Dialogs |
 | `phonelink` | Fügt Telefonnummern als `tel:`-Links ein (inkl. Normalisierung auf RFC-3966-gültige Zeichen) | `phonelink` |
 | `quote` | Formatierte Zitate (`<blockquote>`) mit optionalem Autor/`<cite>` einfügen | `quote` |
@@ -155,9 +156,49 @@ Unified Picker für Sonderzeichen, native Emojis und Typografie. Als **schwebend
 - **Direkt-Einfüge-Menu-Items** für Einfügen-Menüs: `fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp` oder gesammelt via `fcs_insert_invisibles`.
 - **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker (`[nbsp]`, `[shy]`, …) sichtbar. Die Marker sind `data-mce-bogus="1"` – werden niemals gespeichert.
 - **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
+- **Aktions-Favoriten:** jede Typografie-Aktion lässt sich über den Stern ☆ als Favorit markieren. Favoriten erscheinen gebündelt oben im Favoriten-Tab (separat von den Zeichen-Favoriten) und sind pro Browser persistent.
+- **Autoreplace (optional):** `for_chars_symbols_autoreplace: true` aktiviert Live-Ersetzungen beim Tippen, getriggert durch Space/Enter/Satzzeichen. Eingebaute Regeln: `(c)`→©, `(r)`→®, `(tm)`→™, `(p)`→℗, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `2^3`→2³ (Ziffer + `^` + 0-9 → Superscript). Eigene Regeln per `for_chars_symbols_autoreplace_rules` (siehe unten). Nicht aktiv in `<code>`, `<pre>`, `<kbd>`, `<samp>`.
 - **Shortcut:** `Strg/⌘ + Shift + I` öffnet den Picker.
 - **Locale:** `for_chars_symbols_locale` – `de` (Default), `de-ch`, `en`, `fr`.
+- **Autoreplace-Konfiguration (im Profilassistent, `extra`-YAML):**
+
+  ```yaml
+  for_chars_symbols_autoreplace: true
+  for_chars_symbols_autoreplace_defaults: true  # optional, Default: true
+  for_chars_symbols_autoreplace_rules:
+    # einfache Ersetzung (Array-Kurzform)
+    - ["(tel)",  "+49 2843 999999"]
+    - ["(mail)", "info@example.com"]
+    # Objekt-Form
+    - { from: "(zvk)", to: "Zahlung per Vorkasse" }
+    # Regex mit Backreference ($1..$9):
+    - { re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }
+  ```
+
+  `for_chars_symbols_autoreplace_defaults: false` deaktiviert die eingebauten Standardregeln (nur eigene Regeln aktiv). Custom-Regeln überschreiben Defaults bei identischem `from`.
 - **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
+
+---
+
+### `for_abbr` – Abkürzungen & Fremdwörter (abbr-Element)
+
+Semantisches `<abbr title="…">`-Markup für Abkürzungen, Fachbegriffe und Fremdwörter. Screenreader können die Langform vorlesen, Browser zeigen sie beim Hovern als Tooltip — wichtig für Barrierefreiheit (WCAG 3.1.4 *Abkürzungen*) und SEO.
+
+- **Toolbar-Button / Menüeintrag / Context-Toolbar:** `for_abbr` (Toggle-Button mit Active-State auf bestehenden `<abbr>`).
+- **Dialog:** Anzeigetext + Langform (→ `title`) + optionales `lang`-Attribut (z. B. `en` für englische Fremdwörter — Screenreader wechselt dann die Aussprache).
+- **Edit-Modus:** Cursor in/auf einem `<abbr>` → beim Öffnen werden die Felder aus dem Element befüllt. Zusätzlicher *Entfernen*-Button unwrappt das Element und behält den Textinhalt.
+- **Optionales Glossar** via Editor-Option `for_abbr_glossary` – eine Liste bekannter Abkürzungen. Sobald der Anzeigetext im Dialog einer Glossar-Term entspricht (case-insensitive), werden `title` und optional `lang` automatisch vorbefüllt:
+
+  ```yaml
+  for_abbr_glossary:
+    - { term: HTML,  title: 'Hypertext Markup Language',    lang: en }
+    - { term: CSS,   title: 'Cascading Style Sheets',       lang: en }
+    - { term: WCAG,  title: 'Web Content Accessibility Guidelines', lang: en }
+    - { term: DSGVO, title: 'Datenschutz-Grundverordnung' }
+    - { term: z. B., title: 'zum Beispiel' }
+  ```
+
+- **Shortcut:** <kbd>Ctrl/Cmd + Alt + A</kbd>.
 
 ---
 

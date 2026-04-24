@@ -43,7 +43,7 @@ $demoHtml = <<<'HTML'
     <tr><td><code>for_toc</code></td><td>Inhaltsverzeichnis mit Live-Sync (siehe oben ↑)</td></tr>
     <tr><td><code>for_a11y</code></td><td>Accessibility-Checker on demand (WCAG-nah)</td></tr>
     <tr><td><code>for_rootstrip</code></td><td>Entfernt beim Speichern automatisch den TinyMCE-Root-Wrapper</td></tr>
-    <tr><td><code>for_chars_symbols</code></td><td>Zeichen, Symbole, native Emojis &amp; Typografie-Helfer (Quotes, Dash, nbsp/shy, Favoriten)</td></tr>
+    <tr><td><code>for_chars_symbols</code></td><td>Zeichen, Symbole, native Emojis &amp; Typografie-Helfer (Quotes, Dash, nbsp/shy, Favoriten) – plus <strong>Autoreplace</strong> beim Tippen ((c)→©, (tm)→™, …→…, Pfeile, Brüche) mit eigenen Text-/Regex-Regeln, komplett im Profil-Assistenten pflegbar</td></tr>
   </tbody>
 </table>
 
@@ -103,9 +103,82 @@ HTML;
 
 $content = '
 <div class="tinymce-demo">
-    <div name="content" class="tiny-editor" data-profile="demo" data-lang="' . Lang::getUserLang() . '">'
-    . $demoHtml .
-    '</div>
+    <div class="row">
+        <div class="col-md-9">
+            <div name="content" class="tiny-editor" data-profile="demo" data-lang="' . Lang::getUserLang() . '">'
+            . $demoHtml .
+            '</div>
+        </div>
+        <div class="col-md-3">
+            <aside class="tinymce-demo-sidebar" aria-label="Feature-Tipps">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><i class="rex-icon fa-magic"></i> <strong>Zum Ausprobieren</strong></div>
+                    <div class="panel-body">
+                        <p class="help-block" style="margin-top:0">Kopiere die Beispiele in den Editor links und schau, was passiert. Alle Funktionen sind im Demo-Profil aktiv.</p>
+
+                        <h5><i class="rex-icon fa-magic"></i> Autoreplace</h5>
+                        <p class="help-block">Einfach tippen &rarr; ersetzt beim Leerzeichen:</p>
+                        <ul class="tinymce-demo-tips">
+                            <li><code>(c) </code> &rarr; ©</li>
+                            <li><code>(tm) </code> &rarr; ™</li>
+                            <li><code>... </code> &rarr; …</li>
+                            <li><code>--&gt; </code> &rarr; →</li>
+                            <li><code>+/- </code> &rarr; ±</li>
+                            <li><code>1/2 </code> &rarr; ½</li>
+                            <li><code>!= </code> &rarr; ≠ · <code>&lt;= </code> &rarr; ≤</li>
+                            <li><code>(kw12) </code> &rarr; KW 12 <em>(Demo-Regex)</em></li>
+                            <li><code>(tel) </code> &rarr; <em>Telefonnummer</em></li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-universal-access"></i> Barrierefreiheit</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li>Toolbar-Button <strong>A11y</strong> &rarr; findet leere Links, fehlende Alt-Texte, generische Linktexte.</li>
+                            <li>Absatz markieren &rarr; Menü <em>Format &rarr; Sprache</em> setzt <code>lang=""</code>.</li>
+                            <li>Abkürzung markieren &rarr; <strong>abbr</strong>-Button (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>).</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-picture-o"></i> Bilder</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li>Bild einfügen &rarr; Context-Toolbar mit Breiten-/Ausrichtungs-/Effekt-Presets.</li>
+                            <li><strong>Alt-Text</strong>-Dialog direkt am Bild.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-youtube-play"></i> Medien &amp; Embeds</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li><em>Einfügen &rarr; oEmbed</em>: YouTube-/Vimeo-URL einfügen &rarr; Live-Vorschau.</li>
+                            <li><em>Einfügen &rarr; HTML Embed</em>: beliebiges HTML einbinden.</li>
+                            <li><em>Einfügen &rarr; Video</em>: lokales MP4 aus Mediapool.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-list-ol"></i> Struktur</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li><strong>ToC</strong>: Headlines anlegen &rarr; Inhaltsverzeichnis synchronisiert sich live.</li>
+                            <li><strong>Fußnote</strong>: Button <em>Fußnote</em> in der Toolbar fügt Ref+Eintrag ein.</li>
+                            <li><strong>Checkliste</strong>: Menü <em>Einfügen &rarr; Checkliste</em>.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-font"></i> Zeichen &amp; Symbole</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> öffnet Picker (Zeichen / Emoji / Typografie).</li>
+                            <li>Text markieren &rarr; Tab <em>Typografie</em> &rarr; Anführungszeichen, en-Dash, NBSP vor Einheiten.</li>
+                            <li>Toggle <strong>Unsichtbares anzeigen</strong> &rarr; nbsp, shy, zwsp werden sichtbar.</li>
+                        </ul>
+
+                        <h5><i class="rex-icon fa-clipboard"></i> Paste-Helfer</h5>
+                        <ul class="tinymce-demo-tips">
+                            <li>Aus Word/Google&nbsp;Docs einfügen &rarr; automatische Bereinigung.</li>
+                            <li>Bild aus Zwischenablage &rarr; landet im Mediapool.</li>
+                            <li>Markdown einfügen: Menü <em>Einfügen &rarr; Markdown einfügen…</em>.</li>
+                        </ul>
+
+                        <p class="help-block" style="margin-top:12px; border-top:1px solid var(--rex-panel-border-color,#ddd); padding-top:8px;">
+                            <i class="rex-icon fa-cog"></i> Konfiguration aller Features: <em>TinyMCE &rarr; Editor Profile &rarr; „demo" bearbeiten</em>. Der Profil-Assistent kennt inzwischen auch die Autoreplace-Regeln.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
 </div>
 ';
 

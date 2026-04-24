@@ -14,9 +14,24 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('phonelink', rex_url::addonAssets('tinymce', $pluginBasePath . 'phonelink/plugin.min.js'), 'phonelink');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('quote', rex_url::addonAssets('tinymce', $pluginBasePath . 'quote/plugin.min.js'), 'quote');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('snippets', rex_url::addonAssets('tinymce', $pluginBasePath . 'snippets/plugin.min.js'), 'snippets');
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'for_images');
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('cleanpaste', rex_url::addonAssets('tinymce', $pluginBasePath . 'cleanpaste/plugin.min.js'), 'cleanpaste');
-    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('mediapaste', rex_url::addonAssets('tinymce', $pluginBasePath . 'mediapaste/plugin.min.js'), 'mediapaste');
+    // for_images registriert KEINEN Button unter dem Plugin-Namen, sondern
+    // mehrere spezifische Buttons (imagewidth, imagewidthdialog, imagealt,
+    // imagecaption, imagealignleft/center/right/none, imageeffect) und eine
+    // Context-Toolbar. Jeder Button wird hier einzeln registriert, damit er
+    // im Profil-Assistenten ausgewählt werden kann.
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagewidthdialog');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagewidth');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagealignleft');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagealigncenter');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagealignright');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagealignnone');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imageeffect');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagealt');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_images', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_images/plugin.min.js'), 'imagecaption');
+    // cleanpaste + mediapaste sind reine Content-Processing-Plugins
+    // (PastePreProcess-Handler) und registrieren KEINEN Toolbar-Button.
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('cleanpaste', rex_url::addonAssets('tinymce', $pluginBasePath . 'cleanpaste/plugin.min.js'));
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('mediapaste', rex_url::addonAssets('tinymce', $pluginBasePath . 'mediapaste/plugin.min.js'));
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_footnotes', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_footnotes/plugin.min.js'), 'for_footnote_insert');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_footnotes', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_footnotes/plugin.min.js'), 'for_footnote_update');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_checklist', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_checklist/plugin.min.js'), 'for_checklist');
@@ -30,6 +45,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_markdown', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_markdown/plugin.min.js'), 'for_markdown_paste');
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_rootstrip', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_rootstrip/plugin.min.js'));
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_chars_symbols', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_chars_symbols/plugin.min.js'), 'for_chars_symbols');
+    \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin('for_abbr', rex_url::addonAssets('tinymce', $pluginBasePath . 'for_abbr/plugin.min.js'), 'for_abbr');
 }
 
 if (rex::isBackend() && null !== rex::getUser()) {

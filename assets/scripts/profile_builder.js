@@ -186,6 +186,41 @@ function initTinyMceProfileAssistant() {
     
     settingsHtml += '</div>';
 
+    // Content Languages (für Sprach-Menü / language-Toolbar-Button)
+    settingsHtml += '<br><legend><i class="rex-icon fa-language"></i> ' + (i18n.content_langs || 'Sprach-Menü (content_langs)') + '</legend>';
+    settingsHtml += '<p class="help-block">' + (i18n.content_langs_help || 'Liste der Sprachen für den <code>language</code>-Toolbar-Button bzw. das Format-Menü. Markiert Textabschnitte mit einem <code>lang</code>-Attribut (wichtig für Screenreader/SEO).') + '</p>';
+    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
+    settingsHtml += '<table class="table table-striped" id="builder-contentlangs-table"><thead><tr>';
+    settingsHtml += '<th style="width:30%">' + (i18n.content_langs_title || 'Titel') + '</th>';
+    settingsHtml += '<th style="width:20%">' + (i18n.content_langs_code || 'Code (lang)') + '</th>';
+    settingsHtml += '<th style="width:25%">' + (i18n.content_langs_customcode || 'Custom-Code (optional)') + '</th>';
+    settingsHtml += '<th style="width:15%">' + (i18n.content_langs_default || 'Standard') + '</th>';
+    settingsHtml += '<th style="width:10%"></th>';
+    settingsHtml += '</tr></thead><tbody></tbody></table>';
+    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-contentlangs-add"><i class="rex-icon fa-plus"></i> ' + (i18n.content_langs_add || 'Sprache hinzufügen') + '</button> ';
+    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-contentlangs-presets"><i class="rex-icon fa-magic"></i> ' + (i18n.content_langs_presets || 'Standard-Set einfügen (de/en/fr/es/it)') + '</button>';
+    settingsHtml += '<p class="help-block" style="margin-top:8px;">' + (i18n.content_langs_hint || '<strong>Titel</strong>: Beschriftung im Menü. <strong>Code</strong>: BCP-47-Sprachcode (z. B. <code>de</code>, <code>en</code>, <code>de-CH</code>). <strong>Custom-Code</strong>: optional, wird als <code>data-mce-lang</code> gesetzt. <strong>Standard</strong>: setzt zusätzlich <code>language</code> (UI-Sprache) auf diesen Code. Leer lassen = Sprach-Menü deaktiviert.') + '</p>';
+    settingsHtml += '</div></div>';
+
+    // Typografie-Autoreplace (for_chars_symbols)
+    settingsHtml += '<br><legend><i class="rex-icon fa-magic"></i> ' + (i18n.autoreplace || 'Typografie-Autoreplace (for_chars_symbols)') + '</legend>';
+    settingsHtml += '<p class="help-block">' + (i18n.autoreplace_help || 'Live-Ersetzung beim Tippen. Ausgelöst durch <kbd>Leer</kbd>, <kbd>Enter</kbd> und Satzzeichen (<code>. , ; : ! ? ) ] " \' /</code>). Greift nicht in <code>&lt;code&gt;</code>, <code>&lt;pre&gt;</code>, <code>&lt;kbd&gt;</code>, <code>&lt;samp&gt;</code>, <code>&lt;tt&gt;</code>. Alle Ersetzungen sind Undo-fähig.') + '</p>';
+    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
+    settingsHtml += '<div class="row"><div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-enabled"> <strong>' + (i18n.autoreplace_enabled || 'Autoreplace aktivieren') + '</strong></label></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-defaults" checked> ' + (i18n.autoreplace_defaults || 'Default-Regeln nutzen (32 Regeln: (c)→©, (tm)→™, …→…, ->→→, +/-→±, Brüche, …)') + '</label></div></div></div>';
+    settingsHtml += '<hr>';
+    settingsHtml += '<label>' + (i18n.autoreplace_custom || 'Eigene Regeln') + '</label>';
+    settingsHtml += '<table class="table table-striped" id="builder-autoreplace-table"><thead><tr>';
+    settingsHtml += '<th style="width:10%">' + (i18n.autoreplace_type || 'Typ') + '</th>';
+    settingsHtml += '<th style="width:40%">' + (i18n.autoreplace_from || 'Von (Text oder Regex)') + '</th>';
+    settingsHtml += '<th style="width:40%">' + (i18n.autoreplace_to || 'Nach (Ziel-Zeichen)') + '</th>';
+    settingsHtml += '<th style="width:10%"></th>';
+    settingsHtml += '</tr></thead><tbody></tbody></table>';
+    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-autoreplace-add"><i class="rex-icon fa-plus"></i> ' + (i18n.autoreplace_add || 'Regel hinzufügen') + '</button> ';
+    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-autoreplace-examples"><i class="rex-icon fa-magic"></i> ' + (i18n.autoreplace_examples || 'Beispiele einfügen') + '</button>';
+    settingsHtml += '<p class="help-block" style="margin-top:8px;">' + (i18n.autoreplace_hint || '<strong>Typ</strong>: <code>Text</code> = wörtliche Ersetzung, <code>Regex</code> = regulärer Ausdruck mit Backreferences (<code>$1</code>, <code>$2</code>). <strong>Nach</strong>: Unicode-Escapes wie <code>\\u00A0</code> (nbsp) oder <code>\\u2011</code> (geschützter Bindestrich) sind erlaubt. Beispiele: Text <code>(tel)</code> → <code>+49 …</code>; Regex <code>\\(kw(\\d{1,2})\\)</code> → <code>KW $1</code>.') + '</p>';
+    settingsHtml += '</div></div>';
+
     // Extras (Codesample, RelList, TOC)
     settingsHtml += '<br><legend>' + (i18n.extras_defaults || 'Extras (Defaults)') + '</legend><div class="row">';
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-codesample" checked> ' + (i18n.default_codesample_languages || 'Default Codesample Languages') + '</label></div></div>';
@@ -826,6 +861,75 @@ function initTinyMceProfileAssistant() {
         $(this).closest('tr').remove();
     });
 
+    // Content Languages Repeater
+    const $clangsTable = $builderBody.find('#builder-contentlangs-table tbody');
+
+    function addContentLangRow(title, code, customCode, isDefault) {
+        title = title || '';
+        code = code || '';
+        customCode = customCode || '';
+        const defChecked = isDefault ? ' checked' : '';
+        const row = '<tr>' +
+            '<td><input type="text" class="form-control input-sm clang-title" value="' + title.replace(/"/g, '&quot;') + '" placeholder="' + (i18n.content_langs_title_placeholder || 'Englisch') + '"></td>' +
+            '<td><input type="text" class="form-control input-sm clang-code" value="' + code.replace(/"/g, '&quot;') + '" placeholder="en"></td>' +
+            '<td><input type="text" class="form-control input-sm clang-customcode" value="' + customCode.replace(/"/g, '&quot;') + '" placeholder="' + (i18n.content_langs_customcode_placeholder || 'z. B. en-GB-oxford') + '"></td>' +
+            '<td style="text-align:center; vertical-align:middle;"><input type="radio" name="clang-default" class="clang-default"' + defChecked + '></td>' +
+            '<td><button type="button" class="btn btn-danger btn-xs clang-remove"><i class="rex-icon fa-times"></i></button></td>' +
+            '</tr>';
+        $clangsTable.append(row);
+    }
+
+    $builderBody.find('.builder-contentlangs-add').on('click', function () {
+        addContentLangRow();
+    });
+
+    $builderBody.find('.builder-contentlangs-presets').on('click', function () {
+        $clangsTable.empty();
+        addContentLangRow('Deutsch', 'de', '', true);
+        addContentLangRow('Englisch', 'en', '');
+        addContentLangRow('Französisch', 'fr', '');
+        addContentLangRow('Spanisch', 'es', '');
+        addContentLangRow('Italienisch', 'it', '');
+    });
+
+    $clangsTable.on('click', '.clang-remove', function () {
+        $(this).closest('tr').remove();
+    });
+
+    // Autoreplace Repeater (for_chars_symbols)
+    const $arTable = $builderBody.find('#builder-autoreplace-table tbody');
+
+    function addAutoreplaceRow(type, from, to) {
+        type = type === 'regex' ? 'regex' : 'text';
+        from = from || '';
+        to = to || '';
+        const row = '<tr>' +
+            '<td><select class="form-control input-sm ar-type">' +
+                '<option value="text"' + (type === 'text' ? ' selected' : '') + '>Text</option>' +
+                '<option value="regex"' + (type === 'regex' ? ' selected' : '') + '>Regex</option>' +
+            '</select></td>' +
+            '<td><input type="text" class="form-control input-sm ar-from" value="' + String(from).replace(/"/g, '&quot;') + '" placeholder="(tel)"></td>' +
+            '<td><input type="text" class="form-control input-sm ar-to" value="' + String(to).replace(/"/g, '&quot;') + '" placeholder="+49 (0) …"></td>' +
+            '<td><button type="button" class="btn btn-danger btn-xs ar-remove"><i class="rex-icon fa-times"></i></button></td>' +
+            '</tr>';
+        $arTable.append(row);
+    }
+
+    $builderBody.find('.builder-autoreplace-add').on('click', function () {
+        addAutoreplaceRow();
+    });
+
+    $builderBody.find('.builder-autoreplace-examples').on('click', function () {
+        addAutoreplaceRow('text', '(tel)', '+49\\u00A0(0)\\u00A0…');
+        addAutoreplaceRow('text', '-->', '→');
+        addAutoreplaceRow('text', '<--', '←');
+        addAutoreplaceRow('regex', '\\(kw(\\d{1,2})\\)', 'KW $1');
+    });
+
+    $arTable.on('click', '.ar-remove', function () {
+        $(this).closest('tr').remove();
+    });
+
     // Auto-load existing config into the builder when in edit mode.
     // Runs after the DOM is ready; if the textarea already contains data we try
     // to hydrate the form controls so the user doesn't have to start over.
@@ -995,11 +1099,33 @@ function generateConfig($textarea, $builderBody) {
         }
     });
 
+    // Content Languages (für language-Toolbar-Button / Format-Menü > Sprache)
+    const contentLangs = [];
+    let contentLangsDefault = '';
+    $builderBody.find('#builder-contentlangs-table tbody tr').each(function () {
+        const $row = $(this);
+        const title = String($row.find('.clang-title').val() || '').trim();
+        const code = String($row.find('.clang-code').val() || '').trim();
+        const customCode = String($row.find('.clang-customcode').val() || '').trim();
+        const isDefault = $row.find('.clang-default').is(':checked');
+        if (!title || !code) {
+            return;
+        }
+        const entry = { title, code };
+        if (customCode) {
+            entry.customCode = customCode;
+        }
+        contentLangs.push(entry);
+        if (isDefault && !contentLangsDefault) {
+            contentLangsDefault = code;
+        }
+    });
+
     // Build the configuration string manually to match the "pro" format (raw JS object body)
     let configStr = '';
     
     configStr += "license_key: 'gpl',\n";
-    configStr += `language: '${lang}',\n`;
+    configStr += `language: '${contentLangsDefault ? escapeString(contentLangsDefault) : lang}',\n`;
     configStr += "branding: false,\n";
     configStr += "statusbar: true,\n";
     configStr += `menubar: ${menubar},\n`;
@@ -1070,6 +1196,43 @@ function generateConfig($textarea, $builderBody) {
         configStr += `toolbar: '${finalToolbar}',\n`;
     }
     
+    // Content Languages (Sprach-Menü)
+    if (contentLangs.length > 0) {
+        configStr += `content_langs: ${JSON.stringify(contentLangs)},\n`;
+    }
+
+    // Typografie-Autoreplace (for_chars_symbols)
+    const autoreplaceEnabled = $builderBody.find('.builder-autoreplace-enabled').is(':checked');
+    const autoreplaceDefaults = $builderBody.find('.builder-autoreplace-defaults').is(':checked');
+    const autoreplaceRules = [];
+    $builderBody.find('#builder-autoreplace-table tbody tr').each(function () {
+        const $row = $(this);
+        const type = String($row.find('.ar-type').val() || 'text');
+        const from = String($row.find('.ar-from').val() || '');
+        const to = String($row.find('.ar-to').val() || '');
+        if (!from) {
+            return;
+        }
+        if (type === 'regex') {
+            autoreplaceRules.push({ re: from, to });
+        } else {
+            autoreplaceRules.push({ from, to });
+        }
+    });
+    if (autoreplaceEnabled) {
+        configStr += `for_chars_symbols_autoreplace: true,\n`;
+        if (!autoreplaceDefaults) {
+            configStr += `for_chars_symbols_autoreplace_defaults: false,\n`;
+        }
+        if (autoreplaceRules.length > 0) {
+            configStr += `for_chars_symbols_autoreplace_rules: ${JSON.stringify(autoreplaceRules)},\n`;
+        }
+    } else if (autoreplaceRules.length > 0) {
+        // User hat Regeln aber Feature aus: trotzdem speichern, damit nichts verloren geht.
+        configStr += `for_chars_symbols_autoreplace: false,\n`;
+        configStr += `for_chars_symbols_autoreplace_rules: ${JSON.stringify(autoreplaceRules)},\n`;
+    }
+
     // Editor-Größe (TinyMCE-Doku: `height` = Number|CSS ohne %/vh, `width` = Number|CSS inkl. %/vh)
     if (autoresize) {
         // Bei Autoresize ignoriert TinyMCE `height` → nur min/max_height setzen.
@@ -1379,6 +1542,74 @@ function loadFromConfig($textarea, $builderBody) {
         if (Array.isArray(cfg.imageeffect_presets)) {
             $builderBody.find('.builder-imagewidth-effect-presets').val(JSON.stringify(cfg.imageeffect_presets, null, 2));
         }
+    }
+
+    // Content Languages (content_langs → Sprach-Menü)
+    if (Array.isArray(cfg.content_langs)) {
+        const $clangsTable = $builderBody.find('#builder-contentlangs-table tbody');
+        $clangsTable.empty();
+        cfg.content_langs.forEach((entry) => {
+            if (!entry || typeof entry !== 'object') return;
+            const title = String(entry.title || '');
+            const code = String(entry.code || '');
+            const customCode = String(entry.customCode || '');
+            const isDefault = typeof cfg.language === 'string' && cfg.language === code;
+            const defChecked = isDefault ? ' checked' : '';
+            $clangsTable.append(
+                '<tr>' +
+                '<td><input type="text" class="form-control input-sm clang-title" value="' + title.replace(/"/g, '&quot;') + '"></td>' +
+                '<td><input type="text" class="form-control input-sm clang-code" value="' + code.replace(/"/g, '&quot;') + '"></td>' +
+                '<td><input type="text" class="form-control input-sm clang-customcode" value="' + customCode.replace(/"/g, '&quot;') + '"></td>' +
+                '<td style="text-align:center; vertical-align:middle;"><input type="radio" name="clang-default" class="clang-default"' + defChecked + '></td>' +
+                '<td><button type="button" class="btn btn-danger btn-xs clang-remove"><i class="rex-icon fa-times"></i></button></td>' +
+                '</tr>'
+            );
+        });
+    }
+
+    // Typografie-Autoreplace (for_chars_symbols)
+    if (typeof cfg.for_chars_symbols_autoreplace === 'boolean') {
+        $builderBody.find('.builder-autoreplace-enabled').prop('checked', !!cfg.for_chars_symbols_autoreplace);
+    }
+    if (typeof cfg.for_chars_symbols_autoreplace_defaults === 'boolean') {
+        $builderBody.find('.builder-autoreplace-defaults').prop('checked', !!cfg.for_chars_symbols_autoreplace_defaults);
+    }
+    if (Array.isArray(cfg.for_chars_symbols_autoreplace_rules)) {
+        const $arTable = $builderBody.find('#builder-autoreplace-table tbody');
+        $arTable.empty();
+        cfg.for_chars_symbols_autoreplace_rules.forEach((rule) => {
+            if (!rule) return;
+            // Kurzform: ["from", "to"]
+            if (Array.isArray(rule) && rule.length >= 2) {
+                const from = String(rule[0] || '');
+                const to = String(rule[1] || '');
+                $arTable.append(
+                    '<tr>' +
+                    '<td><select class="form-control input-sm ar-type"><option value="text" selected>Text</option><option value="regex">Regex</option></select></td>' +
+                    '<td><input type="text" class="form-control input-sm ar-from" value="' + from.replace(/"/g, '&quot;') + '"></td>' +
+                    '<td><input type="text" class="form-control input-sm ar-to" value="' + to.replace(/"/g, '&quot;') + '"></td>' +
+                    '<td><button type="button" class="btn btn-danger btn-xs ar-remove"><i class="rex-icon fa-times"></i></button></td>' +
+                    '</tr>'
+                );
+                return;
+            }
+            if (typeof rule !== 'object') return;
+            const isRegex = typeof rule.re === 'string';
+            const type = isRegex ? 'regex' : 'text';
+            const from = String(isRegex ? rule.re : (rule.from || ''));
+            const to = String(rule.to || '');
+            $arTable.append(
+                '<tr>' +
+                '<td><select class="form-control input-sm ar-type">' +
+                    '<option value="text"' + (type === 'text' ? ' selected' : '') + '>Text</option>' +
+                    '<option value="regex"' + (type === 'regex' ? ' selected' : '') + '>Regex</option>' +
+                '</select></td>' +
+                '<td><input type="text" class="form-control input-sm ar-from" value="' + from.replace(/"/g, '&quot;') + '"></td>' +
+                '<td><input type="text" class="form-control input-sm ar-to" value="' + to.replace(/"/g, '&quot;') + '"></td>' +
+                '<td><button type="button" class="btn btn-danger btn-xs ar-remove"><i class="rex-icon fa-times"></i></button></td>' +
+                '</tr>'
+            );
+        });
     }
 
     // YForm link tables
