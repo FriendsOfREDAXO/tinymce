@@ -208,6 +208,7 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
     settingsHtml += '<div class="row"><div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-enabled"> <strong>' + (i18n.autoreplace_enabled || 'Autoreplace aktivieren') + '</strong></label></div></div>';
     settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-defaults" checked> ' + (i18n.autoreplace_defaults || 'Default-Regeln nutzen (32 Regeln: (c)→©, (tm)→™, …→…, ->→→, +/-→±, Brüche, …)') + '</label></div></div></div>';
+    settingsHtml += '<div class="row"><div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-disable-emoticons"> ' + (i18n.disable_emoticons || 'Emoji-Tab im Picker ausblenden') + '</label></div></div></div>';
     settingsHtml += '<hr>';
     settingsHtml += '<label>' + (i18n.autoreplace_custom || 'Eigene Regeln') + '</label>';
     settingsHtml += '<table class="table table-striped" id="builder-autoreplace-table"><thead><tr>';
@@ -1229,6 +1230,11 @@ function generateConfig($textarea, $builderBody) {
     }
 
     // Typografie-Autoreplace (for_chars_symbols)
+    const disableEmoticons = $builderBody.find('.builder-disable-emoticons').is(':checked');
+    if (disableEmoticons) {
+        configStr += `for_chars_symbols_disable_emoticons: true,\n`;
+    }
+
     const autoreplaceEnabled = $builderBody.find('.builder-autoreplace-enabled').is(':checked');
     const autoreplaceDefaults = $builderBody.find('.builder-autoreplace-defaults').is(':checked');
     const autoreplaceRules = [];
@@ -1616,7 +1622,11 @@ function loadFromConfig($textarea, $builderBody) {
         });
     }
 
-    // Typografie-Autoreplace (for_chars_symbols)
+    // Typografie-Autoreplace & for_chars_symbols
+    if (typeof cfg.for_chars_symbols_disable_emoticons === 'boolean') {
+        $builderBody.find('.builder-disable-emoticons').prop('checked', !!cfg.for_chars_symbols_disable_emoticons);
+    }
+    
     if (typeof cfg.for_chars_symbols_autoreplace === 'boolean') {
         $builderBody.find('.builder-autoreplace-enabled').prop('checked', !!cfg.for_chars_symbols_autoreplace);
     }

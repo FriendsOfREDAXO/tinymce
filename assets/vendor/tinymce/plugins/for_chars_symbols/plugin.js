@@ -1399,16 +1399,22 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
     var panelsByEditor = new WeakMap();
 
     function buildPanel(editor) {
+        var disableEmoticons = editor.getParam('for_chars_symbols_disable_emoticons') === true;
+        var activeTabs = TABS.filter(function(t) {
+            if (t.id === 'emoji' && disableEmoticons) { return false; }
+            return true;
+        });
+
         var root = document.createElement('div');
         root.className = 'fcs-panel';
         root.setAttribute('role', 'dialog');
         root.setAttribute('aria-label', 'Zeichen, Symbole & Emoji');
 
-        var tabsHtml = TABS.map(function (t, i) {
+        var tabsHtml = activeTabs.map(function (t, i) {
             return '<button type="button" class="fcs-panel__tab' + (i === 0 ? ' is-active' : '') + '" data-fcs-tab="' + t.id + '">' + esc(t.title) + '</button>';
         }).join('');
 
-        var panesHtml = TABS.map(function (t, i) {
+        var panesHtml = activeTabs.map(function (t, i) {
             return '<div class="fcs-panel__pane' + (i === 0 ? ' is-active' : '') + '" data-fcs-pane="' + t.id + '">' + t.render() + '</div>';
         }).join('');
 
