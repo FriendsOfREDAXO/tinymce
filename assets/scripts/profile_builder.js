@@ -279,7 +279,12 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Effekt-Presets (JSON)</label>';
     settingsHtml += '<textarea class="form-control builder-imagewidth-effect-presets" rows="6" placeholder=\'[{"label":"Schatten","class":"uk-box-shadow-medium"}]\'></textarea>';
     settingsHtml += '<p class="help-block small">Multi-Select, kombinierbar</p></div></div>';
-    settingsHtml += '</div></div>';
+    settingsHtml += '</div>';
+    // CKE5-Legacy-Hinweis
+    settingsHtml += '<div class="row" style="margin-top:6px;"><div class="col-md-12"><div class="checkbox"><label>';
+    settingsHtml += '<input type="checkbox" class="builder-imagewidth-compat-warn"> ' + (i18n.imagewidth_compat_warn || 'Auf veraltetes CKE5-Bildmarkup hinweisen');
+    settingsHtml += '</label><p class="help-block small" style="margin-left:20px;">' + (i18n.imagewidth_compat_warn_help || 'Zeigt im Editor eine Warnung, wenn der geladene Inhalt noch Bildmarkup aus dem alten CKEditor 5 enthält (z. B. <code>figure.image</code>, <code>image-style-…</code>). Der Redakteur wird gebeten, die betroffenen Bilder mit der neuen Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut zu formatieren. Es wird nichts automatisch konvertiert.') + '</p></div></div></div>';
+    settingsHtml += '</div>';
 
     // TOC Settings
     settingsHtml += '<div class="row" style="margin-top:10px;">';
@@ -1092,6 +1097,7 @@ function generateConfig($textarea, $builderBody) {
 
     // Image Width (preset-based)
     const imagewidthEnabled = $builderBody.find('.builder-imagewidth-enable').is(':checked');
+    const imagewidthCompatWarn = $builderBody.find('.builder-imagewidth-compat-warn').is(':checked');
     let imagewidthWidthPresets = null;
     let imagewidthAlignPresets = null;
     let imagewidthEffectPresets = null;
@@ -1318,6 +1324,9 @@ function generateConfig($textarea, $builderBody) {
         }
         if (imagewidthEffectPresets && imagewidthEffectPresets.length > 1) {
             configStr += `imageeffect_presets: ${JSON.stringify(imagewidthEffectPresets)},\n`;
+        }
+        if (imagewidthCompatWarn) {
+            configStr += `image_compat_warn: true,\n`;
         }
         configStr += '\n';
     }
@@ -1597,6 +1606,9 @@ function loadFromConfig($textarea, $builderBody) {
         if (Array.isArray(cfg.imageeffect_presets)) {
             $builderBody.find('.builder-imagewidth-effect-presets').val(JSON.stringify(cfg.imageeffect_presets, null, 2));
         }
+    }
+    if (cfg.image_compat_warn === true) {
+        $builderBody.find('.builder-imagewidth-compat-warn').prop('checked', true);
     }
 
     // Content Languages (content_langs → Sprach-Menü)

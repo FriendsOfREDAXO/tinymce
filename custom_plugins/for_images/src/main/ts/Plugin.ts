@@ -115,6 +115,35 @@ function stripPresetClasses(el: HTMLElement, presets: Preset[]): void {
 }
 
 /**
+ * Remove legacy CKEditor-5 image classes that conflict with the new
+ * preset-based toolbar (image, image_resized, image-style-*, img-width-*,
+ * img-height-*) and leftover CKE5 inline width on the figure.
+ * Called on every toolbar apply so the markup gets cleaned up the moment
+ * the editor reformats an image.
+ */
+function stripCke5LegacyClasses(figure: HTMLElement): void {
+  const toRemove: string[] = [];
+  figure.classList.forEach(cls => {
+    if (
+      cls === 'image' ||
+      cls === 'image_resized' ||
+      cls.indexOf('image-style-') === 0 ||
+      cls.indexOf('img-width-') === 0 ||
+      cls.indexOf('img-height-') === 0
+    ) {
+      toRemove.push(cls);
+    }
+  });
+  toRemove.forEach(cls => figure.classList.remove(cls));
+  // CKE5 inline width="NN%" on figure
+  const inlineWidth = figure.style.width;
+  if (inlineWidth && inlineWidth.indexOf('%') !== -1) {
+    figure.style.removeProperty('width');
+    if (figure.getAttribute('style') === '') figure.removeAttribute('style');
+  }
+}
+
+/**
  * Detect the correct full-width class for <img> based on configured presets.
  * - UIkit: uk-width-1-1
  * - Bootstrap: w-100
@@ -142,9 +171,11 @@ function applyImgFullWidth(img: HTMLElement, fullWidthClass: string): void {
 function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
   const figure = preset.class ? ensureFigureWrap(editor, img) : getFigureWrap(img);
   const fullWidthClass = detectImgFullWidthClass(allPresets);
+  const compatMode = !!editor.options.get('image_compat_warn');
   
   if (figure) {
     stripPresetClasses(figure, allPresets);
+    if (compatMode) stripCke5LegacyClasses(figure);
     if (preset.class) {
       preset.class.split(/\s+/).forEach(c => {
         if (c) figure.classList.add(c);
@@ -173,10 +204,12 @@ function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allP
 }
 
 function toggleEffectClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
+  const compatMode = !!editor.options.get('image_compat_warn');
   if (!preset.class) {
     const figure = getFigureWrap(img);
     if (figure) {
       stripPresetClasses(figure, allPresets);
+      if (compatMode) stripCke5LegacyClasses(figure);
       if (figure.classList.length === 0) figure.removeAttribute('class');
     }
   } else {
@@ -189,6 +222,7 @@ function toggleEffectClass(editor: Editor, img: HTMLElement, preset: Preset, all
     } else {
       classes.forEach(c => figure.classList.add(c));
     }
+    if (compatMode) stripCke5LegacyClasses(figure);
     if (figure.classList.length === 0) figure.removeAttribute('class');
   }
 
@@ -386,6 +420,39 @@ const setup = (editor: Editor, _url: string): void => {
   editor.options.register('imagewidth_presets', { processor: 'object[]', default: [] });
   editor.options.register('imagealign_presets', { processor: 'object[]', default: [] });
   editor.options.register('imageeffect_presets', { processor: 'object[]', default: [] });
+  editor.options.register('image_compat_warn', { processor: 'boolean', default: false });
+
+  /* ------------------------------------------------------------------
+   *  CKE5-Legacy-Erkennung
+   *  Reine Erkennung + Hinweis – es wird bewusst nichts konvertiert.
+   *  Aktiv nur wenn im Profil `image_compat_warn: true`.
+   * ------------------------------------------------------------------ */
+  let cke5WarningShown = false;
+  const hasCke5Markup = (root: HTMLElement | null): boolean => {
+    if (!root) return false;
+    if (root.querySelector('figure.image, figure.image_resized')) return true;
+    if (root.querySelector('[class*="image-style-"]')) return true;
+    return false;
+  };
+  const checkCke5Markup = (): void => {
+    if (cke5WarningShown) return;
+    if (!editor.options.get('image_compat_warn')) return;
+    const body = editor.getBody();
+    if (!hasCke5Markup(body)) return;
+    cke5WarningShown = true;
+    try {
+      editor.notificationManager.open({
+        type: 'warning',
+        text:
+          'Hinweis: Dieser Inhalt enthält Bildmarkup aus dem alten CKEditor 5 (z. B. ' +
+          'figure.image, image-style-…). Bitte die betroffenen Bilder mit der neuen ' +
+          'Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut formatieren ' +
+          'und den Beitrag speichern, damit das Markup einheitlich wird.',
+        closeButton: true,
+        timeout: 12000,
+      });
+    } catch (_e) { /* notificationManager nicht verfügbar */ }
+  };
 
   /* Eigenes Icon für den Bildformatierungs-Dialog – grenzt sich klar
      vom Standard-„image"-Icon (Bild einfügen) ab: Bildrahmen mit
@@ -442,6 +509,13 @@ const setup = (editor: Editor, _url: string): void => {
         applyImgFullWidth(img as HTMLElement, fullWidthClass);
       }
     });
+
+    // CKE5-Legacy-Hinweis (nur Erkennung, keine Konvertierung)
+    checkCke5Markup();
+  });
+
+  editor.on('SetContent', () => {
+    checkCke5Markup();
   });
 
   editor.on('ObjectResizeStart', (e: any) => {

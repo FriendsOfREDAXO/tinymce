@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.6.3
+-------------------------------
+
+### `for_images`: Hinweis auf veraltetes CKE5-Bildmarkup
+
+- Neue Plugin-Option `image_compat_warn` (default `false`).
+- Wenn aktiviert, erkennt der Editor beim Laden und bei `SetContent` typisches CKEditor-5-Bildmarkup (`figure.image`, `figure.image_resized`, Klassen `image-style-…`) und zeigt einmalig eine Warnung an, die den Redakteur bittet, die betroffenen Bilder mit der neuen Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut zu formatieren.
+- Es wird **nichts automatisch konvertiert** – ausschließlich Hinweis. Ziel: einheitliches, sauberes Markup nach erneutem Speichern.
+- Im **Profil-Assistent** über die neue Checkbox „Auf veraltetes CKE5-Bildmarkup hinweisen“ im Bereich „Bildformatierung“ steuerbar.
+
 Version 8.6.0
 -------------------------------
 
