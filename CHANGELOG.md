@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 8.6.4
+-------------------------------
+
+### `for_images`: ALT-Text aus Medienpool
+
+- Beim Auswahl eines Bildes aus dem Medienpool wird der ALT-Text ermittelt und übernommen:  med_alt (sofern vorhanden) -> fallback ist title
+
+
 Version 8.6.3
 -------------------------------
 
