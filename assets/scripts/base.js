@@ -29,12 +29,22 @@ let rex5_picker_function = function (callback, value, meta) {
         $(mediaPool).on('rex:selectMedia', function (event, filename) {
             event.preventDefault();
             mediaPool.close();
-            
+
             // use media manager for raster images, direct path for SVG/TIFF/BMP
             var extension = filename.split('.').pop().toLowerCase();
             var useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
             var imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
-            callback(imagePath, {alt: ''});
+
+            // Mediapool-Metadaten holen (med_alt, Title) und Alt-Text vorbefuellen.
+            // Schlaegt der Request fehl, wird leer als Alt uebergeben - wie zuvor.
+            $.getJSON(
+                'index.php?rex-api-call=tinymce_media_meta&file=' + encodeURIComponent(filename)
+            ).done(function (meta) {
+                var alt = (meta && meta.alt) ? meta.alt : '';
+                callback(imagePath, { alt: alt });
+            }).fail(function () {
+                callback(imagePath, { alt: '' });
+            });
         });
     }
 
