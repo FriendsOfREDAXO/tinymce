@@ -37,7 +37,8 @@ class Assets
             $styleSetsOptions = self::loadActiveStyleSets();
 
             // Global content_style to fix UIkit/Bootstrap focus outlines in editor
-            $contentStyle = 'body { outline: none !important; box-shadow: none !important; } :focus { outline: none !important; box-shadow: none !important; }';
+            // and ensure a comfortable padding inside the editor iframe.
+            $contentStyle = 'body { padding: 10px !important; outline: none !important; box-shadow: none !important; } :focus { outline: none !important; box-shadow: none !important; }';
 
             // Fire extension point for addons to add profile options
             // These options will be merged into all profiles at runtime
