@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 8.6.5
+-------------------------------
+Boddy padding korrigiert
+
 Version 8.6.4
 -------------------------------
 
