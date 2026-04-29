@@ -29,7 +29,6 @@ class Assets
         if ($provided) {
             return;
         }
-        $provided = true;
 
         try {
             rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/base.css'));
@@ -60,6 +59,8 @@ class Assets
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/base.js'));
             rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/sticky_navbar_freeze.js'));
+
+            $provided = true;
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
