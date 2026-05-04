@@ -74,6 +74,11 @@ class Profiles
             // See base.js: rex.tinyExternalPlugins (runtime) takes precedence over tinyExternalPlugins (static).
             $externalPluginsJs = '{}';
 
+            // Frontend fallback (no rex_view::setJsProperty available there).
+            // These constants are consumed by base.js if rex.* properties are missing.
+            $tinyAssetBasePathJs = json_encode(rtrim(rex_url::addonAssets('tinymce', ''), '/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $tinyPluginBasePathJs = json_encode(rtrim(rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins'), '/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
             // CleanPaste config – embedded here so it works in frontend too (rex_view::setJsProperty is backend-only)
             $cleanPasteCfg = self::getAddon()->getConfig('cleanpaste_settings', [
                 'strip_ms_office'        => true,
@@ -104,6 +109,8 @@ class Profiles
             $content =
                 "
 const tinyExternalPlugins = $externalPluginsJs;
+const tinyAssetBasePath = $tinyAssetBasePathJs;
+const tinyPluginBasePath = $tinyPluginBasePathJs;
 const tinyCleanPasteConfig = $cleanPasteConfigJs;
 const tinyMediaUploadConfig = $mediaUploadConfigJs;
 const tinyprofiles = $profiles;

@@ -64,7 +64,49 @@ let rex5_picker_function = function (callback, value, meta) {
 
 let tinyareas = '.tiny-editor';
 
+function getConfiguredTinyAssetPrefix() {
+    let basePath = null;
+    if (typeof rex !== 'undefined' && rex && typeof rex.tinyAssetBasePath === 'string') {
+        basePath = rex.tinyAssetBasePath;
+    } else if (typeof tinyAssetBasePath !== 'undefined' && typeof tinyAssetBasePath === 'string') {
+        basePath = tinyAssetBasePath;
+    }
+
+    if (basePath === null) {
+        return null;
+    }
+
+    if (basePath === '') {
+        return null;
+    }
+
+    let marker = '/assets/addons/tinymce';
+    let idx = basePath.indexOf(marker);
+    if (idx === -1) {
+        return null;
+    }
+
+    return basePath.substring(0, idx);
+}
+
+function getConfiguredTinyPluginBase() {
+    if (typeof rex !== 'undefined' && rex && typeof rex.tinyPluginBasePath === 'string' && rex.tinyPluginBasePath !== '') {
+        return rex.tinyPluginBasePath;
+    }
+
+    if (typeof tinyPluginBasePath !== 'undefined' && typeof tinyPluginBasePath === 'string' && tinyPluginBasePath !== '') {
+        return tinyPluginBasePath;
+    }
+
+    return null;
+}
+
 function getTinyAssetPrefix() {
+    let configuredPrefix = getConfiguredTinyAssetPrefix();
+    if (configuredPrefix !== null) {
+        return configuredPrefix;
+    }
+
     // Derive prefix from loaded TinyMCE assets (e.g. /test_tiny/assets/...).
     let selectors = [
         'script[src*="/assets/addons/tinymce/"]',
@@ -139,6 +181,57 @@ function normalizeTinyAssetUrl(url, prefix) {
     }
 
     return normalized;
+}
+
+function forceCanonicalTinyPluginUrls(externalPlugins, prefix) {
+    if (!externalPlugins || typeof externalPlugins !== 'object') {
+        return externalPlugins;
+    }
+
+    let configuredPluginBase = getConfiguredTinyPluginBase();
+    let canonicalBase = configuredPluginBase ? (configuredPluginBase.replace(/\/+$/, '') + '/') : ((prefix ? prefix : '') + '/assets/addons/tinymce/scripts/tinymce/plugins/');
+    let rewritten = {};
+
+    for (let pluginName in externalPlugins) {
+        if (!Object.prototype.hasOwnProperty.call(externalPlugins, pluginName)) {
+            continue;
+        }
+
+        let rawUrl = externalPlugins[pluginName];
+        if (typeof rawUrl !== 'string' || rawUrl === '') {
+            rewritten[pluginName] = rawUrl;
+            continue;
+        }
+
+        let normalized = normalizeTinyAssetUrl(rawUrl, prefix);
+        let isTinyAddonPluginUrl = normalized.indexOf('/assets/addons/tinymce/') !== -1 || normalized.indexOf('/tinymce/plugins/') !== -1;
+
+        if (!isTinyAddonPluginUrl) {
+            rewritten[pluginName] = normalized;
+            continue;
+        }
+
+        let query = '';
+        let hash = '';
+        try {
+            let parsed = new URL(normalized, window.location.origin);
+            query = parsed.search;
+            hash = parsed.hash;
+        } catch (e) {
+            let queryPos = normalized.indexOf('?');
+            let hashPos = normalized.indexOf('#');
+            if (queryPos !== -1) {
+                query = hashPos !== -1 ? normalized.substring(queryPos, hashPos) : normalized.substring(queryPos);
+            }
+            if (hashPos !== -1) {
+                hash = normalized.substring(hashPos);
+            }
+        }
+
+        rewritten[pluginName] = canonicalBase + pluginName + '/plugin.min.js' + query + hash;
+    }
+
+    return rewritten;
 }
 
 $(document).on('rex:ready', function (e, container) {
@@ -466,6 +559,9 @@ function tiny_init(container) {
                     );
                 }
             }
+
+            // Final safety-net: enforce canonical TinyMCE addon plugin paths.
+            options['external_plugins'] = forceCanonicalTinyPluginUrls(options['external_plugins'], tinyAssetPrefix);
         }
 
         // Store the original setup function if it exists

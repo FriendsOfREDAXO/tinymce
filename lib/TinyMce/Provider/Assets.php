@@ -42,6 +42,10 @@ class Assets
         try {
             rex_view::addCssFile(self::assetUrl('styles/base.css'));
 
+            $assetBasePath = rtrim(self::getAddon()->getAssetsUrl(''), '/');
+            \rex_view::setJsProperty('tinyAssetBasePath', $assetBasePath);
+            \rex_view::setJsProperty('tinyPluginBasePath', $assetBasePath . '/scripts/tinymce/plugins');
+
             // Provide external plugins from PluginRegistry as JS property
             // This ensures correct URLs at runtime with rex_url::base()
             $externalPlugins = PluginRegistry::getExternalPlugins();
