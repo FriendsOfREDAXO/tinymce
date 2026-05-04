@@ -259,6 +259,7 @@ tinymce_cleanpaste_saved = Einstellungen gespeichert.
 
 tinymce_settings_title = Globale URL-Einstellungen
 tinymce_settings_installation_root = Installations-Root der REDAXO-Instanz
+tinymce_settings_installation_root_placeholder = / oder /unterordner
 tinymce_settings_installation_root_help = Einmalig den Web-Root der Instanz eintragen. Beispiele: <code>/</code> für Root-Installationen oder <code>/test_tiny</code> für Subfolder. <code>/redaxo</code> am Ende wird automatisch entfernt.
 tinymce_settings_resolved_asset_base = Aufgelöste TinyMCE-Asset-URL
 tinymce_settings_resolved_plugin_base = Aufgelöste TinyMCE-Plugin-URL

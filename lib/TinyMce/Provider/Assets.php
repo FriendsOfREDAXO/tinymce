@@ -131,7 +131,10 @@ class Assets
                 $styleFormatsRaw = isset($set['style_formats']) ? (string) $set['style_formats'] : '';
                 if ('' !== $styleFormatsRaw) {
                     $formats = json_decode($styleFormatsRaw, true);
-                    if (is_array($formats)) {
+                    // Validate JSON parse succeeded (null means invalid JSON)
+                    if (null === $formats) {
+                        rex_logger::warning('Invalid JSON in style_formats for style-set "' . htmlspecialchars($set['name'] ?? 'unknown') . '": ' . json_last_error_msg());
+                    } elseif (is_array($formats)) {
                         foreach ($formats as $format) {
                             if (!is_array($format)) {
                                 continue;

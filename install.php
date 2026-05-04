@@ -53,6 +53,9 @@ try {
     // Ignore - table might not exist yet on fresh install
 }
 
+// Initialize installation_root config to '/' (can be changed in settings)
+$this->setConfig('installation_root', '/');
+
 // Set flag to regenerate profiles.js on first backend request
 // This ensures external plugins get correct absolute URLs (boot.php runs at runtime)
 $this->setConfig('update_profiles', true);

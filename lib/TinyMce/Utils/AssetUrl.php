@@ -14,9 +14,18 @@ class AssetUrl
             return '';
         }
 
+        // Reject protocol-relative URLs (//...) and anything containing a scheme (http://, ...)
+        // to prevent generated asset URLs from pointing to an external origin.
+        if (str_starts_with($root, '//') || str_contains($root, '://')) {
+            return '';
+        }
+
         if ('/' !== $root[0]) {
             $root = '/' . $root;
         }
+
+        // Collapse multiple consecutive slashes (e.g. //foo -> /foo)
+        $root = (string) preg_replace('#/{2,}#', '/', $root);
 
         $root = rtrim($root, '/');
 

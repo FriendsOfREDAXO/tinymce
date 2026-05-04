@@ -1044,6 +1044,75 @@ Wenn du weiterhin yarn benutzt, funktionieren die meisten plugin-Builds ebenfall
 Wichtig: Custom‑Plugin‑Artefakte werden unter `assets/scripts/tinymce/plugins/<plugin>` erstellt und zusätzlich in `assets/vendor/tinymce/plugins/<plugin>` abgelegt.
 Das erlaubt, die Plugins direkt per `plugins` Konfiguration zu nutzen, ohne `external_plugins` anzugeben — weil die Build‑Pipeline die minifizierten Plugin‑Artefakte zusätzlich in `assets/vendor/tinymce/plugins/<plugin>` legt.
 
+## Extension Points
+
+Das Addon bietet mehrere Extension Points, mit denen die Editor-Konfiguration und Profil-Verwaltung erweitert werden können:
+
+### TINYMCE_GLOBAL_OPTIONS
+
+Wird beim Generieren der globalen TinyMCE Editor-Optionen (nicht profilespezifisch) aufgerufen.
+
+**Parameter:**
+- `$globalOptions` (array): Die globalen Optionen
+
+**Beispiel:**
+```php
+rex_extension::register('TINYMCE_GLOBAL_OPTIONS', function ($ep) {
+    $options = $ep->getSubject();
+    $options['my_custom_option'] = 'value';
+    return $options;
+});
+```
+
+### TINYMCE_PROFILE_OPTIONS
+
+Wird beim Laden eines TinyMCE Profils aufgerufen. Ermöglicht profileabhängige Anpassungen.
+
+**Parameter:**
+- `$options` (array): Die Profil-Optionen
+- **Kontext:** Das Addon durchläuft alle definierten Profile und generiert die Endkonfiguration
+
+**Beispiel:**
+```php
+rex_extension::register('TINYMCE_PROFILE_OPTIONS', function ($ep) {
+    $options = $ep->getSubject();
+    // profilespezifische Anpassung
+    $options['toolbar'] = $options['toolbar'] . ' | mybutton';
+    return $options;
+});
+```
+
+### TINY_PROFILE_CLONE
+
+Wird nach dem Duplizieren eines Profils aufgerufen (Clone-Aktion in der Backend-UI).
+
+**Parameter:**
+- `$profileId` (int): Die ID des geklonten Profils (des neuen Profils nach dem Clone)
+
+**Beispiel:**
+```php
+rex_extension::register('TINY_PROFILE_CLONE', function ($ep) {
+    $newProfileId = $ep->getSubject();
+    // Nach dem Clone: Custom-Logik durchführen
+    rex_logger::info('Profile ' . $newProfileId . ' wurde geklont');
+});
+```
+
+### TINY_PROFILE_DELETE
+
+Wird nach dem Löschen eines Profils aufgerufen.
+
+**Parameter:**
+- `$profileId` (int): Die ID des gelöschten Profils
+
+**Beispiel:**
+```php
+rex_extension::register('TINY_PROFILE_DELETE', function ($ep) {
+    $deletedProfileId = $ep->getSubject();
+    // Nach dem Delete: Cleanup durchführen (z.B. in Custom-Tabellen)
+});
+```
+
 ## Licenses
 
 - AddOn: [MIT LICENSE](https://github.com/FriendsOfREDAXO/tinymce/blob/master/LICENSE.md) – siehe [LICENSE.md](LICENSE.md)

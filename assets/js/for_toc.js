@@ -4,11 +4,11 @@
  * Markiert den aktuell sichtbaren Abschnitt im Inhaltsverzeichnis mit der
  * Klasse `for-toc__link--active` (bzw. `aria-current="true"`).
  *
- * Einbinden:
- *   <script src="/assets/addons/tinymce/js/for_toc.js" defer></script>
+ * Einbinden im Template:
+ *   <script src="<?php echo rex_url::addonAssets('tinymce', 'js/for_toc.js'); ?>" defer></script>
  *
- * Oder in REDAXO:
- *   echo '<script src="' . rex_addon::get('tinymce')->getAssetsUrl('js/for_toc.js') . '" defer></script>';
+ * Oder als Fallback (hardcoded):
+ *   <script src="/assets/addons/tinymce/js/for_toc.js" defer></script>
  *
  * Ohne dieses Script funktionieren TOC-Links ganz normal – das
  * Highlighting ist rein optional.

@@ -182,6 +182,7 @@ tinymce_imagewidth_help = Fixed image widths via CSS classes instead of manual r
 
 tinymce_settings_title = Global URL settings
 tinymce_settings_installation_root = Installation root of this REDAXO instance
+tinymce_settings_installation_root_placeholder = / or /subfolder
 tinymce_settings_installation_root_help = Enter the web root once. Examples: <code>/</code> for root installs or <code>/test_tiny</code> for subfolder installs. A trailing <code>/redaxo</code> is removed automatically.
 tinymce_settings_resolved_asset_base = Resolved TinyMCE asset URL
 tinymce_settings_resolved_plugin_base = Resolved TinyMCE plugin URL
