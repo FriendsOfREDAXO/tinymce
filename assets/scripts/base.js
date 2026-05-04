@@ -64,6 +64,66 @@ let rex5_picker_function = function (callback, value, meta) {
 
 let tinyareas = '.tiny-editor';
 
+function getTinyAssetPrefix() {
+    // Derive prefix from loaded TinyMCE assets (e.g. /test_tiny/assets/...).
+    let selectors = [
+        'script[src*="/assets/addons/tinymce/"]',
+        'link[href*="/assets/addons/tinymce/"]'
+    ];
+
+    for (let i = 0; i < selectors.length; i++) {
+        let nodes = document.querySelectorAll(selectors[i]);
+        for (let j = 0; j < nodes.length; j++) {
+            let attrName = nodes[j].tagName.toLowerCase() === 'link' ? 'href' : 'src';
+            let raw = nodes[j].getAttribute(attrName);
+            if (!raw) {
+                continue;
+            }
+
+            try {
+                let url = new URL(raw, window.location.origin);
+                let idx = url.pathname.indexOf('/assets/addons/tinymce/');
+                if (idx !== -1) {
+                    return url.pathname.substring(0, idx);
+                }
+            } catch (e) {
+                // ignore malformed URLs
+            }
+        }
+    }
+
+    // Fallback: use first path segment from current location (common subfolder setup).
+    let parts = window.location.pathname.split('/').filter(Boolean);
+    if (parts.length > 0) {
+        return '/' + parts[0];
+    }
+
+    return '';
+}
+
+function normalizeTinyAssetUrl(url, prefix) {
+    if (typeof url !== 'string' || url === '') {
+        return url;
+    }
+
+    // Keep absolute URLs and data URIs untouched.
+    if (/^(?:https?:)?\/\//.test(url) || /^data:/.test(url)) {
+        return url;
+    }
+
+    // Normalize known asset variants to /assets/... first.
+    let normalized = url
+        .replace(/^\.\.\/assets\//, '/assets/')
+        .replace(/^assets\//, '/assets/');
+
+    // For subfolder installations, rewrite /assets/... to /subfolder/assets/...
+    if (normalized.indexOf('/assets/') === 0 && prefix !== '') {
+        return prefix + normalized;
+    }
+
+    return normalized;
+}
+
 $(document).on('rex:ready', function (e, container) {
     if (container.find(tinyareas).length) {
         tiny_init(container);
@@ -360,26 +420,33 @@ function tiny_init(container) {
         let externalPluginsSource = (typeof rex !== 'undefined' && rex.tinyExternalPlugins) ? rex.tinyExternalPlugins : 
                                     (typeof tinyExternalPlugins !== 'undefined' ? tinyExternalPlugins : {});
         
-        // Fix relative paths: replace ../assets/ with /assets/ for absolute paths
+        let tinyAssetPrefix = getTinyAssetPrefix();
+        let normalizedExternalPluginsSource = {};
         for (let pluginName in externalPluginsSource) {
-            if (typeof externalPluginsSource[pluginName] === 'string') {
-                externalPluginsSource[pluginName] = externalPluginsSource[pluginName].replace(/^\.\.\/assets\//, '/assets/');
+            if (Object.prototype.hasOwnProperty.call(externalPluginsSource, pluginName)) {
+                normalizedExternalPluginsSource[pluginName] = normalizeTinyAssetUrl(
+                    externalPluginsSource[pluginName],
+                    tinyAssetPrefix
+                );
             }
         }
         
-        if (Object.keys(externalPluginsSource).length > 0) {
+        if (Object.keys(normalizedExternalPluginsSource).length > 0) {
             if (!options.hasOwnProperty('external_plugins')) {
                 options['external_plugins'] = {};
             }
             // Merge registered external plugins (profile-specific ones take precedence)
-            options['external_plugins'] = Object.assign({}, externalPluginsSource, options['external_plugins']);
+            options['external_plugins'] = Object.assign({}, normalizedExternalPluginsSource, options['external_plugins']);
         }
-        
-        // Also fix any relative paths in existing external_plugins from profile
+
+        // Also normalize any path variants in profile-defined external plugins.
         if (options['external_plugins']) {
             for (let pluginName in options['external_plugins']) {
                 if (typeof options['external_plugins'][pluginName] === 'string') {
-                    options['external_plugins'][pluginName] = options['external_plugins'][pluginName].replace(/^\.\.\/assets\//, '/assets/');
+                    options['external_plugins'][pluginName] = normalizeTinyAssetUrl(
+                        options['external_plugins'][pluginName],
+                        tinyAssetPrefix
+                    );
                 }
             }
         }
