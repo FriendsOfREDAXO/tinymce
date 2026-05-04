@@ -4,6 +4,7 @@ namespace FriendsOfRedaxo\TinyMce\Creator;
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
 use FriendsOfRedaxo\TinyMce\PluginRegistry;
+use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 use rex_addon;
 use rex_addon_interface;
 use rex_file;
@@ -76,8 +77,8 @@ class Profiles
 
             // Frontend fallback (no rex_view::setJsProperty available there).
             // These constants are consumed by base.js if rex.* properties are missing.
-            $tinyAssetBasePathJs = json_encode(rtrim(rex_url::addonAssets('tinymce', ''), '/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $tinyPluginBasePathJs = json_encode(rtrim(rex_url::addonAssets('tinymce', 'scripts/tinymce/plugins'), '/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $tinyAssetBasePathJs = json_encode(AssetUrl::getTinyAssetBaseUrl(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $tinyPluginBasePathJs = json_encode(AssetUrl::getTinyPluginBaseUrl(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             // CleanPaste config – embedded here so it works in frontend too (rex_view::setJsProperty is backend-only)
             $cleanPasteCfg = self::getAddon()->getConfig('cleanpaste_settings', [
@@ -131,7 +132,7 @@ const tinyprofiles = $profiles;
         $jsonProfile = [];
         if (!empty($profile['extra'])) {
             $extra = (string) $profile['extra'];
-            $addonAssetBase = rtrim(rex_url::addonAssets('tinymce', ''), '/');
+            $addonAssetBase = AssetUrl::getTinyAssetBaseUrl();
             $addonAssetBaseEscaped = str_replace('/', '\\/', $addonAssetBase);
 
             // Normalize legacy hardcoded plugin paths so subfolder installs work.

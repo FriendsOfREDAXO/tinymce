@@ -3,6 +3,7 @@
 namespace FriendsOfRedaxo\TinyMce\Provider;
 
 use FriendsOfRedaxo\TinyMce\PluginRegistry;
+use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 use rex_addon;
 use rex_addon_interface;
 use rex_be_controller;
@@ -26,7 +27,7 @@ class Assets
             }
         }
 
-        return $addon->getAssetsUrl($path) . '?v=' . rawurlencode($cacheToken);
+        return AssetUrl::getTinyAssetUrl($path) . '?v=' . rawurlencode($cacheToken);
     }
 
     public static function provideDemoAssets(): void
@@ -51,9 +52,9 @@ class Assets
         try {
             rex_view::addCssFile(self::assetUrl('styles/base.css'));
 
-            $assetBasePath = rtrim(self::getAddon()->getAssetsUrl(''), '/');
+            $assetBasePath = AssetUrl::getTinyAssetBaseUrl();
             \rex_view::setJsProperty('tinyAssetBasePath', $assetBasePath);
-            \rex_view::setJsProperty('tinyPluginBasePath', $assetBasePath . '/scripts/tinymce/plugins');
+            \rex_view::setJsProperty('tinyPluginBasePath', AssetUrl::getTinyPluginBaseUrl());
 
             // Provide external plugins from PluginRegistry as JS property
             // This ensures correct URLs at runtime with rex_url::base()

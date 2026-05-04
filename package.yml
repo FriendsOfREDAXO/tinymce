@@ -9,6 +9,8 @@ page:
     subpages:
         main:
             title: 'translate:main'
+        settings:
+            title: 'translate:settings'
         profiles:
             title: 'translate:profiles'
         snippets:
