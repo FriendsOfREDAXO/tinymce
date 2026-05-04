@@ -1,6 +1,20 @@
 Changelog
 =========
 
+Version 8.7.3
+-------------------------------
+
+### Audit: Robustheit und Fehlerbehandlung verbessert
+
+* **Exception-Logging:** Fehler bei der Regeneration von `profiles.js` werden jetzt geloggt, um Berechtigungsfehler oder Disk-Space-Probleme sichtbar zu machen (statt silently zu fehlschlagen).
+* **JSON-Fehlerbehandlung:** Ungültiges JSON in Style-Formats wird erkannt und geloggt, statt silently ignoriert zu werden. Verhindert Datenverlust.
+* **Profil-Import Sicherheit:** File-Size-Limit (5MB) und maximale Anzahl von Profilen (1000) beim Import hinzugefügt, um DOS und Large-Object-Attacken zu verhindern.
+* **installation_root Fallback:** Config wird bei Installation und Updates initialisiert (Standard: `/`), um sicherzustellen, dass die URL-Auflösung nach Updates konsistent arbeitet.
+* **Dokumentation:** Extension Points (`TINYMCE_GLOBAL_OPTIONS`, `TINYMCE_PROFILE_OPTIONS`, `TINY_PROFILE_CLONE`, `TINY_PROFILE_DELETE`) sind jetzt im README mit Beispielen dokumentiert.
+* **Code-Kommentare korrigiert:** JS-Dokumentation in `for_toc.js` und `for_oembed.js` verwenden jetzt `rex_url::addonAssets()` als primary Beispiel statt hardcodierter Pfade.
+
+**Vendor Version:** TinyMCE 8.5.0 (unverändert)
+
 Version 8.7.2
 -------------------------------
 
@@ -21,7 +35,24 @@ Die Registrierung der FOR- und Legacy-Plugins in `boot.php` nutzt jetzt ebenfall
 
 Asset-URLs enthalten jetzt neben der AddOn-Version auch den Dateizeitstempel (`version-mtime`) als Query-Token. Damit werden geaenderte JS/CSS-Dateien nach Deployments deutlich zuverlaessiger neu geladen.
 
+**Vendor Version:** TinyMCE 8.5.0
+
 Version 8.7.0
+-------------------------------
+
+### TinyMCE Vendor auf 8.5.0 aktualisiert
+
+- TinyMCE-Core von `8.4.0` auf `8.5.0` angehoben und Vendor-Dateien neu gebaut.
+- Prüfung gegen das offizielle TinyMCE-Changelog: **keine AddOn-seitigen Code-Anpassungen notwendig**. Version `8.5.0` bringt vor allem Core-Fixes sowie die neue optionale Konfiguration `content_language`.
+
+### Migrationen robuster gemacht
+
+- Beim AddOn-Update werden veraltete TinyMCE-5-Plugin-Namen aus bestehenden Profilen bereinigt, damit TinyMCE 8 keine nicht mehr vorhandenen Plugins als externe Plugins nachlädt und Dialoge bzw. Editor-Initialisierung nicht abbrechen.
+- Neue Reset-Funktion auf der Migrations-Seite: Die mitgelieferten Standardprofile `full`, `light`, `default` und das gesperrte `demo`-Profil lassen sich per Button auf den aktuellen AddOn-Standard zurücksetzen. Vorhandene Profile mit gleichem Namen werden ersetzt, eigene Profile bleiben erhalten.
+
+### Weitere Fixes
+
+- Doppelte Einbindung von `assets/addons/tinymce/styles/base.css` verhindert, wenn `provideBaseAssets()` mehrfach aus unterschiedlichen Integrationen aufgerufen wird.
 -------------------------------
 
 ### TinyMCE Vendor auf 8.5.0 aktualisiert

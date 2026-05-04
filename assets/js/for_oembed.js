@@ -9,11 +9,14 @@
  *  erzeugt. Das ist aber komplett optional – ohne vidstack gibt's
  *  einen schlichten responsiven iframe-Fallback.
  *
- *  Einbindung im Template / Frontend:
- *    <script src="/assets/addons/tinymce/js/for_oembed.js" defer></script>
- *
- *  Oder REDAXO-seitig:
+ *  Einbindung im Template/Frontend (mit REDAXO URL-Helper):
  *    rex_view::addJsFile(rex_url::addonAssets('tinymce', 'js/for_oembed.js'));
+ *
+ *  Oder direkt im HTML:
+ *    <script src="<?php echo rex_url::addonAssets('tinymce', 'js/for_oembed.js'); ?>" defer></script>
+ *
+ *  Fallback (hardcoded path, nicht subfolder-safe):
+ *    <script src="/assets/addons/tinymce/js/for_oembed.js" defer></script>
  * ================================================================== */
 (function () {
     'use strict';

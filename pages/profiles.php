@@ -88,10 +88,23 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
     // read overwrite option from POST
     $overwrite = (bool) rex_request::request('overwrite', 'int', 0);
     try {
+        // Validate upload success
         if ($_FILES['profiles_file']['error'] !== UPLOAD_ERR_OK) {
             throw new Exception('upload_error');
         }
+        
+        // Validate file size (max 5MB to prevent DOS and large object attacks)
+        $fileSize = (int) ($_FILES['profiles_file']['size'] ?? 0);
+        if ($fileSize > 5 * 1024 * 1024) {
+            throw new Exception('File size exceeds 5MB limit');
+        }
+        
+        // Read and validate JSON
         $content = file_get_contents($_FILES['profiles_file']['tmp_name']);
+        if (false === $content) {
+            throw new Exception('Could not read uploaded file');
+        }
+        
         $data = json_decode((string) $content, true);
         if (null === $data) {
             throw new Exception('json_invalid');
@@ -103,6 +116,11 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
             $items[] = $data;
         } elseif (is_array($data)) {
             $items = $data;
+        }
+        
+        // Prevent importing excessive number of profiles (sanity check)
+        if (count($items) > 1000) {
+            throw new Exception('Cannot import more than 1000 profiles at once');
         }
 
         $imported = 0;
@@ -351,7 +369,6 @@ if ('' === $func) {
     $form->addParam('send', true);
 
     $default_value = ('add' === $func && false === $send) ? true : false;
-    $mediapath = str_replace(['../', '/'], '', rex_url::media());
 
     if ('edit' === $func) {
         $form->addParam('id', $id);
