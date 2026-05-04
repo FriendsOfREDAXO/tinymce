@@ -568,8 +568,10 @@
         return html;
     }
 
-    function favsPanelHtml() {
-        // Legacy – wird nicht mehr als eigener Tab verwendet. Favs/Recent leben jetzt im "Zeichen"-Tab.
+    function favsPanelHtmlLegacy() {
+        // Legacy-Renderer (nicht aktiv): wurde frueher fuer einen separaten Favoriten-Tab genutzt.
+        // Behalten wir nur zu Debug-Zwecken, damit die aktive favsPanelHtml()-Definition
+        // mit data-fcs-favs-section/data-fcs-recent-section nicht ueberschrieben wird.
         return favsBlockHtml() + recentBlockHtml();
     }
 
