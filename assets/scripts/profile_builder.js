@@ -1314,7 +1314,6 @@ function generateConfig($textarea, $builderBody) {
     // Image Width (preset-based: width, alignment, effects on <figure>)
     if (imagewidthEnabled) {
         configStr += `object_resizing: false,\n`;
-        configStr += `quickbars_image_toolbar: false,\n`;
         configStr += `extended_valid_elements: 'figure[class|style|contenteditable],figcaption[contenteditable]',\n`;
         if (imagewidthWidthPresets) {
             configStr += `imagewidth_presets: ${JSON.stringify(imagewidthWidthPresets)},\n`;

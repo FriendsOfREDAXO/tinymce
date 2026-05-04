@@ -49,7 +49,6 @@ document_base_url: '/',
 entity_encoding: 'raw',
 convert_urls: true,
 object_resizing: false,
-quickbars_image_toolbar: false,
 link_rel_list: [
     {title: 'Keine', value: ''},
     {title: 'Nofollow', value: 'nofollow'},

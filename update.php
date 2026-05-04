@@ -119,6 +119,39 @@ try {
     // Ignore errors during migration
 }
 
+// =============================================================================
+// Migration: Entferne quickbars_image_toolbar aus Profil-Extras (v8.7.1)
+// =============================================================================
+// Die Option wird in TinyMCE nur registriert, wenn das quickbars-Plugin aktiv
+// ist. In Profilen ohne quickbars führt ein gesetzter Wert daher zu Warnungen
+// in der Browser-Konsole. for_images setzt die Option künftig nur noch
+// konditional; diese Migration bereinigt bestehende Profile rückwirkend.
+try {
+    $sql = rex_sql::factory();
+    $profiles = $sql->getArray('SELECT id, extra FROM ' . rex::getTable('tinymce_profiles'));
+
+    foreach ($profiles as $profile) {
+        $extra = (string) $profile['extra'];
+        if (!str_contains($extra, 'quickbars_image_toolbar')) {
+            continue;
+        }
+
+        $cleaned = preg_replace('/^\s*quickbars_image_toolbar\s*:\s*[^,\r\n]+,\s*$/mi', '', $extra);
+        if (null === $cleaned || $cleaned === $extra) {
+            continue;
+        }
+
+        $upd = rex_sql::factory();
+        $upd->setTable(rex::getTable('tinymce_profiles'));
+        $upd->setWhere(['id' => (int) $profile['id']]);
+        $upd->setValue('extra', $cleaned);
+        $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+        $upd->update();
+    }
+} catch (rex_sql_exception $e) {
+    // Migration ist best-effort
+}
+
 // Set flag to regenerate profiles.js on next backend request
 $this->setConfig('update_profiles', true);
 

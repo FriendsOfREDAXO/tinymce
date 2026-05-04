@@ -524,7 +524,10 @@ const setup = (editor: Editor, _url: string): void => {
     }
   });
   editor.options.set('object_resizing', false);
-  editor.options.set('quickbars_image_toolbar', false);
+  const hasOption = (editor.options as any).isRegistered;
+  if (typeof hasOption === 'function' && hasOption.call(editor.options, 'quickbars_image_toolbar')) {
+    editor.options.set('quickbars_image_toolbar', false);
+  }
   editor.options.set('image_caption', false);
 
   /* WIDTH MENU */
