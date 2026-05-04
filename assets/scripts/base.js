@@ -103,7 +103,9 @@ function getConfiguredTinyPluginBase() {
 
 function getTinyAssetPrefix() {
     let configuredPrefix = getConfiguredTinyAssetPrefix();
-    if (configuredPrefix !== null) {
+    // Only short-circuit for non-empty prefixes. Empty prefix is ambiguous
+    // and may come from misconfigured server base paths on subfolder installs.
+    if (configuredPrefix !== null && configuredPrefix !== '') {
         return configuredPrefix;
     }
 
@@ -132,6 +134,12 @@ function getTinyAssetPrefix() {
                 // ignore malformed URLs
             }
         }
+    }
+
+    // If configured prefix was explicitly empty and we did not detect better data,
+    // keep it as final fallback for root installs.
+    if (configuredPrefix === '') {
+        return '';
     }
 
     // Fallback: use first path segment from current location (common subfolder setup).
@@ -189,6 +197,10 @@ function forceCanonicalTinyPluginUrls(externalPlugins, prefix) {
     }
 
     let configuredPluginBase = getConfiguredTinyPluginBase();
+    if (configuredPluginBase && prefix !== '' && configuredPluginBase.indexOf('/assets/') === 0) {
+        configuredPluginBase = prefix + configuredPluginBase;
+    }
+
     let canonicalBase = configuredPluginBase ? (configuredPluginBase.replace(/\/+$/, '') + '/') : ((prefix ? prefix : '') + '/assets/addons/tinymce/scripts/tinymce/plugins/');
     let rewritten = {};
 
