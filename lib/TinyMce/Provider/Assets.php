@@ -12,11 +12,19 @@ use rex_view;
 
 class Assets
 {
+    private static function assetUrl(string $path): string
+    {
+        $addon = self::getAddon();
+        $version = (string) $addon->getVersion();
+
+        return $addon->getAssetsUrl($path) . '?v=' . rawurlencode($version);
+    }
+
     public static function provideDemoAssets(): void
     {
         if ('tinymce' === rex_be_controller::getCurrentPagePart(1)) {
             try {
-                rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/demo.css'));
+                rex_view::addCssFile(self::assetUrl('styles/demo.css'));
             } catch (rex_exception $e) {
                 rex_logger::logException($e);
             }
@@ -32,7 +40,7 @@ class Assets
         $called = true;
 
         try {
-            rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/base.css'));
+            rex_view::addCssFile(self::assetUrl('styles/base.css'));
 
             // Provide external plugins from PluginRegistry as JS property
             // This ensures correct URLs at runtime with rex_url::base()
@@ -56,10 +64,10 @@ class Assets
             ]));
             \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
 
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/base.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/sticky_navbar_freeze.js'));
+            rex_view::addJsFile(self::assetUrl('vendor/tinymce/tinymce.min.js'));
+            rex_view::addJsFile(self::assetUrl('generated/profiles.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/base.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/sticky_navbar_freeze.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
