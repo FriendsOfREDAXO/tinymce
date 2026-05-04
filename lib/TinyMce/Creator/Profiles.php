@@ -4,6 +4,7 @@ namespace FriendsOfRedaxo\TinyMce\Creator;
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
 use FriendsOfRedaxo\TinyMce\PluginRegistry;
+use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 use rex_addon;
 use rex_addon_interface;
 use rex_file;
@@ -74,6 +75,11 @@ class Profiles
             // See base.js: rex.tinyExternalPlugins (runtime) takes precedence over tinyExternalPlugins (static).
             $externalPluginsJs = '{}';
 
+            // Frontend fallback (no rex_view::setJsProperty available there).
+            // These constants are consumed by base.js if rex.* properties are missing.
+            $tinyAssetBasePathJs = json_encode(AssetUrl::getTinyAssetBaseUrl(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $tinyPluginBasePathJs = json_encode(AssetUrl::getTinyPluginBaseUrl(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
             // CleanPaste config – embedded here so it works in frontend too (rex_view::setJsProperty is backend-only)
             $cleanPasteCfg = self::getAddon()->getConfig('cleanpaste_settings', [
                 'strip_ms_office'        => true,
@@ -104,6 +110,8 @@ class Profiles
             $content =
                 "
 const tinyExternalPlugins = $externalPluginsJs;
+const tinyAssetBasePath = $tinyAssetBasePathJs;
+const tinyPluginBasePath = $tinyPluginBasePathJs;
 const tinyCleanPasteConfig = $cleanPasteConfigJs;
 const tinyMediaUploadConfig = $mediaUploadConfigJs;
 const tinyprofiles = $profiles;
@@ -123,7 +131,21 @@ const tinyprofiles = $profiles;
     {
         $jsonProfile = [];
         if (!empty($profile['extra'])) {
-            return $profile['extra'];
+            $extra = (string) $profile['extra'];
+            $addonAssetBase = AssetUrl::getTinyAssetBaseUrl();
+            $addonAssetBaseEscaped = str_replace('/', '\\/', $addonAssetBase);
+
+            // Normalize legacy hardcoded plugin paths so subfolder installs work.
+            $extra = str_replace('"/assets/addons/tinymce/', '"' . $addonAssetBase . '/', $extra);
+            $extra = str_replace('"assets/addons/tinymce/', '"' . $addonAssetBase . '/', $extra);
+            $extra = str_replace('"../assets/addons/tinymce/', '"' . $addonAssetBase . '/', $extra);
+
+            // Also cover escaped variants from imported JSON payloads.
+            $extra = str_replace('"\/assets\/addons\/tinymce\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+            $extra = str_replace('"assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+            $extra = str_replace('"..\\/assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+
+            return $extra;
         }
         return $jsonProfile;
     }

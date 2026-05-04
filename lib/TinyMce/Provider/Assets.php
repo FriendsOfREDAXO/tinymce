@@ -3,6 +3,7 @@
 namespace FriendsOfRedaxo\TinyMce\Provider;
 
 use FriendsOfRedaxo\TinyMce\PluginRegistry;
+use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 use rex_addon;
 use rex_addon_interface;
 use rex_be_controller;
@@ -12,11 +13,28 @@ use rex_view;
 
 class Assets
 {
+    private static function assetUrl(string $path): string
+    {
+        $addon = self::getAddon();
+        $version = (string) $addon->getVersion();
+        $assetFile = $addon->getAssetsPath($path);
+
+        $cacheToken = $version;
+        if (is_file($assetFile)) {
+            $mtime = filemtime($assetFile);
+            if (false !== $mtime) {
+                $cacheToken .= '-' . (string) $mtime;
+            }
+        }
+
+        return AssetUrl::getTinyAssetUrl($path) . '?v=' . rawurlencode($cacheToken);
+    }
+
     public static function provideDemoAssets(): void
     {
         if ('tinymce' === rex_be_controller::getCurrentPagePart(1)) {
             try {
-                rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/demo.css'));
+                rex_view::addCssFile(self::assetUrl('styles/demo.css'));
             } catch (rex_exception $e) {
                 rex_logger::logException($e);
             }
@@ -32,7 +50,11 @@ class Assets
         $called = true;
 
         try {
-            rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/base.css'));
+            rex_view::addCssFile(self::assetUrl('styles/base.css'));
+
+            $assetBasePath = AssetUrl::getTinyAssetBaseUrl();
+            \rex_view::setJsProperty('tinyAssetBasePath', $assetBasePath);
+            \rex_view::setJsProperty('tinyPluginBasePath', AssetUrl::getTinyPluginBaseUrl());
 
             // Provide external plugins from PluginRegistry as JS property
             // This ensures correct URLs at runtime with rex_url::base()
@@ -56,10 +78,10 @@ class Assets
             ]));
             \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
 
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/tinymce/tinymce.min.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('generated/profiles.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/base.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/sticky_navbar_freeze.js'));
+            rex_view::addJsFile(self::assetUrl('vendor/tinymce/tinymce.min.js'));
+            rex_view::addJsFile(self::assetUrl('generated/profiles.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/base.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/sticky_navbar_freeze.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
@@ -360,17 +382,17 @@ class Assets
 
             \rex_view::setJsProperty('tinymceProfileOptions', $options);
 
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile_builder.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profiles-list.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/alphanum/jquery.alphanum.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/profile.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/profile_builder.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/profiles-list.js'));
+            rex_view::addJsFile(self::assetUrl('vendor/alphanum/jquery.alphanum.js'));
         }
     }
 
     public static function providePopupAssets(): void
     {
         try {
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/linkmap.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/linkmap.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }

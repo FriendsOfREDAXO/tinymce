@@ -3,6 +3,7 @@ tinymce_title = TinyMCE
 
 # navigation
 tinymce_main = Overview & demo
+tinymce_settings = Settings
 tinymce_demo = TinyMCE demo
 tinymce_mblock_demo = MBlock demo
 tinymce_profiles = Editor profile
@@ -178,6 +179,16 @@ tinymce_none = None
 # imagewidth plugin
 tinymce_imagewidth = Image Width Plugin
 tinymce_imagewidth_help = Fixed image widths via CSS classes instead of manual resizing.
+
+tinymce_settings_title = Global URL settings
+tinymce_settings_installation_root = Installation root of this REDAXO instance
+tinymce_settings_installation_root_help = Enter the web root once. Examples: <code>/</code> for root installs or <code>/test_tiny</code> for subfolder installs. A trailing <code>/redaxo</code> is removed automatically.
+tinymce_settings_resolved_asset_base = Resolved TinyMCE asset URL
+tinymce_settings_resolved_plugin_base = Resolved TinyMCE plugin URL
+tinymce_settings_reload_hint = After saving, do one hard reload. <code>profiles.js</code> is regenerated when saving.
+tinymce_settings_save = Save
+tinymce_settings_saved = Settings saved.
+tinymce_settings_saved_profiles_failed = Settings saved, but <code>profiles.js</code> could not be regenerated. Please check logs.
 tinymce_imagewidth_enable = Enable Image Width Plugin
 tinymce_imagewidth_framework = CSS Framework
 tinymce_imagewidth_general = General (pixel-based)

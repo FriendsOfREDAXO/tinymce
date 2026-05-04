@@ -3,6 +3,7 @@ tinymce_title = TinyMCE
 
 # navigation
 tinymce_main = Überblick & Demo
+tinymce_settings = Einstellungen
 tinymce_demo = TinyMCE Demo
 tinymce_mblock_demo = MBlock Demo
 tinymce_profiles = Editor Profile
@@ -255,6 +256,16 @@ tinymce_stylesets_import_empty = Es wurden keine gültigen Style-Sets in der Dat
 # paste settings (cleanpaste plugin)
 tinymce_paste_settings = Einfügen-Bereinigung
 tinymce_cleanpaste_saved = Einstellungen gespeichert.
+
+tinymce_settings_title = Globale URL-Einstellungen
+tinymce_settings_installation_root = Installations-Root der REDAXO-Instanz
+tinymce_settings_installation_root_help = Einmalig den Web-Root der Instanz eintragen. Beispiele: <code>/</code> für Root-Installationen oder <code>/test_tiny</code> für Subfolder. <code>/redaxo</code> am Ende wird automatisch entfernt.
+tinymce_settings_resolved_asset_base = Aufgelöste TinyMCE-Asset-URL
+tinymce_settings_resolved_plugin_base = Aufgelöste TinyMCE-Plugin-URL
+tinymce_settings_reload_hint = Nach dem Speichern einmal hart neu laden. Die Datei <code>profiles.js</code> wird beim Speichern neu generiert.
+tinymce_settings_save = Speichern
+tinymce_settings_saved = Einstellungen wurden gespeichert.
+tinymce_settings_saved_profiles_failed = Einstellungen gespeichert, aber <code>profiles.js</code> konnte nicht neu generiert werden. Bitte Logs prüfen.
 
 tinymce_cleanpaste_section_source = Quell-Bereinigung
 tinymce_cleanpaste_strip_ms_office = MS Office Markup entfernen
