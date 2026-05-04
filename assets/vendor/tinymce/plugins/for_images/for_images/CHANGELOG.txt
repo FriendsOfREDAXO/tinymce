@@ -1,3 +1,11 @@
+Version 1.1.0 (2026-04-26)
+  - Added image_compat_warn option (default: false)
+  - When enabled: detects legacy CKEditor 5 image markup (figure.image,
+    figure.image_resized, image-style-* classes) on init and SetContent
+  - Shows a one-time warning notification asking the editor to reformat
+    affected images with the new image formatting toolbar
+  - No automatic conversion – detection and notice only
+
 Version 1.0.0 (2026-02-06)
   - Initial release
   - UIkit 3 width classes with breakpoint support

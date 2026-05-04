@@ -1,0 +1,10 @@
+Changelog for Clean Paste Plugin
+
+1.0.0 (2026-04-22)
+  - Initial release
+  - Automatic cleanup of pasted content from MS Office, Google Docs and other sources
+  - Configurable via REDAXO TinyMCE addon settings page
+  - Supports positive list for preserved CSS classes (exact names and regex patterns)
+  - Supports positive list for preserved inline style properties
+  - Configurable limits for consecutive <br> tags and empty paragraphs
+  - Optional allowed-tags filter (unwrap disallowed tags, keep content)
