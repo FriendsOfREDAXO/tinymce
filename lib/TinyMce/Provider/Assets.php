@@ -16,8 +16,17 @@ class Assets
     {
         $addon = self::getAddon();
         $version = (string) $addon->getVersion();
+        $assetFile = $addon->getAssetsPath($path);
 
-        return $addon->getAssetsUrl($path) . '?v=' . rawurlencode($version);
+        $cacheToken = $version;
+        if (is_file($assetFile)) {
+            $mtime = filemtime($assetFile);
+            if (false !== $mtime) {
+                $cacheToken .= '-' . (string) $mtime;
+            }
+        }
+
+        return $addon->getAssetsUrl($path) . '?v=' . rawurlencode($cacheToken);
     }
 
     public static function provideDemoAssets(): void
@@ -372,17 +381,17 @@ class Assets
 
             \rex_view::setJsProperty('tinymceProfileOptions', $options);
 
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profile_builder.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/profiles-list.js'));
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('vendor/alphanum/jquery.alphanum.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/profile.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/profile_builder.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/profiles-list.js'));
+            rex_view::addJsFile(self::assetUrl('vendor/alphanum/jquery.alphanum.js'));
         }
     }
 
     public static function providePopupAssets(): void
     {
         try {
-            rex_view::addJsFile(self::getAddon()->getAssetsUrl('scripts/linkmap.js'));
+            rex_view::addJsFile(self::assetUrl('scripts/linkmap.js'));
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }
