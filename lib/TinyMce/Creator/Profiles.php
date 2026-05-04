@@ -123,7 +123,21 @@ const tinyprofiles = $profiles;
     {
         $jsonProfile = [];
         if (!empty($profile['extra'])) {
-            return $profile['extra'];
+            $extra = (string) $profile['extra'];
+            $addonAssetBase = rtrim(rex_url::addonAssets('tinymce', ''), '/');
+            $addonAssetBaseEscaped = str_replace('/', '\\/', $addonAssetBase);
+
+            // Normalize legacy hardcoded plugin paths so subfolder installs work.
+            $extra = str_replace('"/assets/addons/tinymce/', '"' . $addonAssetBase . '/', $extra);
+            $extra = str_replace('"assets/addons/tinymce/', '"' . $addonAssetBase . '/', $extra);
+            $extra = str_replace('"../assets/addons/tinymce/', '"' . $addonAssetBase . '/', $extra);
+
+            // Also cover escaped variants from imported JSON payloads.
+            $extra = str_replace('"\/assets\/addons\/tinymce\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+            $extra = str_replace('"assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+            $extra = str_replace('"..\\/assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+
+            return $extra;
         }
         return $jsonProfile;
     }

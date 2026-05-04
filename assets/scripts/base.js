@@ -106,8 +106,25 @@ function normalizeTinyAssetUrl(url, prefix) {
         return url;
     }
 
-    // Keep absolute URLs and data URIs untouched.
-    if (/^(?:https?:)?\/\//.test(url) || /^data:/.test(url)) {
+    if (/^data:/.test(url)) {
+        return url;
+    }
+
+    // For same-origin absolute URLs, normalize by pathname and keep query/hash.
+    if (/^(?:https?:)?\/\//.test(url)) {
+        try {
+            let abs = new URL(url, window.location.origin);
+            if (abs.origin === window.location.origin) {
+                if (abs.pathname.indexOf('/assets/') === 0 && prefix !== '') {
+                    abs.pathname = prefix + abs.pathname;
+                }
+                return abs.pathname + abs.search + abs.hash;
+            }
+        } catch (e) {
+            return url;
+        }
+
+        // Keep external absolute URLs untouched.
         return url;
     }
 
