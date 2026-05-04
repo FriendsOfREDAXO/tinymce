@@ -61,7 +61,7 @@ echo $message;
                         class="form-control"
                         name="installation_root"
                         value="<?= rex_escape($displayRoot) ?>"
-                        placeholder="/ oder /projekt"
+                        placeholder="<?= rex_escape($addon->i18n('settings_installation_root_placeholder')) ?>"
                     >
                     <p class="help-block"><?= $addon->i18n('settings_installation_root_help') ?></p>
                 </div>

@@ -18,11 +18,11 @@ Version 8.7.3
 Version 8.7.2
 -------------------------------
 
-### Fix: Zuverlaessige TinyMCE-Asset- und Plugin-URLs bei Subfolder-Installationen
+### Fix: Zuverlässige TinyMCE-Asset- und Plugin-URLs bei Subfolder-Installationen
 
-Bei REDAXO-Installationen im Unterverzeichnis konnten TinyMCE-Plugins je nach Kontext mit relativen Pfaden wie `../assets/...` aufgeloest werden und in 404 laufen.
+Bei REDAXO-Installationen im Unterverzeichnis konnten TinyMCE-Plugins je nach Kontext mit relativen Pfaden wie `../assets/...` aufgelöst werden und in 404 laufen.
 
-* Neue zentrale URL-Helferklasse `TinyMce\Utils\AssetUrl`.
+* Neue zentrale URL-Helferklasse `FriendsOfRedaxo\TinyMce\Utils\AssetUrl`.
 * Neue AddOn-Einstellung fuer den Installations-Root (`/` oder z. B. `/test_tiny`) unter **TinyMCE -> Einstellungen**.
 * Asset- und Plugin-Basis-URLs werden jetzt konsistent aus dieser einen Quelle erzeugt (Backend und Frontend).
 * `profiles.js` wird beim Speichern der Einstellung automatisch neu generiert.
@@ -31,9 +31,9 @@ Bei REDAXO-Installationen im Unterverzeichnis konnten TinyMCE-Plugins je nach Ko
 
 Die Registrierung der FOR- und Legacy-Plugins in `boot.php` nutzt jetzt ebenfalls die zentrale Plugin-Base-URL. Dadurch bleiben externe TinyMCE-Plugin-Pfade auch bei abweichenden Web-Roots stabil.
 
-### Verbesserung: Staerkere Cache-Invalidierung fuer Assets
+### Verbesserung: Stärkere Cache-Invalidierung für Assets
 
-Asset-URLs enthalten jetzt neben der AddOn-Version auch den Dateizeitstempel (`version-mtime`) als Query-Token. Damit werden geaenderte JS/CSS-Dateien nach Deployments deutlich zuverlaessiger neu geladen.
+Asset-URLs enthalten jetzt neben der AddOn-Version auch den Dateizeitstempel (`version-mtime`) als Query-Token. Damit werden geänderte JS/CSS-Dateien nach Deployments deutlich zuverlässiger neu geladen.
 
 **Vendor Version:** TinyMCE 8.5.0
 
