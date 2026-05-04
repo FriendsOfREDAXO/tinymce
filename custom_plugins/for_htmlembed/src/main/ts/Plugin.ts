@@ -113,7 +113,7 @@ function buildLabel(code: string): string {
 }
 
 function openDialog(editor: any, existingCode: string, onSubmit: (code: string) => void): void {
-    editor.windowManager.open({
+    const dialogApi = editor.windowManager.open({
         title: DIALOG_TITLE,
         size: 'large',
         body: {
@@ -144,7 +144,7 @@ function openDialog(editor: any, existingCode: string, onSubmit: (code: string) 
     // Klasse "rex-js-code-editor". Wir setzen zusätzlich monospace als Fallback.
     setTimeout(() => {
         try {
-            const dlgRoot = document.querySelector('.tox-dialog-wrap:last-of-type') as HTMLElement | null;
+            const dlgRoot = typeof dialogApi.getEl === 'function' ? dialogApi.getEl() as HTMLElement | null : null;
             const textarea = dlgRoot?.querySelector('textarea') as HTMLTextAreaElement | null;
             if (textarea) {
                 textarea.classList.add('rex-js-code-editor');

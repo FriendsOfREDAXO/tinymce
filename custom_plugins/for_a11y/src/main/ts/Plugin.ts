@@ -733,15 +733,20 @@ const EDITOR_MARKER_CSS = `
 }
 `;
 
-let markerStyleInjected = false;
-let activeFindings: Finding[] = [];
+const markerStyleEditors = new Set<string>();
+const activePanels = new Map<string, HTMLElement>();
+
+function getEditorStateKey(editor: any): string {
+    return String(editor?.id || editor?.targetElm?.id || 'default');
+}
 
 /** Fügt die Marker-CSS-Regeln einmalig in den Editor-IFrame ein. */
 function ensureMarkerStyle(editor: any): void {
-    if (markerStyleInjected) return;
+    const editorKey = getEditorStateKey(editor);
+    if (markerStyleEditors.has(editorKey)) return;
     try {
         editor.dom.addStyle(EDITOR_MARKER_CSS);
-        markerStyleInjected = true;
+        markerStyleEditors.add(editorKey);
     } catch (_e) { /* noop */ }
 }
 
@@ -750,7 +755,6 @@ function ensureMarkerStyle(editor: any): void {
 function applyMarkers(editor: any, findings: Finding[]): void {
     ensureMarkerStyle(editor);
     clearMarkers(editor); // evtl. vorherige zuerst entfernen
-    activeFindings = findings.slice();
 
     // Pro Element die höchste Schwere bestimmen
     const map = new Map<HTMLElement, Severity>();
@@ -777,7 +781,6 @@ function clearMarkers(editor: any): void {
             el.removeAttribute('data-a11y-mark-active');
         });
     } catch (_e) { /* noop */ }
-    activeFindings = [];
 }
 
 /** Hebt ein einzelnes Element temporär hervor (Pulse-Animation + „active"-Marker). */
@@ -819,14 +822,14 @@ function ensurePanelStyle(): void {
     styleInjected = true;
 }
 
-let activePanel: HTMLElement | null = null;
-
 function openReportDialog(editor: any, findings: Finding[]): void {
     // Schwebendes, draggbares Panel – KEIN Modal-Backdrop, KEIN Overlay.
     // Element bleibt sichtbar, Panel kann verschoben werden.
-    if (activePanel) {
-        try { activePanel.remove(); } catch (_e) { /* noop */ }
-        activePanel = null;
+    const editorKey = getEditorStateKey(editor);
+    const existingPanel = activePanels.get(editorKey);
+    if (existingPanel) {
+        try { existingPanel.remove(); } catch (_e) { /* noop */ }
+        activePanels.delete(editorKey);
     }
     ensurePanelStyle();
 
@@ -846,9 +849,19 @@ function openReportDialog(editor: any, findings: Finding[]): void {
     panel.style.right = '24px';
     panel.style.bottom = '24px';
 
+    const onResize = () => {
+        if (!panel.isConnected) return;
+        const r = panel.getBoundingClientRect();
+        if (r.right > window.innerWidth) panel.style.left = Math.max(4, window.innerWidth - panel.offsetWidth - 4) + 'px';
+        if (r.bottom > window.innerHeight) panel.style.top = Math.max(4, window.innerHeight - panel.offsetHeight - 4) + 'px';
+    };
+
     const closePanel = () => {
+        window.removeEventListener('resize', onResize);
         try { panel.remove(); } catch (_e) { /* noop */ }
-        if (activePanel === panel) activePanel = null;
+        if (activePanels.get(editorKey) === panel) {
+            activePanels.delete(editorKey);
+        }
         clearMarkers(editor);
         fireEvent('A11ycheckStop');
     };
@@ -978,12 +991,6 @@ function openReportDialog(editor: any, findings: Finding[]): void {
     panel.addEventListener('mousedown', onDragStart);
 
     // Reposition bei Viewport-Resize, falls das Panel sonst rausläuft.
-    const onResize = () => {
-        if (!panel.isConnected) return;
-        const r = panel.getBoundingClientRect();
-        if (r.right > window.innerWidth) panel.style.left = Math.max(4, window.innerWidth - panel.offsetWidth - 4) + 'px';
-        if (r.bottom > window.innerHeight) panel.style.top = Math.max(4, window.innerHeight - panel.offsetHeight - 4) + 'px';
-    };
     window.addEventListener('resize', onResize);
 
     // Auto-Close wenn Editor entfernt wird.
@@ -991,7 +998,7 @@ function openReportDialog(editor: any, findings: Finding[]): void {
 
     render();
     document.body.appendChild(panel);
-    activePanel = panel;
+    activePanels.set(editorKey, panel);
 
     applyMarkers(editor, remaining);
     fireEvent('A11ycheckStart', { total: remaining.length });

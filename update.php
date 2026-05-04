@@ -9,6 +9,70 @@
 $this->includeFile(__DIR__ . '/ensure_table.php');
 
 // =============================================================================
+// Migration: TinyMCE 5 legacy plugins entfernen (v8.7.0)
+// =============================================================================
+// Plugins, die in TinyMCE 5 vorhanden waren, in v6/v7/v8 aber entfernt oder
+// umbenannt wurden. Stehen diese noch in der Profil-Datenbank, versucht TinyMCE
+// sie als External-Plugin per URL zu laden → 404 → Editor-Absturz.
+// Diese Liste enthält alle TinyMCE-5-built-ins, die in v8 nicht mehr existieren.
+try {
+    $legacyPlugins = [
+        // TinyMCE 5 → 6 removed
+        'bbcode', 'colorpicker', 'contextmenu', 'fullpage', 'hr', 'legacyoutput',
+        'print', 'spellchecker', 'tabfocus', 'textcolor', 'toc', 'wordcount',
+        // Toolbar-Buttons die mit diesen Plugins kamen
+    ];
+    $legacyToolbarButtons = [
+        'print', 'spellchecker', 'fullpage', 'hr',
+    ];
+
+    $sql = rex_sql::factory();
+    $profiles = $sql->getArray('SELECT id, plugins, toolbar FROM ' . rex::getTable('tinymce_profiles'));
+
+    foreach ($profiles as $profile) {
+        $needsUpdate = false;
+        $pluginsList = (string) $profile['plugins'];
+        $toolbar = (string) $profile['toolbar'];
+
+        // Remove legacy plugins (space-separated list)
+        $pluginsArray = preg_split('/\s+/', trim($pluginsList));
+        if (is_array($pluginsArray)) {
+            $cleaned = array_values(array_diff($pluginsArray, $legacyPlugins));
+            $newPlugins = implode(' ', $cleaned);
+            if ($newPlugins !== $pluginsList) {
+                $pluginsList = $newPlugins;
+                $needsUpdate = true;
+            }
+        }
+
+        // Remove legacy toolbar buttons
+        $toolbarParts = preg_split('/(\s*\|\s*|\s+)/', $toolbar, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        if (is_array($toolbarParts)) {
+            $toolbarCleaned = implode(' ', array_filter($toolbarParts, static fn (string $t): bool => !in_array($t, $legacyToolbarButtons, true)));
+            // Normalize multiple separators
+            $toolbarCleaned = (string) preg_replace('/(\|\s*){2,}/', '| ', $toolbarCleaned);
+            $toolbarCleaned = trim($toolbarCleaned, " \t\n\r|");
+            if ($toolbarCleaned !== $toolbar) {
+                $toolbar = $toolbarCleaned;
+                $needsUpdate = true;
+            }
+        }
+
+        if ($needsUpdate) {
+            $upd = rex_sql::factory();
+            $upd->setTable(rex::getTable('tinymce_profiles'));
+            $upd->setWhere(['id' => (int) $profile['id']]);
+            $upd->setValue('plugins', $pluginsList);
+            $upd->setValue('toolbar', $toolbar);
+            $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+            $upd->update();
+        }
+    }
+} catch (rex_sql_exception $e) {
+    // Migration ist best-effort
+}
+
+// =============================================================================
 // Migration: imagewidth -> for_images (v8.2.0)
 // =============================================================================
 // The imagewidth plugin was renamed to for_images. Update existing profiles.

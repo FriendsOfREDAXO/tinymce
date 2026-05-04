@@ -1,6 +1,23 @@
 Changelog
 =========
 
+Version 8.7.0
+-------------------------------
+
+### TinyMCE Vendor auf 8.5.0 aktualisiert
+
+- TinyMCE-Core von `8.4.0` auf `8.5.0` angehoben und Vendor-Dateien neu gebaut.
+- Prüfung gegen das offizielle TinyMCE-Changelog: **keine AddOn-seitigen Code-Anpassungen notwendig**. Version `8.5.0` bringt vor allem Core-Fixes sowie die neue optionale Konfiguration `content_language`.
+
+### Migrationen robuster gemacht
+
+- Beim AddOn-Update werden veraltete TinyMCE-5-Plugin-Namen aus bestehenden Profilen bereinigt, damit TinyMCE 8 keine nicht mehr vorhandenen Plugins als externe Plugins nachlädt und Dialoge bzw. Editor-Initialisierung nicht abbrechen.
+- Neue Reset-Funktion auf der Migrations-Seite: Die mitgelieferten Standardprofile `full`, `light`, `default` und das gesperrte `demo`-Profil lassen sich per Button auf den aktuellen AddOn-Standard zurücksetzen. Vorhandene Profile mit gleichem Namen werden ersetzt, eigene Profile bleiben erhalten.
+
+### Weitere Fixes
+
+- Doppelte Einbindung von `assets/addons/tinymce/styles/base.css` verhindert, wenn `provideBaseAssets()` mehrfach aus unterschiedlichen Integrationen aufgerufen wird.
+
 Version 8.6.5
 -------------------------------
 Boddy padding korrigiert

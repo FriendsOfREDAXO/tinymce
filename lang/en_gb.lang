@@ -12,6 +12,11 @@ tinymce_profile_demo_locked = The demo profile is locked and cannot be edited, c
 tinymce_profile_demo_locked_info = This profile is refreshed automatically on every AddOn update and must not be edited. Please clone it to make your own adjustments.
 tinymce_back_to_list = Back to list
 tinymce_help = Help
+tinymce_reset_default_profiles_title = Reset default profiles
+tinymce_reset_default_profiles_description = Resets the built-in default profiles to the current AddOn state. Existing profiles with the same name will be overwritten. Custom profiles remain untouched.
+tinymce_reset_default_profiles_button = Reset default profiles
+tinymce_reset_default_profiles_confirm = The following default profiles will be overwritten: full, light, default, demo. Custom profiles will not be affected. Continue?
+tinymce_reset_default_profiles_success = Default profiles have been reset successfully.
 
 # heading
 tinymce_subnavigation_header_title = TinyMCE 8 for REDAXO 5

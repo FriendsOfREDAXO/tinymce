@@ -86,6 +86,23 @@ $(document).on('rex:ready', function (e, container) {
 // Store TinyMCE content before DOM manipulation (move up/down in relations)
 let tinyEditorCache = {};
 let tinyRestoringContent = false;
+let tinyEditorSequence = 0;
+
+function ensureTinyEditorId($elm) {
+    let editorId = $elm.attr('id');
+    if (editorId) {
+        return editorId;
+    }
+
+    do {
+        tinyEditorSequence += 1;
+        editorId = 'tiny-editor-' + tinyEditorSequence;
+    } while (document.getElementById(editorId));
+
+    $elm.attr('id', editorId);
+
+    return editorId;
+}
 
 function saveTinyEditorContent() {
     if (typeof tinymce === 'undefined' || !tinymce.editors || tinymce.editors.length === 0) {
@@ -139,18 +156,22 @@ $(document).on('click', '[data-yform-be-relation-moveup], [data-yform-be-relatio
 });
 
 function tiny_init(container) {
-    let profiles = [];
+    let profiles = {};
 
     container.find(tinyareas).each(function() {
         let $this = $(this);
-        let e_id = $this.attr('id');
+        let e_id = ensureTinyEditorId($this);
 
         // Skip if already initialized
         if ($this.hasClass('mce-initialized')) {
             return true;
         }
 
-        profiles.push($this.data('profile'));
+        let profileName = $this.data('profile');
+        if (!profiles[profileName]) {
+            profiles[profileName] = [];
+        }
+        profiles[profileName].push(e_id);
 
         // ============================================
         // FIX: Content VOR Init bereinigen
@@ -204,17 +225,14 @@ function tiny_init(container) {
         }
     });
 
-    // Filter duplicate profiles
-    profiles = profiles.filter(function(item, i, ar) {
-        return ar.indexOf(item) === i;
-    });
-
     // If no profiles found, skip initialization
-    if (profiles.length === 0) {
+    if (Object.keys(profiles).length === 0) {
         return;
     }
 
-    profiles.forEach(function(profile) {
+    Object.keys(profiles).forEach(function(profile) {
+        let editorIds = profiles[profile];
+
         let options = {};
         if (profile in tinyprofiles) {
             // Shallow copy to avoid mutating the shared tinyprofiles cache.
@@ -491,7 +509,9 @@ function tiny_init(container) {
         };
 
         if (!options.hasOwnProperty('selector')) {
-            options['selector'] = '.tiny-editor[data-profile="' + profile + '"]:not(.mce-initialized)';
+            options['selector'] = editorIds.map(function(editorId) {
+                return '#' + editorId;
+            }).join(', ');
         }
 
         tinymce.init(options).then(function(editors) {

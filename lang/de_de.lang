@@ -72,6 +72,12 @@ tinymce_migration_repair_all_confirm = Alle Profile reparieren? Dies kann nicht 
 tinymce_migration_needs_fix = Reparatur nötig
 tinymce_migration_ok = Keine Aktion nötig
 
+tinymce_reset_default_profiles_title = Standardprofile zurücksetzen
+tinymce_reset_default_profiles_description = Setzt die mitgelieferten Standardprofile auf den aktuellen AddOn-Stand zurück. Vorhandene Profile mit gleichem Namen werden überschrieben. Eigene Profile bleiben unangetastet.
+tinymce_reset_default_profiles_button = Standardprofile zurücksetzen
+tinymce_reset_default_profiles_confirm = Die folgenden Standardprofile werden überschrieben: full, light, default, demo. Eigene Profile bleiben erhalten. Fortfahren?
+tinymce_reset_default_profiles_success = Standardprofile wurden erfolgreich zurückgesetzt.
+
 tinymce_profile_export = Exportieren
 tinymce_profile_export_filename = tinymce-profil-%s.json
 tinymce_profile_export_all = Alle exportieren

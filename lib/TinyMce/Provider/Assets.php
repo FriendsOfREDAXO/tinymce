@@ -25,6 +25,12 @@ class Assets
 
     public static function provideBaseAssets(): void
     {
+        static $called = false;
+        if ($called) {
+            return;
+        }
+        $called = true;
+
         try {
             rex_view::addCssFile(self::getAddon()->getAssetsUrl('styles/base.css'));
 

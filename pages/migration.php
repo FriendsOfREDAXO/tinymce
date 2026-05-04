@@ -2,6 +2,7 @@
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
 use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
+use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 
 /**
  * Inline migration logic (avoid adding new classes required by updates/install).
@@ -83,6 +84,8 @@ function tinymce_migrate_extra(string $extra): array
 $func = rex_request('func', 'string');
 $id = (int) rex_request('id', 'int');
 
+$csrfToken = rex_csrf_token::factory('tinymce_migration');
+
 $profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
 
 if ('repair' === $func && $id > 0) {
@@ -139,6 +142,20 @@ if ('repair_all' === $func) {
     echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired_count', $count));
 }
 
+if ('reset_default_profiles' === $func) {
+    if (!$csrfToken->isValid()) {
+        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
+        try {
+            DefaultProfiles::resetAll();
+            echo rex_view::success(rex_i18n::msg('tinymce_reset_default_profiles_success'));
+        } catch (\Throwable $e) {
+            rex_logger::logException($e);
+            echo rex_view::error($e->getMessage());
+        }
+    }
+}
+
 $profiles = TinyMceDatabaseHandler::getAllProfiles() ?: [];
 
 // action buttons (repair all)
@@ -187,3 +204,27 @@ $fragment->setVar('title', rex_i18n::msg('tinymce_migration_title'));
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
+
+// =============================================================================
+// Section: Standardprofile zurücksetzen
+// =============================================================================
+$resetBody = '<p>' . rex_i18n::msg('tinymce_reset_default_profiles_description') . '</p>';
+$resetBody .= '<ul>';
+foreach (DefaultProfiles::NAMES as $pName) {
+    $resetBody .= '<li><code>' . rex_escape($pName) . '</code></li>';
+}
+$resetBody .= '<li><code>' . rex_escape(\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) . '</code> <span class="text-muted">(' . rex_i18n::msg('tinymce_profile_demo_locked_badge') . ')</span></li>';
+$resetBody .= '</ul>';
+$resetBody .= '<form action="' . rex_url::currentBackendPage() . '" method="post">';
+$resetBody .= $csrfToken->getHiddenField();
+$resetBody .= '<input type="hidden" name="func" value="reset_default_profiles">';
+$resetBody .= '<button class="btn btn-danger" type="submit" data-confirm="' . rex_i18n::msg('tinymce_reset_default_profiles_confirm') . '">';
+$resetBody .= rex_i18n::msg('tinymce_reset_default_profiles_button');
+$resetBody .= '</button>';
+$resetBody .= '</form>';
+
+$resetFragment = new rex_fragment();
+$resetFragment->setVar('title', rex_i18n::msg('tinymce_reset_default_profiles_title'));
+$resetFragment->setVar('class', 'edit', false);
+$resetFragment->setVar('body', $resetBody, false);
+echo $resetFragment->parse('core/page/section.php');
