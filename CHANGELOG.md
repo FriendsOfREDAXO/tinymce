@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 8.7.9
+-------------------------------
+
+### Fix: Leere `<p>`-Tags beim Speichern/Öffnen
+
+* **Ursache**: Der Pre-Init-Code entfernte fälschlicherweise äußere `<p>`-Tags aus mehrstufigem Content. Der greedy `.*`-Regex mit `s`-Flag matchte bei `<p>Para 1</p><p>Para 2</p>` von der ersten `<p>` bis zur letzten `</p>`, sodass `innerContent = 'Para 1</p><p>Para 2'` nicht mit `</p>` endete – die Prüfung schlug fälschlich an und lieferte kaputtes HTML an TinyMCE. TinyMCE reparierte das durch Einfügen leerer `<p>`-Tags.
+* **Fix (base.js)**: Der fehlerhafte `pTagMatch`-Block wurde vollständig entfernt. Die Pre-Init-Regex für leere `<p>` am Anfang/Ende wurde auf das gleiche Pattern wie der `GetContent`-Handler vereinheitlicht (inkl. `&nbsp;` und `<br>`).
+
 Version 8.7.8
 -------------------------------
 

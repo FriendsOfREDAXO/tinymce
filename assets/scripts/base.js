@@ -399,26 +399,10 @@ function tiny_init(container) {
         currentContent = currentContent.trim();
         
         // Entferne mehrere aufeinanderfolgende leere <p>-Tags am Anfang
-        currentContent = currentContent.replace(/^(<p[^>]*>\s*<\/p>)+/i, '');
+        currentContent = currentContent.replace(/^(\s*<p[^>]*>\s*(?:&nbsp;|\u00a0|<br\/?>)?\s*<\/p>\s*)+/gi, '');
         
         // Entferne mehrere aufeinanderfolgende leere <p>-Tags am Ende
-        currentContent = currentContent.replace(/(<p[^>]*>\s*<\/p>)+$/i, '');
-        
-        // Entferne NUR die Ã¤uÃŸersten <p>-Tags wenn der ganze Content darin ist
-        // Pattern: ^<p...>content</p>$ aber NICHT wenn mehrere <p> mit Content existieren
-        let pTagMatch = currentContent.match(/^<p[^>]*>(.*)<\/p>$/is);
-        
-        if (pTagMatch) {
-            // Es ist ein einzelner <p>-Tag um alles
-            let innerContent = pTagMatch[1];
-            
-            // PrÃ¼fe, ob der innere Content nicht mit <p> beginnt/endet
-            // Wenn nicht, dann waren die Ã¤uÃŸeren Tags redundant
-            if (!innerContent.match(/^<p/i) && !innerContent.match(/<\/p>$/i)) {
-                // Nicht mehrstÃ¶ckig - entferne die Ã¤uÃŸeren Tags
-                currentContent = innerContent;
-            }
-        }
+        currentContent = currentContent.replace(/(\s*<p[^>]*>\s*(?:&nbsp;|\u00a0|<br\/?>)?\s*<\/p>\s*)+$/gi, '');
         
         // ============================================
         // FIX: Speichere zurÃ¼ck - universell fÃ¼r textarea und div
