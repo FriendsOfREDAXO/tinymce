@@ -3,7 +3,6 @@
 namespace FriendsOfRedaxo\TinyMce\Creator;
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
-use FriendsOfRedaxo\TinyMce\PluginRegistry;
 use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 use rex_addon;
 use rex_addon_interface;
@@ -12,7 +11,6 @@ use rex_functional_exception;
 use rex_i18n;
 use rex_url;
 
-use function count;
 use function is_string;
 
 class Profiles
@@ -132,6 +130,7 @@ const tinyprofiles = $profiles;
         $jsonProfile = [];
         if (!empty($profile['extra'])) {
             $extra = (string) $profile['extra'];
+            $plugins = (string) ($profile['plugins'] ?? '');
             $addonAssetBase = AssetUrl::getTinyAssetBaseUrl();
             $addonAssetBaseEscaped = str_replace('/', '\\/', $addonAssetBase);
 
@@ -144,6 +143,13 @@ const tinyprofiles = $profiles;
             $extra = str_replace('"\/assets\/addons\/tinymce\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
             $extra = str_replace('"assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
             $extra = str_replace('"..\\/assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
+
+            if (!preg_match('/(^|\s)quickbars(\s|$)/', $plugins)) {
+                $sanitized = preg_replace('/^\s*quickbars_(?:selection|insert|image)_toolbar\s*:\s*[^,\r\n]+,\s*$/mi', '', $extra);
+                if (is_string($sanitized)) {
+                    $extra = $sanitized;
+                }
+            }
 
             return $extra;
         }
