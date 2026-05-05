@@ -2,7 +2,6 @@
 
 namespace FriendsOfRedaxo\TinyMce\Utils;
 
-use rex_addon;
 use rex_url;
 
 class AssetUrl
@@ -48,54 +47,9 @@ class AssetUrl
         return '/' . implode('/', $normalizedSegments);
     }
 
-    public static function sanitizeInstallationRoot(string $value): string
-    {
-        $root = trim($value);
-        if ('' === $root || '/' === $root) {
-            return '';
-        }
-
-        // Reject protocol-relative URLs (//...) and anything containing a scheme (http://, ...)
-        // to prevent generated asset URLs from pointing to an external origin.
-        if (str_starts_with($root, '//') || str_contains($root, '://')) {
-            return '';
-        }
-
-        if ('/' !== $root[0]) {
-            $root = '/' . $root;
-        }
-
-        // Collapse multiple consecutive slashes (e.g. //foo -> /foo)
-        $root = (string) preg_replace('#/{2,}#', '/', $root);
-
-        $root = rtrim($root, '/');
-
-        if (str_ends_with($root, '/redaxo')) {
-            $root = substr($root, 0, -7);
-        }
-
-        if ('' === $root || '/' === $root) {
-            return '';
-        }
-
-        return $root;
-    }
-
-    public static function getInstallationRoot(): string
-    {
-        /** @var string $configuredRoot */
-        $configuredRoot = (string) rex_addon::get('tinymce')->getConfig('installation_root', '');
-        return self::sanitizeInstallationRoot($configuredRoot);
-    }
-
     public static function getTinyAssetBaseUrl(): string
     {
-        $root = self::getInstallationRoot();
-        if ('' === $root) {
-            return rtrim(self::makeRootRelative(rex_url::addonAssets('tinymce', '')), '/');
-        }
-
-        return $root . '/assets/addons/tinymce';
+        return rtrim(self::makeRootRelative(rex_url::addonAssets('tinymce', '')), '/');
     }
 
     public static function getTinyPluginBaseUrl(): string

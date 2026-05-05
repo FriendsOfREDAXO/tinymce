@@ -13,11 +13,6 @@ if ($send) {
     if (!$csrfToken->isValid()) {
         $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
-        $installationRootInput = rex_request::request('installation_root', 'string', '/');
-        $installationRoot = AssetUrl::sanitizeInstallationRoot($installationRootInput);
-
-        $addon->setConfig('installation_root', $installationRoot);
-
         try {
             TinyMceProfilesCreator::profilesCreate();
         } catch (rex_functional_exception $e) {
@@ -30,10 +25,6 @@ if ($send) {
         }
     }
 }
-
-/** @var string $configuredRoot */
-$configuredRoot = (string) $addon->getConfig('installation_root', '');
-$displayRoot = '' === $configuredRoot ? '/' : $configuredRoot;
 
 $resolvedAssetBase = AssetUrl::getTinyAssetBaseUrl();
 $resolvedPluginBase = AssetUrl::getTinyPluginBaseUrl();
@@ -53,19 +44,6 @@ echo $message;
                 <div class="panel-title"><?= $addon->i18n('settings_title') ?></div>
             </div>
             <div class="panel-body">
-                <div class="form-group">
-                    <label class="control-label" for="tinymce-installation-root"><?= $addon->i18n('settings_installation_root') ?></label>
-                    <input
-                        id="tinymce-installation-root"
-                        type="text"
-                        class="form-control"
-                        name="installation_root"
-                        value="<?= rex_escape($displayRoot) ?>"
-                        placeholder="<?= rex_escape($addon->i18n('settings_installation_root_placeholder')) ?>"
-                    >
-                    <p class="help-block"><?= $addon->i18n('settings_installation_root_help') ?></p>
-                </div>
-
                 <div class="alert alert-info" role="status">
                     <p><strong><?= $addon->i18n('settings_resolved_asset_base') ?>:</strong> <code><?= rex_escape($resolvedAssetBase) ?></code></p>
                     <p><strong><?= $addon->i18n('settings_resolved_plugin_base') ?>:</strong> <code><?= rex_escape($resolvedPluginBase) ?></code></p>
@@ -74,7 +52,7 @@ echo $message;
                 <p class="help-block"><?= $addon->i18n('settings_reload_hint') ?></p>
             </div>
             <div class="panel-footer">
-                <button class="btn btn-save" type="submit"><?= $addon->i18n('settings_save') ?></button>
+                <button class="btn btn-save" type="submit"><?= $addon->i18n('settings_regenerate') ?></button>
             </div>
         </div>
     </form>

@@ -152,10 +152,8 @@ try {
     // Migration ist best-effort
 }
 
-// Initialize installation_root config if not already set (important for profile regeneration)
-if (null === $this->getConfig('installation_root')) {
-    $this->setConfig('installation_root', '/');
-}
+// Migration: installation_root ist nicht mehr nötig – wird automatisch via rex_url aufgelöst
+$this->removeConfig('installation_root');
 
 // Set flag to regenerate profiles.js on next backend request
 $this->setConfig('update_profiles', true);

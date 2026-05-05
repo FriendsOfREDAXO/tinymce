@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.7.5
+-------------------------------
+
+### Refactor: `installation_root` entfernt – URL-Auflösung vollautomatisch
+
+* Das manuelle Einstellungsfeld "Installations-Root" entfällt komplett. `AssetUrl::getTinyAssetBaseUrl()` nutzt jetzt ausschließlich `makeRootRelative(rex_url::addonAssets())`, das für Root-, Unterverzeichnis- und Backend-Kontexte zuverlässig korrekte absolute Pfade liefert.
+* `sanitizeInstallationRoot()` und `getInstallationRoot()` aus `AssetUrl` entfernt.
+* `installation_root`-Config-Key wird beim Update automatisch gelöscht (`removeConfig`).
+* Settings-Seite zeigt nur noch die automatisch ermittelten URLs und einen "profiles.js neu generieren"-Button.
+
 Version 8.7.4
 -------------------------------
 
