@@ -51,7 +51,19 @@ class AssetUrl
     {
         $root = self::getInstallationRoot();
         if ('' === $root) {
-            return rtrim(rex_url::addonAssets('tinymce', ''), '/');
+            $fallback = rtrim(rex_url::addonAssets('tinymce', ''), '/');
+
+            // In backend contexts rex_url::addonAssets() can return relative URLs
+            // like "../assets/...". Normalize those to absolute paths.
+            if (str_starts_with($fallback, '../assets/')) {
+                return '/assets/' . ltrim(substr($fallback, strlen('../assets/')), '/');
+            }
+
+            if (str_starts_with($fallback, 'assets/')) {
+                return '/assets/' . ltrim(substr($fallback, strlen('assets/')), '/');
+            }
+
+            return $fallback;
         }
 
         return $root . '/assets/addons/tinymce';
