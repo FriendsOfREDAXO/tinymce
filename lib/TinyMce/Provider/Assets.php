@@ -350,7 +350,7 @@ class Assets
 
             // Split registered plugins into "bundled with tinymce addon" (FOR)
             // and "provided by other addons" (AddOn) based on the plugin URL path.
-            $tinymceAssetsBase = (string) \rex_url::addonAssets('tinymce', '');
+            $tinymceAssetsBase = AssetUrl::getTinyAssetBaseUrl();
             $addonPlugins = [];
             $addonToolbarButtons = [];
             $forPlugins = [];

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 8.7.8
+-------------------------------
+
+### Fix: Overflow-Toolbar (`...`-Button) funktioniert jetzt in Bootstrap-Modals
+
+* **Ursache**: Bootstrap 3's `enforceFocus()` registriert beim Öffnen eines Modals einen `focusin.bs.modal`-Handler am Dokument. Sobald TinyMCE's Overflow-Toolbar-Popup in `.tox-tinymce-aux` (außerhalb des Modal-DOMs am `<body>`) den Fokus erhielt, hat Bootstrap diesen Fokus sofort zurück in das Modal gezwungen – das Popup schloss sich dadurch unmittelbar wieder.
+* **Fix (base.js)**: Ein `focusin`-Handler wird früh am Dokument registriert – noch vor Bootstrap's Modal-Open-Handler. Wenn das Fokus-Event von einem Element in `.tox-tinymce-aux`, `.tox-dialog` oder `.tox-dialog-wrap` kommt, wird `stopImmediatePropagation()` aufgerufen, sodass Bootstrap's Handler nie ausgeführt wird.
+
 Version 8.7.7
 -------------------------------
 

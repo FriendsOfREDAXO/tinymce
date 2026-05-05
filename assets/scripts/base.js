@@ -262,6 +262,19 @@ function releaseTinyDialogScrollLock() {
     document.body.style.removeProperty('overflow-y');
 }
 
+// Fix: Bootstrap 3's enforceFocus() steals focus from TinyMCE popups that are
+// rendered in .tox-tinymce-aux (appended to <body>, outside any modal DOM).
+// When the overflow toolbar or other TinyMCE popups open, Bootstrap detects
+// a focusin outside the modal and redirects focus back – closing the popup immediately.
+// We register this handler early (before Bootstrap's modal opens and registers its
+// own focusin.bs.modal handler), so ours runs first and stops Bootstrap's handler
+// via stopImmediatePropagation().
+$(document).on('focusin', function (e) {
+    if ($(e.target).closest('.tox-tinymce-aux, .tox-dialog, .tox-dialog-wrap').length) {
+        e.stopImmediatePropagation();
+    }
+});
+
 $(document).on('rex:ready', function (e, container) {
     if (container.find(tinyareas).length) {
         tiny_init(container);
