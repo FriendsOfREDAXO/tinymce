@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.7.6
+-------------------------------
+
+### Fix: Quellcode-Dialog Scroll-Lock (PR #154, @TobiasKrais)
+
+* `releaseTinyDialogScrollLock()` entfernt `tox-dialog__disable-scroll`-Klasse und `overflow`-Styles von `html` und `body`.
+* Neuer `OpenWindow`-Handler prüft via `setTimeout(0)`, ob ein Dialog tatsächlich sichtbar ist – falls nicht, wird der Scroll-Lock sofort freigegeben.
+* `CloseWindow`-Handler nutzt jetzt die neue Funktion statt nur `documentElement` zu bereinigen.
+* CSS: `body.tox-dialog__disable-scroll { overflow: visible !important }` verhindert das Verstecken des Editors. `z-index: 1300` für `.tox-tinymce-aux` stellt sicher, dass Dialoge über anderen Elementen erscheinen.
+
 Version 8.7.5
 -------------------------------
 

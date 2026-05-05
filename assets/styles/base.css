@@ -5,3 +5,11 @@
 .tox .tox-promotion {
     display: none;
 }
+
+body.tox-dialog__disable-scroll {
+    overflow: visible !important;
+}
+
+.tox.tox-tinymce-aux {
+    z-index: 1300;
+}

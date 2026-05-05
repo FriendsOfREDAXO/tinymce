@@ -252,6 +252,16 @@ function forceCanonicalTinyPluginUrls(externalPlugins, prefix) {
     return rewritten;
 }
 
+function releaseTinyDialogScrollLock() {
+    document.documentElement.classList.remove('tox-dialog__disable-scroll');
+    document.documentElement.style.removeProperty('overflow');
+    document.documentElement.style.removeProperty('overflow-y');
+
+    document.body.classList.remove('tox-dialog__disable-scroll');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('overflow-y');
+}
+
 $(document).on('rex:ready', function (e, container) {
     if (container.find(tinyareas).length) {
         tiny_init(container);
@@ -698,11 +708,20 @@ function tiny_init(container) {
                 }
             });
 
-            // Fix: TinyMCE setzt overflow:hidden auf <html> bei Dialogen und entfernt es nicht
-            // zuverlÃ¤ssig â€“ das blockiert window.scroll-Events und damit die REDAXO-Nav (Issue #139)
+            // Fix: TinyMCE setzt beim Oeffnen von Dialogen Scroll-Locks auf html/body.
+            // Wenn diese haengen bleiben, wirkt es so, als ob der Editor verschwindet
+            // und die Seite nicht mehr scrollt.
+            editor.on('OpenWindow', function() {
+                window.setTimeout(function() {
+                    let hasVisibleDialog = !!document.querySelector('.tox-dialog-wrap, .tox-dialog, .tox-tinymce-aux .tox-dialog');
+                    if (!hasVisibleDialog) {
+                        releaseTinyDialogScrollLock();
+                    }
+                }, 0);
+            });
+
             editor.on('CloseWindow', function() {
-                document.documentElement.style.removeProperty('overflow');
-                document.documentElement.style.removeProperty('overflow-y');
+                releaseTinyDialogScrollLock();
             });
             // Filter padding nodes (leere <p>-Tags) beim Speichern und für den Quelltext-Dialog.
             // TinyMCE fügt intern leere <p> an den Rändern für den Cursor ein.
