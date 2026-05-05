@@ -89,6 +89,8 @@ link_target_list: [
 link_default_protocol: 'https',
 /* URLs ohne Protokoll beim Einfügen automatisch mit https:// versehen. */
 link_assume_external_targets: 'https',
+/* Quicklink-Bubble deaktivieren: internen Picker immer über den normalen Dialog öffnen. */
+link_quicklink: false,
 
 /* Sicherheits-Hardening für Links:
    Bei target="_blank" automatisch rel="noopener noreferrer" ergänzen.

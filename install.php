@@ -115,6 +115,8 @@ link_target_list: [
 ],
 link_default_protocol: 'https',
 link_assume_external_targets: 'https',
+link_quicklink: false,
+quickbars_selection_toolbar: 'bold italic | link h2 h3 blockquote',
 link_attributes_postprocess: function (attrs) {
  if (!attrs || attrs.target !== '_blank') { return; }
  var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
@@ -151,6 +153,8 @@ link_target_list: [
 ],
 link_default_protocol: 'https',
 link_assume_external_targets: 'https',
+link_quicklink: false,
+quickbars_selection_toolbar: 'bold italic | link h2 h3 blockquote',
 link_attributes_postprocess: function (attrs) {
  if (!attrs || attrs.target !== '_blank') { return; }
  var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
@@ -216,6 +220,8 @@ link_target_list: [
 ],
 link_default_protocol: 'https',
 link_assume_external_targets: 'https',
+link_quicklink: false,
+quickbars_selection_toolbar: 'bold italic | link h2 h3 blockquote',
 link_attributes_postprocess: function (attrs) {
  if (!attrs || attrs.target !== '_blank') { return; }
  var rel = (attrs.rel || '').toLowerCase().split(/\s+/).filter(Boolean);
