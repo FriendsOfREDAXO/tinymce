@@ -17,7 +17,7 @@ class AssetUrl
             return $url;
         }
 
-        $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+        $requestUri = rex_server('REQUEST_URI', 'string', '/');
         $requestPath = parse_url($requestUri, PHP_URL_PATH);
         if (!is_string($requestPath) || $requestPath === '') {
             $requestPath = '/';
@@ -74,7 +74,7 @@ class AssetUrl
             $root = substr($root, 0, -7);
         }
 
-        if (false === $root || '' === $root || '/' === $root) {
+        if ('' === $root || '/' === $root) {
             return '';
         }
 

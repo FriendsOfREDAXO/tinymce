@@ -1,6 +1,26 @@
 Changelog
 =========
 
+Version 8.7.4
+-------------------------------
+
+### Fix: Stabile Asset-/Plugin-URLs in allen Kontexten
+
+* Relative Basispfade wie `../assets/...` werden in der URL-Normalisierung nicht mehr als Prefix-Quelle verwendet. Damit werden korrekte absolute Plugin-URLs nicht mehr auf fehlerhafte relative Pfade umgeschrieben.
+* Fallback in `AssetUrl` normalisiert relative `rex_url::addonAssets()`-Ergebnisse auf absolute `/assets/...`-Pfade.
+
+### Fix: Link-Quickbar mit internem REDAXO-Linkdialog
+
+* Standardverhalten ist jetzt der normale TinyMCE-Linkdialog statt des eingeschränkten Quicklink-Bubbles, damit die interne Link-Auswahl verfügbar ist.
+* Dafür werden `link_quicklink: false` und eine `quickbars_selection_toolbar` mit `link` als Default gesetzt.
+
+### Installation und Reset-Profile geprüft und angeglichen
+
+* Installations-Defaults in `install.php` enthalten jetzt ebenfalls die Link-Defaults (`link_quicklink: false` + `quickbars_selection_toolbar` mit `link`).
+* Reset-Defaults in `DefaultProfiles` sowie das gesperrte `demo`-Profil wurden entsprechend ergänzt, damit Neuinstallation und "Standardprofile zurücksetzen" beim Link-Verhalten konsistent sind.
+
+**Vendor Version:** TinyMCE 8.5.0 (unverändert)
+
 Version 8.7.3
 -------------------------------
 
