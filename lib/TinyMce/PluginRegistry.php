@@ -2,6 +2,7 @@
 
 namespace FriendsOfRedaxo\TinyMce;
 
+use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 use rex_extension;
 use rex_extension_point;
 
@@ -28,8 +29,25 @@ class PluginRegistry
         // ohne REDAXOs Asset-Versionierung).
         if ($pluginUrl !== '' && !str_contains($pluginUrl, '?')) {
             $addon = \rex_addon::get('tinymce');
-            $version = $addon->isAvailable() ? (string) $addon->getVersion() : '0';
-            $pluginUrl .= '?v=' . rawurlencode($version);
+            $cacheToken = $addon->isAvailable() ? (string) $addon->getVersion() : '0';
+            $pluginPath = parse_url($pluginUrl, PHP_URL_PATH);
+            $assetBasePath = parse_url(AssetUrl::getTinyAssetBaseUrl(), PHP_URL_PATH);
+
+            if (is_string($pluginPath) && is_string($assetBasePath)) {
+                $assetBasePath = rtrim($assetBasePath, '/');
+                if (str_starts_with($pluginPath, $assetBasePath . '/')) {
+                    $relativeAssetPath = ltrim(substr($pluginPath, strlen($assetBasePath)), '/');
+                    $assetFile = $addon->getAssetsPath($relativeAssetPath);
+                    if (is_file($assetFile)) {
+                        $mtime = filemtime($assetFile);
+                        if (false !== $mtime) {
+                            $cacheToken .= '-' . (string) $mtime;
+                        }
+                    }
+                }
+            }
+
+            $pluginUrl .= '?v=' . rawurlencode($cacheToken);
         }
 
         // Store plugin statically for profiles.js generation

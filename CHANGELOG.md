@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 8.7.7
+-------------------------------
+
+### Fix: TinyMCE quickbars-Option-Guards (PR #155, @TobiasKrais)
+
+* **JS**: `quickbars_*_toolbar`-Optionen werden aus den TinyMCE-Init-Optionen entfernt, wenn das `quickbars`-Plugin nicht aktiv ist – verhindert Konsolen-Warnungen.
+* **Profiles.php**: `mapProfile()` entfernt `quickbars_*_toolbar`-Einträge aus dem Extra-Feld, wenn das Profil kein `quickbars`-Plugin enthält. Nicht verwendete `use`-Statements (`PluginRegistry`) entfernt.
+* **PluginRegistry.php**: Cache-Token nutzt jetzt zusätzlich den `mtime`-Wert der Plugin-Datei (wenn es sich um eine lokale Addon-Asset-Datei handelt), für präziseres Cache-Busting nach Plugin-Updates.
+
 Version 8.7.6
 -------------------------------
 

@@ -604,6 +604,21 @@ function tiny_init(container) {
             options['external_plugins'] = forceCanonicalTinyPluginUrls(options['external_plugins'], tinyAssetPrefix);
         }
 
+        let activePlugins = [];
+        if (Array.isArray(options.plugins)) {
+            activePlugins = options.plugins.map(function(pluginName) {
+                return String(pluginName || '').trim();
+            }).filter(Boolean);
+        } else if (typeof options.plugins === 'string') {
+            activePlugins = options.plugins.split(/\s+/).filter(Boolean);
+        }
+
+        if (activePlugins.indexOf('quickbars') === -1) {
+            delete options.quickbars_selection_toolbar;
+            delete options.quickbars_insert_toolbar;
+            delete options.quickbars_image_toolbar;
+        }
+
         // Store the original setup function if it exists
         let originalSetup = options['setup'] || null;
         
