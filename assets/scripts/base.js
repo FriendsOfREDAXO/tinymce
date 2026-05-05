@@ -80,6 +80,12 @@ function getConfiguredTinyAssetPrefix() {
         return null;
     }
 
+    // Ignore relative values like "../assets/..." because extracting a prefix
+    // from them would yield ".." and break absolute plugin URLs.
+    if (basePath.charAt(0) !== '/') {
+        return null;
+    }
+
     let marker = '/assets/addons/tinymce';
     let idx = basePath.indexOf(marker);
     if (idx === -1) {
@@ -435,6 +441,18 @@ function tiny_init(container) {
         }
         if (!options.hasOwnProperty('remove_trailing_brs')) {
             options.remove_trailing_brs = true;
+        }
+
+        // Use the full link dialog (with REDAXO internal picker) instead of
+        // TinyMCE's quicklink bubble unless a profile explicitly opts in.
+        if (!options.hasOwnProperty('link_quicklink')) {
+            options.link_quicklink = false;
+        }
+
+        // TinyMCE's default quickbars selection toolbar uses "quicklink".
+        // Replace it with "link" so selecting text opens the full dialog.
+        if (!options.hasOwnProperty('quickbars_selection_toolbar')) {
+            options.quickbars_selection_toolbar = 'bold italic | link h2 h3 blockquote';
         }
 
         // IMPORTANT: Merge global options FIRST before any other processing
