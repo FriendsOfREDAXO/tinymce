@@ -422,19 +422,25 @@ const Plugin = (): void => {
             // nach dem initialen SetContent erhalten bleiben. Ohne das würde
             // TinyMCE id="…" auf h1-h6 strippen und die Backlinks aus dem TOC
             // würden ins Leere laufen.
+            //
+            // WICHTIG: Das '+'-Präfix vor jedem Element bedeutet "erweitern statt
+            // ersetzen". Ohne '+' überschreibt addValidElements() die bestehende
+            // Attributliste des jeweiligen Elements und entfernt dabei u. a. das
+            // 'style'-Attribut – was dazu führt, dass TinyMCE text-align und andere
+            // Inline-Styles aus getipptem Text herausfiltert.
             editor.schema.addValidElements(
-                'nav[class|' + DATA_MIN + '|' + DATA_MAX + '|' + DATA_ORDERED + '|' + DATA_TITLE + '|contenteditable],' +
-                'p[class|contenteditable],' +
-                'ol[class],' +
-                'ul[class],' +
-                'li[class],' +
-                'a[href|id|class|name|target|rel|title],' +
-                'h1[id|class],' +
-                'h2[id|class],' +
-                'h3[id|class],' +
-                'h4[id|class],' +
-                'h5[id|class],' +
-                'h6[id|class]'
+                '+nav[class|' + DATA_MIN + '|' + DATA_MAX + '|' + DATA_ORDERED + '|' + DATA_TITLE + '|contenteditable],' +
+                '+p[class|contenteditable],' +
+                '+ol[class],' +
+                '+ul[class],' +
+                '+li[class],' +
+                '+a[href|id|class|name|target|rel|title],' +
+                '+h1[id|class],' +
+                '+h2[id|class],' +
+                '+h3[id|class],' +
+                '+h4[id|class],' +
+                '+h5[id|class],' +
+                '+h6[id|class]'
             );
         });
 
