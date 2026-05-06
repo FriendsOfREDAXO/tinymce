@@ -588,16 +588,16 @@ const Plugin = (): void => {
         // --- Schema: figure, video, source, img, div, button, svg/path/rect, span ---
         editor.on('PreInit', () => {
             const schema = editor.schema;
-            // schema.addValidElements('figure[class|contenteditable|data-for-video-src|data-for-video-poster|data-for-video-controls|data-for-video-autoplay|data-for-video-loop|data-for-video-muted|data-for-video-playsinline|data-for-video-active]');
-            // schema.addValidElements('video[src|poster|controls|autoplay|loop|muted|playsinline|preload|width|height|crossorigin]');
-            // schema.addValidElements('source[src|type]');
-            // schema.addValidElements('div[class|style|data-for-video-toolbar]');
-            // schema.addValidElements('span[class|title]');
-            // schema.addValidElements('button[type|class|title|aria-label|data-for-video-stop|data-for-video-select]');
-            // schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
-            // schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
-            // schema.addValidElements('path[d|fill|fill-opacity|stroke|stroke-width]');
-            // schema.addValidElements('rect[x|y|width|height|rx|ry|fill|stroke|stroke-width]');
+            schema.addValidElements('figure[class|contenteditable|data-for-video-src|data-for-video-poster|data-for-video-controls|data-for-video-autoplay|data-for-video-loop|data-for-video-muted|data-for-video-playsinline|data-for-video-active]');
+            schema.addValidElements('video[src|poster|controls|autoplay|loop|muted|playsinline|preload|width|height|crossorigin]');
+            schema.addValidElements('source[src|type]');
+            schema.addValidElements('div[class|style|data-for-video-toolbar]');
+            schema.addValidElements('span[class|title]');
+            schema.addValidElements('button[type|class|title|aria-label|data-for-video-stop|data-for-video-select]');
+            schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
+            schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
+            schema.addValidElements('path[d|fill|fill-opacity|stroke|stroke-width]');
+            schema.addValidElements('rect[x|y|width|height|rx|ry|fill|stroke|stroke-width]');
             schema.addValidChildren('+figure[video|div|a]');
             schema.addValidChildren('+video[source|a|track]');
             schema.addValidChildren('+div[video|div|svg|img|span|button]');

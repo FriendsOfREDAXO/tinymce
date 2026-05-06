@@ -241,10 +241,10 @@ const Plugin = (): void => {
 
             // script, iframe, style, noscript als valide Elemente registrieren
             try {
-                // schema.addValidElements('script[type|src|async|defer|*]');
-                // schema.addValidElements('iframe[src|width|height|frameborder|allow|allowfullscreen|sandbox|loading|referrerpolicy|*]');
-                // schema.addValidElements('style[type|media]');
-                // schema.addValidElements('noscript');
+                schema.addValidElements('script[type|src|async|defer|*]');
+                schema.addValidElements('iframe[src|width|height|frameborder|allow|allowfullscreen|sandbox|loading|referrerpolicy|*]');
+                schema.addValidElements('style[type|media]');
+                schema.addValidElements('noscript');
                 // Diese Elemente als Kinder von div erlauben
                 schema.addValidChildren('+div[script|iframe|style|noscript]');
             } catch (_e) { /* noop */ }

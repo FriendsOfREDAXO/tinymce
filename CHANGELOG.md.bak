@@ -1,14 +1,6 @@
 Changelog
 =========
 
-Version 8.7.10
--------------------------------
-
-### Fix: Inline-Styles und Attribute von Block-Level-Elementen bleiben jetzt erhalten
-
-* **Ursache**: Die Custom-Plugins `for_toc`, `for_htmlembed`, `for_oembed` und `for_video` haben über `editor.schema.addValidElements(...)` harte Schema-Definitionen für Standard-HTML5-Tags (wie `p`, `a`, `h1`-`h6`, `div`, `figure`, `iframe` etc.) im TinyMCE Core überschrieben. Dies führte dazu, dass alle dort nicht explizit genannten globalen Attribute wie `style="text-align: center"`, `dir`, `lang` etc. aus Block-Elementen gelöscht wurden.
-* **Fix**: Die fehlerhaften Redefinitionen der Standard-Tags bei den betroffenen Custom-Plugins wurden restlos aus dem Code entfernt. In `addValidElements()` werden nun ausschließlich die wirklichen Custom-DOM-Nodes (z.B. `nav`, `oembed`) registriert. Die betroffenen Plugins wurden mit esbuild neu transpiliert und als Minified-Asset bereitgestellt. Ausrichtung (`text-align: center`) und andere Inline-Attribute beleiben nun vollumfänglich und persistent erhalten.
-
 Version 8.7.9
 -------------------------------
 

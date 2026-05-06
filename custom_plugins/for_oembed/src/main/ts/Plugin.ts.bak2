@@ -601,18 +601,18 @@ const Plugin = (): void => {
         editor.on('PreInit', () => {
             const schema = editor.schema;
             try {
-                // schema.addValidElements('figure[class|contenteditable|data-for-oembed-url|data-for-oembed-provider|data-for-oembed-id|data-for-oembed-poster|data-for-oembed-active]');
-                // schema.addValidElements('oembed[url]');
-                // schema.addValidElements('iframe[src|width|height|frameborder|allow|allowfullscreen|loading|referrerpolicy]');
+                schema.addValidElements('figure[class|contenteditable|data-for-oembed-url|data-for-oembed-provider|data-for-oembed-id|data-for-oembed-poster|data-for-oembed-active]');
+                schema.addValidElements('oembed[url]');
+                schema.addValidElements('iframe[src|width|height|frameborder|allow|allowfullscreen|loading|referrerpolicy]');
                 // style erlaubt für background-image auf der Ratio-Box
-                // schema.addValidElements('div[class|style|data-for-oembed-overlay|data-for-oembed-toolbar]');
-                // schema.addValidElements('span[class|title]');
-                // schema.addValidElements('button[type|class|title|aria-label|data-for-oembed-stop|data-for-oembed-select]');
-                // schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
+                schema.addValidElements('div[class|style|data-for-oembed-overlay|data-for-oembed-toolbar]');
+                schema.addValidElements('span[class|title]');
+                schema.addValidElements('button[type|class|title|aria-label|data-for-oembed-stop|data-for-oembed-select]');
+                schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
                 // SVG-Elemente fürs Play-Icon + Buttons
-                // schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
-                // schema.addValidElements('path[d|fill|fill-opacity|stroke|stroke-width]');
-                // schema.addValidElements('rect[x|y|width|height|rx|ry|fill|stroke|stroke-width]');
+                schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
+                schema.addValidElements('path[d|fill|fill-opacity|stroke|stroke-width]');
+                schema.addValidElements('rect[x|y|width|height|rx|ry|fill|stroke|stroke-width]');
                 schema.addValidChildren('+figure[oembed|div|iframe]');
                 schema.addValidChildren('+div[iframe|div|svg|img|span|button]');
                 schema.addValidChildren('+button[svg]');
