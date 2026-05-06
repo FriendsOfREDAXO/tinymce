@@ -236,6 +236,7 @@ Hook in den `PastePreProcess`-Handler. Entfernt Word-/Office-Rauschen und normal
 - Kein sichtbarer Button – wirkt automatisch, sobald das Plugin im Profil aktiv ist
 - **Konfigurierbare Whitelist** `paste_preserve_classes` für projekteigene Klassen-Präfixe
 - **Interne Schutzliste** (nicht überschreibbar) für `for_*`-Plugin-Markup: Klassen mit Präfix `for-*` sowie `media` bleiben immer erhalten, Attribute mit Präfix `data-for-*` sowie `data-mce-selected` werden nie entfernt – verhindert Kollisionen mit `for_oembed`, `for_video`, `for_images`, `for_checklist`, `for_toc` und `for_footnotes`
+- **Textausrichtung immer erhalten**: `text-align` und `direction` werden nie entfernt, auch wenn `remove_styles: true` konfiguriert ist – TinyMCE speichert Textausrichtung als Inline-Style, ein Entfernen würde linksbündig, zentriert, rechtsbündig und Blocksatz wirkungslos machen
 - Ersetzt bei den meisten Anwendungen das kommerzielle `powerpaste`
 
 ### `mediapaste` – Medien beim Paste automatisch hochladen

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 8.7.10
+-------------------------------
+
+### Fix: Textausrichtung wird durch `cleanpaste` entfernt
+
+* **Ursache**: Wenn `cleanpaste` mit `remove_styles: true` konfiguriert ist, wurden alle Inline-Styles entfernt – einschließlich `text-align` und `direction`, die TinyMCE für die Textausrichtung (links, zentriert, rechts, Blocksatz) und Schreibrichtung (LTR/RTL) verwendet.
+* **Fix (`cleanpaste/Plugin.ts`)**: `text-align` und `direction` sind jetzt hart codiert geschützt und werden nie entfernt – analog zur bestehenden Schutzliste für `for-*`-Klassen. Die neue Hilfsfunktion `isProtectedStyleProp()` prüft diese Eigenschaften unabhängig von `preserve_styles`.
+
 Version 8.7.9
 -------------------------------
 

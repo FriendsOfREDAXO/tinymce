@@ -1,5 +1,10 @@
 Changelog for Clean Paste Plugin
 
+1.0.1 (2026-05-06)
+  - Fix: text-align and direction are now always preserved even when remove_styles is true
+    (TinyMCE stores text alignment as inline style; stripping it silently removed all
+     left/center/right/justify formatting applied via the toolbar)
+
 1.0.0 (2026-04-22)
   - Initial release
   - Automatic cleanup of pasted content from MS Office, Google Docs and other sources

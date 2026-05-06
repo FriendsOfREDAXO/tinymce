@@ -90,6 +90,11 @@ function isProtectedDataAttr(name: string): boolean {
     return /^data-for-/.test(name) || name === 'data-mce-selected';
 }
 
+/** CSS property controls text alignment or writing direction (always preserve). */
+function isProtectedStyleProp(prop: string): boolean {
+    return prop === 'text-align' || prop === 'direction';
+}
+
 /* ================================================================== */
 /*  MS Office string-level cleanup                                     */
 /* ================================================================== */
@@ -193,7 +198,9 @@ function cleanElement(el: Element, config: CleanPasteConfig, doc: Document): voi
         let kept: string[] = [];
 
         if (config.remove_styles) {
-            // Keep only explicitly preserved properties
+            // Keep only explicitly preserved properties AND always-protected ones
+            // (text-align / direction must never be stripped: they store alignment
+            //  applied via the TinyMCE toolbar and are fundamental content semantics)
             kept = styleStr
                 .split(';')
                 .map((s) => s.trim())
@@ -201,7 +208,7 @@ function cleanElement(el: Element, config: CleanPasteConfig, doc: Document): voi
                 .filter((part) => {
                     const colonIdx = part.indexOf(':');
                     const prop = colonIdx >= 0 ? part.slice(0, colonIdx).trim() : part;
-                    return matchesPattern(prop, config.preserve_styles);
+                    return isProtectedStyleProp(prop.toLowerCase()) || matchesPattern(prop, config.preserve_styles);
                 });
         } else {
             // Remove at least mso-* properties when strip_ms_office is active
