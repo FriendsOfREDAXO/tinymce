@@ -36,31 +36,23 @@ if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\Ti
 
 Oftmals ist es am einfachsten, ein Profil im REDAXO Backend zusammenzuklicken, es über den *Export*-Button in eine `.json`-Datei herunterzuladen und dann als Teil deines AddOns auszuliefern.
 
-Ein solches JSON lässt sich exzellent mit derselben API einladen:
+Mit der Hilfsmethode `importProfileFromJson` lässt sich ein solches JSON (Einzelnes Profil oder Array aus mehreren Profilen) als idealer One-Liner importieren:
 
 ```php
 if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
 
     $jsonFile = rex_path::addon('mein_addon', 'data/mein_tinymce_profil.json');
-    if (file_exists($jsonFile)) {
-        
-        $profileData = json_decode(file_get_contents($jsonFile), true);
-        
-        // Prüfe ob Array gültig ist (ggf. eine Iteration nutzen, falls das JSON mehrere Profile enthält!)
-        if (is_array($profileData) && isset($profileData['name'])) {
-            \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
-                $profileData['name'],
-                $profileData['description'] ?? 'Automatisch importiert',
-                $profileData,
-                false // Setze auf true, wenn dein AddOn-Update das Profil zwingend aktualisieren soll!
-            );
-        }
-        
-    }
+    
+    // Importiert das Profil auf einen Schlag
+    \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::importProfileFromJson(
+        $jsonFile, 
+        false // Setze auf true, wenn dein AddOn-Update das Profil zwingend überschreiben/aktualisieren soll
+    );
+
 }
 ```
 
-Die Methode `ensureProfile()` triggert am Ende vollautomatisch den internen Build-Prozess (`Profiles::profilesCreate()`), sodass das neu eingespeiste Profil augenblicklich im REDAXO Frontend und Backend zur Verfügung steht.
+Die Methoden triggern am Ende vollautomatisch den internen Build-Prozess (`Profiles::profilesCreate()`), sodass das neu eingespeiste Profil augenblicklich im REDAXO Frontend und Backend zur Verfügung steht.
 
 ## Eigene Plugins registrieren
 

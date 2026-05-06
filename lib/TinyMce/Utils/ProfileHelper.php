@@ -69,4 +69,40 @@ class ProfileHelper
 
         return true;
     }
+
+    /**
+     * Imports one or more TinyMCE profiles from a JSON file.
+     *
+     * @param string $filePath Absolute path to the JSON file
+     * @param bool $forceUpdate If true, overwrites existing profile data
+     * @return bool True if at least one profile was successfully created or updated
+     * @throws rex_sql_exception
+     */
+    public static function importProfileFromJson(string $filePath, bool $forceUpdate = false): bool
+    {
+        $content = \rex_file::get($filePath);
+        if ($content === null) {
+            return false;
+        }
+        
+        $data = json_decode($content, true);
+        if (!is_array($data)) {
+            return false;
+        }
+
+        $items = isset($data['name']) ? [$data] : $data;
+        $success = false;
+
+        foreach ($items as $item) {
+            if (empty($item['name'])) {
+                continue;
+            }
+            $description = $item['description'] ?? 'Imported Profile';
+            if (self::ensureProfile($item['name'], $description, $item, $forceUpdate)) {
+                $success = true;
+            }
+        }
+        
+        return $success;
+    }
 }

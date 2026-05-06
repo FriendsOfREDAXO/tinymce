@@ -5,7 +5,7 @@ Version 8.7.10
 -------------------------------
 
 ### Feature: Programmatische Bereitstellung von Profilen für Dritt-AddOns
-* **API**: Andere AddOns können nun via `\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile()` maßgeschneiderte TinyMCE-Profile programmatisch in REDAXO installieren (z.B. über deren `install.php`). Die Dokumentation hierzu, inkl. Beispielen für den automatisierten JSON-Import (aus exportierten Profilen), wurde in der `DEVS.md` ergänzt.
+* **API**: Andere AddOns können nun via `\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile()` und der neuen Einzeiler-Methode `\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::importProfileFromJson()` maßgeschneiderte TinyMCE-Profile programmatisch in REDAXO installieren (z.B. über deren `install.php`). Die Dokumentation hierzu, inkl. Beispielen für den automatisierten JSON-Import (aus exportierten Profilen), wurde in der `DEVS.md` deutlich vereinfacht und ergänzt.
 
 ### Fix: Inline-Styles und Attribute von Block-Level-Elementen bleiben jetzt erhalten
 
