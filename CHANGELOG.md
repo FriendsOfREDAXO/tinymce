@@ -4,6 +4,9 @@ Changelog
 Version 8.7.10
 -------------------------------
 
+### Feature: Programmatische Bereitstellung von Profilen für Dritt-AddOns
+* **API**: Andere AddOns können nun via `\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile()` maßgeschneiderte TinyMCE-Profile programmatisch in REDAXO installieren (z.B. über deren `install.php`). Die Dokumentation hierzu, inkl. Beispielen für den automatisierten JSON-Import (aus exportierten Profilen), wurde in der `DEVS.md` ergänzt.
+
 ### Fix: Inline-Styles und Attribute von Block-Level-Elementen bleiben jetzt erhalten
 
 * **Ursache**: Die Custom-Plugins `for_toc`, `for_htmlembed`, `for_oembed` und `for_video` haben über `editor.schema.addValidElements(...)` harte Schema-Definitionen für Standard-HTML5-Tags (wie `p`, `a`, `h1`-`h6`, `div`, `figure`, `iframe` etc.) im TinyMCE Core überschrieben. Dies führte dazu, dass alle dort nicht explizit genannten globalen Attribute wie `style="text-align: center"`, `dir`, `lang` etc. aus Block-Elementen gelöscht wurden.

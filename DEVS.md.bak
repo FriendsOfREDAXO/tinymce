@@ -2,66 +2,6 @@
 
 Diese Dokumentation richtet sich an Entwickler, die das TinyMCE-Addon erweitern oder eigene Plugins integrieren möchten.
 
-
-## Profile programmatisch bereitstellen (für andere AddOns)
-
-Wenn dein AddOn maßgeschneiderte TinyMCE-Profile erfordert (z.B. für ein Textmodul mit ganz bestimmten Plugins), kannst du diese direkt bei der Installation deines eigenen AddOns, z.B. in deiner `install.php` oder `boot.php`, automatisch einspielen.
-
-Dafür stellt dieses AddOn die Hilfsmethode `\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile()` zur Verfügung.
-
-### Beispiel 1: Profil als PHP Array importieren
-
-```php
-if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
-
-    // Fügt ein TinyMCE-Profil hinzu (oder ignoriert es, falls existent)
-    $success = \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
-        'mein_addon_profil',         // 1. Eindeutiger Profil-Name
-        'Spezialprofil für AddOn X', // 2. Beschreibung (Backend Label)
-        [                            // 3. Konfiguration mit TinyMCE Werten
-            'plugins' => 'autolink lists link image media code',
-            'toolbar' => 'undo redo | bold italic | link image media | help',
-            'extra'   => 'branding: false, menubar: false',
-        ],
-        false // 4. Param $forceUpdate: Wenn "true", überschreibt es bestehende Profile gleichen Namens hart.
-    );
-
-    if ($success) {
-        // Das Profil wurde erfolgreich erzeugt.
-    }
-}
-```
-
-### Beispiel 2: Profile aus exportierten JSON-Dateien importieren
-
-Oftmals ist es am einfachsten, ein Profil im REDAXO Backend zusammenzuklicken, es über den *Export*-Button in eine `.json`-Datei herunterzuladen und dann als Teil deines AddOns auszuliefern.
-
-Ein solches JSON lässt sich exzellent mit derselben API einladen:
-
-```php
-if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
-
-    $jsonFile = rex_path::addon('mein_addon', 'data/mein_tinymce_profil.json');
-    if (file_exists($jsonFile)) {
-        
-        $profileData = json_decode(file_get_contents($jsonFile), true);
-        
-        // Prüfe ob Array gültig ist (ggf. eine Iteration nutzen, falls das JSON mehrere Profile enthält!)
-        if (is_array($profileData) && isset($profileData['name'])) {
-            \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
-                $profileData['name'],
-                $profileData['description'] ?? 'Automatisch importiert',
-                $profileData,
-                false // Setze auf true, wenn dein AddOn-Update das Profil zwingend aktualisieren soll!
-            );
-        }
-        
-    }
-}
-```
-
-Die Methode `ensureProfile()` triggert am Ende vollautomatisch den internen Build-Prozess (`Profiles::profilesCreate()`), sodass das neu eingespeiste Profil augenblicklich im REDAXO Frontend und Backend zur Verfügung steht.
-
 ## Eigene Plugins registrieren
 
 Das TinyMCE-Addon bietet eine einfache Möglichkeit, benutzerdefinierte Plugins aus anderen Addons zu registrieren. Dies geschieht über die Klasse `\FriendsOfRedaxo\TinyMce\PluginRegistry`.
