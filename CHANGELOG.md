@@ -12,6 +12,18 @@ Version 8.8.0
 * **Separator-Handling**: Der Separator (`|`) bleibt im Picker immer verfügbar und wird immer am Listenanfang angezeigt.
 * **Protected Extras**: Nicht vom Assistenten verwaltete Optionen bleiben in `protected extras` erhalten und werden beim Generieren wieder angehängt.
 
+
+### Feature: Demo-Snippets bei Erstinstallation
+
+* Bei einer frischen Installation werden automatisch drei Demo-Snippets eingefügt (sofern die Snippet-Tabelle noch leer ist): **Kontaktinformationen**, **Öffnungszeiten** und eine **witzige Stellenausschreibung**.
+* Die Demo-Snippets dienen als direkt einsetzbare Vorlagen und zeigen die Möglichkeiten des Snippet-Managers.
+
+### Feature: Aktiv/Inaktiv-Funktion für Snippets
+
+* Jeder Snippet kann im Backend einzeln aktiviert oder deaktiviert werden. Ein Klick auf das Status-Icon in der Liste schaltet den Zustand um.
+* Inaktive Snippets werden im TinyMCE-Editor (Snippet-Dropdown) **nicht** angeboten.
+* Das Bearbeitungsformular enthält ein neues Feld zum direkten Setzen des Aktivierungsstatus.
+
 ### Fixes aus Review und Round-Trip-Verhalten
 
 * **Managed Keys**: `quickbars_image_toolbar` ist nicht mehr als vom Assistenten verwaltet markiert und wird dadurch nicht mehr versehentlich entfernt.
