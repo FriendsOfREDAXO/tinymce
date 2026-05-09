@@ -1,15 +1,29 @@
 <?php
 
 use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
+use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 
 $addon = rex_addon::get('tinymce');
 $message = '';
 
+$func = rex_request::request('func', 'string', '');
 $send = rex_request::request('send', 'boolean', false);
 $csrfToken = rex_csrf_token::factory('tinymce_settings');
 
-if ($send) {
+if ('reset_default_profiles' === $func) {
+    if (!$csrfToken->isValid()) {
+        $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
+        try {
+            DefaultProfiles::resetAll();
+            $message = rex_view::success(rex_i18n::msg('tinymce_reset_default_profiles_success'));
+        } catch (Throwable $e) {
+            rex_logger::logException($e);
+            $message = rex_view::error(rex_i18n::msg('tinymce_profile_reset_failed'));
+        }
+    }
+} elseif ($send) {
     if (!$csrfToken->isValid()) {
         $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
@@ -123,6 +137,18 @@ echo $message;
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title"><?= rex_i18n::msg('tinymce_reset_default_profiles_title') ?></div>
+            </div>
+            <div class="panel-body">
+                <p class="help-block"><?= rex_i18n::msg('tinymce_reset_default_profiles_description') ?></p>
+                <button class="btn btn-danger" type="submit" name="func" value="reset_default_profiles" onclick="return confirm('<?= rex_escape(rex_i18n::msg('tinymce_reset_default_profiles_confirm')) ?>');">
+                    <?= rex_i18n::msg('tinymce_reset_default_profiles_button') ?>
+                </button>
             </div>
         </div>
 

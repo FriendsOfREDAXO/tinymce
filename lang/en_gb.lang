@@ -18,6 +18,7 @@ tinymce_reset_default_profiles_description = Resets the built-in default profile
 tinymce_reset_default_profiles_button = Reset default profiles
 tinymce_reset_default_profiles_confirm = The following default profiles will be overwritten: full, light, default, demo. Custom profiles will not be affected. Continue?
 tinymce_reset_default_profiles_success = Default profiles have been reset successfully.
+tinymce_profile_reset_failed = Default profiles could not be reset. Please check logs.
 
 # heading
 tinymce_subnavigation_header_title = TinyMCE 8 for REDAXO 5
