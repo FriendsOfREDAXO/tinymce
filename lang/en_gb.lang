@@ -223,8 +223,13 @@ tinymce_snippets_content = Content
 tinymce_snippets_add = Add Snippet
 tinymce_snippets_edit = Edit Snippet
 tinymce_snippets_deleted = Snippet deleted
+tinymce_snippets_toggled = Status changed
 tinymce_snippets_no_content = No content
 tinymce_snippets_name_empty = Name cannot be empty!
+tinymce_snippets_active = Active
+tinymce_snippets_active_yes = Active
+tinymce_snippets_active_no = Inactive
+tinymce_snippets_toggle = Toggle status
 
 # Style-Sets
 stylesets = Style-Sets

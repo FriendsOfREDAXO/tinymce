@@ -26,6 +26,7 @@
     ->ensurePrimaryIdColumn()
     ->ensureColumn(new \rex_sql_column('name', 'varchar(255)', false))
     ->ensureColumn(new \rex_sql_column('content', 'longtext', false))
+    ->ensureColumn(new \rex_sql_column('active', 'tinyint(1)', false, '1'))
     ->ensureColumn(new \rex_sql_column('createdate', 'datetime', true))
     ->ensureColumn(new \rex_sql_column('updatedate', 'datetime', true))
     ->ensureColumn(new \rex_sql_column('createuser', 'varchar(255)', true))

@@ -219,8 +219,13 @@ tinymce_snippets_content = Inhalt
 tinymce_snippets_add = Snippet hinzufügen
 tinymce_snippets_edit = Snippet bearbeiten
 tinymce_snippets_deleted = Snippet gelöscht
+tinymce_snippets_toggled = Status geändert
 tinymce_snippets_no_content = Kein Inhalt
 tinymce_snippets_name_empty = Der Name darf nicht leer sein!
+tinymce_snippets_active = Aktiv
+tinymce_snippets_active_yes = Aktiv
+tinymce_snippets_active_no = Inaktiv
+tinymce_snippets_toggle = Status umschalten
 
 # Style-Sets
 stylesets = Style-Sets

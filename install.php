@@ -419,6 +419,7 @@ HTML,
             $ins->setTable(\rex::getTable('tinymce_snippets'));
             $ins->setValue('name', $snippet['name']);
             $ins->setValue('content', $snippet['content']);
+            $ins->setValue('active', 1);
             $ins->setValue('createdate', $now);
             $ins->setValue('updatedate', $now);
             $ins->setValue('createuser', 'admin');

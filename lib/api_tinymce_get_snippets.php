@@ -18,6 +18,7 @@ class rex_api_tinymce_get_snippets extends rex_api_function
 
         $sql = rex_sql::factory();
         $sql->setTable(rex::getTable('tinymce_snippets'));
+        $sql->setWhere(['active' => 1]);
         $sql->select('name, content');
         $snippets = $sql->getArray();
 
