@@ -1,8 +1,2 @@
 packages:
   - 'custom_plugins/*'
-allowBuilds:
-  core-js: set this to true or false
-  core-js-bundle: set this to true or false
-  edgedriver: set this to true or false
-  esbuild: set this to true or false
-  geckodriver: set this to true or false
