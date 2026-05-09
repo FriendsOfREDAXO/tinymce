@@ -671,7 +671,6 @@ function initTinyMceProfileAssistant() {
     // Logic
     const $toolbarRows = $builderBody.find('.builder-toolbar-rows');
     const $toolbarInput = $builderBody.find('.builder-toolbar-input');
-    const toolbarValueSet = new Set(toolbarSuggestions);
 
     // Context Logic
     const $contextSelectedList = $('#builder-context-selected-items');
@@ -680,17 +679,6 @@ function initTinyMceProfileAssistant() {
     // Insert-Menu Logic
     const $insertSelectedList = $('#builder-insert-selected-items');
     const $insertInput = $builderBody.find('.builder-insert-menu-input');
-
-    function normalizeToolbarItemValue(value) {
-        const normalized = String(value || '').trim();
-        if (!normalized) {
-            return '';
-        }
-        if (normalized === '|' || normalized.toLowerCase() === 'separator') {
-            return '|';
-        }
-        return normalized;
-    }
 
     function updateToolbarRowLabels() {
         $toolbarRows.find('.builder-toolbar-row').each(function(index) {
@@ -901,9 +889,7 @@ function initTinyMceProfileAssistant() {
 
     $toolbarRows.on('input change', '.builder-toolbar-item-input', function() {
         const normalized = normalizeToolbarItemValue($(this).val());
-        if (!normalized || normalized === '|' || toolbarValueSet.has(normalized) || normalized === String($(this).val()).trim()) {
-            $(this).val(normalized);
-        }
+        $(this).val(normalized);
         updateInput();
     });
 
@@ -1142,6 +1128,17 @@ function initTinyMceProfileAssistant() {
 function escapeString(str) {
     if (!str) return '';
     return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function normalizeToolbarItemValue(value) {
+    const normalized = String(value || '').trim();
+    if (!normalized) {
+        return '';
+    }
+    if (normalized === '|' || normalized.toLowerCase() === 'separator') {
+        return '|';
+    }
+    return normalized;
 }
 
 /**
@@ -1421,9 +1418,9 @@ function generateConfig($textarea, $builderBody) {
     $builderBody.find('.builder-toolbar-rows .builder-toolbar-row').each(function() {
         const items = [];
         $(this).find('.builder-toolbar-item-input').each(function() {
-            const value = String($(this).val() || '').trim();
+            const value = normalizeToolbarItemValue($(this).val());
             if (value) {
-                items.push(value === 'separator' ? '|' : value);
+                items.push(value);
             }
         });
         if (items.length > 0) {
