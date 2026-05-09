@@ -1250,6 +1250,7 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             { kind: 'text', from: '<--', to: '←' },
             { kind: 'text', from: '<-', to: '←' },
             { kind: 'text', from: '==>', to: '⇒' },
+            { kind: 'text', from: '<=>', to: '⇔' },
             { kind: 'text', from: '...', to: '…' },
             { kind: 'text', from: '(c)', to: '©' },
             { kind: 'text', from: '(r)', to: '®' },
@@ -1263,6 +1264,8 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             { kind: 'text', from: '1/2', to: '½' },
             { kind: 'text', from: '1/4', to: '¼' },
             { kind: 'text', from: '3/4', to: '¾' },
+            { kind: 'text', from: '1/3', to: '⅓' },
+            { kind: 'text', from: '2/3', to: '⅔' },
             {
                 kind: 'regex',
                 re: /(\d)\^([0-9])$/,
@@ -1338,11 +1341,36 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         return normalizedCustomRules.concat(filteredDefaults);
     }
 
+    function getAutoreplaceTriggerKey(e) {
+        if (!e) { return null; }
+
+        if (typeof e.key === 'string' && e.key.length > 0) {
+            if (e.key === 'Enter') { return 'Enter'; }
+            if (e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar') { return ' '; }
+            if (e.key.length === 1) { return e.key; }
+        }
+
+        var keyCode = typeof e.which === 'number' && e.which !== 0 ? e.which : e.keyCode;
+        if (typeof keyCode !== 'number') { return null; }
+
+        if (keyCode === 13) { return 'Enter'; }
+        if (keyCode === 32) { return ' '; }
+
+        var char = String.fromCharCode(keyCode);
+        if (AUTOREPLACE_TRIGGER_CHARS.indexOf(char) >= 0) {
+            return char;
+        }
+
+        return null;
+    }
+
     function isAutoreplaceTriggerEvent(e) {
         if (!e || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) { return false; }
-        if (e.key === 'Enter') { return true; }
-        if (typeof e.key === 'string' && e.key.length === 1) {
-            return AUTOREPLACE_TRIGGER_CHARS.indexOf(e.key) >= 0;
+
+        var triggerKey = getAutoreplaceTriggerKey(e);
+        if (triggerKey === 'Enter') { return true; }
+        if (typeof triggerKey === 'string' && triggerKey.length === 1) {
+            return AUTOREPLACE_TRIGGER_CHARS.indexOf(triggerKey) >= 0;
         }
         return false;
     }

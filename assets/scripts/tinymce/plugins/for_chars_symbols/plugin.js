@@ -1250,6 +1250,7 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             { kind: 'text', from: '<--', to: '←' },
             { kind: 'text', from: '<-', to: '←' },
             { kind: 'text', from: '==>', to: '⇒' },
+            { kind: 'text', from: '<=>', to: '⇔' },
             { kind: 'text', from: '...', to: '…' },
             { kind: 'text', from: '(c)', to: '©' },
             { kind: 'text', from: '(r)', to: '®' },
@@ -1263,6 +1264,8 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             { kind: 'text', from: '1/2', to: '½' },
             { kind: 'text', from: '1/4', to: '¼' },
             { kind: 'text', from: '3/4', to: '¾' },
+            { kind: 'text', from: '1/3', to: '⅓' },
+            { kind: 'text', from: '2/3', to: '⅔' },
             {
                 kind: 'regex',
                 re: /(\d)\^([0-9])$/,
