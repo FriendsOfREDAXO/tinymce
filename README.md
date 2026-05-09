@@ -45,6 +45,31 @@ echo $mform->show();
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 8 Doku](https://www.tiny.cloud/docs/tinymce/latest/) beachten.
 
+### Profil-Assistent (aktuell)
+
+Der Profil-Assistent in der Profilverwaltung wurde erweitert und arbeitet jetzt näher an der nativen TinyMCE-Konfiguration:
+
+* **Mehrzeilige Toolbars**: `toolbar` kann als String oder als Array von Toolbar-Zeilen gepflegt werden.
+* **Toolbar-Modus**: `toolbar_mode` ist direkt im Assistenten auswählbar (`sliding`, `floating`, `wrap`, `scrolling`).
+* **Toolbar deaktivieren**: Es wird korrekt `toolbar: false` erzeugt.
+* **Toolbar-Picker als Popover**: Buttons werden als sortierbare Pills gepflegt (mit Core/FOR/AddOn-Badge). Der Picker öffnet sich direkt am Klickpunkt.
+* **Separator (`|`)**: Bleibt im Picker immer auswählbar und ist immer am Listenanfang.
+* **Zeilenaktionen**: „Löschen“ (einzelnes Element) und „Alle löschen“ (mit Bestätigung) sind im Picker verfügbar.
+
+### Protected Extras (nicht verwaltete Optionen)
+
+Zusätzliche Profiloptionen, die der Assistent nicht direkt über UI-Felder verwaltet, können als `protected extras` hinterlegt werden. Diese Einträge bleiben beim Generieren erhalten und werden wieder angehängt.
+
+Beispiele:
+
+```javascript
+toolbar_sticky: true,
+toolbar_sticky_offset: 0,
+my_custom_option: function () { return 'kept'; }
+```
+
+Hinweis: Eingaben mit Top-Level-Kommas werden JS-sicher gesplittet. Als Fallback werden auch property-basierte „eine Zeile pro Eintrag“-Angaben unterstützt.
+
 ### Migration von TinyMCE 5/6 zu TinyMCE 8
 
 Bei der Aktualisierung von älteren Versionen (tinymce4, tinymce5, tinymce6) werden bestehende Profile automatisch migriert:
@@ -835,6 +860,14 @@ Seit **8.5.3** ist Autoreplace komplett im **Profil-Assistent** konfigurierbar (
 - Repeater-Tabelle **Eigene Regeln** mit den Spalten *Typ* (`Text` oder `Regex`), *Von* (Muster) und *Nach* (Ziel). Der Button *Beispiele einfügen* füllt `(tel)`, `-->`, `<--` sowie die Regex `\(kw(\d{1,2})\)` → `KW $1` vor.
 
 Der Assistent serialisiert die Tabelle beim Speichern automatisch in `for_chars_symbols_autoreplace_rules` als Objekte (`{from, to}` für Text-Regeln, `{re, to}` für Regex-Regeln). Beim erneuten Öffnen eines Profils werden bestehende Regeln – auch in der Kurzform `["from","to"]` – zurück in die Tabelle geladen.
+
+### Profil-Assistent: Mehrere Toolbars & geschützte Extras
+
+Der Profil-Assistent unterstützt jetzt auch **mehrere Toolbar-Zeilen**. Jede Zeile im Repeater wird als eigener TinyMCE-Toolbar-String gespeichert; bei mehreren Zeilen erzeugt der Assistent automatisch `toolbar: ['…', '…']`. Über **Toolbar-Ansicht** wird zusätzlich `toolbar_mode` gepflegt (`sliding`, `floating`, `wrap`, `scrolling`).
+
+- **Toolbar anzeigen** deaktivieren → der Assistent schreibt `toolbar: false`, sodass Profile ohne Toolbar und ohne Menüleiste möglich bleiben.
+- **Geschützte Extras** werden immer **nach** den generierten Optionen angehängt. Damit lassen sich individuelle TinyMCE-Optionen wie `toolbar_sticky`, eigene Funktionen oder bewusste Overrides pflegen, ohne dass der Assistent sie beim nächsten Generieren entfernt.
+- Beim Laden bestehender Profile wandern nicht vom Assistenten verwaltete Optionen automatisch in dieses Feld, damit bestehende Sonderkonfigurationen kompatibel bleiben.
 
 ### Aktions-Favoriten
 

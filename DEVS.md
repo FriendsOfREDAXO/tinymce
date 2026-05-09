@@ -2,6 +2,19 @@
 
 Diese Dokumentation richtet sich an Entwickler, die das TinyMCE-Addon erweitern oder eigene Plugins integrieren möchten.
 
+## Profil-Assistent: Managed Keys und Protected Extras
+
+Der Profil-Assistent verwaltet einen festen Satz an Optionen direkt über UI-Felder ("managed keys").
+
+* Nicht verwaltete Optionen werden beim Laden automatisch in den Bereich **Protected Extras** verschoben.
+* Beim Generieren werden diese Extras wieder an die erzeugte Konfiguration angehängt.
+* Dadurch bleiben projektspezifische Zusatzoptionen bei Round-Trips erhalten.
+
+Wichtig:
+
+* `quickbars_image_toolbar` ist absichtlich **nicht** als managed key behandelt, solange es dafür kein explizites UI-Feld gibt.
+* Für Protected-Extras-Eingaben unterstützt die Normalisierung sowohl Top-Level-Komma-Splitting als auch den Fallback "eine Property pro Zeile".
+
 
 ## Profile programmatisch bereitstellen (für andere AddOns)
 

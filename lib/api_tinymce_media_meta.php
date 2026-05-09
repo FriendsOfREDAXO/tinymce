@@ -104,7 +104,7 @@ class rex_api_tinymce_media_meta extends rex_api_function
         } catch (rex_exception $e) {
             return '';
         }
-        if (null === $value || false === $value) {
+        if (null === $value) {
             return '';
         }
         return trim((string) $value);

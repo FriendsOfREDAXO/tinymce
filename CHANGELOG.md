@@ -1,6 +1,28 @@
 Changelog
 =========
 
+Version 8.8.0
+-------------------------------
+
+### Feature: Profil-Assistent mit Multi-Row-Toolbar, Popover-Picker und Protected Extras
+
+* **Toolbar-Editor**: Der Profil-Assistent unterstützt native TinyMCE-Multi-Row-Toolbars (`toolbar` als String-Array), `toolbar_mode` sowie `toolbar: false`.
+* **Inline-Picker UX**: Toolbar-Elemente werden als sortierbare Pills mit Herkunfts-Badges (Core/FOR/AddOn) bearbeitet. Auswahl erfolgt über ein suchbares Popover direkt am Klickpunkt.
+* **Zeilenaktionen im Picker**: Aktionen wie „Alle löschen“ und „Löschen“ sind direkt im Popover verfügbar; „Alle löschen“ erfordert eine explizite Bestätigung.
+* **Separator-Handling**: Der Separator (`|`) bleibt im Picker immer verfügbar und wird immer am Listenanfang angezeigt.
+* **Protected Extras**: Nicht vom Assistenten verwaltete Optionen bleiben in `protected extras` erhalten und werden beim Generieren wieder angehängt.
+
+### Fixes aus Review und Round-Trip-Verhalten
+
+* **Managed Keys**: `quickbars_image_toolbar` ist nicht mehr als vom Assistenten verwaltet markiert und wird dadurch nicht mehr versehentlich entfernt.
+* **Load-Reihenfolge**: Beim Laden von Profilen wird der Toolbar-Enabled-State nach dem Rendern der Zeilen gesetzt, damit deaktivierte Toolbars konsistent deaktiviert bleiben.
+* **Protected-Extras Parsing**: Fallback für „eine Property pro Zeile“ verbessert, damit raw-line Eingaben ohne Top-Level-Kommas stabil verarbeitet werden.
+
+### UI: Dark-Mode Lesbarkeit verbessert
+
+* Kontraste für Panel-Header, Panel-Bodies und Item-Buttons im betroffenen Assistentenbereich erhöht.
+* Gleiche Werte für expliziten Dark-Mode und Auto-Dark-Mode umgesetzt.
+
 Version 8.7.10
 -------------------------------
 

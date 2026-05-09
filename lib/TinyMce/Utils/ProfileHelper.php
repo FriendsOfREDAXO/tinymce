@@ -51,7 +51,7 @@ class ProfileHelper
         $sql->setTable(rex::getTable('tinymce_profiles'));
         $sql->setValue('name', $name);
         $sql->setValue('description', $description);
-        
+
         // Default values
         $defaults = [
             'plugins' => 'autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table wordcount',
@@ -72,14 +72,14 @@ class ProfileHelper
         }
 
         if ($exists) {
-             $sql->setWhere(['name' => $name]);
-             $sql->addGlobalUpdateFields();
-             $sql->update();
+            $sql->setWhere(['name' => $name]);
+            $sql->addGlobalUpdateFields();
+            $sql->update();
         } else {
-             $sql->addGlobalCreateFields();
-             $sql->insert();
+            $sql->addGlobalCreateFields();
+            $sql->insert();
         }
-        
+
         // Trigger profile recreation
         Profiles::profilesCreate();
 
@@ -100,7 +100,7 @@ class ProfileHelper
         if ($content === null) {
             return false;
         }
-        
+
         $data = json_decode($content, true);
         if (!is_array($data)) {
             return false;
@@ -119,7 +119,7 @@ class ProfileHelper
                 $success = true;
             }
         }
-        
+
         return $success;
     }
 

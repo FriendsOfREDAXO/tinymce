@@ -12,7 +12,7 @@ $profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
 $message = '';
 
 // Export single profile or all profiles as JSON
-    if ('export' === $func && $id > 0) {
+if ('export' === $func && $id > 0) {
     $sql = rex_sql::factory();
     $sql->setTable($profileTable);
     $sql->setWhere(['id' => $id]);
@@ -113,19 +113,19 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
         if ($_FILES['profiles_file']['error'] !== UPLOAD_ERR_OK) {
             throw new Exception('upload_error');
         }
-        
+
         // Validate file size (max 5MB to prevent DOS and large object attacks)
         $fileSize = (int) ($_FILES['profiles_file']['size'] ?? 0);
         if ($fileSize > 5 * 1024 * 1024) {
             throw new Exception('File size exceeds 5MB limit');
         }
-        
+
         // Read and validate JSON
         $content = file_get_contents($_FILES['profiles_file']['tmp_name']);
         if (false === $content) {
             throw new Exception('Could not read uploaded file');
         }
-        
+
         $data = json_decode((string) $content, true);
         if (null === $data) {
             throw new Exception('json_invalid');
@@ -138,7 +138,7 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
         } elseif (is_array($data)) {
             $items = $data;
         }
-        
+
         // Prevent importing excessive number of profiles (sanity check)
         if (count($items) > 1000) {
             throw new Exception('Cannot import more than 1000 profiles at once');
@@ -268,8 +268,8 @@ if ('' === $func) {
     $list = rex_list::factory("SELECT id, name, description FROM $profileTable ORDER BY id");
     $list->addTableAttribute('class', 'table-striped');
 
-        // columns: icon, name, description, actions
-        $list->addTableColumnGroup([40, '*', '*', 140]);
+    // columns: icon, name, description, actions
+    $list->addTableColumnGroup([40, '*', '*', 140]);
 
     $list->removeColumn('id');
 

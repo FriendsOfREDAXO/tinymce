@@ -118,7 +118,7 @@ if ('export' === $func && $id > 0) {
         $export = $data[0];
         // style_formats ist bereits JSON-String, decodieren für sauberen Export
         $export['style_formats'] = json_decode((string) $export['style_formats'], true);
-        
+
         rex_response::cleanOutputBuffers();
         rex_response::sendContentType('application/json');
         rex_response::setHeader('Content-Disposition', 'attachment; filename="styleset_' . rex_string::normalize((string) $export['name']) . '.json"');
@@ -137,7 +137,7 @@ if ('export_all' === $func) {
         $row['style_formats'] = json_decode((string) $row['style_formats'], true);
         $exports[] = $row;
     }
-    
+
     rex_response::cleanOutputBuffers();
     rex_response::sendContentType('application/json');
     rex_response::setHeader('Content-Disposition', 'attachment; filename="tinymce_stylesets_export.json"');
@@ -154,7 +154,7 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
         if (!empty($file['tmp_name']) && is_uploaded_file($file['tmp_name'])) {
             $content = rex_file::get($file['tmp_name']);
             $importData = json_decode((string) $content, true);
-            
+
             if (null === $importData) {
                 echo rex_view::error(rex_i18n::msg('tinymce_stylesets_import_invalid_json'));
             } else {
@@ -162,12 +162,12 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
                 if (isset($importData['name'])) {
                     $importData = [$importData];
                 }
-                
+
                 $now = date('Y-m-d H:i:s');
                 $user = rex::requireUser()->getLogin();
                 $imported = 0;
                 $skipped = 0;
-                
+
                 // Bestehende Namen holen
                 $sql = rex_sql::factory();
                 $existing = $sql->getArray('SELECT name FROM ' . rex::getTable('tinymce_stylesets'));
@@ -175,17 +175,17 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
                 $sqlPrio = rex_sql::factory();
                 $sqlPrio->setQuery('SELECT MAX(prio) as max_prio FROM ' . rex::getTable('tinymce_stylesets'));
                 $maxPrio = (int) $sqlPrio->getValue('max_prio');
-                
+
                 foreach ($importData as $set) {
                     if (!isset($set['name']) || !isset($set['style_formats'])) {
                         continue;
                     }
-                    
+
                     if (in_array($set['name'], $existingNames, true)) {
                         ++$skipped;
                         continue;
                     }
-                    
+
                     ++$maxPrio;
                     $ins = rex_sql::factory();
                     $ins->setTable(rex::getTable('tinymce_stylesets'));
@@ -202,7 +202,7 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
                     $ins->insert();
                     ++$imported;
                 }
-                
+
                 if ($imported > 0) {
                     echo rex_view::success(rex_i18n::msg('tinymce_stylesets_imported', $imported));
                     rex_addon::get('tinymce')->setConfig('update_profiles', true);
@@ -286,6 +286,7 @@ if ('cke5_convert' === $func) {
             }
         }
     }
+
 
     if ('cke5_convert' === $func) {
         $formAction = rex_url::currentBackendPage(['func' => 'cke5_convert']);

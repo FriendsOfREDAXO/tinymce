@@ -133,7 +133,13 @@ class Assets
                     $formats = json_decode($styleFormatsRaw, true);
                     // Validate JSON parse succeeded (null means invalid JSON)
                     if (null === $formats) {
-                        rex_logger::warning('Invalid JSON in style_formats for style-set "' . htmlspecialchars($set['name'] ?? 'unknown') . '": ' . json_last_error_msg());
+                        rex_logger::factory()->warning(
+                            'Invalid JSON in style_formats for style-set "{style_set}": {json_error}',
+                            [
+                                'style_set' => isset($set['name']) ? (string) $set['name'] : 'unknown',
+                                'json_error' => json_last_error_msg(),
+                            ],
+                        );
                     } elseif (is_array($formats)) {
                         foreach ($formats as $format) {
                             if (!is_array($format)) {
@@ -198,6 +204,20 @@ class Assets
                 'plugins' => \rex_i18n::msg('tinymce_plugins'),
                 'toolbar' => \rex_i18n::msg('tinymce_toolbar'),
                 'toolbar_help' => \rex_i18n::msg('tinymce_toolbar_help'),
+                'toolbar_enabled' => \rex_i18n::msg('tinymce_toolbar_enabled'),
+                'toolbar_enabled_help' => \rex_i18n::rawMsg('tinymce_toolbar_enabled_help'),
+                'toolbar_mode' => \rex_i18n::msg('tinymce_toolbar_mode'),
+                'toolbar_mode_help' => \rex_i18n::rawMsg('tinymce_toolbar_mode_help'),
+                'toolbar_mode_sliding' => \rex_i18n::msg('tinymce_toolbar_mode_sliding'),
+                'toolbar_mode_floating' => \rex_i18n::msg('tinymce_toolbar_mode_floating'),
+                'toolbar_mode_wrap' => \rex_i18n::msg('tinymce_toolbar_mode_wrap'),
+                'toolbar_mode_scrolling' => \rex_i18n::msg('tinymce_toolbar_mode_scrolling'),
+                'toolbar_add_row' => \rex_i18n::msg('tinymce_toolbar_add_row'),
+                'toolbar_row' => \rex_i18n::msg('tinymce_toolbar_row'),
+                'toolbar_add_item' => \rex_i18n::msg('tinymce_toolbar_add_item'),
+                'toolbar_remove_row' => \rex_i18n::msg('tinymce_toolbar_remove_row'),
+                'toolbar_item_placeholder' => \rex_i18n::msg('tinymce_toolbar_item_placeholder'),
+                'toolbar_row_empty' => \rex_i18n::msg('tinymce_toolbar_row_empty'),
                 'available_items' => \rex_i18n::msg('tinymce_available_items'),
                 'separator' => \rex_i18n::msg('tinymce_separator'),
                 'selected_toolbar' => \rex_i18n::msg('tinymce_selected_toolbar'),
@@ -264,6 +284,9 @@ class Assets
                 'toc_depth' => \rex_i18n::msg('tinymce_toc_depth'),
                 'toc_header_tag' => \rex_i18n::msg('tinymce_toc_header_tag'),
                 'toc_class' => \rex_i18n::msg('tinymce_toc_class'),
+                'protected_extras' => \rex_i18n::msg('tinymce_protected_extras'),
+                'protected_extras_help' => \rex_i18n::rawMsg('tinymce_protected_extras_help'),
+                'protected_extras_placeholder' => \rex_i18n::msg('tinymce_protected_extras_placeholder'),
                 'generate_config' => \rex_i18n::msg('tinymce_generate_config'),
                 'generate_and_save' => \rex_i18n::msg('tinymce_generate_and_save'),
                 'overwrites_existing_config' => \rex_i18n::msg('tinymce_overwrites_existing_config'),
