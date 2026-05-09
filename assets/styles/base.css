@@ -37,3 +37,127 @@ body.rex-theme-dark .tinymce-phpcode-pre {
         color: #f0f0f0;
     }
 }
+
+/**
+ * REDAXO Theme Support für Toolbar-Button-Badges
+ * Light Mode: Helle Buttons mit gutem Kontrast
+ * Auto/Dark Mode: Dunkle Buttons wie designt
+ */
+
+/* Light Mode: Explizit hell */
+body.rex-theme-light #tinymce-profile-assistant {
+    --tpa-chip-bg: #f0f0f0;
+    --tpa-chip-border: #d0d0d0;
+    --tpa-chip-hover-bg: #e0e0e0;
+    --tpa-chip-hover-border: #999;
+    --tpa-chip-remove: #d9534f;
+}
+
+body.rex-theme-light .for-plugin-badge,
+body.rex-theme-light .for-plugin-badge-inline {
+    background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
+    color: #1a5a8a;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    border: 1px solid #9ecde8;
+}
+
+body.rex-theme-light .for-plugin-badge--addon {
+    background: linear-gradient(135deg, #eaf7f0, #d9efe5);
+    color: #2d6a45;
+    border-color: #9ecde8;
+}
+
+body.rex-theme-light .builder-toolbar-pill {
+    background: #f0f0f0;
+    color: #1a1a1a;
+    border-color: #d0d0d0;
+}
+
+body.rex-theme-light .builder-toolbar-pill--for {
+    background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
+    color: #1a5a8a;
+    border-color: #6b9fbf;
+}
+
+body.rex-theme-light .builder-toolbar-pill--addon {
+    background: linear-gradient(135deg, #eaf7f0, #d9efe5);
+    color: #2d6a45;
+    border-color: #6ba58f;
+}
+
+body.rex-theme-light .builder-toolbar-pill--core {
+    background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
+    color: #333;
+    border-color: #999;
+}
+
+body.rex-theme-light .builder-toolbar-inline-picker {
+    background: #fff;
+    border-color: #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+body.rex-theme-light .builder-toolbar-inline-picker-search {
+    background: #f9f9f9;
+    border-color: #ddd;
+}
+
+body.rex-theme-light .builder-toolbar-inline-picker-item:hover,
+body.rex-theme-light .builder-toolbar-inline-picker-item:focus {
+    background: #f0f0f0;
+    border-color: #ccc;
+}
+
+body.rex-theme-light .builder-insert-item-btn.btn-default {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #d0d0d0;
+}
+
+body.rex-theme-light .builder-insert-item-btn.btn-default:hover,
+body.rex-theme-light .builder-insert-item-btn.btn-default:focus {
+    background: #e8e8e8;
+    color: #1a1a1a;
+    border-color: #999;
+}
+
+/* Auto Mode (System-Einstellung): Helles Theme bei heller Systemeinstellung */
+@media (prefers-color-scheme: light) {
+    body.rex-has-theme:not(.rex-theme-dark) #tinymce-profile-assistant {
+        --tpa-chip-bg: #f0f0f0;
+        --tpa-chip-border: #d0d0d0;
+        --tpa-chip-hover-bg: #e0e0e0;
+        --tpa-chip-hover-border: #999;
+    }
+
+    body.rex-has-theme:not(.rex-theme-dark) .for-plugin-badge,
+    body.rex-has-theme:not(.rex-theme-dark) .for-plugin-badge-inline {
+        background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
+        color: #1a5a8a;
+        border-color: #9ecde8;
+    }
+
+    body.rex-has-theme:not(.rex-theme-dark) .for-plugin-badge--addon {
+        background: linear-gradient(135deg, #eaf7f0, #d9efe5);
+        color: #2d6a45;
+        border-color: #9ecde8;
+    }
+
+    body.rex-has-theme:not(.rex-theme-dark) .builder-toolbar-pill {
+        background: #f0f0f0;
+        color: #1a1a1a;
+        border-color: #d0d0d0;
+    }
+
+    body.rex-has-theme:not(.rex-theme-dark) .builder-toolbar-pill--for {
+        background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
+        color: #1a5a8a;
+        border-color: #6b9fbf;
+    }
+
+    body.rex-has-theme:not(.rex-theme-dark) .builder-toolbar-pill--addon {
+        background: linear-gradient(135deg, #eaf7f0, #d9efe5);
+        color: #2d6a45;
+        border-color: #6ba58f;
+    }
+}
