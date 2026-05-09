@@ -113,6 +113,7 @@ class ProfileHelper
             if (!is_array($item)) {
                 continue;
             }
+            // Name/description validation and field filtering happen in normalizeImportedProfile().
             if (self::ensureProfileFromImportedArray($item, $forceUpdate)) {
                 $success = true;
             }

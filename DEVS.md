@@ -60,6 +60,8 @@ Wenn du ein exportiertes Profil lieber direkt in PHP pflegen möchtest (statt ü
 if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
     $exportedProfile = [
         'id' => 5, // wird ignoriert (Export-Metadatum, Ziel-System generiert eigene ID)
+        'createdate' => '2026-05-01 12:00:00', // wird ignoriert (Export-Metadatum)
+        'updatedate' => '2026-05-09 09:00:00', // wird ignoriert (Export-Metadatum)
         'name' => 'base',
         'description' => 'Angelegt vom BASE AddOn',
         'extra' => <<<'JS'
@@ -93,7 +95,7 @@ JS,
 }
 ```
 
-`ensureProfileFromImportedArray()` übernimmt dabei nur die relevanten Profilfelder (`name`, `description`, `plugins`, `toolbar`, `extra`, `media*`, `upload_default`) und ignoriert Export-Metadaten wie `id`.
+`ensureProfileFromImportedArray()` übernimmt dabei nur die relevanten Profilfelder (`name`, `description`, `plugins`, `toolbar`, `extra`, `mediatype`, `mediapath`, `mediacategory`, `upload_default`) und ignoriert Export-Metadaten wie `id`, `createdate`, `updatedate`.
 
 Die Methoden triggern am Ende vollautomatisch den internen Build-Prozess (`Profiles::profilesCreate()`), sodass das neu eingespeiste Profil augenblicklich im REDAXO Frontend und Backend zur Verfügung steht.
 
