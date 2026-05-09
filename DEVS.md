@@ -52,6 +52,51 @@ if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\Ti
 }
 ```
 
+### Beispiel 3: Export-JSON in ein PHP-Array für `ensureProfile()` umschreiben
+
+Wenn du ein exportiertes Profil lieber direkt in PHP pflegen möchtest (statt über Datei-Import), kannst du den Export 1:1 als Array übergeben und über die Hilfsmethode normalisieren:
+
+```php
+if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
+    $exportedProfile = [
+        'id' => 5, // wird ignoriert (Export-Metadatum, Ziel-System generiert eigene ID)
+        'createdate' => '2026-05-01 12:00:00', // wird ignoriert (Export-Metadatum)
+        'updatedate' => '2026-05-09 09:00:00', // wird ignoriert (Export-Metadatum)
+        'name' => 'base',
+        'description' => 'Angelegt vom BASE AddOn',
+        'extra' => <<<'JS'
+license_key: 'gpl',
+language: 'de',
+branding: false,
+statusbar: true,
+menubar: false,
+plugins: 'autolink autoresize cleanpaste fullscreen link',
+toolbar: 'blocks | link | bold italic underline subscript superscript bullist numlist | table | removeformat pastetext undo | for_a11y',
+min_height: 300,
+autoresize_bottom_margin: 20,
+width: '100%',
+relative_urls: false,
+remove_script_host: true,
+document_base_url: "/",
+entity_encoding: 'raw',
+convert_urls: true,
+file_picker_callback: function (callback, value, meta) {
+    rex5_picker_function(callback, value, meta);
+}
+JS,
+        'plugins' => 'autolink autoresize cleanpaste fullscreen link',
+        'toolbar' => 'blocks | link | bold italic underline subscript superscript bullist numlist | table | removeformat pastetext undo | for_a11y',
+    ];
+
+    \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfileFromImportedArray(
+        $exportedProfile,
+        true // optional: bestehendes Profil überschreiben
+    );
+}
+```
+
+`ensureProfileFromImportedArray()` übernimmt dabei nur die relevanten Profilfelder (`name`, `description`, `plugins`, `toolbar`, `extra`, `mediatype`, `mediapath`, `mediacategory`, `upload_default`) und ignoriert Export-Metadaten wie `id`, `createdate`, `updatedate`.
+
 Die Methoden triggern am Ende vollautomatisch den internen Build-Prozess (`Profiles::profilesCreate()`), sodass das neu eingespeiste Profil augenblicklich im REDAXO Frontend und Backend zur Verfügung steht.
 
 ## Eigene Plugins registrieren

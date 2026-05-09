@@ -90,6 +90,10 @@ tinymce_profile_import_overwrite = Vorhandene Profile überschreiben
 tinymce_profile_import_invalid = Die hochgeladene Datei ist kein gültiges JSON.
 tinymce_profile_import_error = Import fehlgeschlagen.
 tinymce_profile_export_error = Profil nicht gefunden.
+tinymce_profile_phpcode = PHP-Code erzeugen
+tinymce_profile_phpcode_title = Profil als PHP-Code
+tinymce_profile_phpcode_copy = Code kopieren
+tinymce_profile_phpcode_copied = Kopiert!
 tinymce_preview = Vorschau
 tinymce_loading = Lädt…
 

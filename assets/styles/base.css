@@ -13,3 +13,27 @@ body.tox-dialog__disable-scroll {
 .tox.tox-tinymce-aux {
     z-index: 1300;
 }
+
+.tinymce-phpcode-pre {
+    white-space: pre-wrap;
+    background: #f7f7f7;
+    padding: 12px;
+    border-radius: 4px;
+    max-height: 360px;
+    overflow: auto;
+    font-family: monospace;
+    font-size: 12px;
+    tab-size: 4;
+}
+
+body.rex-theme-dark .tinymce-phpcode-pre {
+    background: #2a2a2a;
+    color: #f0f0f0;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .tinymce-phpcode-pre {
+        background: #2a2a2a;
+        color: #f0f0f0;
+    }
+}

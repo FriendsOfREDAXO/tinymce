@@ -1,5 +1,5 @@
 /* profiles-list.js
- * Handles the preview modal on the TinyMCE profiles list page.
+ * Handles the preview modal and PHP code modal on the TinyMCE profiles list page.
  * This file should be loaded via rex_view::addJsFile from the addon boot/assets provider.
  */
 (function () {
@@ -20,6 +20,86 @@
   function escapeHtml(s) {
     return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
+
+  // ── PHP-Code modal ────────────────────────────────────────────────────────
+
+  document.addEventListener('click', function (ev) {
+    var target = ev.target;
+    if (!target) return;
+    while (target && !(target.classList && target.classList.contains && target.classList.contains('tinymce-phpcode'))) {
+      target = target.parentNode;
+    }
+    if (!target || !target.classList || !target.classList.contains('tinymce-phpcode')) return;
+
+    ev.preventDefault();
+
+    var url = target.dataset.url || null;
+    if (!url) return;
+
+    var bodyEl = document.getElementById('tinymcePHPCodeBody');
+    if (bodyEl) bodyEl.textContent = findLoadingText();
+
+    var modal = document.getElementById('tinymcePHPCodeModal');
+    if (modal && window.jQuery && window.jQuery(modal).modal) {
+      window.jQuery(modal).modal('show');
+    }
+
+    fetch(url, { credentials: 'include' })
+      .then(function (resp) {
+        if (!resp.ok) throw new Error('Profile not found');
+        return resp.json();
+      })
+      .then(function (data) {
+        if (!bodyEl) return;
+        while (bodyEl.firstChild) bodyEl.removeChild(bodyEl.firstChild);
+
+        var nameEl = document.createElement('h4');
+        nameEl.style.marginTop = '0';
+        nameEl.textContent = data.name || '';
+        bodyEl.appendChild(nameEl);
+
+        var pre = document.createElement('pre');
+        pre.id = 'tinymcePHPCodePre';
+        pre.className = 'tinymce-phpcode-pre';
+        pre.textContent = data.code || '';
+        bodyEl.appendChild(pre);
+      })
+      .catch(function (err) {
+        if (bodyEl) bodyEl.textContent = err.message || 'Error';
+      });
+  }, false);
+
+  // Copy button inside PHP-Code modal
+  document.addEventListener('click', function (ev) {
+    var btn = ev.target;
+    if (!btn || btn.id !== 'tinymcePHPCodeCopy') return;
+    var pre = document.getElementById('tinymcePHPCodePre');
+    if (!pre) return;
+    var code = pre.textContent || pre.innerText || '';
+    if (!navigator.clipboard) {
+      // Fallback for older browsers
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = btn.dataset.copiedLabel || 'Copied!';
+        setTimeout(function () { btn.textContent = btn.dataset.copyLabel || 'Copy code'; }, 2000);
+      } catch (e) {}
+      return;
+    }
+    navigator.clipboard.writeText(code).then(function () {
+      btn.textContent = btn.dataset.copiedLabel || 'Copied!';
+      setTimeout(function () { btn.textContent = btn.dataset.copyLabel || 'Copy code'; }, 2000);
+    });
+  }, false);
+
+  // ── Preview modal ─────────────────────────────────────────────────────────
 
   document.addEventListener('click', function (ev) {
     var target = ev.target;
