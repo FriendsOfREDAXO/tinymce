@@ -1,7 +1,7 @@
 Changelog
 =========
 
-Version 8.8.0
+Version 8.8.0 - 8.8.1
 -------------------------------
 
 ### Feature: Profil-Assistent mit Multi-Row-Toolbar, Popover-Picker und Protected Extras
