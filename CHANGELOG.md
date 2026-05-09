@@ -13,6 +13,13 @@ Version 8.8.0
 * **Protected Extras**: Nicht vom Assistenten verwaltete Optionen bleiben in `protected extras` erhalten und werden beim Generieren wieder angehängt.
 
 
+### Feature: PHP-Code-Generator in der Profilverwaltung
+
+* In der Profilliste gibt es im Aktionsmenü jedes Profils den neuen Eintrag **„PHP-Code generieren"**.
+* Ein Klick öffnet ein Modal mit fertigem PHP-Code, der `ProfileHelper::ensureProfile()` mit allen Einstellungen des aktuellen Profils aufruft – inkl. `extra`, Media-Typ, -Pfad und -Kategorie.
+* Der generierte Code kann direkt in die `install.php` eines anderen Addons eingefügt werden, um ein Profil programmatisch bereitzustellen.
+* Ein **„Kopieren"**-Button überträgt den Code per Clipboard-API in die Zwischenablage und bestätigt den Vorgang visuell.
+
 ### Feature: Demo-Snippets bei Erstinstallation
 
 * Bei einer frischen Installation werden automatisch drei Demo-Snippets eingefügt (sofern die Snippet-Tabelle noch leer ist): **Kontaktinformationen**, **Öffnungszeiten** und eine **witzige Stellenausschreibung**.
