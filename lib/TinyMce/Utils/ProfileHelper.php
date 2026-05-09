@@ -110,6 +110,7 @@ class ProfileHelper
         $success = false;
 
         foreach ($items as $item) {
+            // Guard against malformed JSON where an item is not an array (e.g. a scalar in a mixed JSON array).
             if (!is_array($item)) {
                 continue;
             }

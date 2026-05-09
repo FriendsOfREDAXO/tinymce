@@ -37,7 +37,7 @@
     if (!url) return;
 
     var bodyEl = document.getElementById('tinymcePHPCodeBody');
-    if (bodyEl) bodyEl.innerHTML = findLoadingText();
+    if (bodyEl) bodyEl.textContent = findLoadingText();
 
     var modal = document.getElementById('tinymcePHPCodeModal');
     if (modal && window.jQuery && window.jQuery(modal).modal) {
@@ -51,7 +51,7 @@
       })
       .then(function (data) {
         if (!bodyEl) return;
-        bodyEl.innerHTML = '';
+        while (bodyEl.firstChild) bodyEl.removeChild(bodyEl.firstChild);
 
         var nameEl = document.createElement('h4');
         nameEl.style.marginTop = '0';
@@ -60,7 +60,7 @@
 
         var pre = document.createElement('pre');
         pre.id = 'tinymcePHPCodePre';
-        pre.style.cssText = 'white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:360px; overflow:auto; font-family:monospace; font-size:12px; tab-size:4;';
+        pre.className = 'tinymce-phpcode-pre';
         pre.textContent = data.code || '';
         bodyEl.appendChild(pre);
       })
@@ -94,9 +94,8 @@
       return;
     }
     navigator.clipboard.writeText(code).then(function () {
-      var orig = btn.textContent;
       btn.textContent = btn.dataset.copiedLabel || 'Copied!';
-      setTimeout(function () { btn.textContent = orig; }, 2000);
+      setTimeout(function () { btn.textContent = btn.dataset.copyLabel || 'Copy code'; }, 2000);
     });
   }, false);
 
