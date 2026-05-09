@@ -449,15 +449,16 @@ function initTinyMceProfileAssistant() {
             --tpa-panel-body-bg: #f5f5f5;
             --tpa-dropzone-bg: #fff;
             --tpa-dropzone-border: #ccc;
-            --tpa-chip-bg: #324050;
-            --tpa-chip-border: #202b35;
-            --tpa-chip-hover-bg: #283340;
-            --tpa-chip-hover-border: #000;
-            --tpa-chip-remove: #ff9999;
-            --tpa-placeholder-bg: #dff0d8;
-            --tpa-placeholder-border: #3c763d;
-            --tpa-help-muted: #999;
-            --tpa-context-border: #eee;
+            --tpa-chip-bg: #f0f0f0;
+            --tpa-chip-border: #d0d0d0;
+            --tpa-chip-hover-bg: #e0e0e0;
+            --tpa-chip-hover-border: #999;
+            --tpa-chip-text: #1a1a1a;
+            --tpa-chip-remove: #d9534f;
+            --tpa-placeholder-bg: #e8f5e9;
+            --tpa-placeholder-border: #4caf50;
+            --tpa-help-muted: #666;
+            --tpa-context-border: #ddd;
         }
         .builder-dropzone-panel-body {
             background-color: var(--tpa-panel-body-bg);
@@ -473,7 +474,7 @@ function initTinyMceProfileAssistant() {
             cursor: move;
             margin-bottom: 5px;
             background: var(--tpa-chip-bg);
-            color: #fff;
+            color: var(--tpa-chip-text);
             border: 1px solid var(--tpa-chip-border);
             padding: 5px 10px;
             border-radius: 3px;
@@ -496,60 +497,62 @@ function initTinyMceProfileAssistant() {
             width: 50px;
         }
 
-        /* FOR Plugin highlighting (FriendsOfREDAXO) */
+        /* FOR Plugin highlighting (FriendsOfREDAXO) - Light Mode Default */
         .for-plugin-badge, .for-plugin-badge-inline {
             display: inline-block;
-            padding: 1px 5px;
-            font-size: 9px;
+            padding: 2px 6px;
+            font-size: 10px;
             font-weight: 700;
             letter-spacing: 0.5px;
             line-height: 1.3;
             border-radius: 3px;
-            background: linear-gradient(135deg, #4b9ad9, #2c7cb8);
-            color: #fff;
+            background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
+            color: #1a5a8a;
+            border: 1px solid #9ecde8;
             vertical-align: middle;
-            text-shadow: 0 1px 1px rgba(0,0,0,.15);
-            box-shadow: 0 1px 2px rgba(0,0,0,.1);
+            box-shadow: 0 1px 2px rgba(0,0,0,.06);
         }
         .for-plugin-badge-inline { margin-left: 6px; }
         .for-plugin-legend-hint { margin-left: 8px; color: var(--tpa-help-muted); font-weight: 400; }
         .builder-plugin-row--for label { font-weight: 600; }
-        .builder-plugin-row--for label input { accent-color: #4b9ad9; }
+        .builder-plugin-row--for label input { accent-color: #2c7cb8; }
         .builder-toolbar-btn--for {
-            background: linear-gradient(135deg, #fff 0%, #fff 50%, #e3f0fa 100%) !important;
+            background: linear-gradient(135deg, #e3f0fa 0%, #d0e8f7 100%) !important;
             color: #1a5a8a !important;
-            border: 1px solid #4b9ad9 !important;
+            border: 1px solid #6b9fbf !important;
             font-weight: 600;
         }
-        .builder-toolbar-btn--for:hover { background: #e3f0fa !important; }
+        .builder-toolbar-btn--for:hover { background: #d0e8f7 !important; }
         .builder-insert-item-btn--for {
-            background: linear-gradient(135deg, #4b9ad9, #2c7cb8) !important;
-            border-color: transparent !important;
-            color: #fff !important;
+            background: linear-gradient(135deg, #e3f0fa, #d0e8f7) !important;
+            border-color: #6b9fbf !important;
+            color: #1a5a8a !important;
             font-weight: 600;
         }
-        .builder-insert-item-btn--for:hover { filter: brightness(1.1); }
+        .builder-insert-item-btn--for:hover { background: #c7dff4 !important; }
 
-        /* AddOn Plugin highlighting (plugins registered by OTHER addons) */
+        /* AddOn Plugin highlighting (plugins registered by OTHER addons) - Light Mode */
         .for-plugin-badge--addon {
-            background: linear-gradient(135deg, #5bb585, #3e8c60);
+            background: linear-gradient(135deg, #eaf7f0, #d9efe5);
+            color: #2d6a45;
+            border-color: #7eca9d;
         }
         .builder-plugin-row--addon label { font-weight: 600; }
-        .builder-plugin-row--addon label input { accent-color: #5bb585; }
+        .builder-plugin-row--addon label input { accent-color: #3e8c60; }
         .builder-toolbar-btn--addon {
-            background: linear-gradient(135deg, #fff 0%, #fff 50%, #edf7f0 100%) !important;
+            background: linear-gradient(135deg, #eaf7f0 0%, #d9efe5 100%) !important;
             color: #2d6a45 !important;
-            border: 1px solid #5bb585 !important;
+            border: 1px solid #7eca9d !important;
             font-weight: 600;
         }
-        .builder-toolbar-btn--addon:hover { background: #edf7f0 !important; }
+        .builder-toolbar-btn--addon:hover { background: #d9efe5 !important; }
         .builder-insert-item-btn--addon {
-            background: linear-gradient(135deg, #5bb585, #3e8c60) !important;
-            border-color: transparent !important;
-            color: #fff !important;
+            background: linear-gradient(135deg, #eaf7f0, #d9efe5) !important;
+            border-color: #7eca9d !important;
+            color: #2d6a45 !important;
             font-weight: 600;
         }
-        .builder-insert-item-btn--addon:hover { filter: brightness(1.1); }
+        .builder-insert-item-btn--addon:hover { background: #cae5d9 !important; }
 
         .builder-toolbar-settings.is-disabled {
             opacity: 0.65;
@@ -587,7 +590,8 @@ function initTinyMceProfileAssistant() {
             color: var(--tpa-help-muted);
         }
         .for-plugin-badge--core {
-            background: linear-gradient(135deg, #7f8b97, #5f6a75);
+            background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
+            color: #333;
         }
         .builder-toolbar-pill-dropzone {
             position: relative;
@@ -608,25 +612,28 @@ function initTinyMceProfileAssistant() {
             margin: 0 6px 6px 0;
             padding: 4px 8px;
             border-radius: 4px;
-            color: #fff;
+            color: var(--tpa-chip-text);
             border: 1px solid var(--tpa-chip-border);
             background: var(--tpa-chip-bg);
         }
         .builder-toolbar-pill--for {
-            border-color: #2c7cb8;
-            background: #27415a;
+            border-color: #6b9fbf;
+            background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
+            color: #1a5a8a;
         }
         .builder-toolbar-pill--addon {
-            border-color: #3e8c60;
-            background: #244634;
+            border-color: #7eca9d;
+            background: linear-gradient(135deg, #eaf7f0, #d9efe5);
+            color: #2d6a45;
         }
         .builder-toolbar-pill--core {
-            border-color: #5f6a75;
-            background: #3d4650;
+            border-color: #999;
+            background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
+            color: #333;
         }
         .builder-toolbar-pill.dragging {
             opacity: .25;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
             cursor: grabbing;
         }
         .builder-toolbar-pill.over {
@@ -662,14 +669,14 @@ function initTinyMceProfileAssistant() {
             border: 1px solid var(--tpa-dropzone-border);
             border-radius: 6px;
             background: var(--tpa-panel-body-bg);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
             padding: 8px;
             display: none;
         }
         .builder-toolbar-inline-picker-search {
             margin-bottom: 8px;
             border-color: var(--tpa-dropzone-border);
-            background: var(--tpa-panel-body-bg);
+            background: var(--tpa-dropzone-bg);
             color: inherit;
         }
         .builder-toolbar-inline-picker-list {
@@ -709,18 +716,18 @@ function initTinyMceProfileAssistant() {
             margin: 4px 0;
         }
         .builder-toolbar-inline-picker-delete {
-            color: #ff6b6b;
+            color: #d9534f;
             font-weight: 600;
         }
         .builder-toolbar-inline-picker-delete:hover {
-            background: rgba(255, 107, 107, .1);
+            background: rgba(217, 83, 79, .1);
         }
         .builder-toolbar-inline-picker-clear-all {
-            color: #ff6b6b;
+            color: #d9534f;
             font-weight: 600;
         }
         .builder-toolbar-inline-picker-clear-all:hover {
-            background: rgba(255, 107, 107, .1);
+            background: rgba(217, 83, 79, .1);
         }
         .builder-toolbar-inline-picker-empty {
             color: var(--tpa-help-muted);
@@ -749,24 +756,38 @@ function initTinyMceProfileAssistant() {
             --tpa-chip-border: #111820;
             --tpa-chip-hover-bg: #34455a;
             --tpa-chip-hover-border: #000;
+            --tpa-chip-text: #e8f0f7;
             --tpa-chip-remove: #ff8080;
             --tpa-placeholder-bg: #1e3a28;
             --tpa-placeholder-border: #5a8a6a;
             --tpa-help-muted: #8a98a6;
             --tpa-context-border: #3a4654;
         }
+        body.rex-theme-dark .for-plugin-badge,
+        body.rex-theme-dark .for-plugin-badge-inline {
+            background: linear-gradient(135deg, #2c5a8f, #1e4066);
+            color: #8ec5ea;
+            border-color: #2c7cb8;
+            text-shadow: 0 1px 1px rgba(0,0,0,.3);
+            box-shadow: 0 1px 2px rgba(0,0,0,.2);
+        }
+        body.rex-theme-dark .for-plugin-badge--addon {
+            background: linear-gradient(135deg, #2d6a45, #1e4626);
+            color: #8fd4a8;
+            border-color: #3e8c60;
+        }
         body.rex-theme-dark .builder-toolbar-btn--for {
-            background: linear-gradient(135deg, #2a2a2a 0%, #1e3a4f 100%) !important;
+            background: linear-gradient(135deg, #2c5a8f 0%, #1e4066 100%) !important;
             color: #8ec5ea !important;
             border-color: #2c7cb8 !important;
         }
-        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #1e3a4f !important; }
+        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #1e4066 !important; }
         body.rex-theme-dark .builder-toolbar-btn--addon {
-            background: linear-gradient(135deg, #2a2a2a 0%, #1e3a28 100%) !important;
+            background: linear-gradient(135deg, #2d6a45 0%, #1e4626 100%) !important;
             color: #8fd4a8 !important;
             border-color: #3e8c60 !important;
         }
-        body.rex-theme-dark .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
+        body.rex-theme-dark .builder-toolbar-btn--addon:hover { background: #1e4626 !important; }
         body.rex-theme-dark #tinymce-profile-assistant .panel {
             border-color: #34475a;
             background: #1b2632;
@@ -799,19 +820,52 @@ function initTinyMceProfileAssistant() {
             color: #e7f4ff;
             border-color: #4e6a86;
         }
-        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn--for {
-            background: linear-gradient(135deg, #327fbc, #256796) !important;
-            color: #f3faff !important;
-            border: 1px solid #4f9bd2 !important;
-            text-shadow: none;
+        body.rex-theme-dark .builder-toolbar-pill {
+            background: #2a3744;
+            color: #e8f0f7;
+            border-color: #111820;
         }
-        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn--for:hover {
-            filter: brightness(1.08);
+        body.rex-theme-dark .builder-toolbar-pill--for {
+            border-color: #2c7cb8;
+            background: #2c5a8f;
+            color: #8ec5ea;
         }
+        body.rex-theme-dark .builder-toolbar-pill--addon {
+            border-color: #3e8c60;
+            background: #2d6a45;
+            color: #8fd4a8;
+        }
+        body.rex-theme-dark .builder-toolbar-pill--core {
+            border-color: #5f6a75;
+            background: #3d4650;
+            color: #e8f0f7;
+        }
+        body.rex-theme-dark .builder-toolbar-inline-picker {
+            background: #1f2933;
+            border-color: #3a4654;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+        }
+        body.rex-theme-dark .builder-toolbar-inline-picker-search {
+            background: #14191f;
+            border-color: #3a4654;
+        }
+        body.rex-theme-dark .builder-insert-item-btn--for {
+            background: linear-gradient(135deg, #2c5a8f, #1e4066) !important;
+            border-color: transparent !important;
+            color: #8ec5ea !important;
+            font-weight: 600;
+        }
+        body.rex-theme-dark .builder-insert-item-btn--for:hover { filter: brightness(1.15); }
+        body.rex-theme-dark .builder-insert-item-btn--addon {
+            background: linear-gradient(135deg, #2d6a45, #1e4626) !important;
+            border-color: transparent !important;
+            color: #8fd4a8 !important;
+            font-weight: 600;
+        }
+        body.rex-theme-dark .builder-insert-item-btn--addon:hover { filter: brightness(1.15); }
 
         /* ================================================================
-           REDAXO Auto-Dark-Mode (prefers-color-scheme)
-           Gleiche Werte wie explicit dark.
+           REDAXO Auto Mode: prefers-color-scheme (responsive to system)
            ================================================================ */
         @media (prefers-color-scheme: dark) {
             body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant {
@@ -822,24 +876,38 @@ function initTinyMceProfileAssistant() {
                 --tpa-chip-border: #111820;
                 --tpa-chip-hover-bg: #34455a;
                 --tpa-chip-hover-border: #000;
+                --tpa-chip-text: #e8f0f7;
                 --tpa-chip-remove: #ff8080;
                 --tpa-placeholder-bg: #1e3a28;
                 --tpa-placeholder-border: #5a8a6a;
                 --tpa-help-muted: #8a98a6;
                 --tpa-context-border: #3a4654;
             }
+            body.rex-has-theme:not(.rex-theme-light) .for-plugin-badge,
+            body.rex-has-theme:not(.rex-theme-light) .for-plugin-badge-inline {
+                background: linear-gradient(135deg, #2c5a8f, #1e4066);
+                color: #8ec5ea;
+                border-color: #2c7cb8;
+                text-shadow: 0 1px 1px rgba(0,0,0,.3);
+                box-shadow: 0 1px 2px rgba(0,0,0,.2);
+            }
+            body.rex-has-theme:not(.rex-theme-light) .for-plugin-badge--addon {
+                background: linear-gradient(135deg, #2d6a45, #1e4626);
+                color: #8fd4a8;
+                border-color: #3e8c60;
+            }
             body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for {
-                background: linear-gradient(135deg, #2a2a2a 0%, #1e3a4f 100%) !important;
+                background: linear-gradient(135deg, #2c5a8f 0%, #1e4066 100%) !important;
                 color: #8ec5ea !important;
                 border-color: #2c7cb8 !important;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for:hover { background: #1e3a4f !important; }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for:hover { background: #1e4066 !important; }
             body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon {
-                background: linear-gradient(135deg, #2a2a2a 0%, #1e3a28 100%) !important;
+                background: linear-gradient(135deg, #2d6a45 0%, #1e4626 100%) !important;
                 color: #8fd4a8 !important;
                 border-color: #3e8c60 !important;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon:hover { background: #1e4626 !important; }
             body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel {
                 border-color: #34475a;
                 background: #1b2632;
@@ -872,15 +940,49 @@ function initTinyMceProfileAssistant() {
                 color: #e7f4ff;
                 border-color: #4e6a86;
             }
-            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn--for {
-                background: linear-gradient(135deg, #327fbc, #256796) !important;
-                color: #f3faff !important;
-                border: 1px solid #4f9bd2 !important;
-                text-shadow: none;
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-pill {
+                background: #2a3744;
+                color: #e8f0f7;
+                border-color: #111820;
             }
-            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn--for:hover {
-                filter: brightness(1.08);
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-pill--for {
+                border-color: #2c7cb8;
+                background: #2c5a8f;
+                color: #8ec5ea;
             }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-pill--addon {
+                border-color: #3e8c60;
+                background: #2d6a45;
+                color: #8fd4a8;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-pill--core {
+                border-color: #5f6a75;
+                background: #3d4650;
+                color: #e8f0f7;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-inline-picker {
+                background: #1f2933;
+                border-color: #3a4654;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-inline-picker-search {
+                background: #14191f;
+                border-color: #3a4654;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--for {
+                background: linear-gradient(135deg, #2c5a8f, #1e4066) !important;
+                border-color: transparent !important;
+                color: #8ec5ea !important;
+                font-weight: 600;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--for:hover { filter: brightness(1.15); }
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--addon {
+                background: linear-gradient(135deg, #2d6a45, #1e4626) !important;
+                border-color: transparent !important;
+                color: #8fd4a8 !important;
+                font-weight: 600;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--addon:hover { filter: brightness(1.15); }
         }
     `;
     document.head.appendChild(style);
