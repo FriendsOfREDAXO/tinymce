@@ -325,3 +325,111 @@ try {
 
 // Style-Sets: Table is created via ensure_table.php
 // Default sets are NOT auto-installed - user can install them via "Demo-Sets installieren" button
+
+// =============================================================================
+// Demo-Snippets: nur bei frischer Installation einfügen (0 Einträge in Tabelle)
+// =============================================================================
+try {
+    $snippetSql = \rex_sql::factory();
+    $snippetCount = (int) $snippetSql->getValue('SELECT COUNT(*) FROM ' . \rex::getTable('tinymce_snippets'));
+
+    if ($snippetCount === 0) {
+        $now = date('Y-m-d H:i:s');
+
+        $demoSnippets = [
+            [
+                'name' => 'Kontaktinformationen',
+                'content' => <<<'HTML'
+<div class="contact-info">
+  <h3>So erreichen Sie uns</h3>
+  <address>
+    <p><strong>Musterunternehmen GmbH</strong><br>
+    Musterstraße 42<br>
+    12345 Musterstadt</p>
+    <p>📞 <a href="tel:+491234567890">+49 123 456 78-90</a><br>
+    📠 +49 123 456 78-99<br>
+    ✉ <a href="mailto:hallo@musterunternehmen.de">hallo@musterunternehmen.de</a></p>
+    <p>🌐 <a href="https://www.musterunternehmen.de">www.musterunternehmen.de</a></p>
+  </address>
+</div>
+HTML,
+            ],
+            [
+                'name' => 'Öffnungszeiten',
+                'content' => <<<'HTML'
+<div class="opening-hours">
+  <h3>Unsere Öffnungszeiten</h3>
+  <table>
+    <tbody>
+      <tr><td><strong>Montag – Donnerstag</strong></td><td>08:00 – 17:30 Uhr</td></tr>
+      <tr><td><strong>Freitag</strong></td><td>08:00 – 14:00 Uhr</td></tr>
+      <tr><td><strong>Samstag</strong></td><td>09:00 – 13:00 Uhr</td></tr>
+      <tr><td><strong>Sonntag &amp; Feiertage</strong></td><td>Geschlossen</td></tr>
+    </tbody>
+  </table>
+  <p><em>Termine außerhalb der regulären Zeiten gerne nach Vereinbarung.</em></p>
+</div>
+HTML,
+            ],
+            [
+                'name' => 'Stellenausschreibung (witzig)',
+                'content' => <<<'HTML'
+<div class="job-posting">
+  <h2>Gesucht: PHP-Flüsterer (m/w/d) – auch bekannt als Softwareentwickler</h2>
+  <p><strong>Vollzeit · Remote möglich · Kaffeeflat inklusive</strong></p>
+
+  <h3>Über uns</h3>
+  <p>Wir sind ein dynamisches Unternehmen, das so agil ist, dass selbst unsere Kaffeemaschine Sprints macht. Unsere Meetings dauern selten länger als ein Standup – außer dem Freitagsmeeting, das irgendwie immer beim Biergarten endet.</p>
+
+  <h3>Ihre Aufgaben</h3>
+  <ul>
+    <li>Code schreiben, der so sauber ist, dass Ihre Kolleginnen und Kollegen spontan weinen (vor Freude, natürlich)</li>
+    <li>Bugs debuggen, die sich seit 2019 erfolgreich verstecken</li>
+    <li>Technische Schulden in produktive Features umdeuten</li>
+    <li>Gelegentlich an Meetings teilnehmen und dabei so tun, als hätte man die E-Mail gelesen</li>
+    <li>Die Frage „Könnte man das nicht einfach mit KI machen?" souverän beantworten</li>
+  </ul>
+
+  <h3>Das bringen Sie mit</h3>
+  <ul>
+    <li>Mehrjährige Erfahrung mit PHP – oder zumindest eine überzeugende Geschichte darüber</li>
+    <li>Kenntnisse in REDAXO, weil Sie sonst nicht hier wären</li>
+    <li>Humor, Geduld und die Fähigkeit, bei „Es war doch gestern noch alles okay!" ruhig zu bleiben</li>
+    <li>Teamgeist – wir arbeiten zusammen, auch wenn Git Merge-Konflikte das nicht immer so sehen</li>
+  </ul>
+
+  <h3>Das bieten wir</h3>
+  <ul>
+    <li>☕ Kaffee in allen erdenklichen Formen und Temperaturen</li>
+    <li>🏠 Homeoffice – Ihre Katze darf am Meeting teilnehmen</li>
+    <li>🎯 Flache Hierarchien (unser CTO macht selbst noch Pull Requests)</li>
+    <li>🚀 Moderne Technologien (meistens)</li>
+    <li>🎉 Legendäre Weihnachtsfeier, bei der sich alle fest vornehmen, früher zu gehen</li>
+  </ul>
+
+  <p><strong>Klingt gut?</strong> Dann schicken Sie uns Ihre Bewerbung – gerne mit Lebenslauf, Arbeitsproben und dem Lieblingsfehlercode, den Sie je debuggt haben.</p>
+  <p>📧 <a href="mailto:jobs@musterunternehmen.de">jobs@musterunternehmen.de</a></p>
+</div>
+HTML,
+            ],
+        ];
+
+        foreach ($demoSnippets as $snippet) {
+            $ins = \rex_sql::factory();
+            $ins->setTable(\rex::getTable('tinymce_snippets'));
+            $ins->setValue('name', $snippet['name']);
+            $ins->setValue('content', $snippet['content']);
+            $ins->setValue('createdate', $now);
+            $ins->setValue('updatedate', $now);
+            $ins->setValue('createuser', 'admin');
+            $ins->setValue('updateuser', 'admin');
+            try {
+                $ins->insert();
+            } catch (\Throwable $e) {
+                \rex_logger::logException($e);
+            }
+        }
+    }
+} catch (\Throwable $e) {
+    \rex_logger::logException($e);
+}
