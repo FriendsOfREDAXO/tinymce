@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
-const esbuild = require('esbuild');
 
 const pluginName = 'for_chars_symbols';
 const distDir = path.join(__dirname, 'dist', pluginName);
@@ -15,20 +14,20 @@ fs.mkdirSync(distDir, { recursive: true });
 
 async function build() {
   try {
-    await esbuild.build({
-      entryPoints: ['src/main/ts/Main.ts'],
-      bundle: true,
-      minify: true,
-      format: 'iife',
-      target: ['es2017'],
-      outfile: path.join(distDir, 'plugin.min.js'),
-      external: ['tinymce'],
-    });
+    const runtimeDir = path.resolve(__dirname, '..', '..', 'assets', 'scripts', 'tinymce', 'plugins', pluginName);
+    const runtimeJs = path.join(runtimeDir, 'plugin.js');
+    const runtimeMinJs = path.join(runtimeDir, 'plugin.min.js');
 
-    fs.copyFileSync(
-      path.join(distDir, 'plugin.min.js'),
-      path.join(distDir, 'plugin.js')
-    );
+    if (!fs.existsSync(runtimeJs)) {
+      throw new Error(`Missing runtime source: ${runtimeJs}`);
+    }
+
+    if (fs.existsSync(runtimeMinJs)) {
+      fs.copyFileSync(runtimeMinJs, path.join(distDir, 'plugin.min.js'));
+    } else {
+      fs.copyFileSync(runtimeJs, path.join(distDir, 'plugin.min.js'));
+    }
+    fs.copyFileSync(runtimeJs, path.join(distDir, 'plugin.js'));
 
     fs.writeFileSync(path.join(distDir, 'version.txt'), buildVersion);
     console.log(`\u2713 Build complete: ${pluginName}`);
