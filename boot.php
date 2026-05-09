@@ -79,7 +79,7 @@ if (rex::isBackend() && null !== rex::getUser()) {
             $addon->setConfig('update_profiles', false);
         } catch (rex_functional_exception $e) {
             // Log generation failure to identify permission/disk issues
-            rex_logger::logException($e, rex_logger::ERROR, 'tinymce_profiles_generation_failed');
+            rex_logger::logException($e, 'tinymce_profiles_generation_failed');
         }
     }
 }

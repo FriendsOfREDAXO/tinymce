@@ -133,7 +133,13 @@ class Assets
                     $formats = json_decode($styleFormatsRaw, true);
                     // Validate JSON parse succeeded (null means invalid JSON)
                     if (null === $formats) {
-                        rex_logger::warning('Invalid JSON in style_formats for style-set "' . htmlspecialchars($set['name'] ?? 'unknown') . '": ' . json_last_error_msg());
+                        rex_logger::factory()->warning(
+                            'Invalid JSON in style_formats for style-set "{style_set}": {json_error}',
+                            [
+                                'style_set' => isset($set['name']) ? (string) $set['name'] : 'unknown',
+                                'json_error' => json_last_error_msg(),
+                            ],
+                        );
                     } elseif (is_array($formats)) {
                         foreach ($formats as $format) {
                             if (!is_array($format)) {

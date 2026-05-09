@@ -45,6 +45,31 @@ echo $mform->show();
 
 Zur Konfiguration eigener Profile bitte in das default Profil schauen und die [TinyMCE 8 Doku](https://www.tiny.cloud/docs/tinymce/latest/) beachten.
 
+### Profil-Assistent (aktuell)
+
+Der Profil-Assistent in der Profilverwaltung wurde erweitert und arbeitet jetzt näher an der nativen TinyMCE-Konfiguration:
+
+* **Mehrzeilige Toolbars**: `toolbar` kann als String oder als Array von Toolbar-Zeilen gepflegt werden.
+* **Toolbar-Modus**: `toolbar_mode` ist direkt im Assistenten auswählbar (`sliding`, `floating`, `wrap`, `scrolling`).
+* **Toolbar deaktivieren**: Es wird korrekt `toolbar: false` erzeugt.
+* **Toolbar-Picker als Popover**: Buttons werden als sortierbare Pills gepflegt (mit Core/FOR/AddOn-Badge). Der Picker öffnet sich direkt am Klickpunkt.
+* **Separator (`|`)**: Bleibt im Picker immer auswählbar und ist immer am Listenanfang.
+* **Zeilenaktionen**: „Löschen“ (einzelnes Element) und „Alle löschen“ (mit Bestätigung) sind im Picker verfügbar.
+
+### Protected Extras (nicht verwaltete Optionen)
+
+Zusätzliche Profiloptionen, die der Assistent nicht direkt über UI-Felder verwaltet, können als `protected extras` hinterlegt werden. Diese Einträge bleiben beim Generieren erhalten und werden wieder angehängt.
+
+Beispiele:
+
+```javascript
+toolbar_sticky: true,
+toolbar_sticky_offset: 0,
+my_custom_option: function () { return 'kept'; }
+```
+
+Hinweis: Eingaben mit Top-Level-Kommas werden JS-sicher gesplittet. Als Fallback werden auch property-basierte „eine Zeile pro Eintrag“-Angaben unterstützt.
+
 ### Migration von TinyMCE 5/6 zu TinyMCE 8
 
 Bei der Aktualisierung von älteren Versionen (tinymce4, tinymce5, tinymce6) werden bestehende Profile automatisch migriert:

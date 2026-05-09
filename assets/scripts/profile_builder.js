@@ -104,19 +104,6 @@ function initTinyMceProfileAssistant() {
     toolbarHtml += '<div class="builder-toolbar-rows"></div>';
     toolbarHtml += '<button type="button" class="btn btn-default btn-xs builder-toolbar-row-add"><i class="rex-icon fa-plus"></i> ' + (i18n.toolbar_add_row || 'Add toolbar row') + '</button>';
     toolbarHtml += '<div class="form-group" style="margin-top: 12px;"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><textarea class="form-control builder-toolbar-input" rows="3" readonly></textarea></div>';
-    toolbarHtml += '<datalist id="builder-toolbar-items-datalist">';
-    toolbarSuggestions.forEach((btn) => {
-        let label = btn;
-        if (btn === '|') {
-            label = i18n.separator || 'Separator';
-        } else if (isAddonToolbarBtn(btn)) {
-            label = 'AddOn • ' + btn;
-        } else if (isForToolbarBtn(btn)) {
-            label = 'FOR • ' + btn;
-        }
-        toolbarHtml += '<option value="' + btn + '" label="' + label + '"></option>';
-    });
-    toolbarHtml += '</datalist>';
     toolbarHtml += '</div>';
 
     // Insert Menu Section
@@ -586,11 +573,159 @@ function initTinyMceProfileAssistant() {
         .builder-toolbar-row-title {
             font-weight: 600;
         }
-        .builder-toolbar-item-row + .builder-toolbar-item-row {
-            margin-top: 8px;
+        .builder-toolbar-picker {
+            margin-bottom: 8px;
         }
-        .builder-toolbar-item-row .input-group-btn > .btn {
-            min-width: 38px;
+        .builder-toolbar-picker-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--tpa-help-muted);
+            margin-bottom: 6px;
+        }
+        .builder-toolbar-picker-help {
+            font-size: 11px;
+            color: var(--tpa-help-muted);
+        }
+        .for-plugin-badge--core {
+            background: linear-gradient(135deg, #7f8b97, #5f6a75);
+        }
+        .builder-toolbar-pill-dropzone {
+            position: relative;
+        }
+        .builder-toolbar-pill-list {
+            min-height: 42px;
+            border: 1px dashed var(--tpa-dropzone-border);
+            background: var(--tpa-dropzone-bg);
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .builder-toolbar-pill {
+            cursor: move;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 6px 6px 0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #fff;
+            border: 1px solid var(--tpa-chip-border);
+            background: var(--tpa-chip-bg);
+        }
+        .builder-toolbar-pill--for {
+            border-color: #2c7cb8;
+            background: #27415a;
+        }
+        .builder-toolbar-pill--addon {
+            border-color: #3e8c60;
+            background: #244634;
+        }
+        .builder-toolbar-pill--core {
+            border-color: #5f6a75;
+            background: #3d4650;
+        }
+        .builder-toolbar-pill.dragging {
+            opacity: .25;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+            cursor: grabbing;
+        }
+        .builder-toolbar-pill.over {
+            outline: 1px dashed var(--tpa-placeholder-border);
+        }
+        .builder-toolbar-pill.new {
+            animation: fadeInScale .3s ease-out forwards;
+        }
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .builder-toolbar-pill-remove {
+            border: 0;
+            background: transparent;
+            color: var(--tpa-chip-remove);
+            font-weight: 700;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+        }
+        .builder-toolbar-inline-picker {
+            position: fixed;
+            z-index: 1060;
+            width: 320px;
+            max-width: calc(100% - 16px);
+            border: 1px solid var(--tpa-dropzone-border);
+            border-radius: 6px;
+            background: var(--tpa-panel-body-bg);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+            padding: 8px;
+            display: none;
+        }
+        .builder-toolbar-inline-picker-search {
+            margin-bottom: 8px;
+            border-color: var(--tpa-dropzone-border);
+            background: var(--tpa-panel-body-bg);
+            color: inherit;
+        }
+        .builder-toolbar-inline-picker-list {
+            max-height: 220px;
+            overflow: auto;
+        }
+        .builder-toolbar-inline-picker-item {
+            width: 100%;
+            text-align: left;
+            border: 1px solid transparent;
+            background: transparent;
+            color: inherit;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .builder-toolbar-inline-picker-item:hover,
+        .builder-toolbar-inline-picker-item:focus {
+            background: var(--tpa-dropzone-bg);
+            border-color: var(--tpa-dropzone-border);
+            outline: 0;
+        }
+        .builder-toolbar-inline-picker-item--for .builder-toolbar-inline-picker-text {
+            color: #2c7cb8;
+            font-weight: 600;
+        }
+        .builder-toolbar-inline-picker-item--addon .builder-toolbar-inline-picker-text {
+            color: #3e8c60;
+            font-weight: 600;
+        }
+        .builder-toolbar-inline-picker-divider {
+            height: 1px;
+            background: var(--tpa-dropzone-border);
+            margin: 4px 0;
+        }
+        .builder-toolbar-inline-picker-delete {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        .builder-toolbar-inline-picker-delete:hover {
+            background: rgba(255, 107, 107, .1);
+        }
+        .builder-toolbar-inline-picker-clear-all {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        .builder-toolbar-inline-picker-clear-all:hover {
+            background: rgba(255, 107, 107, .1);
+        }
+        .builder-toolbar-inline-picker-empty {
+            color: var(--tpa-help-muted);
+            font-size: 12px;
+            padding: 6px 4px;
         }
         .builder-toolbar-row-empty {
             color: var(--tpa-help-muted);
@@ -632,6 +767,47 @@ function initTinyMceProfileAssistant() {
             border-color: #3e8c60 !important;
         }
         body.rex-theme-dark .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
+        body.rex-theme-dark #tinymce-profile-assistant .panel {
+            border-color: #34475a;
+            background: #1b2632;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .panel > .panel-heading {
+            background: #243242;
+            color: #d8e5f1;
+            border-color: #34475a;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .panel.panel-info > .panel-heading {
+            background: linear-gradient(180deg, #274056, #223749);
+            color: #e2f1ff;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .panel.panel-primary > .panel-heading {
+            background: linear-gradient(180deg, #2b4460, #24384f);
+            color: #e6f3ff;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .panel > .panel-body {
+            background: #1a2430;
+            border-top: 1px solid #2f4254;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn.btn-default {
+            background: #223142;
+            color: #b8d2ea;
+            border-color: #3a5269;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn.btn-default:hover,
+        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn.btn-default:focus {
+            background: #2a3c50;
+            color: #e7f4ff;
+            border-color: #4e6a86;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn--for {
+            background: linear-gradient(135deg, #327fbc, #256796) !important;
+            color: #f3faff !important;
+            border: 1px solid #4f9bd2 !important;
+            text-shadow: none;
+        }
+        body.rex-theme-dark #tinymce-profile-assistant .builder-insert-item-btn--for:hover {
+            filter: brightness(1.08);
+        }
 
         /* ================================================================
            REDAXO Auto-Dark-Mode (prefers-color-scheme)
@@ -664,6 +840,47 @@ function initTinyMceProfileAssistant() {
                 border-color: #3e8c60 !important;
             }
             body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon:hover { background: #1e3a28 !important; }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel {
+                border-color: #34475a;
+                background: #1b2632;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel > .panel-heading {
+                background: #243242;
+                color: #d8e5f1;
+                border-color: #34475a;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel.panel-info > .panel-heading {
+                background: linear-gradient(180deg, #274056, #223749);
+                color: #e2f1ff;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel.panel-primary > .panel-heading {
+                background: linear-gradient(180deg, #2b4460, #24384f);
+                color: #e6f3ff;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel > .panel-body {
+                background: #1a2430;
+                border-top: 1px solid #2f4254;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn.btn-default {
+                background: #223142;
+                color: #b8d2ea;
+                border-color: #3a5269;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn.btn-default:hover,
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn.btn-default:focus {
+                background: #2a3c50;
+                color: #e7f4ff;
+                border-color: #4e6a86;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn--for {
+                background: linear-gradient(135deg, #327fbc, #256796) !important;
+                color: #f3faff !important;
+                border: 1px solid #4f9bd2 !important;
+                text-shadow: none;
+            }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-insert-item-btn--for:hover {
+                filter: brightness(1.08);
+            }
         }
     `;
     document.head.appendChild(style);
@@ -686,14 +903,171 @@ function initTinyMceProfileAssistant() {
         });
     }
 
+    function getToolbarItemOrigin(value) {
+        if (isAddonToolbarBtn(value)) {
+            return 'addon';
+        }
+        if (isForToolbarBtn(value)) {
+            return 'for';
+        }
+        return 'core';
+    }
+
+    function getToolbarItemBadge(origin) {
+        if (origin === 'addon') {
+            return '<span class="for-plugin-badge for-plugin-badge--addon">AddOn</span>';
+        }
+        if (origin === 'for') {
+            return '<span class="for-plugin-badge">FOR</span>';
+        }
+        return '<span class="for-plugin-badge for-plugin-badge--core">Core</span>';
+    }
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function getToolbarPickerItems() {
+        const seen = new Set();
+        const items = [];
+        toolbarSuggestions.forEach((value) => {
+            const normalized = normalizeToolbarItemValue(value);
+            if (!normalized || seen.has(normalized)) {
+                return;
+            }
+            seen.add(normalized);
+            items.push(normalized);
+        });
+        return items;
+    }
+
+    function renderToolbarInlinePicker($row, query = '', selectedPillValue = null) {
+        const filter = String(query || '').trim().toLowerCase();
+        const separatorValue = '|';
+        const allItems = getToolbarPickerItems();
+        const items = allItems.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            return filter === '' || value.toLowerCase().includes(filter);
+        });
+        
+        // Filter out items that are already in this toolbar row
+        const $existingPills = $row.find('.builder-toolbar-pill');
+        const usedValues = new Set();
+        $existingPills.each(function() {
+            usedValues.add($(this).data('value'));
+        });
+        
+        const filteredItems = items.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            return !usedValues.has(value);
+        });
+        const orderedItems = [];
+        if (filteredItems.includes(separatorValue)) {
+            orderedItems.push(separatorValue);
+        }
+        filteredItems.forEach((value) => {
+            if (value !== separatorValue) {
+                orderedItems.push(value);
+            }
+        });
+        
+        const $list = $row.find('.builder-toolbar-inline-picker-list');
+        if (orderedItems.length === 0 && !selectedPillValue) {
+            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
+            return;
+        }
+
+        let html = '';
+        
+        // Actions section: separator, clear all, and delete
+        html += '<div class="builder-toolbar-inline-picker-divider"></div>';
+        html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-clear-all" data-clear-all="true">' + escapeHtml(i18n.clear_all_toolbar || 'Alle loeschen') + '</button>';
+        
+        if (selectedPillValue) {
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-delete" data-delete="' + escapeHtml(selectedPillValue) + '">' + escapeHtml(i18n.delete_toolbar_item || 'Loeschen') + '</button>';
+        }
+        
+        html += '<div class="builder-toolbar-inline-picker-divider"></div>';
+        
+        orderedItems.forEach((value) => {
+            const origin = getToolbarItemOrigin(value);
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-item--' + origin + '" data-value="' + escapeHtml(value) + '">' + getToolbarItemBadge(origin) + '<span class="builder-toolbar-inline-picker-text">' + escapeHtml(value) + '</span></button>';
+        });
+        
+        $list.html(html);
+    }
+
+    function closeAllToolbarInlinePickers() {
+        $toolbarRows.find('.builder-toolbar-inline-picker').hide();
+        $toolbarRows.find('.builder-toolbar-inline-picker-search').val('');
+    }
+
+    function getToolbarInsertIndexFromPoint($list, clientX) {
+        const $pills = $list.children('.builder-toolbar-pill');
+        for (let i = 0; i < $pills.length; i++) {
+            const rect = $pills[i].getBoundingClientRect();
+            if (clientX < rect.left + (rect.width / 2)) {
+                return i;
+            }
+        }
+        return $pills.length;
+    }
+
+    function openToolbarInlinePicker($row, clientX, clientY, insertIndex, selectedPillValue = null) {
+        const $picker = $row.find('.builder-toolbar-inline-picker');
+        const $search = $picker.find('.builder-toolbar-inline-picker-search');
+        const viewportPadding = 8;
+        const anchorOffset = 10;
+
+        closeAllToolbarInlinePickers();
+        renderToolbarInlinePicker($row, '', selectedPillValue);
+
+        $picker.css({ left: '-9999px', top: '-9999px' }).show();
+
+        const pickerWidth = Math.ceil($picker.outerWidth() || 320);
+        const pickerHeight = Math.ceil($picker.outerHeight() || 240);
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        let left = clientX + anchorOffset;
+        let top = clientY + anchorOffset;
+
+        if (left + pickerWidth > viewportWidth - viewportPadding) {
+            left = clientX - pickerWidth - anchorOffset;
+        }
+        if (left < viewportPadding) {
+            left = viewportPadding;
+        }
+
+        if (top + pickerHeight > viewportHeight - viewportPadding) {
+            top = clientY - pickerHeight - anchorOffset;
+        }
+        if (top < viewportPadding) {
+            top = viewportPadding;
+        }
+
+        $picker.css({ left: left + 'px', top: top + 'px' }).show();
+        $row.data('toolbarInsertIndex', Number.isInteger(insertIndex) ? insertIndex : 0);
+        $row.data('selectedPillValue', selectedPillValue);
+        $search.val('').trigger('focus');
+    }
+
     function getToolbarRows() {
         const rows = [];
         $toolbarRows.find('.builder-toolbar-row').each(function() {
             const items = [];
-            $(this).find('.builder-toolbar-item-input').each(function() {
-                const value = normalizeToolbarItemValue($(this).val());
+            $(this).find('.builder-toolbar-pill').each(function() {
+                const value = normalizeToolbarItemValue($(this).data('value'));
                 if (value) {
-                    $(this).val(value);
                     items.push(value);
                 }
             });
@@ -705,7 +1079,7 @@ function initTinyMceProfileAssistant() {
     }
 
     function updateToolbarEmptyState($row) {
-        const hasItems = $row.find('.builder-toolbar-item-row').length > 0;
+        const hasItems = $row.find('.builder-toolbar-pill').length > 0;
         $row.find('.builder-toolbar-row-empty').toggle(!hasItems);
     }
 
@@ -714,33 +1088,55 @@ function initTinyMceProfileAssistant() {
         $toolbarInput.val(serializedRows.join('\n'));
     }
 
-    function addToolbarItemRow($row, value = '') {
+    function addToolbarItemRow($row, value = '', insertIndex = null) {
         const normalizedValue = normalizeToolbarItemValue(value);
-        const placeholder = (i18n.toolbar_item_placeholder || 'Type to search toolbar items or enter |').replace(/"/g, '&quot;');
-        const rowHtml = '<div class="builder-toolbar-item-row input-group input-group-sm">' +
-            '<input type="text" class="form-control builder-toolbar-item-input" list="builder-toolbar-items-datalist" placeholder="' + placeholder + '" value="' + normalizedValue.replace(/"/g, '&quot;') + '">' +
-            '<span class="input-group-btn">' +
-            '<button type="button" class="btn btn-danger builder-toolbar-item-remove" title="' + ((i18n.remove || 'Remove').replace(/"/g, '&quot;')) + '"><i class="rex-icon fa-times"></i></button>' +
-            '</span>' +
-            '</div>';
-        $row.find('.builder-toolbar-items').append(rowHtml);
+        if (!normalizedValue) {
+            return;
+        }
+        const origin = getToolbarItemOrigin(normalizedValue);
+        const $pill = $('<li class="builder-toolbar-pill builder-toolbar-pill--' + origin + ' new" draggable="true"></li>');
+        $pill.attr('data-value', normalizedValue);
+        $pill.data('value', normalizedValue);
+        $pill.append($(getToolbarItemBadge(origin)));
+        $pill.append($('<span class="builder-toolbar-pill-text"></span>').text(normalizedValue));
+
+        const $pillList = $row.find('.builder-toolbar-pill-list');
+        const $existing = $pillList.children('.builder-toolbar-pill');
+        if (Number.isInteger(insertIndex) && insertIndex >= 0 && insertIndex < $existing.length) {
+            $existing.eq(insertIndex).before($pill);
+        } else {
+            $pillList.append($pill);
+        }
+        setupDragEvents($pill[0]);
+        $pill.on('animationend', function() {
+            $(this).removeClass('new');
+        });
         updateToolbarEmptyState($row);
         updateInput();
     }
 
     function addToolbarRow(items = []) {
-        const addItemLabel = i18n.toolbar_add_item || 'Add item';
         const removeLabel = i18n.toolbar_remove_row || 'Remove toolbar row';
+        const pickerLabel = i18n.toolbar_picker || 'Toolbarfeld';
         const $row = $('<div class="builder-toolbar-row">' +
             '<div class="builder-toolbar-row-header">' +
                 '<span class="builder-toolbar-row-title"></span>' +
                 '<div class="btn-group btn-group-xs">' +
-                    '<button type="button" class="btn btn-default builder-toolbar-item-add"><i class="rex-icon fa-plus"></i> ' + addItemLabel + '</button>' +
                     '<button type="button" class="btn btn-danger builder-toolbar-row-remove"><i class="rex-icon fa-trash"></i> ' + removeLabel + '</button>' +
                 '</div>' +
             '</div>' +
-            '<div class="builder-toolbar-row-empty">' + (i18n.toolbar_row_empty || 'No items yet. Add entries via the compact search field.') + '</div>' +
-            '<div class="builder-toolbar-items"></div>' +
+            '<div class="builder-toolbar-picker">' +
+                '<div class="builder-toolbar-picker-label">' + pickerLabel + '</div>' +
+                '<div class="builder-toolbar-picker-help">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>' +
+            '</div>' +
+            '<div class="builder-toolbar-row-empty">' + (i18n.toolbar_row_empty || 'No items yet. Select items from the picker below.') + '</div>' +
+            '<div class="builder-toolbar-pill-dropzone">' +
+                '<ul class="builder-toolbar-pill-list list-inline" style="margin-bottom: 0;"></ul>' +
+                '<div class="builder-toolbar-inline-picker">' +
+                    '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">' +
+                    '<div class="builder-toolbar-inline-picker-list"></div>' +
+                '</div>' +
+            '</div>' +
         '</div>');
         $toolbarRows.append($row);
         if (Array.isArray(items) && items.length > 0) {
@@ -867,8 +1263,118 @@ function initTinyMceProfileAssistant() {
         addToolbarRow();
     });
 
-    $toolbarRows.on('click', '.builder-toolbar-item-add', function() {
-        addToolbarItemRow($(this).closest('.builder-toolbar-row'));
+    $toolbarRows.on('click', '.builder-toolbar-pill-list', function(e) {
+        const $clickTarget = $(e.target).closest('.builder-toolbar-pill');
+        if ($clickTarget.length > 0) {
+            return;
+        }
+        const $list = $(this);
+        const $row = $list.closest('.builder-toolbar-row');
+        const insertIndex = getToolbarInsertIndexFromPoint($list, e.clientX);
+        openToolbarInlinePicker($row, e.clientX, e.clientY, insertIndex, null);
+    });
+
+    $toolbarRows.on('click', '.builder-toolbar-pill', function(e) {
+        if ($(e.target).closest('button').length > 0) {
+            return;
+        }
+        e.stopPropagation();
+        const $pill = $(this);
+        const $row = $pill.closest('.builder-toolbar-row');
+        const $list = $row.find('.builder-toolbar-pill-list');
+        const $existing = $list.children('.builder-toolbar-pill');
+        const clickedIndex = $existing.index($pill);
+        const insertIndex = Number.isInteger(clickedIndex) && clickedIndex >= 0 ? clickedIndex + 1 : $existing.length;
+        const pillRect = this.getBoundingClientRect();
+        const clientX = pillRect.right + 8;
+        const clientY = pillRect.top;
+        openToolbarInlinePicker($row, clientX, clientY, insertIndex, $pill.data('value'));
+    });
+
+    $toolbarRows.on('click', '.builder-toolbar-inline-picker', function(e) {
+        e.stopPropagation();
+    });
+
+    $toolbarRows.on('input', '.builder-toolbar-inline-picker-search', function() {
+        const $row = $(this).closest('.builder-toolbar-row');
+        const selectedPillValue = $row.data('selectedPillValue');
+        renderToolbarInlinePicker($row, $(this).val(), selectedPillValue);
+    });
+
+    $toolbarRows.on('keydown', '.builder-toolbar-inline-picker-search', function(e) {
+        const $row = $(this).closest('.builder-toolbar-row');
+        if (e.key === 'Escape') {
+            closeAllToolbarInlinePickers();
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'Enter') {
+            const $first = $row.find('.builder-toolbar-inline-picker-item').first();
+            if ($first.length > 0) {
+                $first.trigger('click');
+            }
+            e.preventDefault();
+        }
+    });
+
+    $toolbarRows.on('click', '.builder-toolbar-inline-picker-item', function() {
+        const $row = $(this).closest('.builder-toolbar-row');
+        const insertIndex = $row.data('toolbarInsertIndex');
+        addToolbarItemRow($row, $(this).data('value'), Number.isInteger(insertIndex) ? insertIndex : null);
+        closeAllToolbarInlinePickers();
+    });
+
+    $toolbarRows.on('click', '.builder-toolbar-inline-picker-delete', function() {
+        const $row = $(this).closest('.builder-toolbar-row');
+        const valueToDel = $(this).data('delete');
+        let deleted = false;
+        $row.find('.builder-toolbar-pill').each(function() {
+            if ($(this).data('value') === valueToDel && !deleted) {
+                const $pill = $(this);
+                $pill.css('animation', 'fadeInScale .2s ease-in reverse');
+                setTimeout(() => {
+                    $pill.remove();
+                    updateToolbarEmptyState($row);
+                    updateInput();
+                }, 200);
+                deleted = true;
+            }
+        });
+        closeAllToolbarInlinePickers();
+    });
+
+    $toolbarRows.on('click', '.builder-toolbar-inline-picker-clear-all', function() {
+        const $row = $(this).closest('.builder-toolbar-row');
+        const $pills = $row.find('.builder-toolbar-pill');
+        if ($pills.length === 0) {
+            closeAllToolbarInlinePickers();
+            return;
+        }
+
+        const confirmMessage = i18n.confirm_clear_all_toolbar || 'Alle Elemente in dieser Toolbar-Zeile wirklich loeschen?';
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        let count = 0;
+        $pills.each(function() {
+            const $pill = $(this);
+            $pill.css('animation', 'fadeInScale .2s ease-in reverse');
+            setTimeout(() => {
+                $pill.remove();
+                if (++count === $pills.length) {
+                    updateToolbarEmptyState($row);
+                    updateInput();
+                }
+            }, 200);
+        });
+        closeAllToolbarInlinePickers();
+    });
+
+    $(document).off('mousedown.tinymceToolbarInlinePicker').on('mousedown.tinymceToolbarInlinePicker', function(e) {
+        if ($(e.target).closest('.builder-toolbar-row').length === 0) {
+            closeAllToolbarInlinePickers();
+        }
     });
 
     $toolbarRows.on('click', '.builder-toolbar-row-remove', function() {
@@ -880,18 +1386,7 @@ function initTinyMceProfileAssistant() {
         updateInput();
     });
 
-    $toolbarRows.on('click', '.builder-toolbar-item-remove', function() {
-        const $row = $(this).closest('.builder-toolbar-row');
-        $(this).closest('.builder-toolbar-item-row').remove();
-        updateToolbarEmptyState($row);
-        updateInput();
-    });
 
-    $toolbarRows.on('input change', '.builder-toolbar-item-input', function() {
-        const normalized = normalizeToolbarItemValue($(this).val());
-        $(this).val(normalized);
-        updateInput();
-    });
 
     $builderBody.on('change', '.builder-toolbar-enabled', function() {
         updateToolbarSettingsState();
@@ -924,21 +1419,31 @@ function initTinyMceProfileAssistant() {
 
     // Auto-wire drag events for <li> elements added by loadFromConfig() or any
     // other code path that inserts items without going through addContextItem()/addInsertItem().
-    [$contextSelectedList[0], $insertSelectedList[0]].forEach(function (list) {
+    [$contextSelectedList[0], $insertSelectedList[0], $toolbarRows[0]].forEach(function (list) {
         if (!list) return;
         const mo = new MutationObserver(function (mutations) {
             mutations.forEach(function (m) {
                 m.addedNodes.forEach(function (node) {
-                    if (node && node.nodeType === 1 && node.tagName === 'LI') {
+                    if (!node || node.nodeType !== 1) {
+                        return;
+                    }
+                    if (node.tagName === 'LI') {
                         setupDragEvents(node);
+                        return;
+                    }
+                    if (typeof node.querySelectorAll === 'function') {
+                        node.querySelectorAll('li').forEach(function (li) {
+                            setupDragEvents(li);
+                        });
                     }
                 });
             });
             // Keep hidden inputs in sync with whatever content is currently in the list.
             if (list.id === 'builder-context-selected-items') updateContextInput();
             else if (list.id === 'builder-insert-selected-items') updateInsertInput();
+            else updateInput();
         });
-        mo.observe(list, { childList: true });
+        mo.observe(list, { childList: true, subtree: true });
     });
 
     function handleDragStart(e) {
@@ -994,6 +1499,8 @@ function initTinyMceProfileAssistant() {
                 updateContextInput();
             } else if (this.parentNode.id === 'builder-insert-selected-items') {
                 updateInsertInput();
+            } else if ($(this.parentNode).hasClass('builder-toolbar-pill-list')) {
+                updateInput();
             }
         }
         return false;
@@ -1003,6 +1510,7 @@ function initTinyMceProfileAssistant() {
         this.classList.remove('dragging');
         $contextSelectedList.find('li').removeClass('over');
         $insertSelectedList.find('li').removeClass('over');
+        $toolbarRows.find('.builder-toolbar-pill').removeClass('over');
     }
 
     $builderBody.find('.builder-apply').on('click', function() {
@@ -1191,7 +1699,7 @@ function parseWidthValue(raw) {
 
 const MANAGED_PROFILE_KEYS = new Set([
     'license_key', 'language', 'branding', 'statusbar', 'menubar', 'toolbar', 'toolbar_mode',
-    'quickbars_selection_toolbar', 'quickbars_insert_toolbar', 'quickbars_image_toolbar',
+    'quickbars_selection_toolbar', 'quickbars_insert_toolbar',
     'tinymce_media_type', 'menu', 'plugins', 'link_yform_tables', 'external_plugins',
     'content_langs', 'for_chars_symbols_disable_emoticons', 'for_chars_symbols_autoreplace',
     'for_chars_symbols_autoreplace_defaults', 'for_chars_symbols_autoreplace_rules',
@@ -1381,10 +1889,29 @@ function normalizeProtectedExtras(extra) {
     if (!trimmed) {
         return [];
     }
+
+    // Primary path: keep JS-aware top-level comma splitting.
     const entries = splitTopLevelProperties(trimmed);
     if (entries.length > 0) {
         return entries;
     }
+
+    // Fallback for "raw lines" input without commas: one property per line.
+    if (!trimmed.includes(',')) {
+        const lineEntries = trimmed
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((line) => line.replace(/[;,]\s*$/, '').trim())
+            .filter(Boolean);
+        const allPropertyLike = lineEntries.length > 1 && lineEntries.every((line) => {
+            return /^(?:[A-Za-z_$][\w$.-]*|"[^"]+"|'[^']+')\s*:/.test(line);
+        });
+        if (allPropertyLike) {
+            return lineEntries;
+        }
+    }
+
     return [trimmed.replace(/,\s*$/, '').trim()];
 }
 
@@ -1417,8 +1944,8 @@ function generateConfig($textarea, $builderBody) {
     const toolbarRows = [];
     $builderBody.find('.builder-toolbar-rows .builder-toolbar-row').each(function() {
         const items = [];
-        $(this).find('.builder-toolbar-item-input').each(function() {
-            const value = normalizeToolbarItemValue($(this).val());
+        $(this).find('.builder-toolbar-pill').each(function() {
+            const value = normalizeToolbarItemValue($(this).data('value'));
             if (value) {
                 items.push(value);
             }
@@ -1861,12 +2388,24 @@ function loadFromConfig($textarea, $builderBody) {
     const loadI18n = rex.tinymceProfileI18n || {};
     const $toolbarRows = $builderBody.find('.builder-toolbar-rows');
     const setToolbarRows = (rows) => {
-        const placeholder = (loadI18n.toolbar_item_placeholder || 'Type to search toolbar items or enter |').replace(/"/g, '&quot;');
-        const addItemLabel = loadI18n.toolbar_add_item || 'Add item';
         const removeLabel = loadI18n.toolbar_remove_row || 'Remove toolbar row';
-        const emptyLabel = loadI18n.toolbar_row_empty || 'No items yet. Add entries via the compact search field.';
+        const emptyLabel = loadI18n.toolbar_row_empty || 'No items yet. Select items from the picker below.';
         const rowTitle = loadI18n.toolbar_row || 'Toolbar row';
-        const removeTitle = (loadI18n.remove || 'Remove').replace(/"/g, '&quot;');
+        const pickerLabel = loadI18n.toolbar_picker || 'Toolbarfeld';
+        const profileOptions = (typeof rex !== 'undefined' && rex.tinymceProfileOptions) ? rex.tinymceProfileOptions : {};
+        const addonToolbarSet = new Set(profileOptions.addon_toolbar_buttons || []);
+        const forToolbarSet = new Set(profileOptions.for_toolbar_buttons || []);
+
+        const originFor = (value) => {
+            if (addonToolbarSet.has(value)) return 'addon';
+            if (forToolbarSet.has(value)) return 'for';
+            return 'core';
+        };
+        const badgeFor = (origin) => {
+            if (origin === 'addon') return '<span class="for-plugin-badge for-plugin-badge--addon">AddOn</span>';
+            if (origin === 'for') return '<span class="for-plugin-badge">FOR</span>';
+            return '<span class="for-plugin-badge for-plugin-badge--core">Core</span>';
+        };
 
         const normalizedRows = Array.isArray(rows) && rows.length > 0 ? rows : [[]];
         $toolbarRows.empty();
@@ -1875,22 +2414,32 @@ function loadFromConfig($textarea, $builderBody) {
                 '<div class="builder-toolbar-row-header">' +
                     '<span class="builder-toolbar-row-title">' + rowTitle + ' ' + (index + 1) + '</span>' +
                     '<div class="btn-group btn-group-xs">' +
-                        '<button type="button" class="btn btn-default builder-toolbar-item-add"><i class="rex-icon fa-plus"></i> ' + addItemLabel + '</button>' +
                         '<button type="button" class="btn btn-danger builder-toolbar-row-remove"><i class="rex-icon fa-trash"></i> ' + removeLabel + '</button>' +
                     '</div>' +
                 '</div>' +
+                '<div class="builder-toolbar-picker">' +
+                    '<div class="builder-toolbar-picker-label">' + pickerLabel + '</div>' +
+                    '<div class="builder-toolbar-picker-help">' + (loadI18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>' +
+                '</div>' +
                 '<div class="builder-toolbar-row-empty"' + ((items && items.length > 0) ? ' style="display:none;"' : '') + '>' + emptyLabel + '</div>' +
-                '<div class="builder-toolbar-items"></div>' +
+                '<div class="builder-toolbar-pill-dropzone">' +
+                    '<ul class="builder-toolbar-pill-list list-inline" style="margin-bottom: 0;"></ul>' +
+                    '<div class="builder-toolbar-inline-picker">' +
+                        '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search" placeholder="' + (loadI18n.search || 'Suche') + '">' +
+                        '<div class="builder-toolbar-inline-picker-list"></div>' +
+                    '</div>' +
+                '</div>' +
             '</div>');
             (items || []).forEach((item) => {
-                $row.find('.builder-toolbar-items').append(
-                    '<div class="builder-toolbar-item-row input-group input-group-sm">' +
-                        '<input type="text" class="form-control builder-toolbar-item-input" list="builder-toolbar-items-datalist" placeholder="' + placeholder + '" value="' + String(item).replace(/"/g, '&quot;') + '">' +
-                        '<span class="input-group-btn">' +
-                            '<button type="button" class="btn btn-danger builder-toolbar-item-remove" title="' + removeTitle + '"><i class="rex-icon fa-times"></i></button>' +
-                        '</span>' +
-                    '</div>'
-                );
+                const value = normalizeToolbarItemValue(item);
+                if (!value) return;
+                const origin = originFor(value);
+                const $pill = $('<li class="builder-toolbar-pill builder-toolbar-pill--' + origin + '" draggable="true"></li>');
+                $pill.attr('data-value', value);
+                $pill.data('value', value);
+                $pill.append($(badgeFor(origin)));
+                $pill.append($('<span class="builder-toolbar-pill-text"></span>').text(value));
+                $row.find('.builder-toolbar-pill-list').append($pill);
             });
             $toolbarRows.append($row);
         });
@@ -1911,14 +2460,14 @@ function loadFromConfig($textarea, $builderBody) {
 
     // Toolbar
     if (cfg.toolbar === false) {
-        $builderBody.find('.builder-toolbar-enabled').prop('checked', false).trigger('change');
         setToolbarRows([]);
+        $builderBody.find('.builder-toolbar-enabled').prop('checked', false).trigger('change');
     } else if (typeof cfg.toolbar === 'string') {
-        $builderBody.find('.builder-toolbar-enabled').prop('checked', true).trigger('change');
         setToolbarRows([tokenize(cfg.toolbar)]);
-    } else if (Array.isArray(cfg.toolbar)) {
         $builderBody.find('.builder-toolbar-enabled').prop('checked', true).trigger('change');
+    } else if (Array.isArray(cfg.toolbar)) {
         setToolbarRows(cfg.toolbar.filter((row) => typeof row === 'string').map((row) => tokenize(row)));
+        $builderBody.find('.builder-toolbar-enabled').prop('checked', true).trigger('change');
     }
     if (typeof cfg.toolbar_mode === 'string' && cfg.toolbar_mode) {
         $builderBody.find('.builder-toolbar-mode').val(cfg.toolbar_mode);
