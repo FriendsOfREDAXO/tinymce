@@ -4,7 +4,7 @@ namespace FriendsOfRedaxo\TinyMce\StyleSets;
 
 /**
  * Default Style-Sets für TinyMCE
- * 
+ *
  * Umfangreiche Style-Definitionen für gängige CSS-Frameworks.
  * Styles werden nur über CSS-Klassen angewendet, keine inline-Styles.
  */
