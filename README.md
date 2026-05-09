@@ -836,6 +836,14 @@ Seit **8.5.3** ist Autoreplace komplett im **Profil-Assistent** konfigurierbar (
 
 Der Assistent serialisiert die Tabelle beim Speichern automatisch in `for_chars_symbols_autoreplace_rules` als Objekte (`{from, to}` für Text-Regeln, `{re, to}` für Regex-Regeln). Beim erneuten Öffnen eines Profils werden bestehende Regeln – auch in der Kurzform `["from","to"]` – zurück in die Tabelle geladen.
 
+### Profil-Assistent: Mehrere Toolbars & geschützte Extras
+
+Der Profil-Assistent unterstützt jetzt auch **mehrere Toolbar-Zeilen**. Jede Zeile im Repeater wird als eigener TinyMCE-Toolbar-String gespeichert; bei mehreren Zeilen erzeugt der Assistent automatisch `toolbar: ['…', '…']`. Über **Toolbar-Ansicht** wird zusätzlich `toolbar_mode` gepflegt (`sliding`, `floating`, `wrap`, `scrolling`).
+
+- **Toolbar anzeigen** deaktivieren → der Assistent schreibt `toolbar: false`, sodass Profile ohne Toolbar und ohne Menüleiste möglich bleiben.
+- **Geschützte Extras** werden immer **nach** den generierten Optionen angehängt. Damit lassen sich individuelle TinyMCE-Optionen wie `toolbar_sticky`, eigene Funktionen oder bewusste Overrides pflegen, ohne dass der Assistent sie beim nächsten Generieren entfernt.
+- Beim Laden bestehender Profile wandern nicht vom Assistenten verwaltete Optionen automatisch in dieses Feld, damit bestehende Sonderkonfigurationen kompatibel bleiben.
+
 ### Aktions-Favoriten
 
 Jede Typografie-Aktion (Anführungszeichen DE/EN/FR, Normalisierung, NBSP-vor-Einheiten, en-Dash-Ranges, Soft-Hyphen, Telefonnummern …) besitzt einen Stern ☆, über den sie als Favorit markiert wird. Favorisierte Aktionen erscheinen gebündelt oben im Favoriten-Tab, getrennt von den Zeichen-Favoriten, und sind pro Browser (`localStorage`) persistent.
