@@ -83,6 +83,29 @@ if ('preview' === $func && $id > 0) {
     exit;
 }
 
+// Return generated PHP snippet for a profile via XHR (HTML fragment mode)
+if ('phpcode' === $func && $id > 0) {
+    $sql = rex_sql::factory();
+    $sql->setTable($profileTable);
+    $sql->setWhere(['id' => $id]);
+    $sql->select('id, name, description, plugins, toolbar, extra, mediatype, mediapath, mediacategory, upload_default');
+    $row = $sql->getArray();
+    if (empty($row)) {
+        rex_response::cleanOutputBuffers();
+        rex_response::sendJson(['error' => rex_i18n::msg('tinymce_profile_export_error')], 404);
+        exit;
+    }
+    rex_response::cleanOutputBuffers();
+    header('Content-Type: text/html; charset=utf-8');
+    $phpCode = \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::generateEnsureProfileCode($row[0]);
+    $name = htmlspecialchars((string) $row[0]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    echo '<h4 id="tinymcePHPCodeName" style="margin-top:0">' . $name . '</h4>';
+    echo '<pre id="tinymcePHPCodePre" style="white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:360px; overflow:auto; font-family:monospace; font-size:12px; tab-size:4;">'
+        . htmlspecialchars($phpCode, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+        . '</pre>';
+    exit;
+}
+
 // Import uploaded JSON file containing a single profile object or an array of profiles
 if ('import' === $func && isset($_FILES['profiles_file'])) {
     // read overwrite option from POST
@@ -291,9 +314,11 @@ if ('' === $func) {
         $cloneUrl = $list->getUrl(['func' => 'clone', 'id' => $id]);
         $deleteUrl = $list->getUrl(['func' => 'delete', 'id' => $id]);
 
+        $phpCodeUrl = $list->getUrl(['func' => 'phpcode', 'id' => $id]);
         $dropdown = '<button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="rex-icon fa-ellipsis-v"></i></button>'
             . '<ul class="dropdown-menu dropdown-menu-right">'
             . '<li><a href="#" class="tinymce-preview" data-url="' . $list->getUrl(['func' => 'preview', 'id' => $id]) . '">' . rex_i18n::msg('tinymce_preview') . '</a></li>'
+            . '<li><a href="#" class="tinymce-phpcode" data-url="' . $phpCodeUrl . '">' . rex_i18n::msg('tinymce_profile_phpcode') . '</a></li>'
             . '<li class="dropdown-divider"></li>'
             . '<li><a href="' . $exportUrl . '">' . rex_i18n::msg('tinymce_profile_export') . '</a></li>';
 
@@ -333,6 +358,21 @@ if ('' === $func) {
 
     // modal HTML is inserted here. JavaScript behaviour is moved to a separate asset file (see assets/scripts/profiles-list.js)
     $body .= $modal;
+
+    $phpCodeModal = '<div id="tinymcePHPCodeModal" class="modal fade" tabindex="-1" role="dialog">'
+        . '<div class="modal-dialog modal-lg" role="document">'
+        . '<div class="modal-content">'
+        . '<div class="modal-header"><h5 class="modal-title">' . rex_i18n::msg('tinymce_profile_phpcode_title') . '</h5>'
+        . '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+        . '<div class="modal-body">'
+        . '<div id="tinymcePHPCodeBody">' . rex_i18n::msg('tinymce_loading') . '</div>'
+        . '</div>'
+        . '<div class="modal-footer">'
+        . '<button type="button" id="tinymcePHPCodeCopy" class="btn btn-primary" data-copy-label="' . rex_escape(rex_i18n::msg('tinymce_profile_phpcode_copy')) . '" data-copied-label="' . rex_escape(rex_i18n::msg('tinymce_profile_phpcode_copied')) . '">' . rex_i18n::msg('tinymce_profile_phpcode_copy') . '</button>'
+        . '<button type="button" class="btn btn-default" data-dismiss="modal">' . rex_i18n::msg('close') . '</button>'
+        . '</div>'
+        . '</div></div></div>';
+    $body .= $phpCodeModal;
 
     $fragment = new rex_fragment();
     $fragment->setVar('title', rex_i18n::msg('tinymce_list_profiles'));
