@@ -14,12 +14,14 @@ $this->includeFile(__DIR__ . '/ensure_table.php');
 // Vor Einführung der Spalte `active` waren alle Snippets implizit aktiv.
 // Beim Update daher nur Alt-Datensätze ohne gesetzten Status auf aktiv setzen,
 // ohne bewusst deaktivierte Snippets (active=0) zu überschreiben.
-try {
-    $sql = rex_sql::factory();
-    $sql->setQuery('UPDATE ' . rex::getTable('tinymce_snippets') . ' SET active = 1 WHERE active IS NULL');
-} catch (rex_sql_exception $e) {
-    // Migration ist best-effort
-    rex_logger::logException($e);
+if (rex_string::versionCompare($this->getVersion(), '8.8.0', '<')) {
+    try {
+        $sql = rex_sql::factory();
+        $sql->setQuery('UPDATE ' . rex::getTable('tinymce_snippets') . ' SET active = 1 WHERE active IS NULL');
+    } catch (rex_sql_exception $e) {
+        // Migration ist best-effort
+        rex_logger::logException($e);
+    }
 }
 
 // =============================================================================
