@@ -1355,11 +1355,14 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
 
         if (keyCode === 13) { return 'Enter'; }
         if (keyCode === 32) { return ' '; }
-
-        var char = String.fromCharCode(keyCode);
-        if (AUTOREPLACE_TRIGGER_CHARS.indexOf(char) >= 0) {
-            return char;
-        }
+        if (keyCode === 190) { return '.'; }  // . >
+        if (keyCode === 188) { return ','; }  // , <
+        if (keyCode === 191) { return '/'; }  // / ?
+        if (keyCode === 186) { return ';'; }  // ; :
+        if (keyCode === 221) { return ']'; }  // ] }
+        if (keyCode === 222) { return '\''; } // ' "
+        if (keyCode === 49 && !!e.shiftKey) { return '!'; } // !
+        if (keyCode === 48 && !!e.shiftKey) { return ')'; } // )
 
         return null;
     }
