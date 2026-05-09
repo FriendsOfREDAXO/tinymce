@@ -16,101 +16,79 @@ Wichtig:
 * Für Protected-Extras-Eingaben unterstützt die Normalisierung sowohl Top-Level-Komma-Splitting als auch den Fallback "eine Property pro Zeile".
 
 
-## Profile programmatisch bereitstellen (für andere AddOns)
+## Profile für andere AddOns bereitstellen
 
-Wenn dein AddOn maßgeschneiderte TinyMCE-Profile erfordert (z.B. für ein Textmodul mit ganz bestimmten Plugins), kannst du diese direkt bei der Installation deines eigenen AddOns, z.B. in deiner `install.php` oder `boot.php`, automatisch einspielen.
+Wenn dein AddOn maßgeschneiderte TinyMCE-Profile erfordert (z.B. für ein Textmodul mit ganz bestimmten Plugins), solltest du diese Workflow befolgen:
 
-Dafür stellt dieses AddOn die Hilfsmethode `\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile()` zur Verfügung.
+### 📋 Empfohlener Workflow: UI-First
 
-### Beispiel 1: Profil als PHP Array importieren
+1. **Profil im Backend erstellen**: Navigiere zu **TinyMCE → Editor Profile** und erstelle dein Profil visuell mit allen gewünschten Einstellungen (Plugins, Toolbar, etc.)
+2. **Profile exportieren**: Nutze den **Export-Button** neben der Profilliste, um das Profil als JSON-Datei herunterzuladen
+3. **Im AddOn speichern**: Kopiere die JSON-Datei in dein AddOn (z.B. in `data/tinymce_profile.json`)
+4. **In `install.php` importieren**: Nutze `ProfileHelper::importProfileFromJson()` um es automatisch beim Installieren einzuspielen
 
-```php
-if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
-
-    // Fügt ein TinyMCE-Profil hinzu (oder ignoriert es, falls existent)
-    $success = \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
-        'mein_addon_profil',         // 1. Eindeutiger Profil-Name
-        'Spezialprofil für AddOn X', // 2. Beschreibung (Backend Label)
-        [                            // 3. Konfiguration mit TinyMCE Werten
-            'plugins' => 'autolink lists link image media code',
-            'toolbar' => 'undo redo | bold italic | link image media | help',
-            'extra'   => 'branding: false, menubar: false',
-        ],
-        false // 4. Param $forceUpdate: Wenn "true", überschreibt es bestehende Profile gleichen Namens hart.
-    );
-
-    if ($success) {
-        // Das Profil wurde erfolgreich erzeugt.
-    }
-}
-```
-
-### Beispiel 2: Profile aus exportierten JSON-Dateien importieren
-
-Oftmals ist es am einfachsten, ein Profil im REDAXO Backend zusammenzuklicken, es über den *Export*-Button in eine `.json`-Datei herunterzuladen und dann als Teil deines AddOns auszuliefern.
-
-Mit der Hilfsmethode `importProfileFromJson` lässt sich ein solches JSON (Einzelnes Profil oder Array aus mehreren Profilen) als idealer One-Liner importieren:
+### Beispiel: JSON importieren (empfohlen)
 
 ```php
 if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
-
-    $jsonFile = rex_path::addon('mein_addon', 'data/mein_tinymce_profil.json');
+    $jsonFile = rex_path::addon('mein_addon', 'data/tinymce_profile.json');
     
-    // Importiert das Profil auf einen Schlag
+    // Importiert das Profil aus der exportierten JSON-Datei
     \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::importProfileFromJson(
-        $jsonFile, 
-        false // Setze auf true, wenn dein AddOn-Update das Profil zwingend überschreiben/aktualisieren soll
+        $jsonFile,
+        false // Setze auf true, wenn dein AddOn das Profil beim Update zwingend aktualisieren soll
     );
-
 }
 ```
 
-### Beispiel 3: Export-JSON in ein PHP-Array für `ensureProfile()` umschreiben
+### Alternative: PHP-Code-Generator nutzen
 
-Wenn du ein exportiertes Profil lieber direkt in PHP pflegen möchtest (statt über Datei-Import), kannst du den Export 1:1 als Array übergeben und über die Hilfsmethode normalisieren:
+Alternativ kannst du den **PHP-Code-Generator** im Backend verwenden (Button "PHP-Code erzeugen" neben der Profilliste):
+
+1. Klicke auf "PHP-Code erzeugen" für dein Profil
+2. Kopiere den generierten Code
+3. Füge ihn direkt in deine `install.php` ein
+
+Der generierte Code sieht etwa so aus:
 
 ```php
 if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
-    $exportedProfile = [
-        'id' => 5, // wird ignoriert (Export-Metadatum, Ziel-System generiert eigene ID)
-        'createdate' => '2026-05-01 12:00:00', // wird ignoriert (Export-Metadatum)
-        'updatedate' => '2026-05-09 09:00:00', // wird ignoriert (Export-Metadatum)
-        'name' => 'base',
-        'description' => 'Angelegt vom BASE AddOn',
-        'extra' => <<<'JS'
-license_key: 'gpl',
-language: 'de',
-branding: false,
-statusbar: true,
-menubar: false,
-plugins: 'autolink autoresize cleanpaste fullscreen link',
-toolbar: 'blocks | link | bold italic underline subscript superscript bullist numlist | table | removeformat pastetext undo | for_a11y',
-min_height: 300,
-autoresize_bottom_margin: 20,
-width: '100%',
-relative_urls: false,
-remove_script_host: true,
-document_base_url: "/",
-entity_encoding: 'raw',
-convert_urls: true,
-file_picker_callback: function (callback, value, meta) {
-    rex5_picker_function(callback, value, meta);
-}
-JS,
-        'plugins' => 'autolink autoresize cleanpaste fullscreen link',
-        'toolbar' => 'blocks | link | bold italic underline subscript superscript bullist numlist | table | removeformat pastetext undo | for_a11y',
-    ];
-
-    \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfileFromImportedArray(
-        $exportedProfile,
-        true // optional: bestehendes Profil überschreiben
+    \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
+        'mein_addon_profil',
+        'Spezialprofil für AddOn X',
+        [
+            'plugins' => 'autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table wordcount',
+            'toolbar' => 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            'extra' => '...',
+            // optional: mediatype, mediapath, mediacategory, upload_default
+        ],
+        false // forceUpdate: true = always overwrite on addon update
     );
 }
 ```
 
-`ensureProfileFromImportedArray()` übernimmt dabei nur die relevanten Profilfelder (`name`, `description`, `plugins`, `toolbar`, `extra`, `mediatype`, `mediapath`, `mediacategory`, `upload_default`) und ignoriert Export-Metadaten wie `id`, `createdate`, `updatedate`.
+### Technischer Hintergrund: Die `extra`-Spalte
 
-Die Methoden triggern am Ende vollautomatisch den internen Build-Prozess (`Profiles::profilesCreate()`), sodass das neu eingespeiste Profil augenblicklich im REDAXO Frontend und Backend zur Verfügung steht.
+**Wichtig zu verstehen:** Bei der Laufzeit nutzt TinyMCE nur die `extra`-Spalte der Profiltabelle. Diese Spalte enthält alle TinyMCE-Konfigurationsoptionen als JSON-String.
+
+- Die Spalten `plugins` und `toolbar` sind **Legacy**-Spalten und werden im Backend nur für die Bearbeitung/Anzeige verwendet
+- Sie werden vom Frontend **nicht** ausgelesen – nur `extra` wird gelesen und an die JavaScript-Initialisierung übergeben
+- Der PHP-Code-Generator gibt diese Spalten mit aus (für Vollständigkeit und UI-Kompatibilität), aber sie sind optional
+- Der wichtige Teil ist die `extra`-Spalte, die bei Bedarf erweiterte YAML-Optionen enthalten kann
+
+### Benutzte Hilfsmethoden
+
+`ProfileHelper` stellt folgende Methoden zur Verfügung:
+
+| Methode | Zweck |
+|---------|-------|
+| `importProfileFromJson($filePath, $forceUpdate)` | **Empfohlen**: JSON-Datei importieren (eine oder mehrere Profile) |
+| `ensureProfile($name, $description, $data, $forceUpdate)` | Profil direkt programmatisch erstellen (mit PHP-Array) |
+| `normalizeImportedProfile($profile)` | Validiert und normalisiert ein importiertes Profil-Array |
+| `ensureProfileFromImportedArray($profile, $forceUpdate)` | Importiert ein Profil-Array (wird von `importProfileFromJson()` verwendet) |
+| `generateEnsureProfileCode($profile)` | Generiert PHP-Code für ein Profil (wird im Backend verwendet) |
+
+Alle Methoden triggern am Ende automatisch `Profiles::profilesCreate()`, sodass das neu eingespeiste Profil sofort im Frontend und Backend zur Verfügung steht.
 
 ## Eigene Plugins registrieren
 
@@ -272,37 +250,4 @@ Das `link_yform` Plugin speichert Links zu YForm-Datensätzen als interne Platzh
 1.  **Namensräume:** Verwenden Sie für Ihre Plugin-Namen einen Präfix (z.B. `addonname_pluginname`), um Konflikte mit anderen Plugins zu vermeiden.
 2.  **Assets:** Legen Sie Ihre Plugin-Dateien im `assets`-Ordner Ihres Addons ab und nutzen Sie `rex_url::addonAssets()`, um die URL zu generieren.
 3.  **Abhängigkeiten:** Prüfen Sie mit `rex_addon::get('tinymce')->isAvailable()`, ob das TinyMCE-Addon installiert und aktiviert ist, bevor Sie Code ausführen, der darauf zugreift.
-
-## Profile programmatisch erstellen
-
-Sie können TinyMCE-Profile programmatisch erstellen oder aktualisieren, z.B. während der Installation Ihres Addons. Nutzen Sie dazu die Klasse `FriendsOfRedaxo\TinyMce\Utils\ProfileHelper`.
-
-### Beispiel: Profil in `install.php` anlegen
-
-```php
-use FriendsOfRedaxo\TinyMce\Utils\ProfileHelper;
-
-if (rex_addon::get('tinymce')->isAvailable()) {
-    ProfileHelper::ensureProfile(
-        'mein_profil',
-        'Beschreibung meines Profils',
-        [
-            'plugins' => 'autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table wordcount',
-            'toolbar' => 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            'extra' => '{"height": 500}',
-            'mediatype' => '',
-            'mediapath' => '',
-            'mediacategory' => 0,
-            'upload_default' => '',
-        ],
-        false // Setzen Sie dies auf true, um ein existierendes Profil zu überschreiben
-    );
-}
-```
-
-### Parameter von `ensureProfile`
-
-*   **`$name`** (string): Der eindeutige Name des Profils (Schlüssel).
-*   **`$description`** (string): Eine Beschreibung für das Profil.
-*   **`$data`** (array): Ein assoziatives Array mit den Konfigurationsdaten. Fehlende Schlüssel werden mit Standardwerten aufgefüllt.
-*   **`$forceUpdate`** (bool): Wenn `true`, werden die Daten eines existierenden Profils überschrieben. Wenn `false` (Standard), wird nichts getan, wenn das Profil bereits existiert.
+4.  **Profile für andere AddOns:** Verwenden Sie `ProfileHelper::importProfileFromJson()` oder den PHP-Code-Generator statt direkter Datenbankoperationen (siehe oben).
