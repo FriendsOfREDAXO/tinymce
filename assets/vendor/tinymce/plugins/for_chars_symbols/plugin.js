@@ -1227,10 +1227,207 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         }
     }
 
+    /* ---------------- Typografie-Autoreplace ---------------- */
+
+    var SUPERSCRIPT_MAP = {
+        '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+        '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
+    };
+    var AUTOREPLACE_TRIGGER_CHARS = ' .,;:!?)]"\'/';
+    var AUTOREPLACE_BLOCKED_SELECTOR = 'code,pre,kbd,samp,tt';
+
+    function decodeEscapes(value) {
+        return String(value || '')
+            .replace(/\\u([0-9a-fA-F]{4})/g, function (_m, hex) { return String.fromCharCode(parseInt(hex, 16)); })
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t');
+    }
+
+    function getDefaultAutoreplaceRules() {
+        return [
+            { kind: 'text', from: '-->', to: '→' },
+            { kind: 'text', from: '->', to: '→' },
+            { kind: 'text', from: '<--', to: '←' },
+            { kind: 'text', from: '<-', to: '←' },
+            { kind: 'text', from: '==>', to: '⇒' },
+            { kind: 'text', from: '<=>', to: '⇔' },
+            { kind: 'text', from: '...', to: '…' },
+            { kind: 'text', from: '(c)', to: '©' },
+            { kind: 'text', from: '(r)', to: '®' },
+            { kind: 'text', from: '(tm)', to: '™' },
+            { kind: 'text', from: '(p)', to: '℗' },
+            { kind: 'text', from: '+/-', to: '±' },
+            { kind: 'text', from: '!=', to: '≠' },
+            { kind: 'text', from: '<=', to: '≤' },
+            { kind: 'text', from: '>=', to: '≥' },
+            { kind: 'text', from: '~=', to: '≈' },
+            { kind: 'text', from: '1/2', to: '½' },
+            { kind: 'text', from: '1/4', to: '¼' },
+            { kind: 'text', from: '3/4', to: '¾' },
+            { kind: 'text', from: '1/3', to: '⅓' },
+            { kind: 'text', from: '2/3', to: '⅔' },
+            {
+                kind: 'regex',
+                re: /(\d)\^([0-9])$/,
+                to: function (_m, base, exp) {
+                    return String(base) + (SUPERSCRIPT_MAP[String(exp)] || String(exp));
+                }
+            }
+        ];
+    }
+
+    function normalizeAutoreplaceRule(rule) {
+        if (!rule) { return null; }
+        if (Array.isArray(rule) && rule.length >= 2) {
+            var fromArr = String(rule[0] || '');
+            if (!fromArr) { return null; }
+            return { kind: 'text', from: fromArr, to: decodeEscapes(rule[1]) };
+        }
+        if (typeof rule !== 'object') { return null; }
+        if (typeof rule.re === 'string' && rule.re) {
+            try {
+                return { kind: 'regex', re: new RegExp('(?:' + rule.re + ')$'), to: decodeEscapes(rule.to) };
+            } catch (_e) {
+                return null;
+            }
+        }
+        if (typeof rule.from === 'string' && rule.from) {
+            return { kind: 'text', from: rule.from, to: decodeEscapes(rule.to) };
+        }
+        return null;
+    }
+
+    function buildAutoreplaceRules(editor) {
+        if (!editor.getParam('for_chars_symbols_autoreplace', false)) {
+            return [];
+        }
+
+        var customRules = editor.getParam('for_chars_symbols_autoreplace_rules', []);
+        if (!Array.isArray(customRules) && typeof customRules === 'string') {
+            try {
+                customRules = JSON.parse(customRules);
+            } catch (_e) {
+                customRules = [];
+            }
+        }
+        if (!Array.isArray(customRules)) {
+            customRules = [];
+        }
+
+        var normalizedCustomRules = customRules
+            .map(normalizeAutoreplaceRule)
+            .filter(function (r) { return !!r; });
+
+        var useDefaults = editor.getParam('for_chars_symbols_autoreplace_defaults');
+        if (typeof useDefaults !== 'boolean') {
+            useDefaults = true;
+        }
+
+        if (!useDefaults) {
+            return normalizedCustomRules;
+        }
+
+        var defaults = getDefaultAutoreplaceRules();
+        var overriddenText = {};
+        normalizedCustomRules.forEach(function (rule) {
+            if (rule.kind === 'text') {
+                overriddenText[rule.from] = true;
+            }
+        });
+        var filteredDefaults = defaults.filter(function (rule) {
+            return !(rule.kind === 'text' && overriddenText[rule.from]);
+        });
+
+        return normalizedCustomRules.concat(filteredDefaults);
+    }
+
+    function getAutoreplaceTriggerKey(e) {
+        if (!e) { return null; }
+
+        if (typeof e.key === 'string' && e.key.length > 0) {
+            if (e.key === 'Enter') { return 'Enter'; }
+            if (e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar') { return ' '; }
+            if (e.key.length === 1) { return e.key; }
+        }
+
+        var keyCode = typeof e.which === 'number' && e.which !== 0 ? e.which : e.keyCode;
+        if (typeof keyCode !== 'number') { return null; }
+
+        if (keyCode === 13) { return 'Enter'; }
+        if (keyCode === 32) { return ' '; }
+        if (keyCode === 190) { return '.'; }  // . >
+        if (keyCode === 188) { return ','; }  // , <
+        if (keyCode === 191) { return '/'; }  // / ?
+        if (keyCode === 186) { return ';'; }  // ; :
+        if (keyCode === 221) { return ']'; }  // ] }
+        if (keyCode === 222) { return '\''; } // ' "
+        if (keyCode === 49 && !!e.shiftKey) { return '!'; } // !
+        if (keyCode === 48 && !!e.shiftKey) { return ')'; } // )
+
+        return null;
+    }
+
+    function isAutoreplaceTriggerEvent(e) {
+        if (!e || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) { return false; }
+
+        var triggerKey = getAutoreplaceTriggerKey(e);
+        if (triggerKey === 'Enter') { return true; }
+        if (typeof triggerKey === 'string' && triggerKey.length === 1) {
+            return AUTOREPLACE_TRIGGER_CHARS.indexOf(triggerKey) >= 0;
+        }
+        return false;
+    }
+
+    function isAutoreplaceBlocked(editor) {
+        var node = editor.selection ? editor.selection.getNode() : null;
+        return !!(node && editor.dom.getParent(node, AUTOREPLACE_BLOCKED_SELECTOR));
+    }
+
+    function applyAutoreplaceOnBeforeText(beforeText, rules) {
+        for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if (rule.kind === 'text') {
+                if (!beforeText.endsWith(rule.from)) { continue; }
+                return beforeText.slice(0, beforeText.length - rule.from.length) + rule.to;
+            }
+            if (rule.kind === 'regex') {
+                if (!rule.re || !rule.re.test(beforeText)) { continue; }
+                return beforeText.replace(rule.re, rule.to);
+            }
+        }
+        return beforeText;
+    }
+
+    function runAutoreplace(editor, rules) {
+        if (!rules || rules.length === 0 || isAutoreplaceBlocked(editor)) { return; }
+        var rng = editor.selection.getRng();
+        if (!rng || !rng.collapsed || rng.startContainer.nodeType !== 3) { return; }
+
+        var textNode = rng.startContainer;
+        var offset = rng.startOffset;
+        if (offset <= 0 || !textNode || typeof textNode.data !== 'string') { return; }
+
+        var before = textNode.data.slice(0, offset);
+        var after = textNode.data.slice(offset);
+        var replacedBefore = applyAutoreplaceOnBeforeText(before, rules);
+        if (replacedBefore === before) { return; }
+
+        editor.undoManager.transact(function () {
+            textNode.data = replacedBefore + after;
+            var nextOffset = replacedBefore.length;
+            var next = editor.selection.getRng();
+            next.setStart(textNode, nextOffset);
+            next.setEnd(textNode, nextOffset);
+            editor.selection.setRng(next);
+        });
+    }
+
     /* ---------------- Plugin-Registrierung ---------------- */
 
     // eslint-disable-next-line no-undef
     tinymce.PluginManager.add('for_chars_symbols', function (editor) {
+        var autoreplaceRules = buildAutoreplaceRules(editor);
+
         editor.on('init', function () {
             try { editor.dom.addStyle(EDITOR_CSS); } catch (_e) {}
         });
@@ -1252,6 +1449,13 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
                 setTimeout(function () { if (editor.__fcsInvOn) { markInvisibles(editor); } }, 30);
             }
         });
+
+        if (autoreplaceRules.length > 0) {
+            editor.on('keydown', function (e) {
+                if (!isAutoreplaceTriggerEvent(e)) { return; }
+                runAutoreplace(editor, autoreplaceRules);
+            });
+        }
 
         editor.ui.registry.addButton('for_chars_symbols', {
             icon: 'insert-character',
