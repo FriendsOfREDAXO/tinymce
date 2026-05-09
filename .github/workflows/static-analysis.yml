@@ -55,10 +55,10 @@ jobs:
       - name: Run PHP-CS-Fixer
         run: |
           if [ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || [ -f .php_cs.dist ] || [ -f .php_cs ]; then
-            php-cs-fixer fix --dry-run --diff --ansi
+            php-cs-fixer fix --dry-run --diff --ansi --config=.php-cs-fixer.php
           else
             echo "Kein .php-cs-fixer-Konfig vorhanden, fallback @PSR12"
-            php-cs-fixer fix --dry-run --diff --ansi --rules=@PSR12 lib pages
+            php-cs-fixer fix --dry-run --diff --ansi --rules=@PSR12 --config=.php-cs-fixer.php
           fi
 
   rexstan:
