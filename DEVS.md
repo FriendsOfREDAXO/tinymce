@@ -59,7 +59,7 @@ Wenn du ein exportiertes Profil lieber direkt in PHP pflegen möchtest (statt ü
 ```php
 if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::class)) {
     $exportedProfile = [
-        'id' => 5, // wird ignoriert
+        'id' => 5, // wird ignoriert (Export-Metadatum, Ziel-System generiert eigene ID)
         'name' => 'base',
         'description' => 'Angelegt vom BASE AddOn',
         'extra' => <<<'JS'

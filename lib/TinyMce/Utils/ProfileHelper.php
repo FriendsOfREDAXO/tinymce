@@ -10,6 +10,9 @@ use FriendsOfRedaxo\TinyMce\Creator\Profiles;
 class ProfileHelper
 {
     /**
+     * Profile fields that can be transferred from exported/imported payloads.
+     * Export metadata (e.g. id, timestamps) is intentionally ignored.
+     *
      * @var array<int, string>
      */
     private const IMPORTABLE_FIELDS = [
