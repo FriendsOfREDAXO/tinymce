@@ -83,7 +83,7 @@ if ('preview' === $func && $id > 0) {
     exit;
 }
 
-// Return generated PHP snippet for a profile via XHR (HTML fragment mode)
+// Return generated PHP snippet for a profile as JSON
 if ('phpcode' === $func && $id > 0) {
     $sql = rex_sql::factory();
     $sql->setTable($profileTable);
@@ -95,14 +95,12 @@ if ('phpcode' === $func && $id > 0) {
         rex_response::sendJson(['error' => rex_i18n::msg('tinymce_profile_export_error')], 404);
         exit;
     }
+    $profile = $row[0];
     rex_response::cleanOutputBuffers();
-    header('Content-Type: text/html; charset=utf-8');
-    $phpCode = \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::generateEnsureProfileCode($row[0]);
-    $name = htmlspecialchars((string) $row[0]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    echo '<h4 id="tinymcePHPCodeName" style="margin-top:0">' . $name . '</h4>';
-    echo '<pre id="tinymcePHPCodePre" style="white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:360px; overflow:auto; font-family:monospace; font-size:12px; tab-size:4;">'
-        . htmlspecialchars($phpCode, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
-        . '</pre>';
+    rex_response::sendJson([
+        'name' => (string) $profile['name'],
+        'code' => \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::generateEnsureProfileCode($profile),
+    ]);
     exit;
 }
 

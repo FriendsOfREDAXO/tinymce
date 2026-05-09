@@ -236,7 +236,7 @@ class ProfileHelper
     /**
      * Exports a PHP string value for use in generated PHP code.
      * Uses single-quoted strings for simple values and double-quoted strings
-     * with escape sequences for values containing newlines or special characters.
+     * with escape sequences for values containing newlines, special characters, or single quotes.
      */
     private static function phpExportString(string $value): string
     {
@@ -244,8 +244,8 @@ class ProfileHelper
         $value = str_replace("\r\n", "\n", $value);
 
         // Single-quoted string is sufficient when no special characters are present
-        if (!str_contains($value, "\n") && !str_contains($value, "\t") && !str_contains($value, '\\')) {
-            return "'" . str_replace("'", "\\'", $value) . "'";
+        if (!str_contains($value, "\n") && !str_contains($value, "\t") && !str_contains($value, '\\') && !str_contains($value, "'")) {
+            return "'" . $value . "'";
         }
 
         // Double-quoted string with explicit escape sequences for multiline values

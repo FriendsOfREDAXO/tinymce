@@ -47,10 +47,22 @@
     fetch(url, { credentials: 'include' })
       .then(function (resp) {
         if (!resp.ok) throw new Error('Profile not found');
-        return resp.text();
+        return resp.json();
       })
-      .then(function (html) {
-        if (bodyEl) bodyEl.innerHTML = escapeScriptClose(html);
+      .then(function (data) {
+        if (!bodyEl) return;
+        bodyEl.innerHTML = '';
+
+        var nameEl = document.createElement('h4');
+        nameEl.style.marginTop = '0';
+        nameEl.textContent = data.name || '';
+        bodyEl.appendChild(nameEl);
+
+        var pre = document.createElement('pre');
+        pre.id = 'tinymcePHPCodePre';
+        pre.style.cssText = 'white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:360px; overflow:auto; font-family:monospace; font-size:12px; tab-size:4;';
+        pre.textContent = data.code || '';
+        bodyEl.appendChild(pre);
       })
       .catch(function (err) {
         if (bodyEl) bodyEl.textContent = err.message || 'Error';
