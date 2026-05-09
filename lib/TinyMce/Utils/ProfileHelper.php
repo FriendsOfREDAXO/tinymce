@@ -10,6 +10,19 @@ use FriendsOfRedaxo\TinyMce\Creator\Profiles;
 class ProfileHelper
 {
     /**
+     * @var array<int, string>
+     */
+    private const IMPORTABLE_FIELDS = [
+        'plugins',
+        'toolbar',
+        'extra',
+        'mediatype',
+        'mediapath',
+        'mediacategory',
+        'upload_default',
+    ];
+
+    /**
      * Ensures that a TinyMCE profile exists.
      *
      * @param string $name The unique name of the profile
@@ -94,15 +107,69 @@ class ProfileHelper
         $success = false;
 
         foreach ($items as $item) {
-            if (empty($item['name'])) {
+            if (!is_array($item)) {
                 continue;
             }
-            $description = $item['description'] ?? 'Imported Profile';
-            if (self::ensureProfile($item['name'], $description, $item, $forceUpdate)) {
+            if (self::ensureProfileFromImportedArray($item, $forceUpdate)) {
                 $success = true;
             }
         }
         
         return $success;
+    }
+
+    /**
+     * Converts an exported/imported profile array into ensureProfile arguments.
+     *
+     * @param array<string, mixed> $profile
+     * @return array{name: string, description: string, data: array<string, mixed>}|null
+     */
+    public static function normalizeImportedProfile(array $profile): ?array
+    {
+        $name = trim((string) ($profile['name'] ?? ''));
+        if ('' === $name) {
+            return null;
+        }
+
+        $description = trim((string) ($profile['description'] ?? ''));
+        if ('' === $description) {
+            $description = 'Imported Profile';
+        }
+
+        $data = [];
+        foreach (self::IMPORTABLE_FIELDS as $field) {
+            if (array_key_exists($field, $profile)) {
+                $data[$field] = $profile[$field];
+            }
+        }
+
+        return [
+            'name' => $name,
+            'description' => $description,
+            'data' => $data,
+        ];
+    }
+
+    /**
+     * Imports one exported profile array.
+     *
+     * @param array<string, mixed> $profile
+     * @param bool $forceUpdate If true, overwrites existing profile data
+     * @return bool True if created or updated
+     * @throws rex_sql_exception
+     */
+    public static function ensureProfileFromImportedArray(array $profile, bool $forceUpdate = false): bool
+    {
+        $normalized = self::normalizeImportedProfile($profile);
+        if (null === $normalized) {
+            return false;
+        }
+
+        return self::ensureProfile(
+            $normalized['name'],
+            $normalized['description'],
+            $normalized['data'],
+            $forceUpdate
+        );
     }
 }
