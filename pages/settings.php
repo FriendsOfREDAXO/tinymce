@@ -8,22 +8,9 @@ $addon = rex_addon::get('tinymce');
 $message = '';
 
 $func = rex_request::request('func', 'string', '');
-$send = rex_request::request('send', 'boolean', false);
 $csrfToken = rex_csrf_token::factory('tinymce_settings');
 
-if ('reset_default_profiles' === $func) {
-    if (!$csrfToken->isValid()) {
-        $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
-    } else {
-        try {
-            DefaultProfiles::resetAll();
-            $message = rex_view::success(rex_i18n::msg('tinymce_reset_default_profiles_success'));
-        } catch (Throwable $e) {
-            rex_logger::logException($e);
-            $message = rex_view::error(rex_i18n::msg('tinymce_profile_reset_failed'));
-        }
-    }
-} elseif ($send) {
+if ('save_media_upload' === $func) {
     if (!$csrfToken->isValid()) {
         $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
@@ -33,16 +20,30 @@ if ('reset_default_profiles' === $func) {
             'upload_media_manager_type' => trim(rex_request::request('upload_media_manager_type', 'string', '')),
         ];
         $addon->setConfig('media_upload_settings', $uploadSettings);
-
+        $message = rex_view::success($addon->i18n('tinymce_media_upload_settings_saved'));
+    }
+} elseif ('regenerate_profiles' === $func) {
+    if (!$csrfToken->isValid()) {
+        $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
         try {
             TinyMceProfilesCreator::profilesCreate();
+            $message = rex_view::success($addon->i18n('settings_saved'));
         } catch (rex_functional_exception $e) {
             rex_logger::logException($e);
             $message = rex_view::error($addon->i18n('settings_saved_profiles_failed'));
         }
-
-        if ('' === $message) {
-            $message = rex_view::success($addon->i18n('settings_saved'));
+    }
+} elseif ('reset_default_profiles' === $func) {
+    if (!$csrfToken->isValid()) {
+        $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
+        try {
+            DefaultProfiles::resetAll();
+            $message = rex_view::success(rex_i18n::msg('tinymce_reset_default_profiles_success'));
+        } catch (Throwable $e) {
+            rex_logger::logException($e);
+            $message = rex_view::error(rex_i18n::msg('tinymce_profile_reset_failed'));
         }
     }
 }
@@ -77,23 +78,30 @@ echo $message;
 
 ?>
 <div class="rex-form">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title"><?= $addon->i18n('settings_title') ?></div>
+        </div>
+        <div class="panel-body">
+            <div class="alert alert-info" role="status">
+                <p><strong><?= $addon->i18n('settings_resolved_asset_base') ?>:</strong> <code><?= rex_escape($resolvedAssetBase) ?></code></p>
+                <p><strong><?= $addon->i18n('settings_resolved_plugin_base') ?>:</strong> <code><?= rex_escape($resolvedPluginBase) ?></code></p>
+            </div>
+
+            <p class="help-block"><?= $addon->i18n('settings_reload_hint') ?></p>
+        </div>
+        <div class="panel-footer">
+            <form action="<?= rex_escape($formUrl) ?>" method="post">
+                <?= $csrfToken->getHiddenField() ?>
+                <input type="hidden" name="func" value="regenerate_profiles">
+                <button class="btn btn-save" type="submit"><?= $addon->i18n('settings_regenerate') ?></button>
+            </form>
+        </div>
+    </div>
+
     <form action="<?= rex_escape($formUrl) ?>" method="post">
         <?= $csrfToken->getHiddenField() ?>
-        <input type="hidden" name="send" value="1">
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="panel-title"><?= $addon->i18n('settings_title') ?></div>
-            </div>
-            <div class="panel-body">
-                <div class="alert alert-info" role="status">
-                    <p><strong><?= $addon->i18n('settings_resolved_asset_base') ?>:</strong> <code><?= rex_escape($resolvedAssetBase) ?></code></p>
-                    <p><strong><?= $addon->i18n('settings_resolved_plugin_base') ?>:</strong> <code><?= rex_escape($resolvedPluginBase) ?></code></p>
-                </div>
-
-                <p class="help-block"><?= $addon->i18n('settings_reload_hint') ?></p>
-            </div>
-        </div>
+        <input type="hidden" name="func" value="save_media_upload">
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -138,23 +146,24 @@ echo $message;
                     </div>
                 </div>
             </div>
+            <div class="panel-footer">
+                <button class="btn btn-save" type="submit"><?= $addon->i18n('form_save') ?></button>
+            </div>
         </div>
+    </form>
 
+    <form action="<?= rex_escape($formUrl) ?>" method="post">
+        <?= $csrfToken->getHiddenField() ?>
+        <input type="hidden" name="func" value="reset_default_profiles">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title"><?= rex_i18n::msg('tinymce_reset_default_profiles_title') ?></div>
             </div>
             <div class="panel-body">
                 <p class="help-block"><?= rex_i18n::msg('tinymce_reset_default_profiles_description') ?></p>
-                <button class="btn btn-danger" type="submit" name="func" value="reset_default_profiles" onclick="return confirm('<?= rex_escape(rex_i18n::msg('tinymce_reset_default_profiles_confirm')) ?>');">
+                <button class="btn btn-danger" type="submit" onclick="return confirm('<?= rex_escape(rex_i18n::msg('tinymce_reset_default_profiles_confirm')) ?>');">
                     <?= rex_i18n::msg('tinymce_reset_default_profiles_button') ?>
                 </button>
-            </div>
-        </div>
-
-        <div class="rex-form-panel-footer">
-            <div class="btn-toolbar">
-                <button class="btn btn-save" type="submit"><?= $addon->i18n('settings_regenerate') ?></button>
             </div>
         </div>
     </form>

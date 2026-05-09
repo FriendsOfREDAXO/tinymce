@@ -209,6 +209,7 @@ tinymce_settings_reload_hint = After regenerating, do one hard reload. <code>pro
 tinymce_settings_regenerate = Regenerate profiles.js
 tinymce_settings_saved = profiles.js has been regenerated.
 tinymce_settings_saved_profiles_failed = <code>profiles.js</code> could not be regenerated. Please check logs.
+tinymce_media_upload_settings_saved = Image upload settings have been saved.
 tinymce_imagewidth_enable = Enable Image Width Plugin
 tinymce_imagewidth_framework = CSS Framework
 tinymce_imagewidth_general = General (pixel-based)

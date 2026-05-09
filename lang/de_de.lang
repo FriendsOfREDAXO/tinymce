@@ -291,6 +291,7 @@ tinymce_settings_reload_hint = Nach dem Regenerieren einmal hart neu laden. Die 
 tinymce_settings_regenerate = profiles.js neu generieren
 tinymce_settings_saved = profiles.js wurde neu generiert.
 tinymce_settings_saved_profiles_failed = <code>profiles.js</code> konnte nicht neu generiert werden. Bitte Logs prüfen.
+tinymce_media_upload_settings_saved = Bild-Upload-Einstellungen wurden gespeichert.
 
 tinymce_cleanpaste_section_source = Quell-Bereinigung
 tinymce_cleanpaste_strip_ms_office = MS Office Markup entfernen
