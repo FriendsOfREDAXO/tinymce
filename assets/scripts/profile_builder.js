@@ -566,6 +566,8 @@ function initTinyMceProfileAssistant() {
 
         .builder-toolbar-settings.is-disabled {
             opacity: 0.65;
+            filter: grayscale(0.2);
+            cursor: not-allowed;
         }
         .builder-toolbar-row {
             border: 1px solid var(--tpa-dropzone-border);
@@ -1297,8 +1299,75 @@ function splitTopLevelProperties(source) {
 }
 
 function getPropertyKey(entry) {
-    const match = String(entry || '').match(/^\s*(?:(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/)\s*)*(["']?)([A-Za-z0-9_$-]+)\1\s*:/);
-    return match ? match[2] : '';
+    const source = String(entry || '');
+    let index = 0;
+
+    while (index < source.length) {
+        const char = source[index];
+        const next = source[index + 1];
+
+        if (/\s/.test(char)) {
+            index++;
+            continue;
+        }
+
+        if (char === '/' && next === '/') {
+            index += 2;
+            while (index < source.length && source[index] !== '\n') {
+                index++;
+            }
+            continue;
+        }
+
+        if (char === '/' && next === '*') {
+            index += 2;
+            while (index < source.length && !(source[index] === '*' && source[index + 1] === '/')) {
+                index++;
+            }
+            index += 2;
+            continue;
+        }
+
+        if (char === '"' || char === '\'') {
+            const quote = char;
+            let key = '';
+            index++;
+            while (index < source.length) {
+                const currentChar = source[index];
+                if (currentChar === '\\' && index + 1 < source.length) {
+                    key += source[index + 1];
+                    index += 2;
+                    continue;
+                }
+                if (currentChar === quote) {
+                    index++;
+                    break;
+                }
+                key += currentChar;
+                index++;
+            }
+            while (index < source.length && /\s/.test(source[index])) {
+                index++;
+            }
+            return source[index] === ':' ? key : '';
+        }
+
+        if (!/[A-Za-z0-9_$-]/.test(char)) {
+            return '';
+        }
+
+        let key = '';
+        while (index < source.length && /[A-Za-z0-9_$-]/.test(source[index])) {
+            key += source[index];
+            index++;
+        }
+        while (index < source.length && /\s/.test(source[index])) {
+            index++;
+        }
+        return source[index] === ':' ? key : '';
+    }
+
+    return '';
 }
 
 function extractProtectedExtras(extra) {
