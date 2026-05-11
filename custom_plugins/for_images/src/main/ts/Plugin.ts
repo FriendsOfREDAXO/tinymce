@@ -571,36 +571,69 @@ const setup = (editor: Editor, _url: string): void => {
   }
   editor.options.set('image_caption', false);
 
-  /* DELETE/CUT/COPY HANDLERS FOR FIGURE */
-  // When deleting an image, also delete the surrounding figure if it exists
-  editor.on('BeforeExecCommand', (e: any) => {
-    if ((e.command === 'delete' || e.command === 'cut') && editor.selection) {
-      const img = getSelectedImg(editor);
-      if (img) {
-        const figure = getFigureWrap(img);
-        if (figure && figure.nodeName === 'FIGURE') {
-          // Select the entire figure and let the delete proceed on the figure instead
-          editor.selection.select(figure);
-          e.preventDefault();
-          editor.execCommand('delete');
-        }
+  /* GROUPED FIGURE HANDLERS (DELETE/CUT/COPY) */
+  // Treat image + figure + figcaption as one logical block.
+  const getSelectedFigure = (): HTMLElement | null => {
+    const img = getSelectedImg(editor);
+    if (!img) {
+      return null;
+    }
+    const figure = getFigureWrap(img);
+    return figure && figure.nodeName === 'FIGURE' ? figure : null;
+  };
+
+  const selectFigureForClipboard = (): boolean => {
+    const figure = getSelectedFigure();
+    if (!figure) {
+      return false;
+    }
+    editor.selection.select(figure, true);
+    editor.nodeChanged();
+    return true;
+  };
+
+  editor.on('keydown', (e: any) => {
+    const key = String(e.key || '').toLowerCase();
+
+    // If an image inside a figure is selected, Delete/Backspace removes the whole figure block.
+    if (key === 'delete' || key === 'backspace') {
+      const figure = getSelectedFigure();
+      if (figure) {
+        e.preventDefault();
+        editor.undoManager.transact(() => {
+          editor.dom.remove(figure);
+        });
+        editor.nodeChanged();
+        return;
       }
+    }
+
+    // Ensure Ctrl/Cmd+C/X works on the whole figure, not only on the img node.
+    if ((e.ctrlKey || e.metaKey) && (key === 'c' || key === 'x')) {
+      selectFigureForClipboard();
     }
   });
 
-  // Allow copying the figure element (not just the img)
   editor.on('BeforeExecCommand', (e: any) => {
-    if (e.command === 'copy' && editor.selection) {
-      const img = getSelectedImg(editor);
-      if (img) {
-        const figure = getFigureWrap(img);
-        if (figure && figure.nodeName === 'FIGURE') {
-          // Select the entire figure for copy
-          editor.selection.select(figure);
-          e.preventDefault();
-          editor.execCommand('copy');
-        }
+    const command = String(e.command || '').toLowerCase();
+
+    if (command === 'copy' || command === 'cut') {
+      selectFigureForClipboard();
+      return;
+    }
+
+    if (command === 'delete' || command === 'forwarddelete') {
+      const figure = getSelectedFigure();
+      if (!figure) {
+        return;
       }
+
+      e.preventDefault();
+      editor.undoManager.transact(() => {
+        editor.dom.remove(figure);
+      });
+      editor.nodeChanged();
+      return;
     }
   });
 
