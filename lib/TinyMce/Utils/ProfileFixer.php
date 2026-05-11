@@ -56,7 +56,7 @@ final class ProfileFixer
         // Fix content_css dark mode fallback
         $result = self::fixContentCssFallback($result, $changes);
 
-        return ['profile' => $result, 'changes' => array_values($changes)];
+        return ['profile' => $result, 'changes' => $changes];
     }
 
     /**

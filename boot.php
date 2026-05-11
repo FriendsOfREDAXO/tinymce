@@ -38,7 +38,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
 
     foreach ($customPlugins as $pluginName => $config) {
         $filePath = $config[0];
-        $buttons = $config[1] ?? [];
+        $buttons = $config[1];
 
         // If buttons are specified, register each button individually
         if (!empty($buttons)) {
