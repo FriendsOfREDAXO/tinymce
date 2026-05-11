@@ -97,30 +97,70 @@ Der Profil-Assistent unterstützt weiterhin den Round-Trip mit `Protected Extras
 - Nicht direkt vom Assistenten verwaltete Optionen bleiben darüber erhalten.
 - Extras werden beim Generieren wieder angehängt.
 
-## Eigene TinyMCE-Plugins registrieren
+## Eigene Plugins erstellen und über eigenes AddOn anmelden
 
-Registrierung über `FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin()`:
+Der typische Integrationsweg besteht aus drei Schritten.
+
+1. Plugin-JS im eigenen AddOn bereitstellen (z. B. unter `assets/`).
+2. Plugin in der `boot.php` des eigenen AddOns über `PluginRegistry::addPlugin()` registrieren.
+3. Pluginname in einem TinyMCE-Profil aktivieren (`plugins: '...'`) und optional den Button in die Toolbar aufnehmen.
+
+### 1) Plugin-Datei erstellen (im eigenen AddOn)
+
+Minimalbeispiel für eine Plugin-Datei:
+
+```javascript
+(function () {
+    'use strict';
+
+    tinymce.PluginManager.add('mein_addon_plugin', function (editor) {
+        editor.ui.registry.addButton('mein_addon_button', {
+            text: 'Mein Button',
+            onAction: function () {
+                editor.insertContent('<p>Hallo aus meinem Plugin</p>');
+            }
+        });
+    });
+})();
+```
+
+### 2) Registrierung in der boot.php des eigenen AddOns
 
 ```php
-if (rex_addon::get('tinymce')->isAvailable()) {
+if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\PluginRegistry::class)) {
     \FriendsOfRedaxo\TinyMce\PluginRegistry::addPlugin(
-        'mein_plugin_name',
-        rex_url::addonAssets('mein_addon', 'plugin.min.js'),
-        'mein_button_name'
+        'mein_addon_plugin',
+        rex_url::addonAssets('mein_addon', 'mein_addon_plugin/plugin.min.js'),
+        'mein_addon_button'
     );
 }
 ```
 
-Signatur:
+Signatur von `addPlugin(...)`:
 
-- `$pluginName`: interner Pluginname
-- `$pluginUrl`: URL auf die Plugin-JS-Datei
-- `$toolbarButton`: optionaler Toolbar-Button
+- `$pluginName`: interner TinyMCE-Pluginname (muss eindeutig sein)
+- `$pluginUrl`: URL zur Plugin-JS-Datei
+- `$toolbarButton`: optionaler Toolbar-Buttonname
 
-Hinweise:
+### 3) Plugin im Profil aktivieren
 
-- `PluginRegistry` hängt automatisch Cache-Busting (`?v=...`) an.
-- Registrierung schreibt in den Extension Point `TINYMCE_PROFILE_OPTIONS`.
+Die Registrierung macht ein Plugin verfügbar, aktiviert es aber nicht automatisch in jedem Profil.
+
+- Im Profil muss der Name in `plugins` enthalten sein.
+- Falls gewünscht, muss der Button zusätzlich in der Toolbar vorkommen.
+
+Beispiel im Profilblock:
+
+```text
+plugins: 'autolink link mein_addon_plugin',
+toolbar: 'undo redo | bold italic | mein_addon_button'
+```
+
+Wichtige Hinweise:
+
+- Nutze einen Präfix im Pluginnamen (z. B. `mein_addon_*`), um Kollisionen zu vermeiden.
+- `PluginRegistry` hängt automatisch Cache-Busting (`?v=...`) an die Plugin-URL.
+- Intern wird über den Extension Point `TINYMCE_PROFILE_OPTIONS` registriert.
 
 ## Extension Points
 
