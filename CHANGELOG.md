@@ -1,6 +1,32 @@
 Changelog
 =========
 
+Version 8.9.1
+-------------------------------
+
+### for_images: Mediapool- und Figure-Workflow stabilisiert
+
+* Mediapool-Integration erweitert: Bilder koennen direkt im Medienpool angezeigt und bestehende Bilder aus dem Medienpool ausgetauscht werden.
+* Beim Austauschen eines Bildes werden inkompatible Preset-/Legacy-Klassen bereinigt, damit keine Verzerrungen durch alte Formatierung entstehen.
+* Figure-Verhalten verbessert: Delete/Backspace/Cut/Copy behandeln Bild und Caption als eine zusammenhaengende Einheit.
+* Einfuegen robuster gemacht: Figure-Wrapper werden nach Paste/SetContent wiederhergestellt, leere Figure-Container werden bereinigt.
+* Toolbar-Icon fuer Bildaustausch ueberarbeitet (klareres Swap-Symbol).
+
+### cleanpaste: Schutz von for_images-Formatierung erweitert
+
+* Figure-Klassen aus dem for_images-Workflow (u. a. `img-*`, relevante `uk-*`- und Bootstrap-Klassen) werden beim Einfuegen nicht mehr entfernt.
+* Dadurch bleiben Bildbreite, Ausrichtung und Effekte auf Figure-Basis beim Paste erhalten.
+
+### Profilverwaltung: fehlende Uebersetzung ergaenzt
+
+* Fehlender Sprachschluessel `tinymce_profile_definition` in den Sprachdateien (`de_de`, `en_gb`, `sv_se`) ergaenzt.
+
+### Dokumentation aktualisiert
+
+* README: for_images-Abschnitt inhaltlich ueberarbeitet und Empfehlung zur gemeinsamen Nutzung von `image` + `for_images` klar dokumentiert.
+* README: Feature-Highlights am Anfang um den aktuellen for_images-Workflow ergaenzt.
+* FOR_PLUGINS.md: Uebersicht, Detailabschnitt und Empfehlungen fuer `for_images` entsprechend aktualisiert.
+
 Version 8.9.0
 -------------------------------
 
