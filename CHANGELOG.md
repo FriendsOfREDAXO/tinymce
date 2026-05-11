@@ -1,6 +1,30 @@
 Changelog
 =========
 
+Version 8.8.2
+-------------------------------
+
+### Fix: Quickbar-Konfiguration wird nicht gespeichert (Issue #166)
+
+* **Ursache**: Die Profil-Generierung (`Profiles.php`) prüfte, ob das `quickbars`-Plugin aktiv ist, ausschließlich über die Legacy-Datenbankspalte `plugins`. Der Profil-Assistent speichert Plugins jedoch in der `extra`-Konfiguration – die Legacy-Spalte blieb leer. Dadurch wurden `quickbars_selection_toolbar` und `quickbars_insert_toolbar` aus der generierten Konfiguration entfernt und die Quickbar fiel auf TinyMCE-Standardwerte zurück.
+* **Fix**: Die neue Methode `profileHasPlugin()` in `Profiles.php` durchsucht sowohl die Legacy-`plugins`-Spalte als auch die `extra`-Konfiguration (String- und Array-Syntax). Eigene Quickbar-Einstellungen bleiben jetzt erhalten.
+
+### Fix: Update-Migration synchronisiert Legacy-Spalten
+
+* Beim AddOn-Update werden `plugins` und `toolbar` in den Legacy-Datenbankspalten mit den Werten aus `extra` abgeglichen. Damit werden Inkonsistenzen behoben, die nach dem Speichern über den Profil-Assistenten entstanden sind.
+* Nach dem Abgleich wird `profiles.js` neu generiert.
+
+### Neu: Profil-Fixer mit Plugin/Toolbar-Spalten-Synchronisation
+
+* Die Seite **„Profil-Fixer"** (ehemals „Migration") wurde um einen neuen Abschnitt ergänzt: **„Plugin-/Toolbar-Spalten synchronisieren"**.
+* Jedes Profil wird geprüft, ob die Legacy-Spalten `plugins` und `toolbar` mit den Werten in `extra` übereinstimmen.
+* Profile mit Abweichungen werden mit einem Badge „Spalten nicht synchron" markiert und zeigen eine Diff-Tabelle (extra vs. DB-Spalte).
+* Ein Klick auf **„Synchronisieren"** (oder „Alle synchronisieren") schreibt die Werte aus `extra` in die Legacy-Spalten und regeneriert `profiles.js`.
+
+### UX: Migrations-Seite in „Profil-Fixer" umbenannt
+
+* Der Backend-Menüpunkt heißt nun **„Profil-Fixer"** (EN: „Profile Fixer"), da die Seite nicht mehr nur für die TinyMCE-8-Migration zuständig ist, sondern generell als Diagnosewerkzeug für Profilprobleme dient.
+
 Version 8.8.0 - 8.8.1
 -------------------------------
 

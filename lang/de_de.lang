@@ -57,7 +57,7 @@ tinymce_upload_default_description = Bilder können via drag+drop in das Textfel
 #migration
 tinymce_migration_message = Die Profile wurden für TinyMCE 8 migriert. Alte TinyMCE-Versionen (4/5/6) können jetzt deinstalliert werden. Bitte die Readme und das Changelog beachten.
 
-tinymce_migration_title = Profil-Migration & Reparatur
+tinymce_migration_title = TinyMCE 8 – Profil-Migration & Kompatibilitätsprüfung
 tinymce_migration_description = Prüft vorhandene Profile auf Inkompatibilitäten mit TinyMCE 8 und erlaubt manuelle Reparatur.
 tinymce_migration_actions = Aktionen
 tinymce_migration_repair = Reparieren
@@ -65,7 +65,7 @@ tinymce_migration_repaired = Profil %s wurde repariert.
 tinymce_migration_no_changes = Profil %s benötigt keine Änderungen.
 tinymce_migration_repaired_count = %s Profile wurden repariert.
 
-migration = Migration
+migration = Profil-Fixer
 tinymce_profile_name = Profilname
 
 tinymce_migration_repair_all = Alle reparieren

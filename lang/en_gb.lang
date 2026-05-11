@@ -60,7 +60,7 @@ tinymce_media_category = Media category
 tinymce_upload_default = Drag & drop image upload
 tinymce_upload_default_description = Images can be placed in the editor using drag & drop
 
-tinymce_migration_title = Profile migration & repair
+tinymce_migration_title = TinyMCE 8 – Profile migration & compatibility check
 tinymce_migration_description = Check profiles for compatibility issues with TinyMCE 8 and repair them manually.
 tinymce_migration_actions = Actions
 tinymce_migration_repair = Repair
@@ -68,7 +68,7 @@ tinymce_migration_repaired = Profile %s was repaired.
 tinymce_migration_no_changes = Profile %s required no changes.
 tinymce_migration_repaired_count = Repaired %s profile(s).
 
-migration = Migration
+migration = Profile Fixer
 tinymce_profile_name = Profile name
 
 tinymce_migration_repair_all = Repair all

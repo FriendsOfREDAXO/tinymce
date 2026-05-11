@@ -1016,6 +1016,35 @@ echo OembedRenderer::registerFrontendAssets();
 </figure>
 ```
 
+## Troubleshooting / Häufige Probleme
+
+### Quickbar oder andere Einstellungen werden nicht übernommen
+
+**Symptom:** Die Quickbar (oder andere über den Profil-Assistenten konfigurierte Optionen wie `plugins`, `toolbar`) wird im Editor immer auf die TinyMCE-Standardwerte zurückgesetzt, obwohl sie im Profil gespeichert wurde.
+
+**Ursache:** Der Profil-Assistent speichert alle Einstellungen in der `extra`-Konfigurationsspalte. Ältere Versionen des AddOns haben zusätzlich die Legacy-Spalten `plugins` und `toolbar` befüllt. Wenn diese Legacy-Spalten leer sind, kann die Profil-Generierung die aktivierten Plugins nicht korrekt erkennen und entfernt zugehörige Konfigurationsblöcke (z.B. `quickbars_selection_toolbar`).
+
+**Lösung:** Im Backend unter **TinyMCE → Profil-Fixer** → Abschnitt **„Plugin-/Toolbar-Spalten synchronisieren"**:
+
+1. Profile mit dem Badge **„Spalten nicht synchron"** identifizieren.
+2. Auf **„Synchronisieren"** klicken (oder „Alle synchronisieren") – die Legacy-Spalten werden mit den Werten aus `extra` abgeglichen und `profiles.js` wird neu generiert.
+
+> Ab Version 8.8.2 läuft dieser Abgleich automatisch beim AddOn-Update.
+
+---
+
+### Profil-Änderungen werden im Editor nicht sichtbar
+
+Nach dem Speichern eines Profils muss der Browser-Cache geleert werden (Strg+Shift+R / Cmd+Shift+R), da `profiles.js` als statische Datei ausgeliefert wird.
+
+---
+
+### TinyMCE zeigt eine Lizenzwarnung
+
+Jedes Profil muss `license_key: 'gpl',` in der Konfiguration enthalten. Bei eigenen Profilen diesen Eintrag am Anfang des `extra`-Feldes ergänzen. Der **Profil-Fixer** prüft unter **„TinyMCE 8 – Profil-Migration & Kompatibilitätsprüfung"** alle Profile auf diesen und weitere Kompatibilitätsprobleme.
+
+---
+
 ## Entwickler
 
 Informationen zur Erweiterung des Addons und zur Registrierung eigener Plugins finden Sie in der [Entwickler-Dokumentation](DEVS.md) oder im Backend unter dem Reiter "Entwickler".
