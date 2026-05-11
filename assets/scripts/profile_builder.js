@@ -151,18 +151,34 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-12 builder-context-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
     
     // Context Toolbar Builder
-    settingsHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.available_items || 'Available Items') + '</div><div class="panel-body" id="builder-context-available-items">';
-    toolbarButtons.forEach(btn => {
-        settingsHtml += `<button type="button" class="btn btn-default btn-xs builder-context-toolbar-btn" data-value="${btn}" style="margin-bottom: 4px;">${btn}</button> `;
-    });
-    settingsHtml += `<button type="button" class="btn btn-default btn-xs builder-context-toolbar-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (${i18n.separator || 'Separator'})</strong></button> `;
+    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.context_items || 'Context Toolbar (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
+    settingsHtml += '<div class="builder-context-picker"><div class="builder-context-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen.') + '</div></div>';
+    settingsHtml += '<div class="builder-context-pill-dropzone">';
+    settingsHtml += '<ul class="builder-context-pill-list list-inline" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
+    settingsHtml += '<div class="builder-context-inline-picker">';
+    settingsHtml += '<input type="text" class="form-control input-sm builder-context-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    settingsHtml += '<div class="builder-context-inline-picker-list"></div>';
+    settingsHtml += '</div>';
+    settingsHtml += '</div>';
     settingsHtml += '</div></div>';
-
-    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected Toolbar (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body"><ul id="builder-context-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
     
-    settingsHtml += '<div class="form-group"><label>Selection Toolbar Result</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
+    settingsHtml += '<div class="form-group"><label>' + (i18n.context_result || 'Context Toolbar Code') + '</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
     
-    settingsHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar-insert"> Show Insert Toolbar (quickimage quicktable)</label></div>';
+    settingsHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar-insert"> ' + (i18n.show_insert_toolbar || 'Show Insert Toolbar') + '</label></div>';
+    settingsHtml += '<div class="col-md-12 builder-insert-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
+    settingsHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.insert_items || 'Insert Menu Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
+    settingsHtml += '<div class="builder-insert-picker"><div class="builder-insert-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen.') + '</div></div>';
+    settingsHtml += '<div class="builder-insert-pill-dropzone">';
+    settingsHtml += '<ul class="builder-insert-pill-list list-inline" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
+    settingsHtml += '<div class="builder-insert-inline-picker">';
+    settingsHtml += '<input type="text" class="form-control input-sm builder-insert-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    settingsHtml += '<div class="builder-insert-inline-picker-list"></div>';
+    settingsHtml += '</div>';
+    settingsHtml += '</div>';
+    settingsHtml += '</div></div>';
+    
+    settingsHtml += '<div class="form-group"><label>' + (i18n.insert_result || 'Insert Menu Code') + '</label><input type="text" class="form-control builder-insert-menu-input" value="" readonly></div>';
+    settingsHtml += '</div>';
     settingsHtml += '</div>';
 
     // Auto Hide Toolbar
@@ -311,6 +327,15 @@ function initTinyMceProfileAssistant() {
             $builderBody.find('.builder-plugin[value="quickbars"]').prop('checked', true);
         } else {
             $builderBody.find('.builder-context-toolbar-options').slideUp();
+        }
+    });
+
+    // Insert Toolbar Toggle
+    $builderBody.on('change', '.builder-context-toolbar-insert', function() {
+        if ($(this).is(':checked')) {
+            $builderBody.find('.builder-insert-toolbar-options').slideDown();
+        } else {
+            $builderBody.find('.builder-insert-toolbar-options').slideUp();
         }
     });
 
@@ -585,6 +610,13 @@ function initTinyMceProfileAssistant() {
             color: var(--tpa-help-muted);
             margin-bottom: 6px;
         }
+        .builder-context-picker-label,
+        .builder-insert-picker-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--tpa-help-muted);
+            margin-bottom: 6px;
+        }
         .builder-toolbar-picker-help {
             font-size: 11px;
             color: var(--tpa-help-muted);
@@ -596,7 +628,20 @@ function initTinyMceProfileAssistant() {
         .builder-toolbar-pill-dropzone {
             position: relative;
         }
+        .builder-context-pill-dropzone,
+        .builder-insert-pill-dropzone {
+            position: relative;
+        }
         .builder-toolbar-pill-list {
+            min-height: 42px;
+            border: 1px dashed var(--tpa-dropzone-border);
+            background: var(--tpa-dropzone-bg);
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .builder-context-pill-list,
+        .builder-insert-pill-list {
             min-height: 42px;
             border: 1px dashed var(--tpa-dropzone-border);
             background: var(--tpa-dropzone-bg);
@@ -616,32 +661,58 @@ function initTinyMceProfileAssistant() {
             border: 1px solid var(--tpa-chip-border);
             background: var(--tpa-chip-bg);
         }
-        .builder-toolbar-pill--for {
+        .builder-toolbar-pill--for,
+        .builder-context-pill--for,
+        .builder-insert-pill--for {
             border-color: #6b9fbf;
             background: linear-gradient(135deg, #e3f0fa, #d0e8f7);
             color: #1a5a8a;
         }
-        .builder-toolbar-pill--addon {
+        .builder-toolbar-pill--addon,
+        .builder-context-pill--addon,
+        .builder-insert-pill--addon {
             border-color: #7eca9d;
             background: linear-gradient(135deg, #eaf7f0, #d9efe5);
             color: #2d6a45;
         }
-        .builder-toolbar-pill--core {
+        .builder-toolbar-pill--core,
+        .builder-context-pill--core,
+        .builder-insert-pill--core {
             border-color: #999;
             background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
             color: #333;
         }
-        .builder-toolbar-pill.dragging {
+        .builder-context-pill,
+        .builder-insert-pill {
+            cursor: move;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 6px 6px 0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: var(--tpa-chip-text);
+            border: 1px solid var(--tpa-chip-border);
+            background: var(--tpa-chip-bg);
+        }
+        .builder-toolbar-pill.dragging,
+        .builder-context-pill.dragging,
+        .builder-insert-pill.dragging {
             opacity: .25;
             box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
             cursor: grabbing;
         }
-        .builder-toolbar-pill.over {
+        .builder-toolbar-pill.over,
+        .builder-context-pill.over,
+        .builder-insert-pill.over {
             outline: 1px dashed var(--tpa-placeholder-border);
         }
-        .builder-toolbar-pill.new {
+        .builder-toolbar-pill.new,
+        .builder-context-pill.new,
+        .builder-insert-pill.new {
             animation: fadeInScale .3s ease-out forwards;
         }
+
         @keyframes fadeInScale {
             from {
                 opacity: 0;
@@ -652,7 +723,8 @@ function initTinyMceProfileAssistant() {
                 transform: scale(1);
             }
         }
-        .builder-toolbar-pill-remove {
+        .builder-toolbar-pill-remove,
+        .remove-item {
             border: 0;
             background: transparent;
             color: var(--tpa-chip-remove);
@@ -660,8 +732,26 @@ function initTinyMceProfileAssistant() {
             line-height: 1;
             padding: 0;
             cursor: pointer;
+            margin-left: 4px;
+            font-size: 18px;
+        }
+        .remove-item:hover {
+            color: #d9534f;
         }
         .builder-toolbar-inline-picker {
+            position: fixed;
+            z-index: 1060;
+            width: 320px;
+            max-width: calc(100% - 16px);
+            border: 1px solid var(--tpa-dropzone-border);
+            border-radius: 6px;
+            background: var(--tpa-panel-body-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+            padding: 8px;
+            display: none;
+        }
+        .builder-context-inline-picker,
+        .builder-insert-inline-picker {
             position: fixed;
             z-index: 1060;
             width: 320px;
@@ -679,7 +769,19 @@ function initTinyMceProfileAssistant() {
             background: var(--tpa-dropzone-bg);
             color: inherit;
         }
+        .builder-context-inline-picker-search,
+        .builder-insert-inline-picker-search {
+            margin-bottom: 8px;
+            border-color: var(--tpa-dropzone-border);
+            background: var(--tpa-dropzone-bg);
+            color: inherit;
+        }
         .builder-toolbar-inline-picker-list {
+            max-height: 220px;
+            overflow: auto;
+        }
+        .builder-context-inline-picker-list,
+        .builder-insert-inline-picker-list {
             max-height: 220px;
             overflow: auto;
         }
@@ -696,8 +798,26 @@ function initTinyMceProfileAssistant() {
             align-items: center;
             gap: 8px;
         }
+        .builder-context-inline-picker-item,
+        .builder-insert-inline-picker-item {
+            width: 100%;
+            text-align: left;
+            border: 1px solid transparent;
+            background: transparent;
+            color: inherit;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .builder-toolbar-inline-picker-item:hover,
-        .builder-toolbar-inline-picker-item:focus {
+        .builder-toolbar-inline-picker-item:focus,
+        .builder-context-inline-picker-item:hover,
+        .builder-context-inline-picker-item:focus,
+        .builder-insert-inline-picker-item:hover,
+        .builder-insert-inline-picker-item:focus {
             background: var(--tpa-dropzone-bg);
             border-color: var(--tpa-dropzone-border);
             outline: 0;
@@ -706,7 +826,17 @@ function initTinyMceProfileAssistant() {
             color: #2c7cb8;
             font-weight: 600;
         }
+        .builder-context-inline-picker-item--for .builder-toolbar-inline-picker-text,
+        .builder-insert-inline-picker-item--for .builder-toolbar-inline-picker-text {
+            color: #2c7cb8;
+            font-weight: 600;
+        }
         .builder-toolbar-inline-picker-item--addon .builder-toolbar-inline-picker-text {
+            color: #3e8c60;
+            font-weight: 600;
+        }
+        .builder-context-inline-picker-item--addon .builder-toolbar-inline-picker-text,
+        .builder-insert-inline-picker-item--addon .builder-toolbar-inline-picker-text {
             color: #3e8c60;
             font-weight: 600;
         }
@@ -825,17 +955,29 @@ function initTinyMceProfileAssistant() {
             color: #e8f0f7;
             border-color: #111820;
         }
-        body.rex-theme-dark .builder-toolbar-pill--for {
+        body.rex-theme-dark .builder-context-pill,
+        body.rex-theme-dark .builder-insert-pill {
+            background: #2a3744;
+            color: #e8f0f7;
+            border-color: #111820;
+        }
+        body.rex-theme-dark .builder-toolbar-pill--for,
+        body.rex-theme-dark .builder-context-pill--for,
+        body.rex-theme-dark .builder-insert-pill--for {
             border-color: #2c7cb8;
             background: #2c5a8f;
             color: #8ec5ea;
         }
-        body.rex-theme-dark .builder-toolbar-pill--addon {
+        body.rex-theme-dark .builder-toolbar-pill--addon,
+        body.rex-theme-dark .builder-context-pill--addon,
+        body.rex-theme-dark .builder-insert-pill--addon {
             border-color: #3e8c60;
             background: #2d6a45;
             color: #8fd4a8;
         }
-        body.rex-theme-dark .builder-toolbar-pill--core {
+        body.rex-theme-dark .builder-toolbar-pill--core,
+        body.rex-theme-dark .builder-context-pill--core,
+        body.rex-theme-dark .builder-insert-pill--core {
             border-color: #5f6a75;
             background: #3d4650;
             color: #e8f0f7;
@@ -845,24 +987,21 @@ function initTinyMceProfileAssistant() {
             border-color: #3a4654;
             box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
         }
+        body.rex-theme-dark .builder-context-inline-picker,
+        body.rex-theme-dark .builder-insert-inline-picker {
+            background: #1f2933;
+            border-color: #3a4654;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+        }
         body.rex-theme-dark .builder-toolbar-inline-picker-search {
             background: #14191f;
             border-color: #3a4654;
         }
-        body.rex-theme-dark .builder-insert-item-btn--for {
-            background: linear-gradient(135deg, #2c5a8f, #1e4066) !important;
-            border-color: transparent !important;
-            color: #8ec5ea !important;
-            font-weight: 600;
+        body.rex-theme-dark .builder-context-inline-picker-search,
+        body.rex-theme-dark .builder-insert-inline-picker-search {
+            background: #14191f;
+            border-color: #3a4654;
         }
-        body.rex-theme-dark .builder-insert-item-btn--for:hover { filter: brightness(1.15); }
-        body.rex-theme-dark .builder-insert-item-btn--addon {
-            background: linear-gradient(135deg, #2d6a45, #1e4626) !important;
-            border-color: transparent !important;
-            color: #8fd4a8 !important;
-            font-weight: 600;
-        }
-        body.rex-theme-dark .builder-insert-item-btn--addon:hover { filter: brightness(1.15); }
 
         /* ================================================================
            REDAXO Auto Mode: prefers-color-scheme (responsive to system)
@@ -945,7 +1084,19 @@ function initTinyMceProfileAssistant() {
                 color: #e8f0f7;
                 border-color: #111820;
             }
+            body.rex-has-theme:not(.rex-theme-light) .builder-context-pill,
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-pill {
+                background: #2a3744;
+                color: #e8f0f7;
+                border-color: #111820;
+            }
             body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-pill--for {
+                border-color: #2c7cb8;
+                background: #2c5a8f;
+                color: #8ec5ea;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-context-pill--for,
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-pill--for {
                 border-color: #2c7cb8;
                 background: #2c5a8f;
                 color: #8ec5ea;
@@ -955,7 +1106,19 @@ function initTinyMceProfileAssistant() {
                 background: #2d6a45;
                 color: #8fd4a8;
             }
+            body.rex-has-theme:not(.rex-theme-light) .builder-context-pill--addon,
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-pill--addon {
+                border-color: #3e8c60;
+                background: #2d6a45;
+                color: #8fd4a8;
+            }
             body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-pill--core {
+                border-color: #5f6a75;
+                background: #3d4650;
+                color: #e8f0f7;
+            }
+            body.rex-has-theme:not(.rex-theme-light) .builder-context-pill--core,
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-pill--core {
                 border-color: #5f6a75;
                 background: #3d4650;
                 color: #e8f0f7;
@@ -965,24 +1128,21 @@ function initTinyMceProfileAssistant() {
                 border-color: #3a4654;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
             }
+            body.rex-has-theme:not(.rex-theme-light) .builder-context-inline-picker,
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-inline-picker {
+                background: #1f2933;
+                border-color: #3a4654;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+            }
             body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-inline-picker-search {
                 background: #14191f;
                 border-color: #3a4654;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--for {
-                background: linear-gradient(135deg, #2c5a8f, #1e4066) !important;
-                border-color: transparent !important;
-                color: #8ec5ea !important;
-                font-weight: 600;
+            body.rex-has-theme:not(.rex-theme-light) .builder-context-inline-picker-search,
+            body.rex-has-theme:not(.rex-theme-light) .builder-insert-inline-picker-search {
+                background: #14191f;
+                border-color: #3a4654;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--for:hover { filter: brightness(1.15); }
-            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--addon {
-                background: linear-gradient(135deg, #2d6a45, #1e4626) !important;
-                border-color: transparent !important;
-                color: #8fd4a8 !important;
-                font-weight: 600;
-            }
-            body.rex-has-theme:not(.rex-theme-light) .builder-insert-item-btn--addon:hover { filter: brightness(1.15); }
         }
     `;
     document.head.appendChild(style);
@@ -1285,28 +1445,262 @@ function initTinyMceProfileAssistant() {
         $insertInput.val(items.join(' '));
     }
 
-    function addContextItem(value) {
-        const $li = $(`<li draggable="true" data-value="${value}">${value} <span class="remove-item">&times;</span></li>`);
-        $contextSelectedList.append($li);
+    function listContainsValue($list, value) {
+        const normalized = normalizeToolbarItemValue(value);
+        if (!normalized) {
+            return false;
+        }
+        let exists = false;
+        $list.find('li').each(function() {
+            if (normalizeToolbarItemValue($(this).data('value')) === normalized) {
+                exists = true;
+                return false;
+            }
+        });
+        return exists;
+    }
+
+    function renderContextInlinePicker(query = '') {
+        const filter = String(query || '').trim().toLowerCase();
+        const separatorValue = '|';
+        const allItems = getToolbarPickerItems();
+        const items = allItems.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            return filter === '' || value.toLowerCase().includes(filter);
+        });
+        
+        // Filter out items already in context list
+        const $existingPills = $contextSelectedList.find('.builder-context-pill');
+        const usedValues = new Set();
+        $existingPills.each(function() {
+            usedValues.add($(this).data('value'));
+        });
+        
+        const filteredItems = items.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            return !usedValues.has(value);
+        });
+        
+        const orderedItems = [];
+        if (filteredItems.includes(separatorValue)) {
+            orderedItems.push(separatorValue);
+        }
+        filteredItems.forEach((value) => {
+            if (value !== separatorValue) {
+                orderedItems.push(value);
+            }
+        });
+        
+        const $list = $contextSelectedList.closest('.builder-context-pill-dropzone').find('.builder-context-inline-picker-list');
+        if (orderedItems.length === 0) {
+            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
+            return;
+        }
+
+        let html = '';
+        orderedItems.forEach((value) => {
+            const origin = getToolbarItemOrigin(value);
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-context-inline-picker-item builder-context-inline-picker-item--' + origin + '" data-value="' + escapeHtml(value) + '">' + getToolbarItemBadge(origin) + '<span class="builder-toolbar-inline-picker-text">' + escapeHtml(value) + '</span></button>';
+        });
+        
+        $list.html(html);
+    }
+
+    function openContextInlinePicker(clientX, clientY) {
+        const $picker = $contextSelectedList.closest('.builder-context-pill-dropzone').find('.builder-context-inline-picker');
+        const $search = $picker.find('.builder-context-inline-picker-search');
+        const viewportPadding = 8;
+        const anchorOffset = 10;
+
+        renderContextInlinePicker('');
+
+        $picker.css({ left: '-9999px', top: '-9999px' }).show();
+
+        const pickerWidth = Math.ceil($picker.outerWidth() || 320);
+        const pickerHeight = Math.ceil($picker.outerHeight() || 240);
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        let left = clientX + anchorOffset;
+        let top = clientY + anchorOffset;
+
+        if (left + pickerWidth > viewportWidth - viewportPadding) {
+            left = clientX - pickerWidth - anchorOffset;
+        }
+        if (left < viewportPadding) {
+            left = viewportPadding;
+        }
+
+        if (top + pickerHeight > viewportHeight - viewportPadding) {
+            top = clientY - pickerHeight - anchorOffset;
+        }
+        if (top < viewportPadding) {
+            top = viewportPadding;
+        }
+
+        $picker.css({ left: left + 'px', top: top + 'px' }).show();
+        $search.val('').trigger('focus');
+    }
+
+    function closeContextInlinePicker() {
+        const $picker = $contextSelectedList.closest('.builder-context-pill-dropzone').find('.builder-context-inline-picker');
+        $picker.hide();
+        $picker.find('.builder-context-inline-picker-search').val('');
+    }
+
+    function renderInsertInlinePicker(query = '') {
+        const filter = String(query || '').trim().toLowerCase();
+        const separatorValue = '|';
+        const allItems = getToolbarPickerItems();
+        const items = allItems.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            return filter === '' || value.toLowerCase().includes(filter);
+        });
+        
+        // Filter out items already in insert list
+        const $existingPills = $insertSelectedList.find('.builder-insert-pill');
+        const usedValues = new Set();
+        $existingPills.each(function() {
+            usedValues.add($(this).data('value'));
+        });
+        
+        const filteredItems = items.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            return !usedValues.has(value);
+        });
+        
+        const orderedItems = [];
+        if (filteredItems.includes(separatorValue)) {
+            orderedItems.push(separatorValue);
+        }
+        filteredItems.forEach((value) => {
+            if (value !== separatorValue) {
+                orderedItems.push(value);
+            }
+        });
+        
+        const $list = $insertSelectedList.closest('.builder-insert-pill-dropzone').find('.builder-insert-inline-picker-list');
+        if (orderedItems.length === 0) {
+            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
+            return;
+        }
+
+        let html = '';
+        orderedItems.forEach((value) => {
+            const origin = getToolbarItemOrigin(value);
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-insert-inline-picker-item builder-insert-inline-picker-item--' + origin + '" data-value="' + escapeHtml(value) + '">' + getToolbarItemBadge(origin) + '<span class="builder-toolbar-inline-picker-text">' + escapeHtml(value) + '</span></button>';
+        });
+        
+        $list.html(html);
+    }
+
+    function openInsertInlinePicker(clientX, clientY) {
+        const $picker = $insertSelectedList.closest('.builder-insert-pill-dropzone').find('.builder-insert-inline-picker');
+        const $search = $picker.find('.builder-insert-inline-picker-search');
+        const viewportPadding = 8;
+        const anchorOffset = 10;
+
+        renderInsertInlinePicker('');
+
+        $picker.css({ left: '-9999px', top: '-9999px' }).show();
+
+        const pickerWidth = Math.ceil($picker.outerWidth() || 320);
+        const pickerHeight = Math.ceil($picker.outerHeight() || 240);
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+        let left = clientX + anchorOffset;
+        let top = clientY + anchorOffset;
+
+        if (left + pickerWidth > viewportWidth - viewportPadding) {
+            left = clientX - pickerWidth - anchorOffset;
+        }
+        if (left < viewportPadding) {
+            left = viewportPadding;
+        }
+
+        if (top + pickerHeight > viewportHeight - viewportPadding) {
+            top = clientY - pickerHeight - anchorOffset;
+        }
+        if (top < viewportPadding) {
+            top = viewportPadding;
+        }
+
+        $picker.css({ left: left + 'px', top: top + 'px' }).show();
+        $search.val('').trigger('focus');
+    }
+
+    function closeInsertInlinePicker() {
+        const $picker = $insertSelectedList.closest('.builder-insert-pill-dropzone').find('.builder-insert-inline-picker');
+        $picker.hide();
+        $picker.find('.builder-insert-inline-picker-search').val('');
+    }
+
+    function addContextPill(value = '') {
+        const normalizedValue = normalizeToolbarItemValue(value);
+        if (!normalizedValue) {
+            return;
+        }
+        if (listContainsValue($contextSelectedList, normalizedValue)) {
+            return;
+        }
+        
+        const origin = getToolbarItemOrigin(normalizedValue);
+        const $pill = $('<li class="builder-context-pill builder-context-pill--' + origin + ' new" draggable="true"></li>');
+        $pill.attr('data-value', normalizedValue);
+        $pill.data('value', normalizedValue);
+        $pill.append($(getToolbarItemBadge(origin)));
+        $pill.append($('<span class="builder-context-pill-text"></span>').text(normalizedValue));
+        $pill.append($('<button type="button" class="remove-item">×</button>'));
+
+        $contextSelectedList.append($pill);
+        setupDragEvents($pill[0]);
+        $pill.on('animationend', function() {
+            $(this).removeClass('new');
+        });
         updateContextInput();
-        setupDragEvents($li[0]);
+        renderContextInlinePicker('');
     }
 
-    function addInsertItem(value) {
-        const $li = $(`<li draggable="true" data-value="${value}">${value} <span class="remove-item">&times;</span></li>`);
-        $insertSelectedList.append($li);
-        updateInsertInput();
-        setupDragEvents($li[0]);
-    }
+    function addInsertPill(value = '') {
+        const normalizedValue = normalizeToolbarItemValue(value);
+        if (!normalizedValue) {
+            return;
+        }
+        if (listContainsValue($insertSelectedList, normalizedValue)) {
+            return;
+        }
+        
+        const origin = getToolbarItemOrigin(normalizedValue);
+        const $pill = $('<li class="builder-insert-pill builder-insert-pill--' + origin + ' new" draggable="true"></li>');
+        $pill.attr('data-value', normalizedValue);
+        $pill.data('value', normalizedValue);
+        $pill.append($(getToolbarItemBadge(origin)));
+        $pill.append($('<span class="builder-insert-pill-text"></span>').text(normalizedValue));
+        $pill.append($('<button type="button" class="remove-item">×</button>'));
 
-    function clearInsertItems() {
-        $insertSelectedList.empty();
+        $insertSelectedList.append($pill);
+        setupDragEvents($pill[0]);
+        $pill.on('animationend', function() {
+            $(this).removeClass('new');
+        });
         updateInsertInput();
+        renderInsertInlinePicker('');
     }
 
     // Initialize Context Items from default value
-    const defaultContextItems = $contextInput.val().split(' ');
-    defaultContextItems.forEach(addContextItem);
+    const defaultContextItems = $contextInput.val().split(' ').filter(v => v.trim());
+    defaultContextItems.forEach(addContextPill);
+    renderContextInlinePicker('');
+    renderInsertInlinePicker('');
 
     function setPlugins(plugins) {
         $builderBody.find('.builder-plugin').prop('checked', false);
@@ -1343,22 +1737,71 @@ function initTinyMceProfileAssistant() {
         $builderBody.find('.builder-imagewidth-enable').prop('checked', true).trigger('change');
     });
 
-    $builderBody.find('.builder-context-toolbar-btn').on('click', function() {
-        addContextItem($(this).data('value'));
+    // Context Inline Picker Events
+    $builderBody.find('.builder-context-inline-picker-search').on('keyup', function() {
+        renderContextInlinePicker($(this).val());
     });
 
-    $builderBody.find('.builder-insert-item-btn').on('click', function() {
-        addInsertItem($(this).data('value'));
+    $builderBody.on('click', '.builder-context-inline-picker-item', function(e) {
+        e.preventDefault();
+        const value = $(this).data('value');
+        addContextPill(value);
+        closeContextInlinePicker();
     });
 
-    $contextSelectedList.on('click', '.remove-item', function() {
-        $(this).parent().remove();
+    $builderBody.find('.builder-context-pill-dropzone').on('click', function(e) {
+        const $clickTarget = $(e.target).closest('.builder-context-pill');
+        if ($clickTarget.length > 0) {
+            return;
+        }
+        const $list = $(this).find('.builder-context-pill-list');
+        openContextInlinePicker(e.clientX, e.clientY);
+    });
+
+    // Insert Inline Picker Events
+    $builderBody.find('.builder-insert-inline-picker-search').on('keyup', function() {
+        renderInsertInlinePicker($(this).val());
+    });
+
+    $builderBody.on('click', '.builder-insert-inline-picker-item', function(e) {
+        e.preventDefault();
+        const value = $(this).data('value');
+        addInsertPill(value);
+        closeInsertInlinePicker();
+    });
+
+    $builderBody.find('.builder-insert-pill-dropzone').on('click', function(e) {
+        const $clickTarget = $(e.target).closest('.builder-insert-pill');
+        if ($clickTarget.length > 0) {
+            return;
+        }
+        const $list = $(this).find('.builder-insert-pill-list');
+        openInsertInlinePicker(e.clientX, e.clientY);
+    });
+
+    // Remove context/insert pills via X button
+    $contextSelectedList.on('click', '.remove-item', function(e) {
+        e.stopPropagation();
+        $(this).closest('li').remove();
         updateContextInput();
+        renderContextInlinePicker('');
     });
 
-    $insertSelectedList.on('click', '.remove-item', function() {
-        $(this).parent().remove();
+    $insertSelectedList.on('click', '.remove-item', function(e) {
+        e.stopPropagation();
+        $(this).closest('li').remove();
         updateInsertInput();
+        renderInsertInlinePicker('');
+    });
+
+    // Close pickers when clicking elsewhere
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.builder-context-pill-dropzone').length) {
+            closeContextInlinePicker();
+        }
+        if (!$(e.target).closest('.builder-insert-pill-dropzone').length) {
+            closeInsertInlinePicker();
+        }
     });
 
     $builderBody.on('click', '.builder-toolbar-row-add', function() {
@@ -1540,10 +1983,16 @@ function initTinyMceProfileAssistant() {
                     }
                 });
             });
-            // Keep hidden inputs in sync with whatever content is currently in the list.
-            if (list.id === 'builder-context-selected-items') updateContextInput();
-            else if (list.id === 'builder-insert-selected-items') updateInsertInput();
-            else updateInput();
+            // Keep hidden inputs and inline picker states in sync.
+            if (list.id === 'builder-context-selected-items') {
+                updateContextInput();
+                renderContextInlinePicker('');
+            } else if (list.id === 'builder-insert-selected-items') {
+                updateInsertInput();
+                renderInsertInlinePicker('');
+            } else {
+                updateInput();
+            }
         });
         mo.observe(list, { childList: true, subtree: true });
     });
@@ -2626,12 +3075,19 @@ function loadFromConfig($textarea, $builderBody) {
         const $ctxList = $('#builder-context-selected-items');
         $ctxList.empty();
         tokenize(cfg.quickbars_selection_toolbar).forEach((v) => {
-            $ctxList.append('<li draggable="true" data-value="' + v + '">' + v + ' <span class="remove-item">&times;</span></li>');
+            const origin = getToolbarItemOrigin(v);
+            const $li = $('<li class="builder-context-pill builder-context-pill--' + origin + '" draggable="true"></li>');
+            $li.attr('data-value', v);
+            $li.data('value', v);
+            $li.append($(getToolbarItemBadge(origin)));
+            $li.append($('<span class="builder-context-pill-text"></span>').text(v));
+            $li.append($('<button type="button" class="remove-item">×</button>'));
+            $ctxList.append($li);
         });
         $builderBody.find('.builder-context-toolbar-selection').val(tokenize(cfg.quickbars_selection_toolbar).join(' '));
     }
     if (cfg.quickbars_insert_toolbar && cfg.quickbars_insert_toolbar !== false) {
-        $builderBody.find('.builder-context-toolbar-insert').prop('checked', true);
+        $builderBody.find('.builder-context-toolbar-insert').prop('checked', true).trigger('change');
     }
 
     // Insert menu
@@ -2642,7 +3098,14 @@ function loadFromConfig($textarea, $builderBody) {
         const $insertList = $('#builder-insert-selected-items');
         $insertList.empty();
         tokenize(items).forEach((v) => {
-            $insertList.append('<li draggable="true" data-value="' + v + '">' + v + ' <span class="remove-item">&times;</span></li>');
+            const origin = getToolbarItemOrigin(v);
+            const $li = $('<li class="builder-insert-pill builder-insert-pill--' + origin + '" draggable="true"></li>');
+            $li.attr('data-value', v);
+            $li.data('value', v);
+            $li.append($(getToolbarItemBadge(origin)));
+            $li.append($('<span class="builder-insert-pill-text"></span>').text(v));
+            $li.append($('<button type="button" class="remove-item">×</button>'));
+            $insertList.append($li);
         });
         $builderBody.find('.builder-insert-menu-input').val(tokenize(items).join(' '));
     }
