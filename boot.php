@@ -32,7 +32,7 @@ if (rex::isBackend() && is_object(rex::getUser())) {
         'for_abbr' => ['for_abbr/plugin.min.js', ['for_abbr']],
         'for_images' => [
             'for_images/plugin.min.js',
-            ['imagewidthdialog', 'imagewidth', 'imagealignleft', 'imagealigncenter', 'imagealignright', 'imagealignnone', 'imageeffect', 'imagealt', 'imagecaption'],
+            ['imagewidthdialog', 'imagewidth', 'for_imagealignleft', 'for_imagealigncenter', 'for_imagealignright', 'for_imagealignnone', 'imageeffect', 'imagealt', 'imagecaption'],
         ],
     ];
 

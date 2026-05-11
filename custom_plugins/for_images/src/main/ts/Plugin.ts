@@ -468,6 +468,38 @@ const setup = (editor: Editor, _url: string): void => {
     '</g></svg>'
   );
 
+  editor.ui.registry.addIcon('for_imagealignleft_icon',
+    '<svg width="24" height="24" viewBox="0 0 20 20">' +
+    '<path fill="currentColor" opacity=".55" d="M2 3h16v1.5H2zM2 15h16v1.5H2z"/>' +
+    '<rect x="2" y="7" width="10" height="6.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+    '<path fill="currentColor" d="M14 8h4v1.4h-4zM14 10.6h3.2V12H14zM14 13.2h3.8v1.3H14z"/>' +
+    '</svg>'
+  );
+
+  editor.ui.registry.addIcon('for_imagealigncenter_icon',
+    '<svg width="24" height="24" viewBox="0 0 20 20">' +
+    '<path fill="currentColor" opacity=".55" d="M2 3h16v1.5H2zM2 15h16v1.5H2z"/>' +
+    '<rect x="5" y="7" width="10" height="6.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+    '</svg>'
+  );
+
+  editor.ui.registry.addIcon('for_imagealignright_icon',
+    '<svg width="24" height="24" viewBox="0 0 20 20">' +
+    '<path fill="currentColor" opacity=".55" d="M2 3h16v1.5H2zM2 15h16v1.5H2z"/>' +
+    '<path fill="currentColor" d="M2 8h4v1.4H2zM2 10.6h3.2V12H2zM2 13.2h3.8v1.3H2z"/>' +
+    '<rect x="8" y="7" width="10" height="6.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+    '</svg>'
+  );
+
+  editor.ui.registry.addIcon('for_imagealignnone_icon',
+    '<svg width="24" height="24" viewBox="0 0 24 24">' +
+    '<rect x="5" y="5" width="14" height="12" rx="1.5" fill="#6b7280"/>' +
+    '<circle cx="8.5" cy="9" r="0.9" fill="#ffffff"/>' +
+    '<path d="M7.2 14l1.6-2 1.2 1.4 1.3-1.8 1.8 2.4" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<path d="M5.8 18.2l12.4-12.4" stroke="#6b7280" stroke-width="1.8" stroke-linecap="round"/>' +
+    '</svg>'
+  );
+
   const getConfig = (): PluginConfig => {
     const getOption = (key: string): any => {
       let val = editor.options.get(key);
@@ -549,8 +581,8 @@ const setup = (editor: Editor, _url: string): void => {
   });
 
   /* ALIGNMENT TOGGLE BUTTONS */
-  editor.ui.registry.addToggleButton('imagealignleft', {
-    icon: 'align-left',
+  editor.ui.registry.addToggleButton('for_imagealignleft', {
+    icon: 'for_imagealignleft_icon',
     tooltip: 'Bild links',
     onAction: () => {
       const img = getSelectedImg(editor);
@@ -583,8 +615,8 @@ const setup = (editor: Editor, _url: string): void => {
     }
   });
 
-  editor.ui.registry.addToggleButton('imagealigncenter', {
-    icon: 'align-center',
+  editor.ui.registry.addToggleButton('for_imagealigncenter', {
+    icon: 'for_imagealigncenter_icon',
     tooltip: 'Bild zentrieren',
     onAction: () => {
       const img = getSelectedImg(editor);
@@ -617,8 +649,8 @@ const setup = (editor: Editor, _url: string): void => {
     }
   });
 
-  editor.ui.registry.addToggleButton('imagealignright', {
-    icon: 'align-right',
+  editor.ui.registry.addToggleButton('for_imagealignright', {
+    icon: 'for_imagealignright_icon',
     tooltip: 'Bild rechts',
     onAction: () => {
       const img = getSelectedImg(editor);
@@ -651,8 +683,8 @@ const setup = (editor: Editor, _url: string): void => {
     }
   });
 
-  editor.ui.registry.addButton('imagealignnone', {
-    icon: 'remove-formatting',
+  editor.ui.registry.addButton('for_imagealignnone', {
+    icon: 'for_imagealignnone_icon',
     tooltip: 'Ausrichtung entfernen',
     onAction: () => {
       const img = getSelectedImg(editor);
@@ -758,7 +790,7 @@ const setup = (editor: Editor, _url: string): void => {
   /* CONTEXT TOOLBAR */
   editor.ui.registry.addContextToolbar('for_imagestoolbar', {
     predicate: (node: any) => node.nodeName === 'IMG' || (node.nodeName === 'FIGURE' && node.querySelector('img')),
-    items: 'imagewidth imagealignleft imagealigncenter imagealignright imageeffect imagealignnone | imagealt imagecaption',
+    items: 'imagewidth for_imagealignleft for_imagealigncenter for_imagealignright imageeffect for_imagealignnone | imagealt imagecaption',
     position: 'node',
     scope: 'node'
   });
