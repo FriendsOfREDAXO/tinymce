@@ -932,7 +932,7 @@ const setup = (editor: Editor, _url: string): void => {
       // Open mediapool with file_name parameter to highlight current image
       if (filename) {
         try {
-          const poolUrl = 'index.php?page=mediapool/media&file_name=' + encodeURIComponent(filename) + '&opener_input_field=REX_MEDIA_tinymce';
+          const poolUrl = 'index.php?page=mediapool/media&file_name=' + encodeURIComponent(filename);
           window.open(poolUrl, 'mediapool', 'width=1000,height=700,resizable=yes,scrollbars=yes');
           editor.notificationManager.open({ 
             text: `Medienpool öffnet sich für: ${filename}`, 
