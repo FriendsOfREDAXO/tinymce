@@ -271,7 +271,7 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
 }
 
 if ('clone' === $func) {
-    // Demo-Profil darf dupliziert werden (Edit/Delete bleiben gesperrt), damit es als Startpunkt für ein eigenes Profil dienen kann.
+    // Demo-Profil darf dupliziert werden, damit es als Startpunkt für ein eigenes Profil dienen kann.
     $message = TinyMceListHelper::cloneData($profileTable, $id);
     rex_extension::registerPoint(new rex_extension_point('TINY_PROFILE_CLONE', $id));
     $func = '';
@@ -426,28 +426,6 @@ if ('' === $func) {
     echo $fragment->parse('core/page/section.php');
 } elseif ('edit' === $func || 'add' === $func) {
     $id = rex_request('id', 'int');
-
-    // Demo-Profil ist gesperrt – kein Bearbeiten erlaubt.
-    if ('edit' === $func && $id > 0) {
-        $lockSql = rex_sql::factory();
-        $lockSql->setTable($profileTable);
-        $lockSql->setWhere(['id' => $id]);
-        $lockSql->select('name');
-        if ($lockSql->getRows() > 0 && $lockSql->getValue('name') === \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) {
-            $backUrl = rex_url::backendPage('tinymce/profiles');
-            $info = rex_view::info(
-                rex_i18n::msg('tinymce_profile_demo_locked_info')
-                . ' <a href="' . $backUrl . '" class="btn btn-xs btn-default" style="margin-left:8px;">'
-                . rex_i18n::msg('tinymce_back_to_list') . '</a>'
-            );
-            $fragment = new rex_fragment();
-            $fragment->setVar('class', 'edit', false);
-            $fragment->setVar('title', rex_i18n::msg('tinymce_profile_edit'));
-            $fragment->setVar('body', $info, false);
-            echo $fragment->parse('core/page/section.php');
-            return;
-        }
-    }
 
     $form = rex_form::factory($profileTable, '', 'id=' . $id, 'post', false);
     $form->addParam('start', $start);

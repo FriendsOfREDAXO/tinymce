@@ -27,7 +27,7 @@ Kennung: `demo` (siehe `lib/TinyMce/Utils/DemoProfile.php`).
 
 Backend-Verhalten in `pages/profiles.php`:
 
-- Bearbeiten des Demo-Profils ist gesperrt.
+- Bearbeiten des Demo-Profils ist erlaubt.
 - Löschen des Demo-Profils ist gesperrt.
 - Duplizieren des Demo-Profils ist erlaubt (als Startpunkt für eigene Profile).
 
@@ -241,7 +241,7 @@ Beiträge sind willkommen. Damit Änderungen gut reviewbar und stabil bleiben, h
 - Arbeite mit kleinen, fokussierten Commits (ein Thema pro Commit).
 - Bevorzuge Anpassungen in `install/tinymce-profiles.json` statt harter Profil-Strings in PHP.
 - Nutze für neue Profil- oder Import-Logik immer `ProfileHelper`, nicht direkte DB-Spezialwege.
-- Belasse Demo-Schutzregeln intakt (`demo` darf nicht editierbar/löschbar werden).
+- Belasse Demo-Schutzregeln intakt (`demo` darf nicht löschbar werden).
 - Registriere neue Plugins über `PluginRegistry::addPlugin()` statt über verstreute Einzel-Implementierungen.
 - Lege JavaScript in Dateien unter `assets/scripts/` oder `custom_plugins/` ab, nicht inline in PHP.
 - Achte auf Rückwärtskompatibilität bei Profil-Imports (`extra`-Legacy-Feld weiterhin akzeptieren).
