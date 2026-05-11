@@ -23,30 +23,30 @@ if ('repair' === $func && $id > 0) {
     if (!$csrfToken->isValid()) {
         echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
-    $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, profile FROM '.$profileTable.' WHERE id = ?', [$id]);
-    $profile = $sql->getArray();
-    if (!empty($profile)) {
-        $profile = $profile[0];
-        $result = ProfileFixer::fixProfile((string)$profile['profile']);
-        if (!empty($result['changes'])) {
-            $update = rex_sql::factory();
-            $update->setTable($profileTable);
-            $update->setWhere(['id' => $id]);
-            $update->setValue('profile', $result['profile']);
-            $update->update();
-            // Regenerate profiles.js
-            try {
-                TinyMceProfilesCreator::profilesCreate();
-            } catch (rex_functional_exception $e) {
-                // ignore
+        $sql = rex_sql::factory();
+        $sql->setQuery('SELECT id, name, profile FROM '.$profileTable.' WHERE id = ?', [$id]);
+        $profile = $sql->getArray();
+        if (!empty($profile)) {
+            $profile = $profile[0];
+            $result = ProfileFixer::fixProfile((string) $profile['profile']);
+            if (!empty($result['changes'])) {
+                $update = rex_sql::factory();
+                $update->setTable($profileTable);
+                $update->setWhere(['id' => $id]);
+                $update->setValue('profile', $result['profile']);
+                $update->update();
+                // Regenerate profiles.js
+                try {
+                    TinyMceProfilesCreator::profilesCreate();
+                } catch (rex_functional_exception $e) {
+                    // ignore
+                }
+                rex_logger::factory()->log('info', 'TinyMCE: Repaired profile "'.$profile['name'].'" via migration page.');
+                echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired', (string) $profile['name']));
+            } else {
+                echo rex_view::info(rex_i18n::msg('tinymce_migration_no_changes', (string) $profile['name']));
             }
-            rex_logger::factory()->log('info', 'TinyMCE: Repaired profile "'.$profile['name'].'" via migration page.');
-            echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired', (string) $profile['name']));
-        } else {
-            echo rex_view::info(rex_i18n::msg('tinymce_migration_no_changes', (string) $profile['name']));
         }
-    }
     }
 }
 
@@ -54,30 +54,30 @@ if ('repair_all' === $func) {
     if (!$csrfToken->isValid()) {
         echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
-    $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, profile FROM '.$profileTable);
-    $profiles = $sql->getArray();
-    $count = 0;
-    foreach ($profiles as $p) {
-        $res = ProfileFixer::fixProfile((string)$p['profile']);
-        if (!empty($res['changes'])) {
-            $update = rex_sql::factory();
-            $update->setTable($profileTable);
-            $update->setWhere(['id' => (int) $p['id']]);
-            $update->setValue('profile', $res['profile']);
-            $update->update();
-            $count++;
+        $sql = rex_sql::factory();
+        $sql->setQuery('SELECT id, name, profile FROM '.$profileTable);
+        $profiles = $sql->getArray();
+        $count = 0;
+        foreach ($profiles as $p) {
+            $res = ProfileFixer::fixProfile((string) $p['profile']);
+            if (!empty($res['changes'])) {
+                $update = rex_sql::factory();
+                $update->setTable($profileTable);
+                $update->setWhere(['id' => (int) $p['id']]);
+                $update->setValue('profile', $res['profile']);
+                $update->update();
+                $count++;
+            }
         }
-    }
-    // Regenerate profiles.js after all repairs
-    if ($count > 0) {
-        try {
-            TinyMceProfilesCreator::profilesCreate();
-        } catch (rex_functional_exception $e) {
-            // ignore
+        // Regenerate profiles.js after all repairs
+        if ($count > 0) {
+            try {
+                TinyMceProfilesCreator::profilesCreate();
+            } catch (rex_functional_exception $e) {
+                // ignore
+            }
         }
-    }
-    echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired_count', $count));
+        echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired_count', $count));
     }
 }
 

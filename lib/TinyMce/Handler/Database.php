@@ -20,11 +20,12 @@ class Database
             $sql = rex_sql::factory();
             $sql->setTable(rex::getTable(self::TINY_PROFILES))
                 ->select('*');
+
             return $sql->getArray();
         } catch (rex_sql_exception $e) {
             rex_logger::logException($e);
+
             return null;
         }
     }
 }
-

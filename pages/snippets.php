@@ -76,7 +76,6 @@ if ($func == 'add' || $func == 'edit') {
     $fragment->setVar('title', ($func == 'edit') ? rex_i18n::msg('tinymce_snippets_edit') : rex_i18n::msg('tinymce_snippets_add'));
     $fragment->setVar('body', $content, false);
     echo $fragment->parse('core/page/section.php');
-
 } else {
     $list = rex_list::factory(sprintf('SELECT id, name, content, active FROM %s ORDER BY name ASC', rex::getTable('tinymce_snippets')));
     $list->addTableAttribute('class', 'table-striped');
@@ -117,4 +116,3 @@ if ($func == 'add' || $func == 'edit') {
     $fragment->setVar('content', $content, false);
     echo $fragment->parse('core/page/section.php');
 }
-
