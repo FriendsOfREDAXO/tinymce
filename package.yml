@@ -51,6 +51,7 @@ conflicts:
     packages:
         tinymce4: '>=0.0.0'
         tinymce5: '>=0.0.0'
+        tinymce: '<8.8.0'
 
 installer_ignore:
     - .github
