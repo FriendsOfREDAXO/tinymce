@@ -976,24 +976,33 @@ const setup = (editor: Editor, _url: string): void => {
             const useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
             const imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
 
-            // Update the image src and reset dimensions to natural size
+            // Get current config to know which classes to remove
+            const config = getConfig();
+            const figure = getFigureWrap(img);
+            
+            // Remove all preset classes (width, align, effects) to reset to original
+            if (figure) {
+              stripPresetClasses(figure, config.widthPresets);
+              stripPresetClasses(figure, config.alignPresets);
+              stripPresetClasses(figure, config.effectPresets);
+              // Also remove any legacy CKE5 classes
+              stripCke5LegacyClasses(figure);
+              // Remove all attributes/styles
+              if (figure.classList.length === 0) figure.removeAttribute('class');
+            }
+            
+            // Remove old inline dimensions from img
+            img.removeAttribute('width');
+            img.removeAttribute('height');
+            img.style.removeProperty('width');
+            img.style.removeProperty('height');
+            if (img.getAttribute('style') === '') img.removeAttribute('style');
+            
+            // Update the image src with new image
             img.setAttribute('src', imagePath);
             
-            // Wait for image to load to get natural dimensions
+            // Wait for image to load, then update editor
             const onImageLoad = () => {
-              const naturalWidth = (img as any).naturalWidth;
-              const naturalHeight = (img as any).naturalHeight;
-              
-              if (naturalWidth && naturalHeight) {
-                // Set width and height attributes to natural dimensions
-                img.setAttribute('width', String(naturalWidth));
-                img.setAttribute('height', String(naturalHeight));
-              } else {
-                // If natural dimensions unavailable, remove old dimensions
-                img.removeAttribute('width');
-                img.removeAttribute('height');
-              }
-              
               img.removeEventListener('load', onImageLoad);
               img.removeEventListener('error', onImageError);
               editor.nodeChanged();
@@ -1001,9 +1010,6 @@ const setup = (editor: Editor, _url: string): void => {
             };
             
             const onImageError = () => {
-              // If image fails to load, remove dimensions
-              img.removeAttribute('width');
-              img.removeAttribute('height');
               img.removeEventListener('load', onImageLoad);
               img.removeEventListener('error', onImageError);
               editor.nodeChanged();
