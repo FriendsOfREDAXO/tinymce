@@ -3,81 +3,7 @@
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
 use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
 use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
-
-/**
- * TinyMCE-8 profile fixer logic for common manual/profile-string mistakes.
- *
- * @return array{profile: string, changes: list<string>}
- */
-function tinymce_fix_profile_for_v8(string $profile): array
-{
-    $result = $profile;
-    $changes = [];
-
-    // Only add license_key if it doesn't already exist
-    if ('' !== $result && strpos($result, 'license_key:') === false) {
-        $result = "license_key: 'gpl',\r\n" . $result;
-        $changes[] = 'Added GPL license key';
-    }
-
-    if ('' !== $result) {
-        $templatePatterns = [
-            '/media template codesample/' => 'media codesample',
-            '/link template codesample/' => 'link codesample',
-            '/codesample template fontsize/' => 'codesample fontsize',
-            '/, template,/' => ', ',
-            '/, template\'/' => "'",
-            '/\'template, /' => "'",
-            '/template\s+codesample/' => 'codesample',
-            '/codesample\s+template/' => 'codesample',
-        ];
-        foreach ($templatePatterns as $pattern => $replacement) {
-            if (preg_match($pattern, $result)) {
-                $result = (string) preg_replace($pattern, $replacement, $result);
-                if (!in_array('Removed template plugin', $changes, true)) {
-                    $changes[] = 'Removed template plugin';
-                }
-            }
-        }
-    }
-
-    // Fix external_plugins paths - ensure absolute paths (starting with /)
-    if ('' !== $result && preg_match('/external_plugins:\s*\{/', $result)) {
-        // Fix relative paths like "assets/addons/..." to "/assets/addons/..."
-        $result = (string) preg_replace(
-            '/"(assets\/addons\/)/',
-            '"/assets/addons/',
-            $result
-        );
-        // Fix escaped relative paths like "..\/assets\/addons\/..." to "/assets/addons/..."
-        $result = (string) preg_replace(
-            '/"(?:\.\.\\\\\/)+assets\\\\\/addons\\\\\//',
-            '"/assets/addons/',
-            $result
-        );
-        // Fix unescaped relative paths like "../assets/addons/..." to "/assets/addons/..."
-        $result = (string) preg_replace(
-            '/"(?:\.\.\/)+assets\/addons\//',
-            '"/assets/addons/',
-            $result
-        );
-        if ($result !== $profile) {
-            $changes[] = 'Fixed external_plugins paths to absolute URLs';
-        }
-    }
-
-    // Fix content_css for proper dark mode support if needed
-    if ('' !== $result && preg_match('/content_css:\s*redaxo\.theme\.current\s*===\s"dark"\s*\?\s*"[^\"]+"\s*:\s*"light"/', $result)) {
-        $result = (string) preg_replace(
-            '/content_css:\s*redaxo\.theme\.current\s*===\s"dark"\s*\?\s*"([^\"]+)"\s*:\s*"light"/',
-            'content_css: redaxo.theme.current === "dark" ? "$1" : "default"',
-            $result
-        );
-        $changes[] = 'Fixed content_css for dark mode';
-    }
-
-    return ['profile' => $result, 'changes' => array_values($changes)];
-}
+use FriendsOfRedaxo\TinyMce\Utils\ProfileFixer;
 
 // Simple admin page to inspect and repair TinyMCE-8 profile definitions.
 $func = rex_request('func', 'string');
@@ -103,7 +29,7 @@ if ('repair' === $func && $id > 0) {
     $profile = $sql->getArray();
     if (!empty($profile)) {
         $profile = $profile[0];
-        $result = tinymce_fix_profile_for_v8((string)$profile['profile']);
+        $result = ProfileFixer::fixProfile((string)$profile['profile']);
         if (!empty($result['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
@@ -134,7 +60,7 @@ if ('repair_all' === $func) {
     $profiles = $sql->getArray();
     $count = 0;
     foreach ($profiles as $p) {
-        $res = tinymce_fix_profile_for_v8((string)$p['profile']);
+        $res = ProfileFixer::fixProfile((string)$p['profile']);
         if (!empty($res['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
@@ -190,7 +116,7 @@ $content .= '</form>';
 $content .= '<div id="tinymce-migration-accordion" class="panel-group">';
 foreach ($profiles as $p) {
     $panelId = 'tinymce-profile-' . $p['id'];
-    $res = tinymce_fix_profile_for_v8((string)$p['profile']);
+    $res = ProfileFixer::fixProfile((string)$p['profile']);
     $needs = !empty($res['changes']);
 
     $statusBadge = $needs ? '<span class="label label-warning">' . rex_i18n::msg('tinymce_migration_needs_fix') . '</span>' : '<span class="label label-success">' . rex_i18n::msg('tinymce_migration_ok') . '</span>';

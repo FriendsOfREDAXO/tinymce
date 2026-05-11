@@ -20,9 +20,9 @@ final class DefaultProfiles
 
     /**
      * Returns an array of default profile definitions.
-     * Each entry has: name, description, extra.
+     * Each entry has: name, description, profile.
      *
-     * @return list<array{name: string, description: string, extra: string}>
+     * @return list<array{name: string, description: string, profile: string}>
      */
     public static function getDefaults(): array
     {
