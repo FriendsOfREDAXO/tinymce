@@ -504,8 +504,8 @@ const setup = (editor: Editor, _url: string): void => {
   editor.ui.registry.addIcon('for_imageswappool_icon',
     '<svg width="24" height="24" viewBox="0 0 24 24">' +
     '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M3 12l4-4m0 0l4 4m-4-4h10a2 2 0 0 1 2 2v2"/>' +
-    '<path d="M21 12l-4 4m0 0l-4-4m4 4H11a2 2 0 0 0-2-2v-2"/>' +
+    '<path d="M16 8H6m0 0l4-4m-4 4l4 4"/>' +
+    '<path d="M8 16h10m0 0l-4-4m4 4l-4 4"/>' +
     '</g></svg>'
   );
 
