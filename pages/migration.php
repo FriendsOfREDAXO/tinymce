@@ -5,6 +5,78 @@ use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
 use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 
 /**
+ * Detect sync issue: returns array with 'plugins_extra', 'toolbar_extra',
+ * 'plugins_col', 'toolbar_col' and 'needs_sync' (bool).
+ *
+ * @param array{id: mixed, name: mixed, extra: mixed, plugins: mixed, toolbar: mixed} $profile
+ * @return array{plugins_extra: string, toolbar_extra: string, plugins_col: string, toolbar_col: string, needs_sync: bool}
+ */
+function tinymce_sync_detect(array $profile): array
+{
+    $extra = (string) $profile['extra'];
+    $pluginsCol = (string) $profile['plugins'];
+    $toolbarCol = (string) $profile['toolbar'];
+
+    $pluginsExtra = '';
+    $toolbarExtra = '';
+
+    // Extract plugins from extra (string syntax: plugins: 'a b c')
+    if (preg_match('/(?:^|[,\{\r\n])\s*plugins\s*:\s*(["\'])([^"\']*)\1/mi', $extra, $m) === 1) {
+        $pluginsExtra = trim($m[2]);
+    }
+    // Extract plugins from extra (array syntax: plugins: ['a', 'b'])
+    if ('' === $pluginsExtra && preg_match('/(?:^|[,\{\r\n])\s*plugins\s*:\s*\[([^\]]*)\]/mi', $extra, $m) === 1) {
+        // Flatten array entries to space-separated string for comparison
+        preg_match_all('/["\']([^"\']+)["\']/', $m[1], $items);
+        $pluginsExtra = implode(' ', $items[1]);
+    }
+
+    // Extract toolbar from extra (string syntax: toolbar: 'bold italic ...')
+    if (preg_match('/(?:^|[,\{\r\n])\s*toolbar\s*:\s*(["\'])([^"\']*)\1/mi', $extra, $m) === 1) {
+        $toolbarExtra = trim($m[2]);
+    }
+
+    // Needs sync when extra has a value that differs from the legacy column
+    $pluginsNeedsSync = '' !== $pluginsExtra && $pluginsExtra !== $pluginsCol;
+    $toolbarNeedsSync = '' !== $toolbarExtra && $toolbarExtra !== $toolbarCol;
+
+    return [
+        'plugins_extra' => $pluginsExtra,
+        'toolbar_extra' => $toolbarExtra,
+        'plugins_col' => $pluginsCol,
+        'toolbar_col' => $toolbarCol,
+        'needs_sync' => $pluginsNeedsSync || $toolbarNeedsSync,
+    ];
+}
+
+/**
+ * Perform sync: write values from extra into legacy columns.
+ *
+ * @param array{id: mixed, name: mixed, extra: mixed, plugins: mixed, toolbar: mixed} $profile
+ * @param array{plugins_extra: string, toolbar_extra: string, plugins_col: string, toolbar_col: string, needs_sync: bool} $detected
+ */
+function tinymce_sync_repair(array $profile, array $detected, string $profileTable): bool
+{
+    if (!$detected['needs_sync']) {
+        return false;
+    }
+
+    $update = rex_sql::factory();
+    $update->setTable($profileTable);
+    $update->setWhere(['id' => (int) $profile['id']]);
+
+    if ('' !== $detected['plugins_extra'] && $detected['plugins_extra'] !== $detected['plugins_col']) {
+        $update->setValue('plugins', $detected['plugins_extra']);
+    }
+    if ('' !== $detected['toolbar_extra'] && $detected['toolbar_extra'] !== $detected['toolbar_col']) {
+        $update->setValue('toolbar', $detected['toolbar_extra']);
+    }
+
+    $update->update();
+    return true;
+}
+
+/**
  * Inline migration logic (avoid adding new classes required by updates/install).
  * Returns array with 'extra' => string and 'changes' => array of change descriptions.
  *
@@ -77,7 +149,7 @@ function tinymce_migrate_extra(string $extra): array
         $changes[] = 'Fixed content_css for dark mode';
     }
 
-    return ['extra' => $result, 'changes' => $changes];
+    return ['extra' => $result, 'changes' => array_values($changes)];
 }
 
 // Simple admin page to inspect and repair old profiles.
@@ -156,6 +228,50 @@ if ('reset_default_profiles' === $func) {
     }
 }
 
+if ('sync_repair' === $func && $id > 0) {
+    $sql = rex_sql::factory();
+    $sql->setQuery('SELECT id, name, extra, plugins, toolbar FROM ' . $profileTable . ' WHERE id = ?', [$id]);
+    /** @var array<array{id: mixed, name: mixed, extra: mixed, plugins: mixed, toolbar: mixed}> $rows */
+    $rows = $sql->getArray();
+    if (!empty($rows)) {
+        $profile = $rows[0];
+        $detected = tinymce_sync_detect($profile);
+        if (tinymce_sync_repair($profile, $detected, $profileTable)) {
+            try {
+                TinyMceProfilesCreator::profilesCreate();
+            } catch (rex_functional_exception $e) {
+                // ignore
+            }
+            rex_logger::factory()->log('info', 'TinyMCE: Synchronised legacy columns for profile "' . (string) $profile['name'] . '" via migration page.');
+            echo rex_view::success(rex_i18n::msg('tinymce_sync_repaired', (string) $profile['name']));
+        } else {
+            echo rex_view::info(rex_i18n::msg('tinymce_sync_no_changes', (string) $profile['name']));
+        }
+    }
+}
+
+if ('sync_repair_all' === $func) {
+    $sql = rex_sql::factory();
+    $sql->setQuery('SELECT id, name, extra, plugins, toolbar FROM ' . $profileTable);
+    /** @var array<array{id: mixed, name: mixed, extra: mixed, plugins: mixed, toolbar: mixed}> $allProfiles */
+    $allProfiles = $sql->getArray();
+    $count = 0;
+    foreach ($allProfiles as $profile) {
+        $detected = tinymce_sync_detect($profile);
+        if (tinymce_sync_repair($profile, $detected, $profileTable)) {
+            $count++;
+        }
+    }
+    if ($count > 0) {
+        try {
+            TinyMceProfilesCreator::profilesCreate();
+        } catch (rex_functional_exception $e) {
+            // ignore
+        }
+    }
+    echo rex_view::success(rex_i18n::msg('tinymce_sync_repaired_count', $count));
+}
+
 $profiles = TinyMceDatabaseHandler::getAllProfiles() ?: [];
 
 // action buttons (repair all)
@@ -204,6 +320,70 @@ $fragment->setVar('title', rex_i18n::msg('tinymce_migration_title'));
 $fragment->setVar('class', 'edit', false);
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
+
+// =============================================================================
+// Section: Plugin-/Toolbar-Spalten synchronisieren (Issue #166)
+// =============================================================================
+$syncRepairAllUrl = rex_url::backendPage('tinymce/migration', ['func' => 'sync_repair_all']);
+$syncBody = '<p>' . rex_i18n::msg('tinymce_sync_description') . '</p>';
+$syncBody .= '<p><a class="btn btn-sm btn-primary" href="' . $syncRepairAllUrl . '" data-confirm="' . rex_i18n::msg('tinymce_sync_repair_all_confirm') . '">' . rex_i18n::msg('tinymce_sync_repair_all') . '</a></p>';
+
+$syncBody .= '<div id="tinymce-sync-accordion" class="panel-group">';
+foreach ($profiles as $sp) {
+    /** @var array{id: mixed, name: mixed, extra: mixed, plugins: mixed, toolbar: mixed} $sp */
+    $syncDetected = tinymce_sync_detect($sp);
+    $syncPanelId = 'tinymce-sync-profile-' . (int) $sp['id'];
+    $syncNeedsFix = $syncDetected['needs_sync'];
+
+    $syncBadge = $syncNeedsFix
+        ? '<span class="label label-warning">' . rex_i18n::msg('tinymce_sync_needs_fix') . '</span>'
+        : '<span class="label label-success">' . rex_i18n::msg('tinymce_sync_ok') . '</span>';
+
+    $syncRepairUrl = rex_url::backendPage('tinymce/migration', ['func' => 'sync_repair', 'id' => (int) $sp['id']]);
+
+    $syncBody .= '<div class="panel panel-default">';
+    $syncBody .= '<div class="panel-heading"><h4 class="panel-title">';
+    $syncBody .= '<a class="collapsed" data-toggle="collapse" href="#' . $syncPanelId . '">';
+    $syncBody .= '<strong>' . rex_escape((string) $sp['name']) . '</strong> <small class="text-muted">#' . (int) $sp['id'] . '</small> ' . $syncBadge;
+    $syncBody .= '</a></h4></div>';
+
+    $syncBody .= '<div id="' . $syncPanelId . '" class="panel-collapse collapse">';
+    $syncBody .= '<div class="panel-body">';
+
+    if ($syncNeedsFix) {
+        $syncBody .= '<table class="table table-condensed" style="font-family:monospace">';
+        $syncBody .= '<thead><tr><th></th><th>extra</th><th>DB-Spalte</th></tr></thead><tbody>';
+
+        $pluginsMatch = $syncDetected['plugins_extra'] === $syncDetected['plugins_col'];
+        $toolbarMatch = $syncDetected['toolbar_extra'] === $syncDetected['toolbar_col'];
+
+        $syncBody .= '<tr class="' . ($pluginsMatch ? '' : 'warning') . '">';
+        $syncBody .= '<th>plugins</th>';
+        $syncBody .= '<td>' . rex_escape($syncDetected['plugins_extra']) . '</td>';
+        $syncBody .= '<td>' . rex_escape($syncDetected['plugins_col']) . '</td>';
+        $syncBody .= '</tr>';
+
+        $syncBody .= '<tr class="' . ($toolbarMatch ? '' : 'warning') . '">';
+        $syncBody .= '<th>toolbar</th>';
+        $syncBody .= '<td>' . rex_escape($syncDetected['toolbar_extra']) . '</td>';
+        $syncBody .= '<td>' . rex_escape($syncDetected['toolbar_col']) . '</td>';
+        $syncBody .= '</tr>';
+
+        $syncBody .= '</tbody></table>';
+        $syncBody .= '<a class="btn btn-sm btn-primary" href="' . $syncRepairUrl . '">' . rex_i18n::msg('tinymce_sync_repair') . '</a>';
+    } else {
+        $syncBody .= '<p class="text-muted">' . rex_i18n::msg('tinymce_sync_ok') . '</p>';
+    }
+
+    $syncBody .= '</div></div></div>'; // panel-body, collapse, panel
+}
+$syncBody .= '</div>'; // accordion
+
+$syncFragment = new rex_fragment();
+$syncFragment->setVar('title', rex_i18n::msg('tinymce_sync_title'));
+$syncFragment->setVar('class', 'edit', false);
+$syncFragment->setVar('body', $syncBody, false);
+echo $syncFragment->parse('core/page/section.php');
 
 // =============================================================================
 // Section: Standardprofile zurücksetzen

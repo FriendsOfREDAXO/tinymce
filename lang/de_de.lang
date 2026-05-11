@@ -347,3 +347,14 @@ tinymce_load_failed = Konfiguration konnte nicht ausgelesen werden. Bitte manuel
 tinymce_custom_menu_items = Custom-Plugin-Einträge
 tinymce_for_plugins_hint = FriendsOfREDAXO-eigene Plugins – hervorgehoben
 tinymce_addon_plugins_hint = Plugins aus externen AddOns – hervorgehoben
+
+tinymce_sync_title = Plugin-/Toolbar-Spalten synchronisieren
+tinymce_sync_description = Prüft, ob die Legacy-Datenbankspalten „plugins" und „toolbar" mit den Werten in der „extra"-Konfiguration übereinstimmen. Abweichungen entstehen, wenn Profile über den Assistenten gespeichert wurden, der alles in „extra" ablegt. Dies behebt z. B. das Problem, dass die Quickbar-Anpassung immer auf Standardwerte zurückfällt.
+tinymce_sync_needs_fix = Spalten nicht synchron
+tinymce_sync_ok = Synchron
+tinymce_sync_repair = Synchronisieren
+tinymce_sync_repair_all = Alle synchronisieren
+tinymce_sync_repair_all_confirm = Alle Profile synchronisieren? Dies kann nicht rückgängig gemacht werden.
+tinymce_sync_repaired = Profil "%s" wurde synchronisiert.
+tinymce_sync_no_changes = Profil "%s" benötigt keine Synchronisation.
+tinymce_sync_repaired_count = %s Profil(e) wurden synchronisiert.
