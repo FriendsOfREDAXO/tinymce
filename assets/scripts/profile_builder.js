@@ -154,7 +154,7 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.context_items || 'Context Toolbar (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
     settingsHtml += '<div class="builder-context-picker"><div class="builder-context-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen.') + '</div></div>';
     settingsHtml += '<div class="builder-context-pill-dropzone">';
-    settingsHtml += '<ul class="builder-context-pill-list list-inline" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
+    settingsHtml += '<ul class="builder-context-pill-list" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
     settingsHtml += '<div class="builder-context-inline-picker">';
     settingsHtml += '<input type="text" class="form-control input-sm builder-context-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
     settingsHtml += '<div class="builder-context-inline-picker-list"></div>';
@@ -169,7 +169,7 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.insert_items || 'Insert Menu Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
     settingsHtml += '<div class="builder-insert-picker"><div class="builder-insert-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen.') + '</div></div>';
     settingsHtml += '<div class="builder-insert-pill-dropzone">';
-    settingsHtml += '<ul class="builder-insert-pill-list list-inline" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
+    settingsHtml += '<ul class="builder-insert-pill-list" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
     settingsHtml += '<div class="builder-insert-inline-picker">';
     settingsHtml += '<input type="text" class="form-control input-sm builder-insert-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
     settingsHtml += '<div class="builder-insert-inline-picker-list"></div>';
@@ -640,7 +640,14 @@ function initTinyMceProfileAssistant() {
             padding: 8px;
             cursor: pointer;
         }
-        .builder-context-pill-list,
+        .builder-context-pill-list {
+            min-height: 42px;
+            border: 1px dashed var(--tpa-dropzone-border);
+            background: var(--tpa-dropzone-bg);
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+        }
         .builder-insert-pill-list {
             min-height: 42px;
             border: 1px dashed var(--tpa-dropzone-border);
