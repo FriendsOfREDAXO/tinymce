@@ -298,6 +298,7 @@ if ('' === $func) {
     // Add import / export ui above the list
     $exportAllUrl = rex_url::backendPage('tinymce/profiles', ['func' => 'export_all']);
     $importUrl = rex_url::backendPage('tinymce/profiles', ['func' => 'import']);
+    $profileFixerUrl = rex_url::backendPage('tinymce/migration');
     $importForm = '<form action="' . $importUrl . '" method="post" enctype="multipart/form-data" style="display:inline-block;margin-right:10px;">'
         . '<label class="control-label">' . rex_i18n::msg('tinymce_profile_import') . '</label> '
         . '<input type="file" name="profiles_file" accept="application/json" style="display:inline-block;margin-left:8px;margin-right:8px;" />'
@@ -307,6 +308,11 @@ if ('' === $func) {
         . '</form>';
 
     $message .= '<p style="margin-bottom:12px;">' . $importForm . ' <a class="btn btn-sm btn-primary" href="' . $exportAllUrl . '">' . rex_i18n::msg('tinymce_profile_export_all') . '</a></p>';
+    $message .= '<div class="alert alert-warning" style="margin-bottom:12px;">'
+        . '<strong>Bei Problemen mit Profilen?</strong> '
+        . 'Nutze den Profil-Fixer für TinyMCE-8-Kompatibilität und Standardprofil-Reset. '
+        . '<a class="btn btn-xs btn-warning" style="margin-left:8px;" href="' . $profileFixerUrl . '">' . rex_i18n::msg('tinymce_migration_title') . '</a>'
+        . '</div>';
     $list = rex_list::factory("SELECT id, name, description FROM $profileTable ORDER BY id");
     $list->addTableAttribute('class', 'table-striped');
 

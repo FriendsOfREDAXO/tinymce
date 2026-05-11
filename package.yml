@@ -22,6 +22,7 @@ page:
         migration:
             title: 'translate:migration'
             subPath: pages/profile_fixer.php
+            hidden: true
         help:
             title: 'translate:help'
             subPath: README.md
