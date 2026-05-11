@@ -308,11 +308,10 @@ if ('' === $func) {
         . '</form>';
 
     $message .= '<p style="margin-bottom:12px;">' . $importForm . ' <a class="btn btn-sm btn-primary" href="' . $exportAllUrl . '">' . rex_i18n::msg('tinymce_profile_export_all') . '</a></p>';
-    $message .= '<div class="alert alert-warning" style="margin-bottom:12px;">'
-        . '<strong>Bei Problemen mit Profilen?</strong> '
-        . 'Nutze den Profil-Fixer für TinyMCE-8-Kompatibilität und Standardprofil-Reset. '
-        . '<a class="btn btn-xs btn-warning" style="margin-left:8px;" href="' . $profileFixerUrl . '">' . rex_i18n::msg('tinymce_migration_title') . '</a>'
-        . '</div>';
+    $message .= '<p class="text-muted" style="margin-bottom:12px;">'
+        . 'Bei Problemen mit Profilen: '
+        . '<a class="btn btn-xs btn-default" style="margin-left:8px;" href="' . $profileFixerUrl . '">' . rex_i18n::msg('tinymce_migration_title') . '</a>'
+        . '</p>';
     $list = rex_list::factory("SELECT id, name, description FROM $profileTable ORDER BY id");
     $list->addTableAttribute('class', 'table-striped');
 
