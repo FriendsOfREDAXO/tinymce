@@ -16,8 +16,6 @@ class ProfileHelper
      * @var array<int, string>
      */
     private const IMPORTABLE_FIELDS = [
-        'plugins',
-        'toolbar',
         'extra',
         'mediatype',
         'mediapath',
@@ -30,7 +28,7 @@ class ProfileHelper
      *
      * @param string $name The unique name of the profile
      * @param string $description A description for the profile
-     * @param array<string, mixed> $data Configuration data (plugins, toolbar, extra, etc.)
+     * @param array<string, mixed> $data Configuration data (extra, etc.)
      * @param bool $forceUpdate If true, overwrites existing profile data
      * @return bool True if created or updated, false if it already existed and forceUpdate was false
      * @throws rex_sql_exception
@@ -52,10 +50,8 @@ class ProfileHelper
         $sql->setValue('name', $name);
         $sql->setValue('description', $description);
 
-        // Default values
+        // Default values (extra is the single source of truth for profile config)
         $defaults = [
-            'plugins' => 'autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table wordcount',
-            'toolbar' => 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
             'extra' => '',
             'mediatype' => '',
             'mediapath' => '',

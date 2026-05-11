@@ -344,13 +344,7 @@ tinymce_custom_menu_items = Custom plugin items
 tinymce_for_plugins_hint = FriendsOfREDAXO exclusive plugins – highlighted
 tinymce_addon_plugins_hint = Plugins from external AddOns – highlighted
 
-tinymce_sync_title = Synchronise plugin/toolbar columns
-tinymce_sync_description = Checks whether the legacy database columns "plugins" and "toolbar" match the values in the "extra" configuration. Mismatches occur when profiles were saved via the assistant, which stores everything in "extra". This also fixes the issue where quickbar customizations always reset to defaults.
-tinymce_sync_needs_fix = Columns out of sync
-tinymce_sync_ok = In sync
-tinymce_sync_repair = Synchronise
-tinymce_sync_repair_all = Synchronise all
-tinymce_sync_repair_all_confirm = Synchronise all profiles? This cannot be undone.
-tinymce_sync_repaired = Profile "%s" was synchronised.
-tinymce_sync_no_changes = Profile "%s" did not need synchronisation.
-tinymce_sync_repaired_count = %s profile(s) were synchronised.
+tinymce_profile_restore_info = Last saved version available.
+tinymce_profile_restore = Restore last version
+tinymce_profile_restore_confirm = Restore last version? The current configuration will be saved as the new backup.
+tinymce_profile_restored = Last version of profile "%s" was restored.

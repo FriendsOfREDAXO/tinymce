@@ -131,7 +131,6 @@ const tinyprofiles = $profiles;
         $jsonProfile = [];
         if (!empty($profile['extra'])) {
             $extra = (string) $profile['extra'];
-            $plugins = (string) ($profile['plugins'] ?? '');
             $addonAssetBase = AssetUrl::getTinyAssetBaseUrl();
             $addonAssetBaseEscaped = str_replace('/', '\\/', $addonAssetBase);
 
@@ -145,7 +144,7 @@ const tinyprofiles = $profiles;
             $extra = str_replace('"assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
             $extra = str_replace('"..\\/assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
 
-            if (!self::profileHasPlugin('quickbars', $plugins, $extra)) {
+            if (!self::profileHasPlugin('quickbars', $extra)) {
                 $sanitized = preg_replace('/^\s*quickbars_(?:selection|insert|image)_toolbar\s*:\s*[^,\r\n]+,\s*$/mi', '', $extra);
                 if (is_string($sanitized)) {
                     $extra = $sanitized;
@@ -157,26 +156,25 @@ const tinyprofiles = $profiles;
         return $jsonProfile;
     }
 
-    private static function profileHasPlugin(string $plugin, string $legacyPlugins, string $extra): bool
+    /**
+     * Checks whether a plugin is active by scanning the `extra` config block.
+     * Supports both string syntax (`plugins: 'a b c'`) and array syntax
+     * (`plugins: ['a', 'b', 'c']`).
+     */
+    private static function profileHasPlugin(string $plugin, string $extra): bool
     {
         $pluginPattern = '/(^|\s)' . preg_quote($plugin, '/') . '(\s|$)/';
 
-        if (preg_match($pluginPattern, $legacyPlugins) === 1) {
-            return true;
-        }
-
-        // Assistant-generated profiles keep plugins in `extra` as: plugins: 'a b c'.
+        // String syntax: plugins: 'a b quickbars'
         if (preg_match('/(?:^|[,\{\r\n])\s*plugins\s*:\s*(["\'])([^"\']*)\1/mi', $extra, $stringMatch) === 1) {
-            $pluginsString = $stringMatch[2];
-            if (preg_match($pluginPattern, $pluginsString) === 1) {
+            if (preg_match($pluginPattern, $stringMatch[2]) === 1) {
                 return true;
             }
         }
 
-        // Also support array syntax: plugins: ['a', 'b', 'quickbars'].
+        // Array syntax: plugins: ['a', 'b', 'quickbars']
         if (preg_match('/(?:^|[,\{\r\n])\s*plugins\s*:\s*\[([^\]]*)\]/mi', $extra, $arrayMatch) === 1) {
-            $pluginsArrayBody = $arrayMatch[1];
-            if (preg_match('/(["\'])' . preg_quote($plugin, '/') . '\\1/', $pluginsArrayBody) === 1) {
+            if (preg_match('/(["\'])' . preg_quote($plugin, '/') . '\\1/', $arrayMatch[1]) === 1) {
                 return true;
             }
         }

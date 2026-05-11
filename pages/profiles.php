@@ -11,6 +11,38 @@ $send = rex_request::request('send', 'boolean', false);
 $profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
 $message = '';
 
+// =============================================================================
+// Handle: Backup wiederherstellen
+// =============================================================================
+if ('restore_backup' === $func && $id > 0) {
+    $restoreSql = rex_sql::factory();
+    $restoreSql->setTable($profileTable);
+    $restoreSql->setWhere(['id' => $id]);
+    $restoreSql->select('name, extra, profile_backup');
+    if ($restoreSql->getRows() > 0) {
+        $currentExtra = (string) $restoreSql->getValue('extra');
+        $backupExtra = (string) $restoreSql->getValue('profile_backup');
+        $profileName = (string) $restoreSql->getValue('name');
+        if ('' !== $backupExtra) {
+            $updSql = rex_sql::factory();
+            $updSql->setTable($profileTable);
+            $updSql->setWhere(['id' => $id]);
+            $updSql->setValue('extra', $backupExtra);
+            $updSql->setValue('profile_backup', $currentExtra);
+            $updSql->setValue('updatedate', date('Y-m-d H:i:s'));
+            $updSql->setValue('updateuser', rex::getUser() ? rex::getUser()->getLogin() : 'restore');
+            $updSql->update();
+            try {
+                \FriendsOfRedaxo\TinyMce\Creator\Profiles::profilesCreate();
+            } catch (\rex_functional_exception $e) {
+                // non-fatal, profiles will be regenerated on next page load
+            }
+            echo rex_view::success(sprintf(rex_i18n::msg('tinymce_profile_restored'), rex_escape($profileName)));
+        }
+    }
+    $func = 'edit';
+}
+
 // Export single profile or all profiles as JSON
 if ('export' === $func && $id > 0) {
     $sql = rex_sql::factory();
@@ -426,7 +458,41 @@ if ('' === $func) {
     $field->setAttribute('class', 'form-control tinymce-options');
     $field->setLabel(rex_i18n::msg('tinymce_extra_definition'));
 
-    $content = '<div class="tinymce_profile_edit">' . $form->get() . '</div>';
+    // Read current extra + backup for inject + restore UI
+    $currentExtra = '';
+    $profileBackup = '';
+    if ('edit' === $func && $id > 0) {
+        $backupReadSql = rex_sql::factory();
+        $backupReadSql->setTable($profileTable);
+        $backupReadSql->setWhere(['id' => $id]);
+        $backupReadSql->select('extra, profile_backup');
+        if ($backupReadSql->getRows() > 0) {
+            $currentExtra = (string) $backupReadSql->getValue('extra');
+            $profileBackup = (string) $backupReadSql->getValue('profile_backup');
+        }
+    }
+
+    $formHtml = $form->get();
+
+    // Inject current extra as hidden field so REX_FORM_SAVED EP can save it as profile_backup
+    $hiddenBackupInput = '<input type="hidden" name="tinymce_profile_backup_value" value="' . htmlspecialchars($currentExtra, ENT_QUOTES, 'UTF-8') . '">';
+    $formHtml = str_replace('</form>', $hiddenBackupInput . '</form>', $formHtml);
+
+    // Show restore panel if a backup is available
+    $restoreHtml = '';
+    if ('edit' === $func && '' !== $profileBackup) {
+        $restoreUrl = rex_url::backendPage('tinymce/profiles', ['func' => 'restore_backup', 'id' => $id, 'start' => $start]);
+        $restoreHtml = '<div class="alert alert-info" style="margin-top:12px;">'
+            . '<i class="rex-icon fa-history"></i> '
+            . rex_i18n::msg('tinymce_profile_restore_info')
+            . ' <a class="btn btn-xs btn-warning" href="' . $restoreUrl . '" data-confirm="' . rex_escape(rex_i18n::msg('tinymce_profile_restore_confirm')) . '">'
+            . '<i class="rex-icon fa-undo"></i> '
+            . rex_i18n::msg('tinymce_profile_restore')
+            . '</a>'
+            . '</div>';
+    }
+
+    $content = '<div class="tinymce_profile_edit">' . $formHtml . $restoreHtml . '</div>';
 
     $fragment = new rex_fragment();
     $fragment->setVar('class', 'edit', false);

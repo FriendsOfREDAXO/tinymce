@@ -27,112 +27,102 @@ if (rex_string::versionCompare($this->getVersion(), '8.8.0', '<')) {
 // =============================================================================
 // Migration: TinyMCE 5 legacy plugins entfernen (v8.7.0)
 // =============================================================================
-// Plugins, die in TinyMCE 5 vorhanden waren, in v6/v7/v8 aber entfernt oder
-// umbenannt wurden. Stehen diese noch in der Profil-Datenbank, versucht TinyMCE
-// sie als External-Plugin per URL zu laden → 404 → Editor-Absturz.
-// Diese Liste enthält alle TinyMCE-5-built-ins, die in v8 nicht mehr existieren.
-try {
-    $legacyPlugins = [
-        // TinyMCE 5 → 6 removed
-        'bbcode', 'colorpicker', 'contextmenu', 'fullpage', 'hr', 'legacyoutput',
-        'print', 'spellchecker', 'tabfocus', 'textcolor', 'toc', 'wordcount',
-        // Toolbar-Buttons die mit diesen Plugins kamen
-    ];
-    $legacyToolbarButtons = [
-        'print', 'spellchecker', 'fullpage', 'hr',
-    ];
+// Nur ausführen, wenn die Legacy-Spalten noch existieren (< 8.8.2).
+if (rex_string::versionCompare($this->getVersion(), '8.8.2', '<')) {
+    try {
+        $legacyPlugins = [
+            'bbcode', 'colorpicker', 'contextmenu', 'fullpage', 'hr', 'legacyoutput',
+            'print', 'spellchecker', 'tabfocus', 'textcolor', 'toc', 'wordcount',
+        ];
+        $legacyToolbarButtons = [
+            'print', 'spellchecker', 'fullpage', 'hr',
+        ];
 
-    $sql = rex_sql::factory();
-    $profiles = $sql->getArray('SELECT id, plugins, toolbar FROM ' . rex::getTable('tinymce_profiles'));
+        $sql = rex_sql::factory();
+        $profiles = $sql->getArray('SELECT id, plugins, toolbar FROM ' . rex::getTable('tinymce_profiles'));
 
-    foreach ($profiles as $profile) {
-        $needsUpdate = false;
-        $pluginsList = (string) $profile['plugins'];
-        $toolbar = (string) $profile['toolbar'];
+        foreach ($profiles as $profile) {
+            $needsUpdate = false;
+            $pluginsList = (string) $profile['plugins'];
+            $toolbar = (string) $profile['toolbar'];
 
-        // Remove legacy plugins (space-separated list)
-        $pluginsArray = preg_split('/\s+/', trim($pluginsList));
-        if (is_array($pluginsArray)) {
-            $cleaned = array_values(array_diff($pluginsArray, $legacyPlugins));
-            $newPlugins = implode(' ', $cleaned);
-            if ($newPlugins !== $pluginsList) {
-                $pluginsList = $newPlugins;
-                $needsUpdate = true;
+            $pluginsArray = preg_split('/\s+/', trim($pluginsList));
+            if (is_array($pluginsArray)) {
+                $cleaned = array_values(array_diff($pluginsArray, $legacyPlugins));
+                $newPlugins = implode(' ', $cleaned);
+                if ($newPlugins !== $pluginsList) {
+                    $pluginsList = $newPlugins;
+                    $needsUpdate = true;
+                }
+            }
+
+            $toolbarParts = preg_split('/(\s*\|\s*|\s+)/', $toolbar, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+            if (is_array($toolbarParts)) {
+                $toolbarCleaned = implode(' ', array_filter($toolbarParts, static fn (string $t): bool => !in_array($t, $legacyToolbarButtons, true)));
+                $toolbarCleaned = (string) preg_replace('/(\|\s*){2,}/', '| ', $toolbarCleaned);
+                $toolbarCleaned = trim($toolbarCleaned, " \t\n\r|");
+                if ($toolbarCleaned !== $toolbar) {
+                    $toolbar = $toolbarCleaned;
+                    $needsUpdate = true;
+                }
+            }
+
+            if ($needsUpdate) {
+                $upd = rex_sql::factory();
+                $upd->setTable(rex::getTable('tinymce_profiles'));
+                $upd->setWhere(['id' => (int) $profile['id']]);
+                $upd->setValue('plugins', $pluginsList);
+                $upd->setValue('toolbar', $toolbar);
+                $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+                $upd->update();
             }
         }
-
-        // Remove legacy toolbar buttons
-        $toolbarParts = preg_split('/(\s*\|\s*|\s+)/', $toolbar, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-        if (is_array($toolbarParts)) {
-            $toolbarCleaned = implode(' ', array_filter($toolbarParts, static fn (string $t): bool => !in_array($t, $legacyToolbarButtons, true)));
-            // Normalize multiple separators
-            $toolbarCleaned = (string) preg_replace('/(\|\s*){2,}/', '| ', $toolbarCleaned);
-            $toolbarCleaned = trim($toolbarCleaned, " \t\n\r|");
-            if ($toolbarCleaned !== $toolbar) {
-                $toolbar = $toolbarCleaned;
-                $needsUpdate = true;
-            }
-        }
-
-        if ($needsUpdate) {
-            $upd = rex_sql::factory();
-            $upd->setTable(rex::getTable('tinymce_profiles'));
-            $upd->setWhere(['id' => (int) $profile['id']]);
-            $upd->setValue('plugins', $pluginsList);
-            $upd->setValue('toolbar', $toolbar);
-            $upd->setValue('updatedate', date('Y-m-d H:i:s'));
-            $upd->update();
-        }
+    } catch (rex_sql_exception $e) {
+        // Migration ist best-effort
     }
-} catch (rex_sql_exception $e) {
-    // Migration ist best-effort
 }
 
 // =============================================================================
 // Migration: imagewidth -> for_images (v8.2.0)
 // =============================================================================
-// The imagewidth plugin was renamed to for_images. Update existing profiles.
-try {
-    $sql = rex_sql::factory();
-    $profiles = $sql->getArray('SELECT id, plugins, toolbar, extra FROM ' . rex::getTable('tinymce_profiles'));
+if (rex_string::versionCompare($this->getVersion(), '8.8.2', '<')) {
+    try {
+        $sql = rex_sql::factory();
+        $profiles = $sql->getArray('SELECT id, plugins, toolbar, extra FROM ' . rex::getTable('tinymce_profiles'));
 
-    foreach ($profiles as $profile) {
-        $needsUpdate = false;
-        $plugins = (string) $profile['plugins'];
-        $toolbar = (string) $profile['toolbar'];
-        $extra = (string) $profile['extra'];
+        foreach ($profiles as $profile) {
+            $needsUpdate = false;
+            $plugins = (string) $profile['plugins'];
+            $toolbar = (string) $profile['toolbar'];
+            $extra = (string) $profile['extra'];
 
-        // Replace imagewidth with for_images in plugins list
-        if (str_contains($plugins, 'imagewidth')) {
-            $plugins = str_replace('imagewidth', 'for_images', $plugins);
-            $needsUpdate = true;
+            if (str_contains($plugins, 'imagewidth')) {
+                $plugins = str_replace('imagewidth', 'for_images', $plugins);
+                $needsUpdate = true;
+            }
+            if (str_contains($toolbar, 'imagewidthdialog')) {
+                $toolbar = str_replace('imagewidthdialog', 'for_images', $toolbar);
+                $needsUpdate = true;
+            }
+            if (str_contains($extra, 'imagewidth')) {
+                $extra = str_replace('imagewidth', 'for_images', $extra);
+                $needsUpdate = true;
+            }
+
+            if ($needsUpdate) {
+                $updateSql = rex_sql::factory();
+                $updateSql->setTable(rex::getTable('tinymce_profiles'));
+                $updateSql->setWhere(['id' => (int) $profile['id']]);
+                $updateSql->setValue('plugins', $plugins);
+                $updateSql->setValue('toolbar', $toolbar);
+                $updateSql->setValue('extra', $extra);
+                $updateSql->setValue('updatedate', date('Y-m-d H:i:s'));
+                $updateSql->update();
+            }
         }
-
-        // Replace imagewidthdialog button with for_images in toolbar
-        if (str_contains($toolbar, 'imagewidthdialog')) {
-            $toolbar = str_replace('imagewidthdialog', 'for_images', $toolbar);
-            $needsUpdate = true;
-        }
-
-        // Replace in extra config as well
-        if (str_contains($extra, 'imagewidth')) {
-            $extra = str_replace('imagewidth', 'for_images', $extra);
-            $needsUpdate = true;
-        }
-
-        if ($needsUpdate) {
-            $updateSql = rex_sql::factory();
-            $updateSql->setTable(rex::getTable('tinymce_profiles'));
-            $updateSql->setWhere(['id' => (int) $profile['id']]);
-            $updateSql->setValue('plugins', $plugins);
-            $updateSql->setValue('toolbar', $toolbar);
-            $updateSql->setValue('extra', $extra);
-            $updateSql->setValue('updatedate', date('Y-m-d H:i:s'));
-            $updateSql->update();
-        }
+    } catch (rex_sql_exception $e) {
+        // Ignore errors during migration
     }
-} catch (rex_sql_exception $e) {
-    // Ignore errors during migration
 }
 
 // =============================================================================
@@ -169,94 +159,73 @@ try {
 }
 
 // =============================================================================
-// Migration: Legacy-Spalten (plugins/toolbar) mit extra synchronisieren (v8.8.1)
+// Migration: Legacy-Spalten plugins/toolbar → extra migrieren und droppen (v8.8.2)
 // =============================================================================
-// Historisch lagen plugins/toolbar in eigenen DB-Spalten. Der Profile-Assistant
-// schreibt diese Werte inzwischen in `extra`. Beim Update werden beide Quellen
-// abgeglichen, damit alte und neue Profile konsistent sind.
-if (rex_string::versionCompare($this->getVersion(), '8.8.1', '<')) {
+// Ab v8.8.2 wird `extra` als einzige Quelle für die Profilkonfiguration genutzt.
+// Legacy-Spalten plugins/toolbar werden in extra übernommen (sofern extra den
+// jeweiligen Wert noch nicht enthält) und anschließend aus der Datenbank entfernt.
+if (rex_string::versionCompare($this->getVersion(), '8.8.2', '<')) {
     try {
         $extractStringProp = static function (string $extra, string $key): ?string {
             $pattern = '/(?:^|[,\{\r\n])\s*' . preg_quote($key, '/') . '\s*:\s*(["\'])([^"\']*)\1/mi';
             if (preg_match($pattern, $extra, $match) !== 1) {
                 return null;
             }
-
             $value = trim($match[2]);
             return '' === $value ? null : $value;
-        };
-
-        $normalizeTokenList = static function (string $value): string {
-            $parts = preg_split('/\s+/', trim($value));
-            if (!is_array($parts)) {
-                return '';
-            }
-            $parts = array_values(array_filter($parts, static fn (string $v): bool => '' !== trim($v)));
-            return implode(' ', $parts);
         };
 
         $appendStringProp = static function (string $extra, string $key, string $value): string {
             $escaped = str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
             $line = $key . ": '" . $escaped . "',";
-
             $trimmed = trim($extra);
             if ('' === $trimmed) {
                 return $line . "\n";
             }
-
             if (!preg_match('/,\s*$/', $trimmed)) {
                 $trimmed .= ',';
             }
-
             return $trimmed . "\n" . $line . "\n";
         };
 
-        $sql = rex_sql::factory();
-        $profiles = $sql->getArray('SELECT id, plugins, toolbar, extra FROM ' . rex::getTable('tinymce_profiles'));
+        $tableHasPluginsCol = \rex_sql_table::get(rex::getTable('tinymce_profiles'))->hasColumn('plugins');
 
-        foreach ($profiles as $profile) {
-            $needsUpdate = false;
+        if ($tableHasPluginsCol) {
+            $sql = rex_sql::factory();
+            $profiles = $sql->getArray('SELECT id, plugins, toolbar, extra FROM ' . rex::getTable('tinymce_profiles'));
 
-            $legacyPlugins = $normalizeTokenList((string) ($profile['plugins'] ?? ''));
-            $legacyToolbar = trim((string) ($profile['toolbar'] ?? ''));
-            $extra = (string) ($profile['extra'] ?? '');
+            foreach ($profiles as $profile) {
+                $needsUpdate = false;
+                $legacyPlugins = trim((string) ($profile['plugins'] ?? ''));
+                $legacyToolbar = trim((string) ($profile['toolbar'] ?? ''));
+                $extra = (string) ($profile['extra'] ?? '');
 
-            $extraPlugins = $extractStringProp($extra, 'plugins');
-            $extraToolbar = $extractStringProp($extra, 'toolbar');
-
-            // `extra` ist die führende Quelle, wenn dort Werte gesetzt sind.
-            if (null !== $extraPlugins) {
-                $normalizedExtraPlugins = $normalizeTokenList($extraPlugins);
-                if ($normalizedExtraPlugins !== $legacyPlugins) {
-                    $legacyPlugins = $normalizedExtraPlugins;
+                // Merge legacy plugins into extra if extra doesn't define them yet
+                if ('' !== $legacyPlugins && null === $extractStringProp($extra, 'plugins')) {
+                    $extra = $appendStringProp($extra, 'plugins', $legacyPlugins);
                     $needsUpdate = true;
                 }
-            } elseif ('' !== $legacyPlugins) {
-                $extra = $appendStringProp($extra, 'plugins', $legacyPlugins);
-                $needsUpdate = true;
-            }
-
-            if (null !== $extraToolbar) {
-                $normalizedExtraToolbar = trim($extraToolbar);
-                if ($normalizedExtraToolbar !== $legacyToolbar) {
-                    $legacyToolbar = $normalizedExtraToolbar;
+                // Merge legacy toolbar into extra if extra doesn't define it yet
+                if ('' !== $legacyToolbar && null === $extractStringProp($extra, 'toolbar')) {
+                    $extra = $appendStringProp($extra, 'toolbar', $legacyToolbar);
                     $needsUpdate = true;
                 }
-            } elseif ('' !== $legacyToolbar) {
-                $extra = $appendStringProp($extra, 'toolbar', $legacyToolbar);
-                $needsUpdate = true;
+
+                if ($needsUpdate) {
+                    $upd = rex_sql::factory();
+                    $upd->setTable(rex::getTable('tinymce_profiles'));
+                    $upd->setWhere(['id' => (int) $profile['id']]);
+                    $upd->setValue('extra', $extra);
+                    $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+                    $upd->update();
+                }
             }
 
-            if ($needsUpdate) {
-                $upd = rex_sql::factory();
-                $upd->setTable(rex::getTable('tinymce_profiles'));
-                $upd->setWhere(['id' => (int) $profile['id']]);
-                $upd->setValue('plugins', $legacyPlugins);
-                $upd->setValue('toolbar', $legacyToolbar);
-                $upd->setValue('extra', $extra);
-                $upd->setValue('updatedate', date('Y-m-d H:i:s'));
-                $upd->update();
-            }
+            // Drop legacy columns
+            $profileTable = rex::getTable('tinymce_profiles');
+            $dropSql = rex_sql::factory();
+            $dropSql->setQuery('ALTER TABLE ' . $profileTable . ' DROP COLUMN plugins');
+            $dropSql->setQuery('ALTER TABLE ' . $profileTable . ' DROP COLUMN toolbar');
         }
     } catch (rex_sql_exception $e) {
         rex_logger::logException($e);
