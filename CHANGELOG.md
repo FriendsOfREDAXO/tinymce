@@ -4,8 +4,6 @@ Changelog
 Version 8.9.0
 -------------------------------
 
-### Aktueller Stand (kurz)
-
 * Legacy-Spalten `plugins` und `toolbar` wurden entfernt; Profilkonfiguration läuft ohne Spalten-Sync nur noch über eine Quelle.
 * Spalte `extra` wurde nach `profile` umbenannt (inkl. Migration im Update).
 * Import bleibt rückwärtskompatibel: alte JSON-Profile mit `extra` werden beim Import automatisch nach `profile` migriert.
