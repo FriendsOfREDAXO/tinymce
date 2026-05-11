@@ -12,7 +12,7 @@ Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FO
 
 | Plugin | Zweck | Toolbar-Button / Menü-Eintrag |
 |---|---|---|
-| `for_images` | Bilder aus dem REDAXO-Mediapool, feste Breiten-Presets, saubere Save-Formate | `for_images` |
+| `for_images` | Erweiterte Bildbearbeitung als Figure-Workflow (Mediapool-Show/Swap, Presets, Caption) - empfohlen zusammen mit `image` | `for_images` |
 | `for_oembed` | oEmbed-Einbettungen (YouTube, Vimeo, …) mit Vorschau | `for_oembed` |
 | `for_video` | Lokale Videos aus dem Mediapool einbinden (HTML5 `<video>`) | `for_video` |
 | `for_htmlembed` | HTML-Snippets sicher einbetten (iframe-ähnliches Pattern, ohne Inline-Script-Risiken) | `for_htmlembed` |
@@ -39,15 +39,20 @@ Die Plugins ohne `for_`-Präfix (`link_yform`, `phonelink`, `quote`, `cleanpaste
 
 ### `for_images` – Bilder aus dem Mediapool
 
-Ersetzt das Core-Plugin `image` und bietet:
+Ergaenzt das Core-Plugin `image` und bietet:
 
-- **Mediapool-Dialog** mit Vorschau
-- **Image-Width-Presets** aus der Profilkonfiguration (z. B. 25 %, 50 %, 100 %) statt manuellem Pixel-Resize
-- Preset-Klassen als `class="img-25"` o. ä. – keine Inline-Styles
-- `alt`-Attribut-Verwaltung inkl. dekorativer Markierung (`role="presentation"` + leeres `alt`)
-- Automatisches Setzen von `loading="lazy"` und `width`/`height` für CLS-freundliche Ausgabe
+- **Mediapool-Aktionen direkt am Bild:** "Im Medienpool anzeigen" und "Aus Medienpool austauschen".
+- **Image-Width-Presets** aus der Profilkonfiguration (z. B. 25 %, 50 %, 100 %) statt manuellem Pixel-Resize.
+- **Ausrichtungs-Presets und Buttons:** links, rechts, zentriert, keine.
+- **Effekt-Presets:** Schatten, Rundungen, Rahmen (togglebar).
+- **Alt-Text-Workflow:** Dialog + Statusanzeige am Toolbar-Button.
+- **Caption-Workflow:** `figcaption` einfuegen/entfernen/bearbeiten.
+- **Figure-Wrapper statt Inline-Styling:** Preset-Klassen auf `figure`, sauberes Save-Format.
+- **Robustes Tauschverhalten:** Beim Bildtausch werden inkompatible Preset-/Legacy-Klassen entfernt, damit keine Verzerrungen entstehen.
+- **Robustes Block-Verhalten:** Delete/Cut/Copy behandeln Bild + Caption als eine Einheit.
+- **Responsive Klassen-Strategie:** UIkit-, Bootstrap- oder projektindividuelle Presets.
 
-> **Tipp:** Wenn `for_images` im Profil aktiv ist, kann das Core-Plugin `image` aus `plugins` entfernt werden.
+> **Empfehlung:** `for_images` zusammen mit dem nativen `image` Plugin verwenden. `image` bleibt fuer die Basis-Bildfunktionen wichtig, `for_images` liefert den erweiterten Figure- und Mediapool-Workflow.
 
 ### `for_oembed` – oEmbed-Einbettungen
 
@@ -279,13 +284,13 @@ Für **Frontend-CSS-Einbindung** (`for_images.css`, `for_footnotes.css`, `for_ch
 
 ---
 
-## Empfehlung: Core-Plugins ersetzen
+## Empfehlung: Core-Plugins sinnvoll kombinieren
 
-Wenn du die FOR-Varianten nutzt, kannst du folgende Core-Plugins aus dem Profil **entfernen** (bessere Vorschau, konsistente Klassen, saubereres Save-Format):
+Wenn du die FOR-Varianten nutzt, empfiehlt sich folgende Kombination:
 
 | Core | Ersatz durch |
 |---|---|
-| `image` | `for_images` |
+| `image` | `image` + `for_images` (zusammen nutzen) |
 | `media` | `for_oembed` + `for_video` |
 
 ---

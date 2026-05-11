@@ -4,6 +4,13 @@ Stellt den TinyMCE 8 Editor im CMS REDAXO bereit.
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/tinymce/blob/assets/screenshot8.png?raw=true)
 
+## Feature-Highlights
+
+- **for_images + image im Team:** Bilder mit dem nativen `image` Plugin einfuegen und mit `for_images` als Figure-Block weiterbearbeiten (Breiten, Ausrichtung, Effekte, Caption, Alt-Text, Mediapool-Aktionen).
+- **for_oembed / for_video:** Moderne Einbettungen mit stabilen Save-Formaten und Editor-Vorschau.
+- **cleanpaste / mediapaste:** Saubere Paste-Pipeline mit Schutz fuer FOR-Markup und optionalem Medienpool-Upload aus der Zwischenablage.
+- **for_toc / for_footnote / for_a11y:** Inhaltsverzeichnis, Fussnoten und Accessibility-Checks direkt im Editor.
+
 ## Anwendung:
 
 **Moduleingabe**
@@ -209,25 +216,28 @@ So können UIkit-Styles nur im UIkit-Profil erscheinen und Bootstrap-Styles nur 
 - `name`: Eindeutiger interner Name (verhindert Kollisionen)
 - `wrapper`: Bei `true` wird das Element um die Auswahl gewickelt
 
-## FOR Images Plugin (Bildformatierung)
+## FOR Images Plugin (Mediapool + Bildformatierung)
 
-Das `for_images` Plugin bietet umfassende Bildformatierung mit CSS-Framework-Unterstützung.
+Das `for_images` Plugin erweitert die Bildbearbeitung im Editor und ist fuer die gemeinsame Nutzung mit dem nativen `image` Plugin ausgelegt.
 
 ### Features
 
-- **Preset-basierte Breiten:** Keine manuellen Pixel-Eingaben, nur vordefinierte CSS-Klassen
-- **Ausrichtung:** Links, Rechts, Zentriert mit Framework-spezifischen Float-Klassen
-- **Effekte:** Schatten, abgerundete Ecken, Rahmen als toggle-bare Optionen
-- **Bildunterschriften:** Eigener Button zum Hinzufügen/Entfernen von Captions
-- **Alt-Text:** Schnellzugriff-Button mit visuellem Status
-- **Figure-Wrapping:** Automatisches Wrappen in `<figure>` für korrektes Float-Verhalten
-- **Responsive:** Unterstützung für Breakpoint-Klassen (@s, @m, @l für UIkit; sm, md, lg für Bootstrap)
+- **Mediapool-Anbindung:** Bild im Medienpool anzeigen und bestehendes Bild direkt aus dem Medienpool austauschen.
+- **Preset-basierte Breiten:** Keine manuellen Pixel-Eingaben, nur vordefinierte CSS-Klassen.
+- **Ausrichtungs-Buttons:** Links, Rechts, Zentriert und Zuruecksetzen auf "keine Ausrichtung".
+- **Effekt-Presets:** Schatten, abgerundete Ecken, Rahmen als schaltbare Optionen.
+- **Alt-Text-Quick-Action:** Schneller Dialog mit visuellem Status am Toolbar-Button.
+- **Caption-Handling:** Bildunterschrift als `figcaption` einfuegen, aktualisieren und entfernen.
+- **Figure-Workflow:** Automatisches Figure-Wrapping und Figure-Normalisierung beim Einfuegen.
+- **Stabiles Austauschen:** Beim Bildtausch werden alte Preset-Klassen bereinigt, damit keine Verzerrung entsteht.
+- **Block-Verhalten fuer Figure:** Delete/Cut/Copy behandeln Bild + Caption als eine Einheit.
+- **Responsive Framework-Support:** Presets fuer UIkit/Bootstrap und eigene Klassen moeglich.
 
 ### Aktivierung
 
-Im Profil `for_images` **zusammen mit dem nativen `image` Plugin** zu den Plugins hinzufügen. Der Profil-Assistent bietet eine komfortable UI mit Template-Auswahl.
+Im Profil `for_images` **zusammen mit dem nativen `image` Plugin** zu den Plugins hinzufuegen. Der Profil-Assistent bietet eine komfortable UI mit Template-Auswahl.
 
-**Wichtig:** Das `image` Plugin und `for_images` ergänzen sich gegenseitig. Das native `image` Plugin bietet die Grundfunktionalität zum Einfügen von Bildern, während `for_images` spezialisierte Formatierung (Breiten, Ausrichtung, Effekte) übernimmt. Beide Plugins sollten immer zusammen aktiviert werden.
+**Wichtig:** Das `image` Plugin und `for_images` ergaenzen sich. Das native `image` Plugin liefert die Grundfunktionalitaet zum Einfuegen und Bearbeiten von Bilddaten, `for_images` uebernimmt den erweiterten Figure-Workflow mit Presets und Mediapool-Aktionen. Empfehlung: beide Plugins aktivieren.
 
 ### Konfiguration im Profil
 
