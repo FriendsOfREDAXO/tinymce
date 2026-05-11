@@ -2,7 +2,7 @@
 
 Stellt den TinyMCE 8 Editor im CMS REDAXO bereit.
 
-![Screenshot](https://github.com/FriendsOfREDAXO/tinymce/blob/assets/screenshot.png?raw=true)
+![Screenshot](https://github.com/FriendsOfREDAXO/tinymce/blob/assets/screenshot8.png?raw=true)
 
 ## Anwendung:
 
