@@ -6,15 +6,13 @@
  */
 
 // Guard: this update path requires at least v8.8.1 as source version.
-// Note: During update.php execution, $this points to the new addon in .new.* directory.
-// We need to get the old/current installed version from the system registry.
-if (rex_string::versionCompare(rex_addon::get('tinymce')->getVersion(), '8.8.1', '<')) {
-    echo rex_view::error(
+// Get old installed version before files are replaced
+$oldVersion = rex_addon::get('tinymce')->getVersion();
+if ($oldVersion && rex_version::compare($oldVersion, '8.8.1', '<')) {
+    throw new rex_functional_exception(
         'Dieses Update erfordert mindestens TinyMCE v8.8.1 als Ausgangsversion. '
         . 'Bitte zuerst auf v8.8.1 aktualisieren.'
     );
-
-    return false;
 }
 
 // ensure schema (include a plain PHP file — safe during install/update)
@@ -26,7 +24,7 @@ $this->includeFile(__DIR__ . '/ensure_table.php');
 // As of v8.9.0, the configuration column is called `profile` instead of
 // `extra`. This is more intuitive and aligns with the UI terminology.
 // Old profiles with the legacy `extra` column are migrated automatically.
-if (rex_string::versionCompare($this->getVersion(), '8.9.0', '<')) {
+if (rex_version::compare($this->getVersion(), '8.9.0', '<')) {
     try {
         $profileTable = rex::getTable('tinymce_profiles');
         $tableObj = rex_sql_table::get($profileTable);
