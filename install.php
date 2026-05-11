@@ -21,7 +21,7 @@ if (\rex_sql_table::get(rex::getTable('tinymce_profiles'))->hasColumn('plugins')
             $needsUpdate = false;
             $plugins = (string) $profile['plugins'];
             $toolbar = (string) $profile['toolbar'];
-            $extra = (string) $profile['extra'];
+            $extra = (string) $profile['profile'];
 
             if (str_contains($plugins, 'imagewidth')) {
                 $plugins = str_replace('imagewidth', 'for_images', $plugins);
@@ -46,7 +46,7 @@ if (\rex_sql_table::get(rex::getTable('tinymce_profiles'))->hasColumn('plugins')
                 $updateSql->setWhere(['id' => (int) $profile['id']]);
                 $updateSql->setValue('plugins', $plugins);
                 $updateSql->setValue('toolbar', $toolbar);
-                $updateSql->setValue('extra', $extra);
+                $updateSql->setValue('profile', $extra);
                 $updateSql->setValue('updatedate', date('Y-m-d H:i:s'));
                 $updateSql->update();
             }
@@ -263,7 +263,7 @@ EXTRA;
 			$ins->setValue('id', $p['id']);
 			$ins->setValue('name', $p['name']);
 			$ins->setValue('description', $p['description']);
-			$ins->setValue('extra', $p['extra']);
+			$ins->setValue('profile', $p['profile']);
 			$ins->setValue('createdate', $now);
 			$ins->setValue('updatedate', $now);
 			$ins->setValue('createuser', 'admin');

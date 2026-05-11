@@ -8,7 +8,7 @@
     ->ensurePrimaryIdColumn()
     ->ensureColumn(new \rex_sql_column('name', 'varchar(40)', true))
     ->ensureColumn(new \rex_sql_column('description', 'varchar(255)', true))
-    ->ensureColumn(new \rex_sql_column('extra', 'longtext', true))
+    ->ensureColumn(new \rex_sql_column('profile', 'longtext', true))
     ->ensureColumn(new \rex_sql_column('profile_backup', 'longtext', true))
     ->ensureColumn(new \rex_sql_column('mediatype', 'varchar(255)', true))
     ->ensureColumn(new \rex_sql_column('mediapath', 'varchar(255)', true))

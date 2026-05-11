@@ -164,17 +164,17 @@ EXTRA;
             [
                 'name' => 'full',
                 'description' => 'Full featured – alle FOR-Plugins aktiv',
-                'extra' => $extra_full,
+                'profile' => $extra_full,
             ],
             [
                 'name' => 'light',
                 'description' => 'Light – minimaler Editor für kurze Texte',
-                'extra' => $extra_light,
+                'profile' => $extra_light,
             ],
             [
                 'name' => 'default',
                 'description' => 'Standard – zwei Toolbars, gängige Plugins',
-                'extra' => $extra_default,
+                'profile' => $extra_default,
             ],
         ];
     }
@@ -204,7 +204,7 @@ EXTRA;
                 $upd->setTable(rex::getTable('tinymce_profiles'));
                 $upd->setWhere(['name' => $p['name']]);
                 $upd->setValue('description', $p['description']);
-                $upd->setValue('extra', $p['extra']);
+                $upd->setValue('profile', $p['profile']);
                 $upd->setValue('updatedate', $now);
                 $upd->setValue('updateuser', $user);
                 $upd->update();
@@ -213,7 +213,7 @@ EXTRA;
                 $ins->setTable(rex::getTable('tinymce_profiles'));
                 $ins->setValue('name', $p['name']);
                 $ins->setValue('description', $p['description']);
-                $ins->setValue('extra', $p['extra']);
+                $ins->setValue('profile', $p['profile']);
                 $ins->setValue('createdate', $now);
                 $ins->setValue('updatedate', $now);
                 $ins->setValue('createuser', $user);
@@ -226,7 +226,7 @@ EXTRA;
         ProfileHelper::ensureProfile(
             DemoProfile::NAME,
             DemoProfile::DESCRIPTION,
-            ['extra' => DemoProfile::getExtra()],
+            ['profile' => DemoProfile::getExtra()],
             true
         );
 

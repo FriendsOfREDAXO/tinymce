@@ -18,17 +18,17 @@ if ('restore_backup' === $func && $id > 0) {
     $restoreSql = rex_sql::factory();
     $restoreSql->setTable($profileTable);
     $restoreSql->setWhere(['id' => $id]);
-    $restoreSql->select('name, extra, profile_backup');
+    $restoreSql->select('name, profile, profile_backup');
     if ($restoreSql->getRows() > 0) {
-        $currentExtra = (string) $restoreSql->getValue('extra');
-        $backupExtra = (string) $restoreSql->getValue('profile_backup');
+        $currentProfile = (string) $restoreSql->getValue('profile');
+        $backupProfile = (string) $restoreSql->getValue('profile_backup');
         $profileName = (string) $restoreSql->getValue('name');
-        if ('' !== $backupExtra) {
+        if ('' !== $backupProfile) {
             $updSql = rex_sql::factory();
             $updSql->setTable($profileTable);
             $updSql->setWhere(['id' => $id]);
-            $updSql->setValue('extra', $backupExtra);
-            $updSql->setValue('profile_backup', $currentExtra);
+            $updSql->setValue('profile', $backupProfile);
+            $updSql->setValue('profile_backup', $currentProfile);
             $updSql->setValue('updatedate', date('Y-m-d H:i:s'));
             $updSql->setValue('updateuser', rex::getUser() ? rex::getUser()->getLogin() : 'restore');
             $updSql->update();
@@ -48,7 +48,7 @@ if ('export' === $func && $id > 0) {
     $sql = rex_sql::factory();
     $sql->setTable($profileTable);
     $sql->setWhere(['id' => $id]);
-    $sql->select('id, name, description, extra');
+    $sql->select('id, name, description, profile');
     $row = $sql->getArray();
     if (empty($row)) {
         echo rex_view::error(rex_i18n::msg('tinymce_profile_export_error'));
@@ -66,7 +66,7 @@ if ('export' === $func && $id > 0) {
 if ('export_all' === $func) {
     $sql = rex_sql::factory();
     $sql->setTable($profileTable);
-    $sql->select('id, name, description, extra');
+    $sql->select('id, name, description, profile');
     $rows = $sql->getArray();
     $payload = json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     rex_response::cleanOutputBuffers();
@@ -95,15 +95,15 @@ if ('preview' === $func && $id > 0) {
         rex_response::cleanOutputBuffers();
         header('Content-Type: text/html; charset=utf-8');
         $name = htmlspecialchars((string) $row[0]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $extra = (string) ($row[0]['extra'] ?? '');
+        $profile = (string) ($row[0]['profile'] ?? '');
         $body = '<h4 id="tinymcePreviewName" style="margin-top:0">' . $name . '</h4>';
         $body .= '<div id="tinymcePreviewJson" style="white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:280px; overflow:auto; font-family:monospace;">';
         // show pretty-printed JSON if parsable, fallback to raw
-        $rawParsed = @json_decode($extra, true);
+        $rawParsed = @json_decode($profile, true);
         if (is_array($rawParsed)) {
             $body .= htmlspecialchars((string) json_encode($rawParsed, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         } else {
-            $body .= htmlspecialchars($extra, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $body .= htmlspecialchars($profile, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         }
         $body .= '</div>';
         $body .= '<hr>'; // demo button removed - preview now opens the editor inside the modal
@@ -164,8 +164,12 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
         }
 
         $items = [];
-        if (isset($data['name']) && isset($data['extra'])) {
-            // single profile
+        if (isset($data['name']) && (isset($data['profile']) || isset($data['extra']))) {
+            // single profile (migrate `extra` → `profile` if needed)
+            if (isset($data['extra']) && !isset($data['profile'])) {
+                $data['profile'] = $data['extra'];
+                unset($data['extra']);
+            }
             $items[] = $data;
         } elseif (is_array($data)) {
             $items = $data;
@@ -180,7 +184,13 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
         $skipped = 0;
         $overwritten = 0;
         foreach ($items as $item) {
-            if (empty($item['name']) || !isset($item['extra'])) {
+            // Migrate legacy `extra` → `profile` automatically
+            if (isset($item['extra']) && !isset($item['profile'])) {
+                $item['profile'] = $item['extra'];
+                unset($item['extra']);
+            }
+
+            if (empty($item['name']) || !isset($item['profile'])) {
                 $skipped++;
                 continue;
             }
@@ -216,7 +226,7 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
                         $update->setTable($profileTable);
                         $update->setWhere(['id' => $row[0]['id']]);
                         $update->setValue('description', isset($item['description']) ? $item['description'] : 'Imported');
-                        $update->setValue('extra', (string) $item['extra']);
+                        $update->setValue('profile', (string) $item['profile']);
                         $update->setValue('updatedate', date('Y-m-d H:i:s'));
                         $update->setValue('updateuser', rex::getUser() ? rex::getUser()->getLogin() : 'import');
                         $update->update();
@@ -233,7 +243,7 @@ if ('import' === $func && isset($_FILES['profiles_file'])) {
             // don't set id — allow the DB to assign an auto-increment value
             $ins->setValue('name', (string) $item['name']);
             $ins->setValue('description', isset($item['description']) ? $item['description'] : 'Imported');
-            $ins->setValue('extra', (string) $item['extra']);
+            $ins->setValue('profile', (string) $item['profile']);
             $ins->setValue('createdate', date('Y-m-d H:i:s'));
             $ins->setValue('updatedate', date('Y-m-d H:i:s'));
             $ins->setValue('createuser', rex::getUser() ? rex::getUser()->getLogin() : 'import');
@@ -453,29 +463,29 @@ if ('' === $func) {
     $field->setLabel(rex_i18n::msg('tinymce_description'));
     $field->setAttribute('placeholder', rex_i18n::msg('tinymce_description_placeholder'));
 
-    $field = $form->addTextAreaField('extra');
+    $field = $form->addTextAreaField('profile');
     $field->setAttribute('style', 'height: 550px');
     $field->setAttribute('class', 'form-control tinymce-options');
-    $field->setLabel(rex_i18n::msg('tinymce_extra_definition'));
+    $field->setLabel(rex_i18n::msg('tinymce_profile_definition'));
 
-    // Read current extra + backup for inject + restore UI
-    $currentExtra = '';
+    // Read current profile + backup for inject + restore UI
+    $currentProfile = '';
     $profileBackup = '';
     if ('edit' === $func && $id > 0) {
         $backupReadSql = rex_sql::factory();
         $backupReadSql->setTable($profileTable);
         $backupReadSql->setWhere(['id' => $id]);
-        $backupReadSql->select('extra, profile_backup');
+        $backupReadSql->select('profile, profile_backup');
         if ($backupReadSql->getRows() > 0) {
-            $currentExtra = (string) $backupReadSql->getValue('extra');
+            $currentProfile = (string) $backupReadSql->getValue('profile');
             $profileBackup = (string) $backupReadSql->getValue('profile_backup');
         }
     }
 
     $formHtml = $form->get();
 
-    // Inject current extra as hidden field so REX_FORM_SAVED EP can save it as profile_backup
-    $hiddenBackupInput = '<input type="hidden" name="tinymce_profile_backup_value" value="' . htmlspecialchars($currentExtra, ENT_QUOTES, 'UTF-8') . '">';
+    // Inject current profile as hidden field so REX_FORM_SAVED EP can save it as profile_backup
+    $hiddenBackupInput = '<input type="hidden" name="tinymce_profile_backup_value" value="' . htmlspecialchars($currentProfile, ENT_QUOTES, 'UTF-8') . '">';
     $formHtml = str_replace('</form>', $hiddenBackupInput . '</form>', $formHtml);
 
     // Show restore panel if a backup is available

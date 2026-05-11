@@ -129,8 +129,8 @@ const tinyprofiles = $profiles;
     public static function mapProfile(array $profile): string|array
     {
         $jsonProfile = [];
-        if (!empty($profile['extra'])) {
-            $extra = (string) $profile['extra'];
+        if (!empty($profile['profile'])) {
+            $extra = (string) $profile['profile'];
             $addonAssetBase = AssetUrl::getTinyAssetBaseUrl();
             $addonAssetBaseEscaped = str_replace('/', '\\/', $addonAssetBase);
 

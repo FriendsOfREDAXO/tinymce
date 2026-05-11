@@ -6,13 +6,13 @@ use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 
 /**
  * Inline migration logic (avoid adding new classes required by updates/install).
- * Returns array with 'extra' => string and 'changes' => array of change descriptions.
+ * Returns array with 'profile' => string and 'changes' => array of change descriptions.
  *
- * @return array{extra: string, changes: list<string>}
+ * @return array{profile: string, changes: list<string>}
  */
-function tinymce_migrate_extra(string $extra): array
+function tinymce_migrate_profile(string $profile): array
 {
-    $result = $extra;
+    $result = $profile;
     $changes = [];
 
     // Only add license_key if it doesn't already exist
@@ -62,7 +62,7 @@ function tinymce_migrate_extra(string $extra): array
             '"/assets/addons/',
             $result
         );
-        if ($result !== $extra) {
+        if ($result !== $profile) {
             $changes[] = 'Fixed external_plugins paths to absolute URLs';
         }
     }
@@ -77,7 +77,7 @@ function tinymce_migrate_extra(string $extra): array
         $changes[] = 'Fixed content_css for dark mode';
     }
 
-    return ['extra' => $result, 'changes' => array_values($changes)];
+    return ['profile' => $result, 'changes' => array_values($changes)];
 }
 
 // Simple admin page to inspect and repair old profiles.
@@ -90,16 +90,16 @@ $profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
 
 if ('repair' === $func && $id > 0) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, extra FROM '.$profileTable.' WHERE id = ?', [$id]);
+    $sql->setQuery('SELECT id, name, profile FROM '.$profileTable.' WHERE id = ?', [$id]);
     $profile = $sql->getArray();
     if (!empty($profile)) {
         $profile = $profile[0];
-        $result = tinymce_migrate_extra((string)$profile['extra']);
+        $result = tinymce_migrate_profile((string)$profile['profile']);
         if (!empty($result['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
             $update->setWhere(['id' => $id]);
-            $update->setValue('extra', $result['extra']);
+            $update->setValue('profile', $result['profile']);
             $update->update();
             // Regenerate profiles.js
             try {
@@ -117,16 +117,16 @@ if ('repair' === $func && $id > 0) {
 
 if ('repair_all' === $func) {
     $sql = rex_sql::factory();
-    $sql->setQuery('SELECT id, name, extra FROM '.$profileTable);
+    $sql->setQuery('SELECT id, name, profile FROM '.$profileTable);
     $profiles = $sql->getArray();
     $count = 0;
-    foreach ($profiles as $profile) {
-        $result = tinymce_migrate_extra((string)$profile['extra']);
-        if (!empty($result['changes'])) {
+    foreach ($profiles as $p) {
+        $res = tinymce_migrate_profile((string)$p['profile']);
+        if (!empty($res['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
-            $update->setWhere(['id' => (int) $profile['id']]);
-            $update->setValue('extra', $result['extra']);
+            $update->setWhere(['id' => (int) $p['id']]);
+            $update->setValue('profile', $res['profile']);
             $update->update();
             $count++;
         }
@@ -167,7 +167,7 @@ $content .= '<p><a class="btn btn-sm btn-primary" href="' . $repairAllUrl . '" d
 $content .= '<div id="tinymce-migration-accordion" class="panel-group">';
 foreach ($profiles as $p) {
     $panelId = 'tinymce-profile-' . $p['id'];
-    $res = tinymce_migrate_extra((string)$p['extra']);
+    $res = tinymce_migrate_profile((string)$p['profile']);
     $needs = !empty($res['changes']);
 
     $statusBadge = $needs ? '<span class="label label-warning">' . rex_i18n::msg('tinymce_migration_needs_fix') . '</span>' : '<span class="label label-success">' . rex_i18n::msg('tinymce_migration_ok') . '</span>';
@@ -186,7 +186,7 @@ foreach ($profiles as $p) {
     $content .= '<div id="' . $panelId . '" class="panel-collapse collapse">';
     $content .= '<div class="panel-body">';
     $content .= '<div class="row">';
-    $content .= '<div class="col-md-9"><pre style="white-space: pre-wrap;">' . htmlspecialchars((string)$p['extra']) . '</pre></div>';
+    $content .= '<div class="col-md-9"><pre style="white-space: pre-wrap;">' . htmlspecialchars((string)$p['profile']) . '</pre></div>';
     $content .= '<div class="col-md-3 text-right">';
     if ($needs) {
         $content .= '<a class="btn btn-sm btn-primary" href="' . $repairUrl . '">' . rex_i18n::msg('tinymce_migration_repair') . '</a> ';

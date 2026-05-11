@@ -16,7 +16,7 @@ class ProfileHelper
      * @var array<int, string>
      */
     private const IMPORTABLE_FIELDS = [
-        'extra',
+        'profile',
         'mediatype',
         'mediapath',
         'mediacategory',
@@ -52,7 +52,7 @@ class ProfileHelper
 
         // Default values (extra is the single source of truth for profile config)
         $defaults = [
-            'extra' => '',
+            'profile' => '',
             'mediatype' => '',
             'mediapath' => '',
             'mediacategory' => 0,
