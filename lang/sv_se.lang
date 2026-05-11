@@ -31,6 +31,7 @@ tinymce_name = Profil-namn
 tinymce_name_placeholder = profile_name
 tinymce_description = Profil beskrivning
 tinymce_description_placeholder = Profilens syfte och omfattning
+tinymce_profile_definition = TinyMCE konfiguration (JSON)
 tinymce_extra_definition = Profil option
 tinymce_toolbar = Toolbar element
 tinymce_heading = Heading element
