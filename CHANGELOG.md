@@ -12,6 +12,7 @@ Version 8.9.0
 * `update.php` wurde deutlich reduziert und auf den aktuellen, wartbaren Migrationspfad bereinigt.
 * Mindest-Ausgangsversion für den Updatepfad auf `8.9.0` ist `8.8.1`.
 * Entwickler-API für programmatische Profile geprüft und dokumentiert: `ProfileHelper`-Doku in `DEVS.md`/`README.md` auf `profile` aktualisiert, inklusive Hinweis auf Legacy-Mapping `extra` → `profile`.
+* Profil-Fixer (`migration`-Seite) auf TinyMCE-8-relevante Korrekturen fokussiert; mutierende Aktionen (`repair`, `repair_all`) laufen jetzt über POST + CSRF.
 
 Version 8.8.0 - 8.8.1
 -------------------------------

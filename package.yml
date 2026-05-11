@@ -21,6 +21,7 @@ page:
             title: 'translate:paste_settings'
         migration:
             title: 'translate:migration'
+            subPath: pages/profile_fixer.php
         help:
             title: 'translate:help'
             subPath: README.md

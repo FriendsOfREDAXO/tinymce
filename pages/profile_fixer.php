@@ -5,12 +5,11 @@ use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
 use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 
 /**
- * Inline migration logic (avoid adding new classes required by updates/install).
- * Returns array with 'profile' => string and 'changes' => array of change descriptions.
+ * TinyMCE-8 profile fixer logic for common manual/profile-string mistakes.
  *
  * @return array{profile: string, changes: list<string>}
  */
-function tinymce_migrate_profile(string $profile): array
+function tinymce_fix_profile_for_v8(string $profile): array
 {
     $result = $profile;
     $changes = [];
@@ -80,21 +79,31 @@ function tinymce_migrate_profile(string $profile): array
     return ['profile' => $result, 'changes' => array_values($changes)];
 }
 
-// Simple admin page to inspect and repair old profiles.
+// Simple admin page to inspect and repair TinyMCE-8 profile definitions.
 $func = rex_request('func', 'string');
 $id = (int) rex_request('id', 'int');
 
 $csrfToken = rex_csrf_token::factory('tinymce_migration');
+$requestMethod = strtoupper((string) rex_request::server('REQUEST_METHOD', 'string', 'GET'));
 
 $profileTable = rex::getTable(TinyMceDatabaseHandler::TINY_PROFILES);
 
+// State-changing actions are only allowed via POST.
+if (in_array($func, ['repair', 'repair_all', 'reset_default_profiles'], true) && 'POST' !== $requestMethod) {
+    echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    $func = '';
+}
+
 if ('repair' === $func && $id > 0) {
+    if (!$csrfToken->isValid()) {
+        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
     $sql = rex_sql::factory();
     $sql->setQuery('SELECT id, name, profile FROM '.$profileTable.' WHERE id = ?', [$id]);
     $profile = $sql->getArray();
     if (!empty($profile)) {
         $profile = $profile[0];
-        $result = tinymce_migrate_profile((string)$profile['profile']);
+        $result = tinymce_fix_profile_for_v8((string)$profile['profile']);
         if (!empty($result['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
@@ -113,15 +122,19 @@ if ('repair' === $func && $id > 0) {
             echo rex_view::info(rex_i18n::msg('tinymce_migration_no_changes', (string) $profile['name']));
         }
     }
+    }
 }
 
 if ('repair_all' === $func) {
+    if (!$csrfToken->isValid()) {
+        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    } else {
     $sql = rex_sql::factory();
     $sql->setQuery('SELECT id, name, profile FROM '.$profileTable);
     $profiles = $sql->getArray();
     $count = 0;
     foreach ($profiles as $p) {
-        $res = tinymce_migrate_profile((string)$p['profile']);
+        $res = tinymce_fix_profile_for_v8((string)$p['profile']);
         if (!empty($res['changes'])) {
             $update = rex_sql::factory();
             $update->setTable($profileTable);
@@ -140,6 +153,7 @@ if ('repair_all' === $func) {
         }
     }
     echo rex_view::success(rex_i18n::msg('tinymce_migration_repaired_count', $count));
+    }
 }
 
 if ('reset_default_profiles' === $func) {
@@ -159,20 +173,27 @@ if ('reset_default_profiles' === $func) {
 $profiles = TinyMceDatabaseHandler::getAllProfiles() ?: [];
 
 // action buttons (repair all)
-$repairAllUrl = rex_url::backendPage('tinymce/migration', ['func' => 'repair_all']);
 $content = '<p>' . rex_i18n::msg('tinymce_migration_description') . '</p>';
-$content .= '<p><a class="btn btn-sm btn-primary" href="' . $repairAllUrl . '" data-confirm="' . rex_i18n::msg('tinymce_migration_repair_all_confirm', '') . '">' . rex_i18n::msg('tinymce_migration_repair_all') . '</a></p>';
+$content .= '<ul>';
+$content .= '<li>license_key wird ergänzt, falls er fehlt</li>';
+$content .= '<li>veraltete template-Plugin-Einträge werden entfernt</li>';
+$content .= '<li>relative external_plugins-Pfade werden auf absolute /assets-Pfade normalisiert</li>';
+$content .= '<li>content_css-Fallback "light" wird auf "default" korrigiert</li>';
+$content .= '</ul>';
+$content .= '<form action="' . rex_url::currentBackendPage() . '" method="post" style="margin-bottom:10px">';
+$content .= $csrfToken->getHiddenField();
+$content .= '<input type="hidden" name="func" value="repair_all">';
+$content .= '<button class="btn btn-sm btn-primary" type="submit" data-confirm="' . rex_i18n::msg('tinymce_migration_repair_all_confirm', '') . '">' . rex_i18n::msg('tinymce_migration_repair_all') . '</button>';
+$content .= '</form>';
 
 // Accordion using bootstrap collapse to keep the page tidy and match backend UI patterns
 $content .= '<div id="tinymce-migration-accordion" class="panel-group">';
 foreach ($profiles as $p) {
     $panelId = 'tinymce-profile-' . $p['id'];
-    $res = tinymce_migrate_profile((string)$p['profile']);
+    $res = tinymce_fix_profile_for_v8((string)$p['profile']);
     $needs = !empty($res['changes']);
 
     $statusBadge = $needs ? '<span class="label label-warning">' . rex_i18n::msg('tinymce_migration_needs_fix') . '</span>' : '<span class="label label-success">' . rex_i18n::msg('tinymce_migration_ok') . '</span>';
-
-    $repairUrl = rex_url::backendPage('tinymce/migration', ['func' => 'repair', 'id' => $p['id']]);
 
     $content .= '<div class="panel panel-default">';
     $content .= '<div class="panel-heading">';
@@ -189,7 +210,12 @@ foreach ($profiles as $p) {
     $content .= '<div class="col-md-9"><pre style="white-space: pre-wrap;">' . htmlspecialchars((string)$p['profile']) . '</pre></div>';
     $content .= '<div class="col-md-3 text-right">';
     if ($needs) {
-        $content .= '<a class="btn btn-sm btn-primary" href="' . $repairUrl . '">' . rex_i18n::msg('tinymce_migration_repair') . '</a> ';
+        $content .= '<form action="' . rex_url::currentBackendPage() . '" method="post" style="display:inline-block">';
+        $content .= $csrfToken->getHiddenField();
+        $content .= '<input type="hidden" name="func" value="repair">';
+        $content .= '<input type="hidden" name="id" value="' . (int) $p['id'] . '">';
+        $content .= '<button class="btn btn-sm btn-primary" type="submit">' . rex_i18n::msg('tinymce_migration_repair') . '</button>';
+        $content .= '</form>';
     }
     $content .= '</div>'; // col
     $content .= '</div>'; // row

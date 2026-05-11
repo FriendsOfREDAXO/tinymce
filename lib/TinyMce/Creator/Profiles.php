@@ -124,11 +124,10 @@ const tinyprofiles = $profiles;
 
     /**
      * @param array<string, mixed> $profile
-     * @return string|array<mixed>
      */
-    public static function mapProfile(array $profile): string|array
+    public static function mapProfile(array $profile): string
     {
-        $jsonProfile = [];
+        $jsonProfile = '';
         if (!empty($profile['profile'])) {
             $extra = (string) $profile['profile'];
             $addonAssetBase = AssetUrl::getTinyAssetBaseUrl();

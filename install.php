@@ -5,55 +5,24 @@
  * @psalm-scope-this rex_addon
  */
 
+$profileTable = rex::getTable('tinymce_profiles');
+$isReinstall = false;
+
+// Reinstall path: if profile table is already accessible, treat install as update.
+try {
+    $probeSql = rex_sql::factory();
+    $probeSql->setQuery('SELECT id FROM ' . $profileTable . ' LIMIT 1');
+    $isReinstall = true;
+} catch (rex_sql_exception $e) {
+    $isReinstall = false;
+}
+
 // ensure schema (include a plain PHP file — safe during install/update)
 $this->includeFile(__DIR__ . '/ensure_table.php');
 
-// =============================================================================
-// Migration: imagewidth -> for_images (v8.2.0)
-// Only runs if legacy columns still exist (pre-8.8.2 upgrades via reinstall).
-// =============================================================================
-if (\rex_sql_table::get(rex::getTable('tinymce_profiles'))->hasColumn('plugins')) {
-    try {
-        $migrateSql = rex_sql::factory();
-        $profiles = $migrateSql->getArray('SELECT id, plugins, toolbar, extra FROM ' . rex::getTable('tinymce_profiles'));
-
-        foreach ($profiles as $profile) {
-            $needsUpdate = false;
-            $plugins = (string) $profile['plugins'];
-            $toolbar = (string) $profile['toolbar'];
-            $extra = (string) $profile['profile'];
-
-            if (str_contains($plugins, 'imagewidth')) {
-                $plugins = str_replace('imagewidth', 'for_images', $plugins);
-                $needsUpdate = true;
-            }
-            if (str_contains($toolbar, 'imagewidthdialog')) {
-                $toolbar = str_replace('imagewidthdialog', 'for_images', $toolbar);
-                $needsUpdate = true;
-            }
-            if (str_contains($toolbar, 'imagewidth')) {
-                $toolbar = str_replace('imagewidth', 'for_images', $toolbar);
-                $needsUpdate = true;
-            }
-            if (str_contains($extra, 'imagewidth')) {
-                $extra = str_replace('imagewidth', 'for_images', $extra);
-                $needsUpdate = true;
-            }
-
-            if ($needsUpdate) {
-                $updateSql = rex_sql::factory();
-                $updateSql->setTable(rex::getTable('tinymce_profiles'));
-                $updateSql->setWhere(['id' => (int) $profile['id']]);
-                $updateSql->setValue('plugins', $plugins);
-                $updateSql->setValue('toolbar', $toolbar);
-                $updateSql->setValue('profile', $extra);
-                $updateSql->setValue('updatedate', date('Y-m-d H:i:s'));
-                $updateSql->update();
-            }
-        }
-    } catch (rex_sql_exception $e) {
-        // Ignore - migration is best-effort
-    }
+if ($isReinstall) {
+    $this->includeFile(__DIR__ . '/update.php');
+    return;
 }
 
 // Set flag to regenerate profiles.js on first backend request
@@ -241,19 +210,19 @@ EXTRA;
 				'id' => 1,
 				'name' => 'full',
 				'description' => 'Full featured example',
-				'extra' => $extra1,
+                'profile' => $extra1,
 			],
 			[
 				'id' => 2,
 				'name' => 'light',
 				'description' => 'Small featured example',
-				'extra' => $extra2,
+                'profile' => $extra2,
 			],
 			[
 				'id' => 3,
 				'name' => 'default',
 				'description' => 'Standard featured example',
-				'extra' => $extra3,
+                'profile' => $extra3,
 			],
 		];
 
@@ -319,7 +288,7 @@ try {
 	\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
 		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME,
 		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::DESCRIPTION,
-		['extra' => \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::getExtra()],
+        ['profile' => \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::getExtra()],
 		true
 	);
 } catch (\Throwable $e) {
