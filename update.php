@@ -10,8 +10,8 @@
 $oldVersion = rex_addon::get('tinymce')->getVersion();
 if ($oldVersion && rex_version::compare($oldVersion, '8.8.1', '<')) {
     throw new rex_functional_exception(
-        'Dieses Update erfordert mindestens TinyMCE v8.8.1 als Ausgangsversion. '
-        . 'Bitte zuerst auf v8.8.1 aktualisieren.'
+        'This update requires at least TinyMCE v8.8.1 as source version. '
+        . 'Please update to v8.8.1 first.'
     );
 }
 
