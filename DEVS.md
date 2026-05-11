@@ -18,7 +18,7 @@ Wichtig:
 
 ## Profile für andere AddOns bereitstellen
 
-Wenn dein AddOn maßgeschneiderte TinyMCE-Profile erfordert (z.B. für ein Textmodul mit ganz bestimmten Plugins), solltest du diese Workflow befolgen:
+Wenn dein AddOn maßgeschneiderte TinyMCE-Profile erfordert (z.B. für ein Textmodul mit ganz bestimmten Plugins), solltest du diesen Workflow befolgen:
 
 ### 📋 Empfohlener Workflow: UI-First
 
@@ -57,9 +57,7 @@ if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\Ti
         'mein_addon_profil',
         'Spezialprofil für AddOn X',
         [
-            'plugins' => 'autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen media table wordcount',
-            'toolbar' => 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            'extra' => '...',
+            'profile' => "plugins: 'autolink lists link'\ntoolbar: 'undo redo | bold italic'",
             // optional: mediatype, mediapath, mediacategory, upload_default
         ],
         false // forceUpdate: true = always overwrite on addon update
@@ -67,14 +65,13 @@ if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\Ti
 }
 ```
 
-### Technischer Hintergrund: Die `extra`-Spalte
+### Technischer Hintergrund: Die `profile`-Spalte
 
-**Wichtig zu verstehen:** Bei der Laufzeit nutzt TinyMCE nur die `extra`-Spalte der Profiltabelle. Diese Spalte enthält alle TinyMCE-Konfigurationsoptionen als JSON-String.
+**Wichtig zu verstehen:** Bei der Laufzeit nutzt TinyMCE die `profile`-Spalte der Profiltabelle als zentrale Konfigurationsquelle.
 
-- Die Spalten `plugins` und `toolbar` sind **Legacy**-Spalten und werden im Backend nur für die Bearbeitung/Anzeige verwendet
-- Sie werden vom Frontend **nicht** ausgelesen – nur `extra` wird gelesen und an die JavaScript-Initialisierung übergeben
-- Der PHP-Code-Generator gibt diese Spalten mit aus (für Vollständigkeit und UI-Kompatibilität), aber sie sind optional
-- Der wichtige Teil ist die `extra`-Spalte, die bei Bedarf erweiterte YAML-Optionen enthalten kann
+- Die Legacy-Spalten `plugins` und `toolbar` wurden entfernt.
+- Der relevante Payload liegt in `profile` (TinyMCE-Optionen als Textblock).
+- Für rückwärtskompatible Imports akzeptiert `ProfileHelper` weiterhin alte JSON-Profile mit `extra` und migriert sie intern nach `profile`.
 
 ### Benutzte Hilfsmethoden
 
@@ -82,10 +79,10 @@ if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\Ti
 
 | Methode | Zweck |
 |---------|-------|
-| `importProfileFromJson($filePath, $forceUpdate)` | **Empfohlen**: JSON-Datei importieren (eine oder mehrere Profile) |
-| `ensureProfile($name, $description, $data, $forceUpdate)` | Profil direkt programmatisch erstellen (mit PHP-Array) |
-| `normalizeImportedProfile($profile)` | Validiert und normalisiert ein importiertes Profil-Array |
-| `ensureProfileFromImportedArray($profile, $forceUpdate)` | Importiert ein Profil-Array (wird von `importProfileFromJson()` verwendet) |
+| `importProfileFromJson($filePath, $forceUpdate)` | **Empfohlen**: JSON-Datei importieren (eine oder mehrere Profile); unterstützt `profile` und Legacy-`extra` |
+| `ensureProfile($name, $description, $data, $forceUpdate)` | Profil programmatisch erstellen/aktualisieren (`$data['profile']` + optionale Media-Felder) |
+| `normalizeImportedProfile($profile)` | Validiert und normalisiert ein importiertes Profil-Array (inkl. Legacy-Mapping `extra` → `profile`) |
+| `ensureProfileFromImportedArray($profile, $forceUpdate)` | Importiert ein einzelnes Profil-Array (wird von `importProfileFromJson()` verwendet) |
 | `generateEnsureProfileCode($profile)` | Generiert PHP-Code für ein Profil (wird im Backend verwendet) |
 
 Alle Methoden triggern am Ende automatisch `Profiles::profilesCreate()`, sodass das neu eingespeiste Profil sofort im Frontend und Backend zur Verfügung steht.

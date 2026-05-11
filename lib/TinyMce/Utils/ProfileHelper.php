@@ -28,7 +28,7 @@ class ProfileHelper
      *
      * @param string $name The unique name of the profile
      * @param string $description A description for the profile
-     * @param array<string, mixed> $data Configuration data (extra, etc.)
+        * @param array<string, mixed> $data Configuration data (profile, optional media settings)
      * @param bool $forceUpdate If true, overwrites existing profile data
      * @return bool True if created or updated, false if it already existed and forceUpdate was false
      * @throws rex_sql_exception
@@ -50,7 +50,12 @@ class ProfileHelper
         $sql->setValue('name', $name);
         $sql->setValue('description', $description);
 
-        // Default values (extra is the single source of truth for profile config)
+        // Backward compatibility for older integration code using 'extra'.
+        if (!isset($data['profile']) && array_key_exists('extra', $data)) {
+            $data['profile'] = $data['extra'];
+        }
+
+        // Default values (profile is the single source of truth for profile config)
         $defaults = [
             'profile' => '',
             'mediatype' => '',
@@ -135,6 +140,11 @@ class ProfileHelper
         $description = trim((string) ($profile['description'] ?? ''));
         if ('' === $description) {
             $description = 'Imported Profile';
+        }
+
+        // Backward compatibility for legacy exported JSON payloads using 'extra'.
+        if (!array_key_exists('profile', $profile) && array_key_exists('extra', $profile)) {
+            $profile['profile'] = $profile['extra'];
         }
 
         $data = [];

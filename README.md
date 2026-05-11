@@ -72,6 +72,11 @@ Hinweis: Eingaben mit Top-Level-Kommas werden JS-sicher gesplittet. Als Fallback
 
 ### Migration von TinyMCE 5/6 zu TinyMCE 8
 
+**Updatepfad-Hinweis (ab v8.9.0):**
+
+- Ein direktes Update auf `v8.9.0` ist nur ab TinyMCE `v8.8.1` vorgesehen.
+- Bei älteren Addon-Versionen zuerst auf `v8.8.1` aktualisieren, danach auf `v8.9.0`.
+
 Bei der Aktualisierung von älteren Versionen (tinymce4, tinymce5, tinymce6) werden bestehende Profile automatisch migriert:
 
 - Der GPL-Lizenzschlüssel wird automatisch hinzugefügt
@@ -841,7 +846,7 @@ Das Plugin registriert zwei Toolbar-Buttons und mehrere Menu-Items:
   - Array-Kurzform: `["(tel)", "+49 2843 999999"]`
   - Objekt: `{ from: "(zvk)", to: "Zahlung per Vorkasse" }`
   - Regex mit Backreferences: `{ re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }`
-  Custom-Regeln überschreiben Defaults bei gleichem `from`. YAML-Beispiel im `extra`-Feld des Profils:
+  Custom-Regeln überschreiben Defaults bei gleichem `from`. YAML-Beispiel im `profile`-Feld des Profils:
 
   ```yaml
   for_chars_symbols_autoreplace: true
@@ -1022,14 +1027,13 @@ echo OembedRenderer::registerFrontendAssets();
 
 **Symptom:** Die Quickbar (oder andere über den Profil-Assistenten konfigurierte Optionen wie `plugins`, `toolbar`) wird im Editor immer auf die TinyMCE-Standardwerte zurückgesetzt, obwohl sie im Profil gespeichert wurde.
 
-**Ursache:** Der Profil-Assistent speichert alle Einstellungen in der `extra`-Konfigurationsspalte. Ältere Versionen des AddOns haben zusätzlich die Legacy-Spalten `plugins` und `toolbar` befüllt. Wenn diese Legacy-Spalten leer sind, kann die Profil-Generierung die aktivierten Plugins nicht korrekt erkennen und entfernt zugehörige Konfigurationsblöcke (z.B. `quickbars_selection_toolbar`).
+**Ursache:** In aktuellen Versionen liegt die Profilkonfiguration ausschließlich in der Spalte `profile`. Probleme entstehen meist durch veraltete Profile/Exporte aus früheren Versionen oder gecachte `profiles.js`-Dateien.
 
-**Lösung:** Im Backend unter **TinyMCE → Profil-Fixer** → Abschnitt **„Plugin-/Toolbar-Spalten synchronisieren"**:
+**Lösung:**
 
-1. Profile mit dem Badge **„Spalten nicht synchron"** identifizieren.
-2. Auf **„Synchronisieren"** klicken (oder „Alle synchronisieren") – die Legacy-Spalten werden mit den Werten aus `extra` abgeglichen und `profiles.js` wird neu generiert.
-
-> Ab Version 8.8.2 läuft dieser Abgleich automatisch beim AddOn-Update.
+1. AddOn mindestens auf `v8.9.0` aktualisieren (Updatepfad setzt `v8.8.1` voraus).
+2. Profil speichern oder `profiles.js` neu generieren, damit die aktuelle Konfiguration geschrieben wird.
+3. Bei JSON-Import alte Exporte mit `extra` sind weiterhin nutzbar; sie werden beim Import automatisch nach `profile` migriert.
 
 ---
 
@@ -1041,7 +1045,7 @@ Nach dem Speichern eines Profils muss der Browser-Cache geleert werden (Strg+Shi
 
 ### TinyMCE zeigt eine Lizenzwarnung
 
-Jedes Profil muss `license_key: 'gpl',` in der Konfiguration enthalten. Bei eigenen Profilen diesen Eintrag am Anfang des `extra`-Feldes ergänzen. Der **Profil-Fixer** prüft unter **„TinyMCE 8 – Profil-Migration & Kompatibilitätsprüfung"** alle Profile auf diesen und weitere Kompatibilitätsprobleme.
+Jedes Profil muss `license_key: 'gpl',` in der Konfiguration enthalten. Bei eigenen Profilen diesen Eintrag am Anfang des `profile`-Feldes ergänzen. Der **Profil-Fixer** prüft unter **„TinyMCE 8 – Profil-Migration & Kompatibilitätsprüfung"** alle Profile auf diesen und weitere Kompatibilitätsprobleme.
 
 ---
 
