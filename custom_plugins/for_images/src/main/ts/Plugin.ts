@@ -1,6 +1,7 @@
 import { Editor, TinyMCE } from 'tinymce';
 
 declare const tinymce: TinyMCE;
+declare const openREXMedia: any;
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -790,7 +791,7 @@ const setup = (editor: Editor, _url: string): void => {
   /* CONTEXT TOOLBAR */
   editor.ui.registry.addContextToolbar('for_imagestoolbar', {
     predicate: (node: any) => node.nodeName === 'IMG' || (node.nodeName === 'FIGURE' && node.querySelector('img')),
-    items: 'imagewidth for_imagealignleft for_imagealigncenter for_imagealignright imageeffect for_imagealignnone | imagealt imagecaption',
+    items: 'imagewidth for_imagealignleft for_imagealigncenter for_imagealignright imageeffect for_imagealignnone | imagealt imagecaption imageshowpool imageswappool',
     position: 'node',
     scope: 'node'
   });
@@ -897,6 +898,124 @@ const setup = (editor: Editor, _url: string): void => {
       editor.on('NodeChange', updateState);
       updateState();
       return () => editor.off('NodeChange', updateState);
+    }
+  });
+
+  /* SHOW IN MEDIAPOOL BUTTON */
+  editor.ui.registry.addButton('imageshowpool', {
+    icon: 'gallery',
+    tooltip: 'Zeige Medium im Medienpool',
+    onAction: () => {
+      const img = getSelectedImg(editor);
+      if (!img) {
+        editor.notificationManager.open({ text: 'Bitte zuerst ein Bild auswählen.', type: 'warning', timeout: 3000 });
+        return;
+      }
+
+      const src = img.getAttribute('src');
+      if (!src) {
+        editor.notificationManager.open({ text: 'Bildquelle nicht gefunden.', type: 'warning', timeout: 3000 });
+        return;
+      }
+
+      // Extract filename from src (handle both full paths and media paths)
+      let filename = src.split('/').pop()?.split('?')[0] || '';
+      
+      // Open mediapool with the current image file
+      // Pass the filename as search/select parameter if possible
+      if (filename && typeof openREXMedia === 'function') {
+        try {
+          openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp&search=' + encodeURIComponent(filename));
+          editor.notificationManager.open({ 
+            text: `Medienpool öffnet sich für: ${filename}`, 
+            type: 'info', 
+            timeout: 3000 
+          });
+        } catch (e) {
+          editor.notificationManager.open({ 
+            text: 'Medienpool konnte nicht geöffnet werden.', 
+            type: 'error', 
+            timeout: 3000 
+          });
+        }
+      }
+    }
+  });
+
+  /* SWAP FROM MEDIAPOOL BUTTON */
+  editor.ui.registry.addButton('imageswappool', {
+    icon: 'sync',
+    tooltip: 'Austauschen aus Medienpool',
+    onAction: () => {
+      const img = getSelectedImg(editor);
+      if (!img) {
+        editor.notificationManager.open({ text: 'Bitte zuerst ein Bild auswählen.', type: 'warning', timeout: 3000 });
+        return;
+      }
+
+      if (typeof openREXMedia !== 'function') {
+        editor.notificationManager.open({ 
+          text: 'Medienpool ist nicht verfügbar.', 
+          type: 'error', 
+          timeout: 3000 
+        });
+        return;
+      }
+
+      try {
+        const mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
+
+        // Use jQuery to listen for media selection if available
+        if (typeof $ !== 'undefined' && $ && typeof $.fn.on === 'function') {
+          $(mediaPool).on('rex:selectMedia', function (event: any, filename: string) {
+            event.preventDefault();
+            mediaPool.close();
+
+            // Determine the correct path based on file extension
+            const extension = filename.split('.').pop()?.toLowerCase() || '';
+            const useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
+            const imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
+
+            // Update the image src
+            img.setAttribute('src', imagePath);
+            
+            // Try to fetch media metadata (alt text, etc.)
+            if (typeof $ !== 'undefined' && $.getJSON) {
+              $.getJSON(
+                'index.php?rex-api-call=tinymce_media_meta&file=' + encodeURIComponent(filename)
+              ).done(function (meta: any) {
+                if (meta && meta.alt) {
+                  img.setAttribute('alt', meta.alt);
+                }
+              }).fail(function () {
+                // If metadata fetch fails, just clear alt or keep existing
+              });
+            }
+
+            editor.nodeChanged();
+            editor.undoManager.add();
+            
+            editor.notificationManager.open({
+              text: `Bild erfolgreich aktualisiert: ${filename}`,
+              type: 'success',
+              timeout: 3000
+            });
+          });
+        } else {
+          // Fallback if jQuery is not available
+          editor.notificationManager.open({ 
+            text: 'jQuery ist nicht verfügbar. Bitte verwenden Sie den Standard-Medienpool.', 
+            type: 'warning', 
+            timeout: 5000 
+          });
+        }
+      } catch (e) {
+        editor.notificationManager.open({ 
+          text: 'Medienpool konnte nicht geöffnet werden.', 
+          type: 'error', 
+          timeout: 3000 
+        });
+      }
     }
   });
 
