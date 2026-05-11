@@ -164,6 +164,61 @@ Relevante Skripte liegen unter `scripts/`:
 - `sync-build-to-assets.js`
 - `clean-build.js`
 
+## Bei der Weiterentwicklung helfen
+
+Beiträge sind willkommen. Damit Änderungen gut reviewbar und stabil bleiben, halte dich an diese Leitplanken:
+
+- Arbeite mit kleinen, fokussierten Commits (ein Thema pro Commit).
+- Bevorzuge Anpassungen in `install/tinymce-profiles.json` statt harter Profil-Strings in PHP.
+- Nutze für neue Profil- oder Import-Logik immer `ProfileHelper`, nicht direkte DB-Spezialwege.
+- Belasse Demo-Schutzregeln intakt (`demo` darf nicht editierbar/löschbar werden).
+- Registriere neue Plugins über `PluginRegistry::addPlugin()` statt über verstreute Einzel-Implementierungen.
+- Lege JavaScript in Dateien unter `assets/scripts/` oder `custom_plugins/` ab, nicht inline in PHP.
+- Achte auf Rückwärtskompatibilität bei Profil-Imports (`extra`-Legacy-Feld weiterhin akzeptieren).
+
+Empfohlene lokale Checks vor einem PR/Commit:
+
+1. PHP-Syntax prüfen (`php -l` auf geänderten Dateien).
+2. Statische Analyse laufen lassen (`rexstan:analyze redaxo/src/addons/tinymce/`).
+3. Bei JS- oder Plugin-Änderungen Build ausführen und erzeugte Assets prüfen.
+4. Kurz im Backend testen: Profile-Liste, Preview, Import/Export, Reset, Demo-Schutz.
+
+## Build-Prozess im Detail
+
+Der Build besteht aus zwei Schritten: Vendor-Dateien bereitstellen und Custom-Plugins bauen/synchronisieren.
+
+### Typische Abläufe
+
+- Vollständiger Build:
+    - `pnpm run build`
+    - Führt intern `build:staging` und danach `build:sync` aus.
+- Nur Plugins neu bauen:
+    - `pnpm run plugins:build`
+- Nur Vendor-Dateien aktualisieren:
+    - `pnpm run vendor:copy`
+- Aufräumen:
+    - `pnpm run clean-build`
+
+### Was die Skripte machen
+
+- `vendor-copy.js`
+    - kopiert TinyMCE-Vendor-Dateien in das AddOn-Asset-Ziel.
+- `build-plugins.js`
+    - baut Plugins aus `custom_plugins/*` (minifiziert/bündelt).
+- `sync-build-to-assets.js`
+    - synchronisiert Build-Ergebnisse in die endgültigen `assets/`-Ziele.
+- `clean-build.js`
+    - entfernt Build-Artefakte für einen sauberen Neuaufbau.
+
+### Wann welcher Build nötig ist
+
+- Änderung in `custom_plugins/*`:
+    - mindestens `pnpm run plugins:build`, empfohlen `pnpm run build`.
+- Änderung an Vendor-Versionen oder Vendor-Dateien:
+    - `pnpm run vendor:copy`, danach empfohlen `pnpm run build`.
+- Nur PHP-Logik (ohne JS/Assets):
+    - kein vollständiger Node-Build zwingend, aber rexstan + kurzer Backend-Test.
+
 ## Best Practices für AddOn-Integratoren
 
 - Nutze bevorzugt JSON-Importe über `ProfileHelper::importProfileFromJson()`.
