@@ -81,7 +81,7 @@ if ('preview' === $func && $id > 0) {
     $sql = rex_sql::factory();
     $sql->setTable($profileTable);
     $sql->setWhere(['id' => $id]);
-    $sql->select('id, name, description, extra');
+    $sql->select('id, name, description, profile');
     $row = $sql->getArray();
     if (empty($row)) {
         rex_response::cleanOutputBuffers();
@@ -120,7 +120,7 @@ if ('phpcode' === $func && $id > 0) {
     $sql = rex_sql::factory();
     $sql->setTable($profileTable);
     $sql->setWhere(['id' => $id]);
-    $sql->select('id, name, description, plugins, toolbar, extra, mediatype, mediapath, mediacategory, upload_default');
+    $sql->select('id, name, description, profile, mediatype, mediapath, mediacategory, upload_default');
     $row = $sql->getArray();
     if (empty($row)) {
         rex_response::cleanOutputBuffers();
