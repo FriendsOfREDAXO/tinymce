@@ -571,6 +571,39 @@ const setup = (editor: Editor, _url: string): void => {
   }
   editor.options.set('image_caption', false);
 
+  /* DELETE/CUT/COPY HANDLERS FOR FIGURE */
+  // When deleting an image, also delete the surrounding figure if it exists
+  editor.on('BeforeExecCommand', (e: any) => {
+    if ((e.command === 'delete' || e.command === 'cut') && editor.selection) {
+      const img = getSelectedImg(editor);
+      if (img) {
+        const figure = getFigureWrap(img);
+        if (figure && figure.nodeName === 'FIGURE') {
+          // Select the entire figure and let the delete proceed on the figure instead
+          editor.selection.select(figure);
+          e.preventDefault();
+          editor.execCommand('delete');
+        }
+      }
+    }
+  });
+
+  // Allow copying the figure element (not just the img)
+  editor.on('BeforeExecCommand', (e: any) => {
+    if (e.command === 'copy' && editor.selection) {
+      const img = getSelectedImg(editor);
+      if (img) {
+        const figure = getFigureWrap(img);
+        if (figure && figure.nodeName === 'FIGURE') {
+          // Select the entire figure for copy
+          editor.selection.select(figure);
+          e.preventDefault();
+          editor.execCommand('copy');
+        }
+      }
+    }
+  });
+
   /* WIDTH MENU */
   editor.ui.registry.addMenuButton('imagewidth', {
     icon: 'resize',
