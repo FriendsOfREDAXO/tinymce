@@ -1,7 +1,6 @@
 <?php
 
 use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
-use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 use FriendsOfRedaxo\TinyMce\Utils\AssetUrl;
 
 $addon = rex_addon::get('tinymce');
@@ -39,11 +38,19 @@ if ('save_media_upload' === $func) {
         $message = rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
         try {
-            DefaultProfiles::resetAll();
+            \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::importProfileFromJson(
+                rex_path::addon('tinymce', 'install/tinymce-profiles.json'),
+                true
+            );
+            try {
+                TinyMceProfilesCreator::profilesCreate();
+            } catch (rex_functional_exception $e) {
+                // non-fatal
+            }
             $message = rex_view::success(rex_i18n::msg('tinymce_reset_default_profiles_success'));
         } catch (Throwable $e) {
             rex_logger::logException($e);
-            $message = rex_view::error(rex_i18n::msg('tinymce_profile_reset_failed'));
+            $message = rex_view::error($e->getMessage());
         }
     }
 }

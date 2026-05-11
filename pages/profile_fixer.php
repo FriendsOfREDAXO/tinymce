@@ -2,7 +2,6 @@
 
 use FriendsOfRedaxo\TinyMce\Handler\Database as TinyMceDatabaseHandler;
 use FriendsOfRedaxo\TinyMce\Creator\Profiles as TinyMceProfilesCreator;
-use FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles;
 use FriendsOfRedaxo\TinyMce\Utils\ProfileFixer;
 
 // Simple admin page to inspect and repair TinyMCE-8 profile definitions.
@@ -87,7 +86,15 @@ if ('reset_default_profiles' === $func) {
         echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
     } else {
         try {
-            DefaultProfiles::resetAll();
+            \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::importProfileFromJson(
+                rex_path::addon('tinymce', 'install/tinymce-profiles.json'),
+                true
+            );
+            try {
+                TinyMceProfilesCreator::profilesCreate();
+            } catch (rex_functional_exception $e) {
+                // non-fatal
+            }
             echo rex_view::success(rex_i18n::msg('tinymce_reset_default_profiles_success'));
         } catch (\Throwable $e) {
             rex_logger::logException($e);
@@ -162,7 +169,7 @@ echo $fragment->parse('core/page/section.php');
 // =============================================================================
 $resetBody = '<p>' . rex_i18n::msg('tinymce_reset_default_profiles_description') . '</p>';
 $resetBody .= '<ul>';
-foreach (DefaultProfiles::NAMES as $pName) {
+foreach (['full', 'light', 'default'] as $pName) {
     $resetBody .= '<li><code>' . rex_escape($pName) . '</code></li>';
 }
 $resetBody .= '<li><code>' . rex_escape(\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME) . '</code> <span class="text-muted">(' . rex_i18n::msg('tinymce_profile_demo_locked_badge') . ')</span></li>';

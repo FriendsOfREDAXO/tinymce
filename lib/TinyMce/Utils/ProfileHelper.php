@@ -90,12 +90,13 @@ class ProfileHelper
     /**
      * Imports one or more TinyMCE profiles from a JSON file.
      *
-     * @param string $filePath Absolute path to the JSON file
-     * @param bool $forceUpdate If true, overwrites existing profile data
-     * @return bool True if at least one profile was successfully created or updated
-     * @throws rex_sql_exception
-     */
-    public static function importProfileFromJson(string $filePath, bool $forceUpdate = false): bool
+    * @param string $filePath Absolute path to the JSON file
+    * @param bool $forceUpdate If true, overwrites existing profile data
+    * @param list<string> $onlyNames Optional list of profile names to import. If empty, all profiles are imported.
+    * @return bool True if at least one profile was successfully created or updated
+    * @throws rex_sql_exception
+    */
+    public static function importProfileFromJson(string $filePath, bool $forceUpdate = false, array $onlyNames = []): bool
     {
         $content = \rex_file::get($filePath);
         if ($content === null) {
@@ -113,6 +114,10 @@ class ProfileHelper
         foreach ($items as $item) {
             // Guard against malformed JSON where an item is not an array (e.g. a scalar in a mixed JSON array).
             if (!is_array($item)) {
+                continue;
+            }
+            // Filter by name if a whitelist was given.
+            if ([] !== $onlyNames && !in_array($item['name'] ?? '', $onlyNames, true)) {
                 continue;
             }
             // Name/description validation and field filtering happen in normalizeImportedProfile().

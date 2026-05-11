@@ -29,51 +29,12 @@ if ($isReinstall) {
 // This ensures external plugins get correct absolute URLs (boot.php runs at runtime)
 $this->setConfig('update_profiles', true);
 
-// Only import default profiles when there are no profiles yet. The package manager
-// also loads install.sql automatically, but we removed/avoid using install.sql to
-// prevent accidental overwrites or SQL syntax issues during reinstall. Insert
-// defaults in PHP so we can safely handle multi-line JS strings.
-
-try {
-	$sql = \rex_sql::factory();
-	$count = (int) $sql->getValue('SELECT COUNT(*) FROM ' . \rex::getTable('tinymce_profiles'));
-
-	if ($count === 0) {
-		// Load default profiles from DefaultProfiles utility
-		require_once __DIR__ . '/lib/TinyMce/Utils/DefaultProfiles.php';
-		$defaults = \FriendsOfRedaxo\TinyMce\Utils\DefaultProfiles::getDefaults();
-		$now = date('Y-m-d H:i:s');
-
-		// Insert default profiles (id 1..3)
-		foreach ($defaults as $i => $p) {
-			$ins = \rex_sql::factory();
-			$ins->setTable(\rex::getTable('tinymce_profiles'));
-			$ins->setValue('id', $i + 1);
-			$ins->setValue('name', $p['name']);
-			$ins->setValue('description', $p['description']);
-			$ins->setValue('profile', $p['profile']);
-			$ins->setValue('createdate', $now);
-			$ins->setValue('updatedate', $now);
-			$ins->setValue('createuser', 'admin');
-			$ins->setValue('updateuser', 'admin');
-			try {
-				$ins->insert();
-			} catch (\Throwable $e) {
-				// If another process already created the default rows (race), ignore duplicate PK
-				\rex_logger::logException($e);
-			}
-		}
-	}
-} catch (\Throwable $e) {
-	\rex_logger::logException($e);
-	echo \rex_view::error($e->getMessage());
-}
-
 // =============================================================================
-// Demo-Profil: immer (bei Install und Update) auf aktuellen Stand setzen.
-// Das Profil ist im Backend gesperrt (siehe pages/profiles.php) und versorgt
-// die Demo-Seite (pages/main.php) mit allen FOR-Plugins.
-// =============================================================================
+// Alle Standardprofile aus JSON importieren.
+// Demo-Profil ist in der JSON enthalten und wird hier ebenfalls angelegt.
+// Bei Reinstall delegiert install.php an update.php – dort wird nur das
+// Demo-Profil force-aktualisiert.
+//
 // Klassen manuell laden: Bei einer frischen Installation ist der Composer-
 // Classmap-Cache noch nicht (neu) aufgebaut, daher greift der Autoloader für
 // AddOn-Klassen hier noch nicht. Wir ziehen alle PHP-Klassendateien unter
@@ -82,7 +43,7 @@ try {
 // Beim Update läuft der Code im .new.tinymce-Pfad, während der Autoloader
 // die gleichnamigen Klassen bereits aus dem alten tinymce-Pfad geladen hat.
 // Darum vor jedem require_once prüfen, ob die Klasse / das Interface schon
-// existiert – sonst gibt es „Cannot declare class … already in use“.
+// existiert – sonst gibt es „Cannot declare class … already in use".
 $__tinymceClassIter = new \RecursiveIteratorIterator(
     new \RecursiveDirectoryIterator(__DIR__ . '/lib/TinyMce', \FilesystemIterator::SKIP_DOTS)
 );
@@ -103,15 +64,15 @@ foreach ($__tinymceClassIter as $__tinymceClassFile) {
 }
 unset($__tinymceClassIter, $__tinymceClassFile, $__tinymceClassSource, $__ns, $__cls, $__fqn);
 
+// Alle Standardprofile (full, light, default, demo) aus JSON einspielen.
+// forceUpdate=false: bereits vorhandene Profile werden nicht überschrieben.
 try {
-	\FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::ensureProfile(
-		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::NAME,
-		\FriendsOfRedaxo\TinyMce\Utils\DemoProfile::DESCRIPTION,
-        ['profile' => \FriendsOfRedaxo\TinyMce\Utils\DemoProfile::getExtra()],
-		true
-	);
+    \FriendsOfRedaxo\TinyMce\Utils\ProfileHelper::importProfileFromJson(
+        __DIR__ . '/install/tinymce-profiles.json'
+    );
 } catch (\Throwable $e) {
-	\rex_logger::logException($e);
+    \rex_logger::logException($e);
+    echo \rex_view::error($e->getMessage());
 }
 
 // Style-Sets: Table is created via ensure_table.php
