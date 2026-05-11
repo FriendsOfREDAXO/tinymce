@@ -225,7 +225,9 @@ Das `for_images` Plugin bietet umfassende Bildformatierung mit CSS-Framework-Unt
 
 ### Aktivierung
 
-Im Profil `for_images` zu den Plugins hinzufügen. Der Profil-Assistent bietet eine komfortable UI mit Template-Auswahl.
+Im Profil `for_images` **zusammen mit dem nativen `image` Plugin** zu den Plugins hinzufügen. Der Profil-Assistent bietet eine komfortable UI mit Template-Auswahl.
+
+**Wichtig:** Das `image` Plugin und `for_images` ergänzen sich gegenseitig. Das native `image` Plugin bietet die Grundfunktionalität zum Einfügen von Bildern, während `for_images` spezialisierte Formatierung (Breiten, Ausrichtung, Effekte) übernimmt. Beide Plugins sollten immer zusammen aktiviert werden.
 
 ### Konfiguration im Profil
 
