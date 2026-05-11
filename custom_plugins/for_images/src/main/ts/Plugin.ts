@@ -94,6 +94,31 @@ function getSelectedImg(editor: Editor): HTMLElement | null {
   return null;
 }
 
+function normalizeFigures(editor: Editor, scope?: ParentNode): void {
+  const root = scope ?? editor.getBody();
+  if (!root) {
+    return;
+  }
+
+  // Re-wrap standalone images (e.g. paste fallback that drops <figure>)
+  const standaloneImages = Array.from(root.querySelectorAll('img')).filter((img) => {
+    const parent = img.parentElement;
+    return !(parent && parent.nodeName === 'FIGURE');
+  });
+
+  standaloneImages.forEach((img) => {
+    ensureFigureWrap(editor, img as HTMLElement);
+  });
+
+  // Remove broken figure wrappers that have no image
+  const figures = Array.from(root.querySelectorAll('figure'));
+  figures.forEach((figure) => {
+    if (!figure.querySelector('img')) {
+      figure.remove();
+    }
+  });
+}
+
 /* ================================================================== */
 /*  Class Management                                                   */
 /* ================================================================== */
@@ -556,7 +581,14 @@ const setup = (editor: Editor, _url: string): void => {
   });
 
   editor.on('SetContent', () => {
+    normalizeFigures(editor);
     checkCke5Markup();
+  });
+
+  editor.on('PastePostProcess', (e: any) => {
+    if (e?.node) {
+      normalizeFigures(editor, e.node as ParentNode);
+    }
   });
 
   editor.on('ObjectResizeStart', (e: any) => {
@@ -592,6 +624,33 @@ const setup = (editor: Editor, _url: string): void => {
     return true;
   };
 
+  editor.on('copy', (e: ClipboardEvent) => {
+    const figure = getSelectedFigure();
+    if (!figure || !e.clipboardData) {
+      return;
+    }
+
+    e.clipboardData.setData('text/html', figure.outerHTML);
+    e.clipboardData.setData('text/plain', figure.textContent || '');
+    e.preventDefault();
+  });
+
+  editor.on('cut', (e: ClipboardEvent) => {
+    const figure = getSelectedFigure();
+    if (!figure || !e.clipboardData) {
+      return;
+    }
+
+    e.clipboardData.setData('text/html', figure.outerHTML);
+    e.clipboardData.setData('text/plain', figure.textContent || '');
+    e.preventDefault();
+
+    editor.undoManager.transact(() => {
+      editor.dom.remove(figure);
+    });
+    editor.nodeChanged();
+  });
+
   editor.on('keydown', (e: any) => {
     const key = String(e.key || '').toLowerCase();
 
@@ -622,7 +681,7 @@ const setup = (editor: Editor, _url: string): void => {
       return;
     }
 
-    if (command === 'delete' || command === 'forwarddelete') {
+    if (command === 'delete' || command === 'forwarddelete' || command === 'mceDelete') {
       const figure = getSelectedFigure();
       if (!figure) {
         return;
