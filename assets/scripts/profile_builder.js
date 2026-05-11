@@ -103,29 +103,8 @@ function initTinyMceProfileAssistant() {
     toolbarHtml += '</select><p class="help-block">' + (i18n.toolbar_mode_help || 'Controls how TinyMCE handles overflowing toolbar buttons.') + '</p></div></div></div>';
     toolbarHtml += '<div class="builder-toolbar-rows"></div>';
     toolbarHtml += '<button type="button" class="btn btn-default btn-xs builder-toolbar-row-add"><i class="rex-icon fa-plus"></i> ' + (i18n.toolbar_add_row || 'Add toolbar row') + '</button>';
-    toolbarHtml += '<div class="form-group" style="margin-top: 12px;"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><textarea class="form-control builder-toolbar-input" rows="3" readonly></textarea></div>';
+    toolbarHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><textarea class="form-control builder-toolbar-input" rows="3" readonly></textarea></div>';
     toolbarHtml += '</div>';
-
-    // Insert Menu Section
-    const defaultInsertItems = options.menu_insert_items || [];
-    const customMenuItems = options.custom_menu_items || {};
-    let insertMenuHtml = '<legend>' + (i18n.insert_menu || 'Insert Menu') + '</legend>';
-    insertMenuHtml += '<p class="help-block">' + (i18n.insert_menu_help || 'Configure which items appear in the menubar "Insert" menu.') + '</p>';
-    insertMenuHtml += '<div class="row"><div class="col-md-6"><div class="form-group"><label>' + (i18n.insert_menu_title || 'Menu title') + '</label><input type="text" class="form-control builder-insert-menu-title" value="Einfügen"></div></div></div>';
-    insertMenuHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.available_items || 'Available Items') + '</div><div class="panel-body" id="builder-insert-available-items">';
-    defaultInsertItems.forEach(function (btn) {
-        insertMenuHtml += '<button type="button" class="btn btn-default btn-xs builder-insert-item-btn" data-value="' + btn + '" style="margin-bottom: 4px;">' + btn + '</button> ';
-    });
-    insertMenuHtml += '<button type="button" class="btn btn-default btn-xs builder-insert-item-btn" data-value="|" style="margin-bottom: 4px;"><strong>| (' + (i18n.separator || 'Separator') + ')</strong></button> ';
-    insertMenuHtml += '</div></div>';
-    insertMenuHtml += '<div class=\"panel panel-info\"><div class=\"panel-heading\"><span class=\"for-plugin-badge\">FOR</span> ' + (i18n.custom_menu_items || 'Custom plugin items') + '</div><div class=\"panel-body\" id=\"builder-insert-custom-items\">';
-    Object.keys(customMenuItems).forEach(function (key) {
-        insertMenuHtml += '<button type=\"button\" class=\"btn btn-info btn-xs builder-insert-item-btn builder-insert-item-btn--for\" data-value=\"' + key + '\" title=\"' + customMenuItems[key] + '\" style=\"margin-bottom: 4px;\"><span class=\"for-plugin-badge\">FOR</span> ' + key + '</button> ';
-    });
-    insertMenuHtml += '</div></div>';
-    insertMenuHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.selected_toolbar || 'Selected (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body"><ul id="builder-insert-selected-items" class="list-inline" style="margin-bottom: 0;"></ul></div></div>';
-    insertMenuHtml += '<div class="form-group"><label>' + (i18n.insert_menu_result || 'Insert menu items (result)') + '</label><input type="text" class="form-control builder-insert-menu-input" readonly></div>';
-    toolbarHtml += insertMenuHtml;
 
     // Common Settings
     let settingsHtml = '<br><legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
@@ -150,34 +129,34 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar"> <strong>' + (i18n.context_toolbar || 'Context Toolbar (Quickbars)') + '</strong></label><p class="help-block">' + (i18n.context_toolbar_help || 'Shows tools directly at the cursor when text is selected.') + '</p></div></div>';
     settingsHtml += '<div class="col-md-12 builder-context-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
     
-    // Context Toolbar Builder
-    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.context_items || 'Context Toolbar (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
-    settingsHtml += '<div class="builder-context-picker"><div class="builder-context-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen.') + '</div></div>';
-    settingsHtml += '<div class="builder-context-pill-dropzone">';
-    settingsHtml += '<ul class="builder-context-pill-list" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
-    settingsHtml += '<div class="builder-context-inline-picker">';
-    settingsHtml += '<input type="text" class="form-control input-sm builder-context-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
-    settingsHtml += '<div class="builder-context-inline-picker-list"></div>';
+    // Context Toolbar Builder - use same toolbar-row pattern
+    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.context_items || 'Context Toolbar Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
+    settingsHtml += '<div class="builder-context-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
+    settingsHtml += '<div class="builder-toolbar-pill-dropzone">';
+    settingsHtml += '<ul class="builder-toolbar-pill-list builder-context-pill-list" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
+    settingsHtml += '<div class="builder-toolbar-inline-picker builder-context-inline-picker">';
+    settingsHtml += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-context-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    settingsHtml += '<div class="builder-toolbar-inline-picker-list builder-context-inline-picker-list"></div>';
     settingsHtml += '</div>';
     settingsHtml += '</div>';
     settingsHtml += '</div></div>';
     
-    settingsHtml += '<div class="form-group"><label>' + (i18n.context_result || 'Context Toolbar Code') + '</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
+    settingsHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.context_result || 'Context Toolbar Code') + '</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
     
     settingsHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar-insert"> ' + (i18n.show_insert_toolbar || 'Show Insert Toolbar') + '</label></div>';
     settingsHtml += '<div class="col-md-12 builder-insert-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
     settingsHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.insert_items || 'Insert Menu Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
-    settingsHtml += '<div class="builder-insert-picker"><div class="builder-insert-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen.') + '</div></div>';
-    settingsHtml += '<div class="builder-insert-pill-dropzone">';
-    settingsHtml += '<ul class="builder-insert-pill-list" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
-    settingsHtml += '<div class="builder-insert-inline-picker">';
-    settingsHtml += '<input type="text" class="form-control input-sm builder-insert-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
-    settingsHtml += '<div class="builder-insert-inline-picker-list"></div>';
+    settingsHtml += '<div class="builder-insert-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
+    settingsHtml += '<div class="builder-toolbar-pill-dropzone">';
+    settingsHtml += '<ul class="builder-toolbar-pill-list builder-insert-pill-list" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
+    settingsHtml += '<div class="builder-toolbar-inline-picker builder-insert-inline-picker">';
+    settingsHtml += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-insert-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    settingsHtml += '<div class="builder-toolbar-inline-picker-list builder-insert-inline-picker-list"></div>';
     settingsHtml += '</div>';
     settingsHtml += '</div>';
     settingsHtml += '</div></div>';
     
-    settingsHtml += '<div class="form-group"><label>' + (i18n.insert_result || 'Insert Menu Code') + '</label><input type="text" class="form-control builder-insert-menu-input" value="" readonly></div>';
+    settingsHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.insert_result || 'Insert Menu Code') + '</label><input type="text" class="form-control builder-insert-menu-input" value="" readonly></div>';
     settingsHtml += '</div>';
     settingsHtml += '</div>';
 
@@ -467,7 +446,12 @@ function initTinyMceProfileAssistant() {
     }
 
     // Styles for Sortable
-    const style = document.createElement('style');
+    let style = document.getElementById('tinymce-profile-assistant-styles');
+    if (!style) {
+        style = document.createElement('style');
+        style.id = 'tinymce-profile-assistant-styles';
+        document.head.appendChild(style);
+    }
     style.innerHTML = `
         /* CSS-Variablen: Light-Defaults auf dem Wrapper des Profile-Assistenten */
         #tinymce-profile-assistant {
@@ -485,17 +469,17 @@ function initTinyMceProfileAssistant() {
             --tpa-help-muted: #666;
             --tpa-context-border: #ddd;
         }
-        .builder-dropzone-panel-body {
+        #tinymce-profile-assistant .builder-dropzone-panel-body {
             background-color: var(--tpa-panel-body-bg);
         }
-        #builder-selected-items, #builder-context-selected-items, #builder-insert-selected-items {
+        #tinymce-profile-assistant #builder-selected-items, #tinymce-profile-assistant #builder-context-selected-items, #tinymce-profile-assistant #builder-insert-selected-items {
             min-height: 40px;
             border: 1px dashed var(--tpa-dropzone-border);
             padding: 10px;
             border-radius: 4px;
             background: var(--tpa-dropzone-bg);
         }
-        #builder-selected-items li, #builder-context-selected-items li, #builder-insert-selected-items li {
+        #tinymce-profile-assistant #builder-selected-items li, #tinymce-profile-assistant #builder-context-selected-items li, #tinymce-profile-assistant #builder-insert-selected-items li {
             cursor: move;
             margin-bottom: 5px;
             background: var(--tpa-chip-bg);
@@ -505,17 +489,17 @@ function initTinyMceProfileAssistant() {
             border-radius: 3px;
             display: inline-block;
         }
-        #builder-selected-items li:hover, #builder-context-selected-items li:hover, #builder-insert-selected-items li:hover {
+        #tinymce-profile-assistant #builder-selected-items li:hover, #tinymce-profile-assistant #builder-context-selected-items li:hover, #tinymce-profile-assistant #builder-insert-selected-items li:hover {
             background: var(--tpa-chip-hover-bg);
             border-color: var(--tpa-chip-hover-border);
         }
-        #builder-selected-items li .remove-item, #builder-context-selected-items li .remove-item, #builder-insert-selected-items li .remove-item {
+        #tinymce-profile-assistant #builder-selected-items li .remove-item, #tinymce-profile-assistant #builder-context-selected-items li .remove-item, #tinymce-profile-assistant #builder-insert-selected-items li .remove-item {
             margin-left: 8px;
             color: var(--tpa-chip-remove);
             cursor: pointer;
             font-weight: bold;
         }
-        #builder-selected-items li.placeholder, #builder-context-selected-items li.placeholder, #builder-insert-selected-items li.placeholder {
+        #tinymce-profile-assistant #builder-selected-items li.placeholder, #tinymce-profile-assistant #builder-context-selected-items li.placeholder, #tinymce-profile-assistant #builder-insert-selected-items li.placeholder {
             background: var(--tpa-placeholder-bg);
             border: 1px dashed var(--tpa-placeholder-border);
             height: 32px;
@@ -523,7 +507,7 @@ function initTinyMceProfileAssistant() {
         }
 
         /* FOR Plugin highlighting (FriendsOfREDAXO) - Light Mode Default */
-        .for-plugin-badge, .for-plugin-badge-inline {
+        #tinymce-profile-assistant .for-plugin-badge, #tinymce-profile-assistant .for-plugin-badge-inline {
             display: inline-block;
             padding: 2px 6px;
             font-size: 10px;
@@ -537,47 +521,47 @@ function initTinyMceProfileAssistant() {
             vertical-align: middle;
             box-shadow: 0 1px 2px rgba(0,0,0,.06);
         }
-        .for-plugin-badge-inline { margin-left: 6px; }
-        .for-plugin-legend-hint { margin-left: 8px; color: var(--tpa-help-muted); font-weight: 400; }
-        .builder-plugin-row--for label { font-weight: 600; }
-        .builder-plugin-row--for label input { accent-color: #2c7cb8; }
-        .builder-toolbar-btn--for {
+        #tinymce-profile-assistant .for-plugin-badge-inline { margin-left: 6px; }
+        #tinymce-profile-assistant .for-plugin-legend-hint { margin-left: 8px; color: var(--tpa-help-muted); font-weight: 400; }
+        #tinymce-profile-assistant .builder-plugin-row--for label { font-weight: 600; }
+        #tinymce-profile-assistant .builder-plugin-row--for label input { accent-color: #2c7cb8; }
+        #tinymce-profile-assistant .builder-toolbar-btn--for {
             background: linear-gradient(135deg, #e3f0fa 0%, #d0e8f7 100%) !important;
             color: #1a5a8a !important;
             border: 1px solid #6b9fbf !important;
             font-weight: 600;
         }
-        .builder-toolbar-btn--for:hover { background: #d0e8f7 !important; }
-        .builder-insert-item-btn--for {
+        #tinymce-profile-assistant .builder-toolbar-btn--for:hover { background: #d0e8f7 !important; }
+        #tinymce-profile-assistant .builder-insert-item-btn--for {
             background: linear-gradient(135deg, #e3f0fa, #d0e8f7) !important;
             border-color: #6b9fbf !important;
             color: #1a5a8a !important;
             font-weight: 600;
         }
-        .builder-insert-item-btn--for:hover { background: #c7dff4 !important; }
+        #tinymce-profile-assistant .builder-insert-item-btn--for:hover { background: #c7dff4 !important; }
 
         /* AddOn Plugin highlighting (plugins registered by OTHER addons) - Light Mode */
-        .for-plugin-badge--addon {
+        #tinymce-profile-assistant .for-plugin-badge--addon {
             background: linear-gradient(135deg, #eaf7f0, #d9efe5);
             color: #2d6a45;
             border-color: #7eca9d;
         }
-        .builder-plugin-row--addon label { font-weight: 600; }
-        .builder-plugin-row--addon label input { accent-color: #3e8c60; }
-        .builder-toolbar-btn--addon {
+        #tinymce-profile-assistant .builder-plugin-row--addon label { font-weight: 600; }
+        #tinymce-profile-assistant .builder-plugin-row--addon label input { accent-color: #3e8c60; }
+        #tinymce-profile-assistant .builder-toolbar-btn--addon {
             background: linear-gradient(135deg, #eaf7f0 0%, #d9efe5 100%) !important;
             color: #2d6a45 !important;
             border: 1px solid #7eca9d !important;
             font-weight: 600;
         }
-        .builder-toolbar-btn--addon:hover { background: #d9efe5 !important; }
-        .builder-insert-item-btn--addon {
+        #tinymce-profile-assistant .builder-toolbar-btn--addon:hover { background: #d9efe5 !important; }
+        #tinymce-profile-assistant .builder-insert-item-btn--addon {
             background: linear-gradient(135deg, #eaf7f0, #d9efe5) !important;
             border-color: #7eca9d !important;
             color: #2d6a45 !important;
             font-weight: 600;
         }
-        .builder-insert-item-btn--addon:hover { background: #cae5d9 !important; }
+        #tinymce-profile-assistant .builder-insert-item-btn--addon:hover { background: #cae5d9 !important; }
 
         .builder-toolbar-settings.is-disabled {
             opacity: 0.65;
@@ -742,7 +726,7 @@ function initTinyMceProfileAssistant() {
             margin-left: 4px;
             font-size: 18px;
         }
-        .remove-item:hover {
+        #tinymce-profile-assistant .remove-item:hover {
             color: #d9534f;
         }
         .builder-toolbar-inline-picker {
@@ -900,31 +884,31 @@ function initTinyMceProfileAssistant() {
             --tpa-help-muted: #8a98a6;
             --tpa-context-border: #3a4654;
         }
-        body.rex-theme-dark .for-plugin-badge,
-        body.rex-theme-dark .for-plugin-badge-inline {
+        body.rex-theme-dark #tinymce-profile-assistant .for-plugin-badge,
+        body.rex-theme-dark #tinymce-profile-assistant .for-plugin-badge-inline {
             background: linear-gradient(135deg, #2c5a8f, #1e4066);
             color: #8ec5ea;
             border-color: #2c7cb8;
             text-shadow: 0 1px 1px rgba(0,0,0,.3);
             box-shadow: 0 1px 2px rgba(0,0,0,.2);
         }
-        body.rex-theme-dark .for-plugin-badge--addon {
+        body.rex-theme-dark #tinymce-profile-assistant .for-plugin-badge--addon {
             background: linear-gradient(135deg, #2d6a45, #1e4626);
             color: #8fd4a8;
             border-color: #3e8c60;
         }
-        body.rex-theme-dark .builder-toolbar-btn--for {
+        body.rex-theme-dark #tinymce-profile-assistant .builder-toolbar-btn--for {
             background: linear-gradient(135deg, #2c5a8f 0%, #1e4066 100%) !important;
             color: #8ec5ea !important;
             border-color: #2c7cb8 !important;
         }
-        body.rex-theme-dark .builder-toolbar-btn--for:hover { background: #1e4066 !important; }
-        body.rex-theme-dark .builder-toolbar-btn--addon {
+        body.rex-theme-dark #tinymce-profile-assistant .builder-toolbar-btn--for:hover { background: #1e4066 !important; }
+        body.rex-theme-dark #tinymce-profile-assistant .builder-toolbar-btn--addon {
             background: linear-gradient(135deg, #2d6a45 0%, #1e4626 100%) !important;
             color: #8fd4a8 !important;
             border-color: #3e8c60 !important;
         }
-        body.rex-theme-dark .builder-toolbar-btn--addon:hover { background: #1e4626 !important; }
+        body.rex-theme-dark #tinymce-profile-assistant .builder-toolbar-btn--addon:hover { background: #1e4626 !important; }
         body.rex-theme-dark #tinymce-profile-assistant .panel {
             border-color: #34475a;
             background: #1b2632;
@@ -1029,31 +1013,31 @@ function initTinyMceProfileAssistant() {
                 --tpa-help-muted: #8a98a6;
                 --tpa-context-border: #3a4654;
             }
-            body.rex-has-theme:not(.rex-theme-light) .for-plugin-badge,
-            body.rex-has-theme:not(.rex-theme-light) .for-plugin-badge-inline {
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .for-plugin-badge,
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .for-plugin-badge-inline {
                 background: linear-gradient(135deg, #2c5a8f, #1e4066);
                 color: #8ec5ea;
                 border-color: #2c7cb8;
                 text-shadow: 0 1px 1px rgba(0,0,0,.3);
                 box-shadow: 0 1px 2px rgba(0,0,0,.2);
             }
-            body.rex-has-theme:not(.rex-theme-light) .for-plugin-badge--addon {
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .for-plugin-badge--addon {
                 background: linear-gradient(135deg, #2d6a45, #1e4626);
                 color: #8fd4a8;
                 border-color: #3e8c60;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for {
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-toolbar-btn--for {
                 background: linear-gradient(135deg, #2c5a8f 0%, #1e4066 100%) !important;
                 color: #8ec5ea !important;
                 border-color: #2c7cb8 !important;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--for:hover { background: #1e4066 !important; }
-            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon {
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-toolbar-btn--for:hover { background: #1e4066 !important; }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-toolbar-btn--addon {
                 background: linear-gradient(135deg, #2d6a45 0%, #1e4626 100%) !important;
                 color: #8fd4a8 !important;
                 border-color: #3e8c60 !important;
             }
-            body.rex-has-theme:not(.rex-theme-light) .builder-toolbar-btn--addon:hover { background: #1e4626 !important; }
+            body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .builder-toolbar-btn--addon:hover { background: #1e4626 !important; }
             body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .panel {
                 border-color: #34475a;
                 background: #1b2632;
@@ -1152,8 +1136,6 @@ function initTinyMceProfileAssistant() {
             }
         }
     `;
-    document.head.appendChild(style);
-
     // Logic
     const $toolbarRows = $builderBody.find('.builder-toolbar-rows');
     const $toolbarInput = $builderBody.find('.builder-toolbar-input');
@@ -1189,7 +1171,7 @@ function initTinyMceProfileAssistant() {
         if (origin === 'for') {
             return '<span class="for-plugin-badge">FOR</span>';
         }
-        return '<span class="for-plugin-badge for-plugin-badge--core">Core</span>';
+        return '';
     }
 
     function escapeHtml(value) {
@@ -1452,79 +1434,119 @@ function initTinyMceProfileAssistant() {
         $insertInput.val(items.join(' '));
     }
 
-    function listContainsValue($list, value) {
-        const normalized = normalizeToolbarItemValue(value);
-        if (!normalized) {
-            return false;
+    function getContextInsertMeta($list) {
+        const isContext = $list.attr('id') === 'builder-context-selected-items';
+        const addClass = isContext ? 'context-item-add' : 'insert-item-add';
+        const pickerSelector = isContext ? '.builder-context-inline-picker' : '.builder-insert-inline-picker';
+        const searchSelector = isContext ? '.builder-context-inline-picker-search' : '.builder-insert-inline-picker-search';
+        const listSelector = isContext ? '.builder-context-inline-picker-list' : '.builder-insert-inline-picker-list';
+        return { isContext, addClass, pickerSelector, searchSelector, listSelector };
+    }
+
+    function refreshContextInsertState($list) {
+        if ($list.attr('id') === 'builder-context-selected-items') {
+            updateContextInput();
+            renderContextInsertInlinePicker($list, '');
+            return;
         }
-        let exists = false;
-        $list.find('li').each(function() {
-            if (normalizeToolbarItemValue($(this).data('value')) === normalized) {
-                exists = true;
+        updateInsertInput();
+        renderContextInsertInlinePicker($list, '');
+    }
+
+    function addContextInsertPill($list, value = '', insertIndex = null) {
+        const normalizedValue = normalizeToolbarItemValue(value);
+        if (!normalizedValue) {
+            return;
+        }
+        const origin = getToolbarItemOrigin(normalizedValue);
+        const $pill = $('<li class="builder-toolbar-pill builder-toolbar-pill--' + origin + ' new" draggable="true"></li>');
+        $pill.attr('data-value', normalizedValue);
+        $pill.data('value', normalizedValue);
+        $pill.append($(getToolbarItemBadge(origin)));
+        $pill.append($('<span class="builder-toolbar-pill-text"></span>').text(normalizedValue));
+
+        const $existing = $list.children('.builder-toolbar-pill');
+        if (Number.isInteger(insertIndex) && insertIndex >= 0 && insertIndex < $existing.length) {
+            $existing.eq(insertIndex).before($pill);
+        } else {
+            $list.append($pill);
+        }
+
+        setupDragEvents($pill[0]);
+        $pill.on('animationend', function() {
+            $(this).removeClass('new');
+        });
+        refreshContextInsertState($list);
+    }
+
+    function renderContextInsertInlinePicker($list, query = '', selectedPillValue = null) {
+        const filter = String(query || '').trim().toLowerCase();
+        const separatorValue = '|';
+        const allItems = getToolbarPickerItems();
+        const meta = getContextInsertMeta($list);
+        const $dropzone = $list.closest('.builder-toolbar-pill-dropzone');
+        const $pickerList = $dropzone.find(meta.listSelector);
+
+        const selected = new Set();
+        $list.find('.builder-toolbar-pill').each(function() {
+            selected.add($(this).data('value'));
+        });
+
+        const items = allItems.filter((value) => {
+            if (value === separatorValue) {
+                return true;
+            }
+            if (selected.has(value)) {
                 return false;
             }
-        });
-        return exists;
-    }
-
-    function renderContextInlinePicker(query = '') {
-        const filter = String(query || '').trim().toLowerCase();
-        const separatorValue = '|';
-        const allItems = getToolbarPickerItems();
-        const items = allItems.filter((value) => {
-            if (value === separatorValue) {
-                return true;
-            }
             return filter === '' || value.toLowerCase().includes(filter);
         });
-        
-        // Filter out items already in context list
-        const $existingPills = $contextSelectedList.find('.builder-context-pill');
-        const usedValues = new Set();
-        $existingPills.each(function() {
-            usedValues.add($(this).data('value'));
-        });
-        
-        const filteredItems = items.filter((value) => {
-            if (value === separatorValue) {
-                return true;
-            }
-            return !usedValues.has(value);
-        });
-        
+
         const orderedItems = [];
-        if (filteredItems.includes(separatorValue)) {
+        if (items.includes(separatorValue)) {
             orderedItems.push(separatorValue);
         }
-        filteredItems.forEach((value) => {
+        items.forEach((value) => {
             if (value !== separatorValue) {
                 orderedItems.push(value);
             }
         });
-        
-        const $list = $contextSelectedList.closest('.builder-context-pill-dropzone').find('.builder-context-inline-picker-list');
-        if (orderedItems.length === 0) {
-            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
+
+        if (orderedItems.length === 0 && !selectedPillValue) {
+            $pickerList.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
             return;
         }
 
         let html = '';
+        html += '<div class="builder-toolbar-inline-picker-divider"></div>';
+        html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-clear-all" data-clear-all="true">' + escapeHtml(i18n.clear_all_toolbar || 'Alle loeschen') + '</button>';
+        if (selectedPillValue) {
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-delete" data-delete="' + escapeHtml(selectedPillValue) + '">' + escapeHtml(i18n.delete_toolbar_item || 'Loeschen') + '</button>';
+        }
+        html += '<div class="builder-toolbar-inline-picker-divider"></div>';
+
         orderedItems.forEach((value) => {
             const origin = getToolbarItemOrigin(value);
-            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-context-inline-picker-item builder-context-inline-picker-item--' + origin + '" data-value="' + escapeHtml(value) + '">' + getToolbarItemBadge(origin) + '<span class="builder-toolbar-inline-picker-text">' + escapeHtml(value) + '</span></button>';
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-item--' + origin + ' ' + meta.addClass + '" data-value="' + escapeHtml(value) + '">' + getToolbarItemBadge(origin) + '<span class="builder-toolbar-inline-picker-text">' + escapeHtml(value) + '</span></button>';
         });
-        
-        $list.html(html);
+        $pickerList.html(html);
     }
 
-    function openContextInlinePicker(clientX, clientY) {
-        const $picker = $contextSelectedList.closest('.builder-context-pill-dropzone').find('.builder-context-inline-picker');
-        const $search = $picker.find('.builder-context-inline-picker-search');
+    function closeAllContextInsertPickers() {
+        $builderBody.find('.builder-context-inline-picker, .builder-insert-inline-picker').hide();
+        $builderBody.find('.builder-context-inline-picker-search, .builder-insert-inline-picker-search').val('');
+    }
+
+    function openContextInsertInlinePicker($list, clientX, clientY, insertIndex, selectedPillValue = null) {
+        const meta = getContextInsertMeta($list);
+        const $dropzone = $list.closest('.builder-toolbar-pill-dropzone');
+        const $picker = $dropzone.find(meta.pickerSelector);
+        const $search = $picker.find(meta.searchSelector);
         const viewportPadding = 8;
         const anchorOffset = 10;
 
-        renderContextInlinePicker('');
-
+        closeAllContextInsertPickers();
+        renderContextInsertInlinePicker($list, '', selectedPillValue);
         $picker.css({ left: '-9999px', top: '-9999px' }).show();
 
         const pickerWidth = Math.ceil($picker.outerWidth() || 320);
@@ -1534,14 +1556,12 @@ function initTinyMceProfileAssistant() {
 
         let left = clientX + anchorOffset;
         let top = clientY + anchorOffset;
-
         if (left + pickerWidth > viewportWidth - viewportPadding) {
             left = clientX - pickerWidth - anchorOffset;
         }
         if (left < viewportPadding) {
             left = viewportPadding;
         }
-
         if (top + pickerHeight > viewportHeight - viewportPadding) {
             top = clientY - pickerHeight - anchorOffset;
         }
@@ -1549,165 +1569,12 @@ function initTinyMceProfileAssistant() {
             top = viewportPadding;
         }
 
-        $picker.css({ left: left + 'px', top: top + 'px' }).show();
+        $picker.css({ left: left + 'px', top: top + 'px' });
+        $list.data('inlineInsertIndex', Number.isInteger(insertIndex) ? insertIndex : 0);
+        $list.data('selectedPillValue', selectedPillValue);
         $search.val('').trigger('focus');
     }
 
-    function closeContextInlinePicker() {
-        const $picker = $contextSelectedList.closest('.builder-context-pill-dropzone').find('.builder-context-inline-picker');
-        $picker.hide();
-        $picker.find('.builder-context-inline-picker-search').val('');
-    }
-
-    function renderInsertInlinePicker(query = '') {
-        const filter = String(query || '').trim().toLowerCase();
-        const separatorValue = '|';
-        const allItems = getToolbarPickerItems();
-        const items = allItems.filter((value) => {
-            if (value === separatorValue) {
-                return true;
-            }
-            return filter === '' || value.toLowerCase().includes(filter);
-        });
-        
-        // Filter out items already in insert list
-        const $existingPills = $insertSelectedList.find('.builder-insert-pill');
-        const usedValues = new Set();
-        $existingPills.each(function() {
-            usedValues.add($(this).data('value'));
-        });
-        
-        const filteredItems = items.filter((value) => {
-            if (value === separatorValue) {
-                return true;
-            }
-            return !usedValues.has(value);
-        });
-        
-        const orderedItems = [];
-        if (filteredItems.includes(separatorValue)) {
-            orderedItems.push(separatorValue);
-        }
-        filteredItems.forEach((value) => {
-            if (value !== separatorValue) {
-                orderedItems.push(value);
-            }
-        });
-        
-        const $list = $insertSelectedList.closest('.builder-insert-pill-dropzone').find('.builder-insert-inline-picker-list');
-        if (orderedItems.length === 0) {
-            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
-            return;
-        }
-
-        let html = '';
-        orderedItems.forEach((value) => {
-            const origin = getToolbarItemOrigin(value);
-            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-insert-inline-picker-item builder-insert-inline-picker-item--' + origin + '" data-value="' + escapeHtml(value) + '">' + getToolbarItemBadge(origin) + '<span class="builder-toolbar-inline-picker-text">' + escapeHtml(value) + '</span></button>';
-        });
-        
-        $list.html(html);
-    }
-
-    function openInsertInlinePicker(clientX, clientY) {
-        const $picker = $insertSelectedList.closest('.builder-insert-pill-dropzone').find('.builder-insert-inline-picker');
-        const $search = $picker.find('.builder-insert-inline-picker-search');
-        const viewportPadding = 8;
-        const anchorOffset = 10;
-
-        renderInsertInlinePicker('');
-
-        $picker.css({ left: '-9999px', top: '-9999px' }).show();
-
-        const pickerWidth = Math.ceil($picker.outerWidth() || 320);
-        const pickerHeight = Math.ceil($picker.outerHeight() || 240);
-        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-
-        let left = clientX + anchorOffset;
-        let top = clientY + anchorOffset;
-
-        if (left + pickerWidth > viewportWidth - viewportPadding) {
-            left = clientX - pickerWidth - anchorOffset;
-        }
-        if (left < viewportPadding) {
-            left = viewportPadding;
-        }
-
-        if (top + pickerHeight > viewportHeight - viewportPadding) {
-            top = clientY - pickerHeight - anchorOffset;
-        }
-        if (top < viewportPadding) {
-            top = viewportPadding;
-        }
-
-        $picker.css({ left: left + 'px', top: top + 'px' }).show();
-        $search.val('').trigger('focus');
-    }
-
-    function closeInsertInlinePicker() {
-        const $picker = $insertSelectedList.closest('.builder-insert-pill-dropzone').find('.builder-insert-inline-picker');
-        $picker.hide();
-        $picker.find('.builder-insert-inline-picker-search').val('');
-    }
-
-    function addContextPill(value = '') {
-        const normalizedValue = normalizeToolbarItemValue(value);
-        if (!normalizedValue) {
-            return;
-        }
-        if (listContainsValue($contextSelectedList, normalizedValue)) {
-            return;
-        }
-        
-        const origin = getToolbarItemOrigin(normalizedValue);
-        const $pill = $('<li class="builder-context-pill builder-context-pill--' + origin + ' new" draggable="true"></li>');
-        $pill.attr('data-value', normalizedValue);
-        $pill.data('value', normalizedValue);
-        $pill.append($(getToolbarItemBadge(origin)));
-        $pill.append($('<span class="builder-context-pill-text"></span>').text(normalizedValue));
-        $pill.append($('<button type="button" class="remove-item">×</button>'));
-
-        $contextSelectedList.append($pill);
-        setupDragEvents($pill[0]);
-        $pill.on('animationend', function() {
-            $(this).removeClass('new');
-        });
-        updateContextInput();
-        renderContextInlinePicker('');
-    }
-
-    function addInsertPill(value = '') {
-        const normalizedValue = normalizeToolbarItemValue(value);
-        if (!normalizedValue) {
-            return;
-        }
-        if (listContainsValue($insertSelectedList, normalizedValue)) {
-            return;
-        }
-        
-        const origin = getToolbarItemOrigin(normalizedValue);
-        const $pill = $('<li class="builder-insert-pill builder-insert-pill--' + origin + ' new" draggable="true"></li>');
-        $pill.attr('data-value', normalizedValue);
-        $pill.data('value', normalizedValue);
-        $pill.append($(getToolbarItemBadge(origin)));
-        $pill.append($('<span class="builder-insert-pill-text"></span>').text(normalizedValue));
-        $pill.append($('<button type="button" class="remove-item">×</button>'));
-
-        $insertSelectedList.append($pill);
-        setupDragEvents($pill[0]);
-        $pill.on('animationend', function() {
-            $(this).removeClass('new');
-        });
-        updateInsertInput();
-        renderInsertInlinePicker('');
-    }
-
-    // Initialize Context Items from default value
-    const defaultContextItems = $contextInput.val().split(' ').filter(v => v.trim());
-    defaultContextItems.forEach(addContextPill);
-    renderContextInlinePicker('');
-    renderInsertInlinePicker('');
 
     function setPlugins(plugins) {
         $builderBody.find('.builder-plugin').prop('checked', false);
@@ -1744,72 +1611,113 @@ function initTinyMceProfileAssistant() {
         $builderBody.find('.builder-imagewidth-enable').prop('checked', true).trigger('change');
     });
 
-    // Context Inline Picker Events
-    $builderBody.find('.builder-context-inline-picker-search').on('keyup', function() {
-        renderContextInlinePicker($(this).val());
+    // Context/Insert Inline Picker Events (toolbar-identisches Verhalten)
+    $builderBody.on('input', '.builder-context-inline-picker-search, .builder-insert-inline-picker-search', function() {
+        const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
+        const selectedPillValue = $list.data('selectedPillValue');
+        renderContextInsertInlinePicker($list, $(this).val(), selectedPillValue);
     });
 
-    $builderBody.on('click', '.builder-context-inline-picker-item', function(e) {
-        e.preventDefault();
-        const value = $(this).data('value');
-        addContextPill(value);
-        closeContextInlinePicker();
-    });
-
-    $builderBody.find('.builder-context-pill-dropzone').on('click', function(e) {
-        const $clickTarget = $(e.target).closest('.builder-context-pill');
-        if ($clickTarget.length > 0) {
+    $builderBody.on('keydown', '.builder-context-inline-picker-search, .builder-insert-inline-picker-search', function(e) {
+        const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
+        if (e.key === 'Escape') {
+            closeAllContextInsertPickers();
+            e.preventDefault();
             return;
         }
-        const $list = $(this).find('.builder-context-pill-list');
-        openContextInlinePicker(e.clientX, e.clientY);
+        if (e.key === 'Enter') {
+            const $first = $list.closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-inline-picker-item').first();
+            if ($first.length > 0) {
+                $first.trigger('click');
+            }
+            e.preventDefault();
+        }
     });
 
-    // Insert Inline Picker Events
-    $builderBody.find('.builder-insert-inline-picker-search').on('keyup', function() {
-        renderInsertInlinePicker($(this).val());
-    });
-
-    $builderBody.on('click', '.builder-insert-inline-picker-item', function(e) {
+    $builderBody.on('click', '.context-item-add, .insert-item-add', function(e) {
         e.preventDefault();
-        const value = $(this).data('value');
-        addInsertPill(value);
-        closeInsertInlinePicker();
+        e.stopPropagation();
+        const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
+        const insertIndex = $list.data('inlineInsertIndex');
+        addContextInsertPill($list, $(this).data('value'), Number.isInteger(insertIndex) ? insertIndex : null);
+        closeAllContextInsertPickers();
     });
 
-    $builderBody.find('.builder-insert-pill-dropzone').on('click', function(e) {
-        const $clickTarget = $(e.target).closest('.builder-insert-pill');
-        if ($clickTarget.length > 0) {
+    $builderBody.on('click', '#builder-context-selected-items, #builder-insert-selected-items', function(e) {
+        if ($(e.target).closest('.builder-context-inline-picker, .builder-insert-inline-picker').length > 0) {
             return;
         }
-        const $list = $(this).find('.builder-insert-pill-list');
-        openInsertInlinePicker(e.clientX, e.clientY);
+        const $list = $(this);
+        const $clickedPill = $(e.target).closest('.builder-toolbar-pill');
+
+        if ($clickedPill.length > 0) {
+            e.stopPropagation();
+            const $existing = $list.children('.builder-toolbar-pill');
+            const clickedIndex = $existing.index($clickedPill);
+            const insertIndex = Number.isInteger(clickedIndex) && clickedIndex >= 0 ? clickedIndex + 1 : $existing.length;
+            const pillRect = $clickedPill[0].getBoundingClientRect();
+            const clientX = pillRect.right + 8;
+            const clientY = pillRect.top;
+            openContextInsertInlinePicker($list, clientX, clientY, insertIndex, $clickedPill.data('value'));
+            return;
+        }
+
+        const insertIndex = getToolbarInsertIndexFromPoint($list, e.clientX);
+        openContextInsertInlinePicker($list, e.clientX, e.clientY, insertIndex, null);
     });
 
-    // Remove context/insert pills via X button
-    $contextSelectedList.on('click', '.remove-item', function(e) {
+    $builderBody.on('click', '.builder-context-inline-picker, .builder-insert-inline-picker', function(e) {
         e.stopPropagation();
-        $(this).closest('li').remove();
-        updateContextInput();
-        renderContextInlinePicker('');
     });
 
-    $insertSelectedList.on('click', '.remove-item', function(e) {
+    $builderBody.on('click', '.builder-context-inline-picker .builder-toolbar-inline-picker-delete, .builder-insert-inline-picker .builder-toolbar-inline-picker-delete', function(e) {
+        e.preventDefault();
         e.stopPropagation();
-        $(this).closest('li').remove();
-        updateInsertInput();
-        renderInsertInlinePicker('');
+        const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
+        const valueToDel = $(this).data('delete');
+        let deleted = false;
+        $list.find('.builder-toolbar-pill').each(function() {
+            if ($(this).data('value') === valueToDel && !deleted) {
+                $(this).remove();
+                deleted = true;
+            }
+        });
+        refreshContextInsertState($list);
+        closeAllContextInsertPickers();
+    });
+
+    $builderBody.on('click', '.builder-context-inline-picker .builder-toolbar-inline-picker-clear-all, .builder-insert-inline-picker .builder-toolbar-inline-picker-clear-all', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
+        if ($list.find('.builder-toolbar-pill').length === 0) {
+            closeAllContextInsertPickers();
+            return;
+        }
+        const confirmMessage = i18n.confirm_clear_all_toolbar || 'Alle Elemente in dieser Toolbar-Zeile wirklich loeschen?';
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+        $list.find('.builder-toolbar-pill').remove();
+        refreshContextInsertState($list);
+        closeAllContextInsertPickers();
     });
 
     // Close pickers when clicking elsewhere
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('.builder-context-pill-dropzone').length) {
-            closeContextInlinePicker();
+        if (!$(e.target).closest('.builder-context-inline-picker, .builder-context-inline-picker-search, .context-item-add').length &&
+            !$(e.target).closest($contextSelectedList).length) {
+            $builderBody.find('.builder-context-inline-picker').hide();
         }
-        if (!$(e.target).closest('.builder-insert-pill-dropzone').length) {
-            closeInsertInlinePicker();
+        if (!$(e.target).closest('.builder-insert-inline-picker, .builder-insert-inline-picker-search, .insert-item-add').length &&
+            !$(e.target).closest($insertSelectedList).length) {
+            $builderBody.find('.builder-insert-inline-picker').hide();
         }
     });
+
+    // Initialize
+    renderContextInsertInlinePicker($contextSelectedList, '');
+    renderContextInsertInlinePicker($insertSelectedList, '');
 
     $builderBody.on('click', '.builder-toolbar-row-add', function() {
         addToolbarRow();
@@ -1993,10 +1901,10 @@ function initTinyMceProfileAssistant() {
             // Keep hidden inputs and inline picker states in sync.
             if (list.id === 'builder-context-selected-items') {
                 updateContextInput();
-                renderContextInlinePicker('');
+                renderContextInsertInlinePicker($contextSelectedList, '');
             } else if (list.id === 'builder-insert-selected-items') {
                 updateInsertInput();
-                renderInsertInlinePicker('');
+                renderContextInsertInlinePicker($insertSelectedList, '');
             } else {
                 updateInput();
             }
@@ -2640,11 +2548,10 @@ function generateConfig($textarea, $builderBody) {
         configStr += `tinymce_media_type: '${mediaType}',\n`;
     }
 
-    // Insert Menu (menubar > Einfügen)
+    // Insert Menu (menubar > Insert)
     const insertMenuItems = escapeString($builderBody.find('.builder-insert-menu-input').val() || '');
-    const insertMenuTitle = escapeString($builderBody.find('.builder-insert-menu-title').val() || 'Einfügen');
     if (menubar && insertMenuItems) {
-        configStr += `menu: {\n  insert: { title: '${insertMenuTitle}', items: '${insertMenuItems}' }\n},\n`;
+        configStr += `menu: {\n  insert: { title: 'Insert', items: '${insertMenuItems}' }\n},\n`;
     }
 
     if (plugins.length > 0) {
@@ -2944,27 +2851,25 @@ function loadFromConfig($textarea, $builderBody) {
 
     const tokenize = (s) => String(s || '').trim().split(/\s+/).filter(Boolean);
     const loadI18n = rex.tinymceProfileI18n || {};
+    const profileOptions = (typeof rex !== 'undefined' && rex.tinymceProfileOptions) ? rex.tinymceProfileOptions : {};
+    const addonToolbarSet = new Set(profileOptions.addon_toolbar_buttons || []);
+    const forToolbarSet = new Set(profileOptions.for_toolbar_buttons || []);
+    const originFor = (value) => {
+        if (addonToolbarSet.has(value)) return 'addon';
+        if (forToolbarSet.has(value)) return 'for';
+        return 'core';
+    };
+    const badgeFor = (origin) => {
+        if (origin === 'addon') return '<span class="for-plugin-badge for-plugin-badge--addon">AddOn</span>';
+        if (origin === 'for') return '<span class="for-plugin-badge">FOR</span>';
+        return '';
+    };
     const $toolbarRows = $builderBody.find('.builder-toolbar-rows');
     const setToolbarRows = (rows) => {
         const removeLabel = loadI18n.toolbar_remove_row || 'Remove toolbar row';
         const emptyLabel = loadI18n.toolbar_row_empty || 'No items yet. Select items from the picker below.';
         const rowTitle = loadI18n.toolbar_row || 'Toolbar row';
         const pickerLabel = loadI18n.toolbar_picker || 'Toolbarfeld';
-        const profileOptions = (typeof rex !== 'undefined' && rex.tinymceProfileOptions) ? rex.tinymceProfileOptions : {};
-        const addonToolbarSet = new Set(profileOptions.addon_toolbar_buttons || []);
-        const forToolbarSet = new Set(profileOptions.for_toolbar_buttons || []);
-
-        const originFor = (value) => {
-            if (addonToolbarSet.has(value)) return 'addon';
-            if (forToolbarSet.has(value)) return 'for';
-            return 'core';
-        };
-        const badgeFor = (origin) => {
-            if (origin === 'addon') return '<span class="for-plugin-badge for-plugin-badge--addon">AddOn</span>';
-            if (origin === 'for') return '<span class="for-plugin-badge">FOR</span>';
-            return '<span class="for-plugin-badge for-plugin-badge--core">Core</span>';
-        };
-
         const normalizedRows = Array.isArray(rows) && rows.length > 0 ? rows : [[]];
         $toolbarRows.empty();
         normalizedRows.forEach((items, index) => {
@@ -3075,21 +2980,19 @@ function loadFromConfig($textarea, $builderBody) {
     }
 
     // Context toolbar (quickbars)
-    if (pluginList.indexOf('quickbars') !== -1 || typeof cfg.quickbars_selection_toolbar === 'string' || typeof cfg.quickbars_insert_toolbar !== 'undefined' || typeof cfg.quickbars_image_toolbar !== 'undefined') {
+    if (pluginList.indexOf('quickbars') !== -1 || typeof cfg.quickbars_selection_toolbar === 'string' || typeof cfg.quickbars_insert_toolbar !== 'undefined') {
         $builderBody.find('.builder-context-toolbar').prop('checked', true).trigger('change');
     }
     if (typeof cfg.quickbars_selection_toolbar === 'string') {
         const $ctxList = $('#builder-context-selected-items');
         $ctxList.empty();
         tokenize(cfg.quickbars_selection_toolbar).forEach((v) => {
-            const origin = getToolbarItemOrigin(v);
-            const $li = $('<li class="builder-context-pill builder-context-pill--' + origin + '" draggable="true"></li>');
-            $li.attr('data-value', v);
-            $li.data('value', v);
-            $li.append($(getToolbarItemBadge(origin)));
-            $li.append($('<span class="builder-context-pill-text"></span>').text(v));
-            $li.append($('<button type="button" class="remove-item">×</button>'));
-            $ctxList.append($li);
+            const origin = originFor(v);
+            const $pill = $('<li class="builder-toolbar-pill builder-toolbar-pill--' + origin + '" draggable="true"></li>');
+            $pill.attr('data-value', v).data('value', v);
+            $pill.append($(badgeFor(origin)));
+            $pill.append($('<span class="builder-toolbar-pill-text"></span>').text(v));
+            $ctxList.append($pill);
         });
         $builderBody.find('.builder-context-toolbar-selection').val(tokenize(cfg.quickbars_selection_toolbar).join(' '));
     }
@@ -3099,20 +3002,16 @@ function loadFromConfig($textarea, $builderBody) {
 
     // Insert menu
     if (cfg.menu && cfg.menu.insert) {
-        const title = cfg.menu.insert.title || 'Einfügen';
         const items = cfg.menu.insert.items || '';
-        $builderBody.find('.builder-insert-menu-title').val(title);
         const $insertList = $('#builder-insert-selected-items');
         $insertList.empty();
         tokenize(items).forEach((v) => {
-            const origin = getToolbarItemOrigin(v);
-            const $li = $('<li class="builder-insert-pill builder-insert-pill--' + origin + '" draggable="true"></li>');
-            $li.attr('data-value', v);
-            $li.data('value', v);
-            $li.append($(getToolbarItemBadge(origin)));
-            $li.append($('<span class="builder-insert-pill-text"></span>').text(v));
-            $li.append($('<button type="button" class="remove-item">×</button>'));
-            $insertList.append($li);
+            const origin = originFor(v);
+            const $pill = $('<li class="builder-toolbar-pill builder-toolbar-pill--' + origin + '" draggable="true"></li>');
+            $pill.attr('data-value', v).data('value', v);
+            $pill.append($(badgeFor(origin)));
+            $pill.append($('<span class="builder-toolbar-pill-text"></span>').text(v));
+            $insertList.append($pill);
         });
         $builderBody.find('.builder-insert-menu-input').val(tokenize(items).join(' '));
     }
