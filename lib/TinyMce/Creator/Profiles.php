@@ -145,7 +145,7 @@ const tinyprofiles = $profiles;
             $extra = str_replace('"assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
             $extra = str_replace('"..\\/assets\\/addons\\/tinymce\\/', '"' . $addonAssetBaseEscaped . '\\/', $extra);
 
-            if (!preg_match('/(^|\s)quickbars(\s|$)/', $plugins)) {
+            if (!self::profileHasPlugin('quickbars', $plugins, $extra)) {
                 $sanitized = preg_replace('/^\s*quickbars_(?:selection|insert|image)_toolbar\s*:\s*[^,\r\n]+,\s*$/mi', '', $extra);
                 if (is_string($sanitized)) {
                     $extra = $sanitized;
@@ -155,6 +155,33 @@ const tinyprofiles = $profiles;
             return $extra;
         }
         return $jsonProfile;
+    }
+
+    private static function profileHasPlugin(string $plugin, string $legacyPlugins, string $extra): bool
+    {
+        $pluginPattern = '/(^|\s)' . preg_quote($plugin, '/') . '(\s|$)/';
+
+        if (preg_match($pluginPattern, $legacyPlugins) === 1) {
+            return true;
+        }
+
+        // Assistant-generated profiles keep plugins in `extra` as: plugins: 'a b c'.
+        if (preg_match('/(?:^|[,\{\r\n])\s*plugins\s*:\s*(["\'])([^"\']*)\1/mi', $extra, $stringMatch) === 1) {
+            $pluginsString = $stringMatch[2];
+            if (preg_match($pluginPattern, $pluginsString) === 1) {
+                return true;
+            }
+        }
+
+        // Also support array syntax: plugins: ['a', 'b', 'quickbars'].
+        if (preg_match('/(?:^|[,\{\r\n])\s*plugins\s*:\s*\[([^\]]*)\]/mi', $extra, $arrayMatch) === 1) {
+            $pluginsArrayBody = $arrayMatch[1];
+            if (preg_match('/(["\'])' . preg_quote($plugin, '/') . '\\1/', $pluginsArrayBody) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function getAddon(): rex_addon|rex_addon_interface
