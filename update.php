@@ -168,6 +168,101 @@ try {
     // Migration ist best-effort
 }
 
+// =============================================================================
+// Migration: Legacy-Spalten (plugins/toolbar) mit extra synchronisieren (v8.8.1)
+// =============================================================================
+// Historisch lagen plugins/toolbar in eigenen DB-Spalten. Der Profile-Assistant
+// schreibt diese Werte inzwischen in `extra`. Beim Update werden beide Quellen
+// abgeglichen, damit alte und neue Profile konsistent sind.
+if (rex_string::versionCompare($this->getVersion(), '8.8.1', '<')) {
+    try {
+        $extractStringProp = static function (string $extra, string $key): ?string {
+            $pattern = '/(?:^|[,\{\r\n])\s*' . preg_quote($key, '/') . '\s*:\s*(["\'])([^"\']*)\1/mi';
+            if (preg_match($pattern, $extra, $match) !== 1) {
+                return null;
+            }
+
+            $value = trim($match[2]);
+            return '' === $value ? null : $value;
+        };
+
+        $normalizeTokenList = static function (string $value): string {
+            $parts = preg_split('/\s+/', trim($value));
+            if (!is_array($parts)) {
+                return '';
+            }
+            $parts = array_values(array_filter($parts, static fn (string $v): bool => '' !== trim($v)));
+            return implode(' ', $parts);
+        };
+
+        $appendStringProp = static function (string $extra, string $key, string $value): string {
+            $escaped = str_replace(['\\', "'"], ['\\\\', "\\'"], $value);
+            $line = $key . ": '" . $escaped . "',";
+
+            $trimmed = trim($extra);
+            if ('' === $trimmed) {
+                return $line . "\n";
+            }
+
+            if (!preg_match('/,\s*$/', $trimmed)) {
+                $trimmed .= ',';
+            }
+
+            return $trimmed . "\n" . $line . "\n";
+        };
+
+        $sql = rex_sql::factory();
+        $profiles = $sql->getArray('SELECT id, plugins, toolbar, extra FROM ' . rex::getTable('tinymce_profiles'));
+
+        foreach ($profiles as $profile) {
+            $needsUpdate = false;
+
+            $legacyPlugins = $normalizeTokenList((string) ($profile['plugins'] ?? ''));
+            $legacyToolbar = trim((string) ($profile['toolbar'] ?? ''));
+            $extra = (string) ($profile['extra'] ?? '');
+
+            $extraPlugins = $extractStringProp($extra, 'plugins');
+            $extraToolbar = $extractStringProp($extra, 'toolbar');
+
+            // `extra` ist die führende Quelle, wenn dort Werte gesetzt sind.
+            if (null !== $extraPlugins) {
+                $normalizedExtraPlugins = $normalizeTokenList($extraPlugins);
+                if ($normalizedExtraPlugins !== $legacyPlugins) {
+                    $legacyPlugins = $normalizedExtraPlugins;
+                    $needsUpdate = true;
+                }
+            } elseif ('' !== $legacyPlugins) {
+                $extra = $appendStringProp($extra, 'plugins', $legacyPlugins);
+                $needsUpdate = true;
+            }
+
+            if (null !== $extraToolbar) {
+                $normalizedExtraToolbar = trim($extraToolbar);
+                if ($normalizedExtraToolbar !== $legacyToolbar) {
+                    $legacyToolbar = $normalizedExtraToolbar;
+                    $needsUpdate = true;
+                }
+            } elseif ('' !== $legacyToolbar) {
+                $extra = $appendStringProp($extra, 'toolbar', $legacyToolbar);
+                $needsUpdate = true;
+            }
+
+            if ($needsUpdate) {
+                $upd = rex_sql::factory();
+                $upd->setTable(rex::getTable('tinymce_profiles'));
+                $upd->setWhere(['id' => (int) $profile['id']]);
+                $upd->setValue('plugins', $legacyPlugins);
+                $upd->setValue('toolbar', $legacyToolbar);
+                $upd->setValue('extra', $extra);
+                $upd->setValue('updatedate', date('Y-m-d H:i:s'));
+                $upd->update();
+            }
+        }
+    } catch (rex_sql_exception $e) {
+        rex_logger::logException($e);
+    }
+}
+
 // Migration: installation_root ist nicht mehr nötig – wird automatisch via rex_url aufgelöst
 $this->removeConfig('installation_root');
 
@@ -304,6 +399,14 @@ try {
         $upd->update();
     }
 } catch (rex_sql_exception $e) {
+    rex_logger::logException($e);
+}
+
+// Finale Regenerierung: sicherstellen, dass profiles.js den synchronisierten
+// Profilstand sofort nach dem Update widerspiegelt.
+try {
+    \FriendsOfRedaxo\TinyMce\Creator\Profiles::profilesCreate();
+} catch (\Throwable $e) {
     rex_logger::logException($e);
 }
 
