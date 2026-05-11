@@ -5,11 +5,10 @@
  * @psalm-scope-this rex_addon
  */
 
-// ensure schema (include a plain PHP file — safe during install/update)
-$this->includeFile(__DIR__ . '/ensure_table.php');
-
 // Guard: this update path requires at least v8.8.1 as source version.
-if (rex_string::versionCompare($this->getVersion(), '8.8.1', '<')) {
+// Note: During update.php execution, $this points to the new addon in .new.* directory.
+// We need to get the old/current installed version from the system registry.
+if (rex_string::versionCompare(rex_addon::get('tinymce')->getVersion(), '8.8.1', '<')) {
     echo rex_view::error(
         'Dieses Update erfordert mindestens TinyMCE v8.8.1 als Ausgangsversion. '
         . 'Bitte zuerst auf v8.8.1 aktualisieren.'
@@ -17,6 +16,9 @@ if (rex_string::versionCompare($this->getVersion(), '8.8.1', '<')) {
 
     return false;
 }
+
+// ensure schema (include a plain PHP file — safe during install/update)
+$this->includeFile(__DIR__ . '/ensure_table.php');
 
 // =============================================================================
 // Migration (v8.9.0): Rename `extra` column → `profile`

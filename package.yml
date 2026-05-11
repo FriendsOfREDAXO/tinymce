@@ -54,3 +54,6 @@ conflicts:
 
 installer_ignore:
     - .github
+    - pnpm-workspace.yaml
+    - .php-cs-fixer.php
+    - custom_plugins

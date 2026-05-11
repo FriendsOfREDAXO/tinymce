@@ -1,0 +1,4 @@
+.github export-ignore
+pnpm-workspace.yaml export-ignore
+.php-cs-fixer.php export-ignore
+custom_plugins export-ignore
