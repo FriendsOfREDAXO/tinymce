@@ -1,5 +1,5 @@
 package: tinymce
-version: '8.9.0'
+version: '8.9.0-beta1'
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/tinymce/issues
 
@@ -51,6 +51,7 @@ conflicts:
     packages:
         tinymce4: '>=0.0.0'
         tinymce5: '>=0.0.0'
+        tinymce: '<8.8.0'
 
 installer_ignore:
     - .github
