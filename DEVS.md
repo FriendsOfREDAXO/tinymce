@@ -173,6 +173,36 @@ Erweitert verfügbare Profil-Optionen (Plugins, Toolbar-Buttons, externe Plugin-
 Wird in `Provider\Assets::provideBaseAssets()` gefeuert.
 Geeignet für globale Optionen wie zusätzliche `content_css` oder `style_formats`.
 
+### TINY_PROFILE_CLONE
+
+Wird nach dem Duplizieren eines Profils in der Backend-UI gefeuert.
+
+- Subject: neue Profil-ID (`int`)
+
+Beispiel:
+
+```php
+rex_extension::register('TINY_PROFILE_CLONE', static function (rex_extension_point $ep) {
+    $newProfileId = (int) $ep->getSubject();
+    rex_logger::factory()->log('info', 'Profil geklont: ' . $newProfileId);
+});
+```
+
+### TINY_PROFILE_DELETE
+
+Wird nach dem Löschen eines Profils gefeuert.
+
+- Subject: gelöschte Profil-ID (`int`)
+
+Beispiel:
+
+```php
+rex_extension::register('TINY_PROFILE_DELETE', static function (rex_extension_point $ep) {
+    $deletedProfileId = (int) $ep->getSubject();
+    // Eigene Cleanup-Logik
+});
+```
+
 ## APIs im AddOn
 
 Vorhandene API-Klassen unter `lib/`:
@@ -258,6 +288,13 @@ Der Build besteht aus zwei Schritten: Vendor-Dateien bereitstellen und Custom-Pl
     - `pnpm run vendor:copy`, danach empfohlen `pnpm run build`.
 - Nur PHP-Logik (ohne JS/Assets):
     - kein vollständiger Node-Build zwingend, aber rexstan + kurzer Backend-Test.
+
+### CI-Hinweis
+
+Für CI ist der übliche Ablauf:
+
+- `pnpm install && pnpm run build`
+- anschließend Artefakte unter `assets/scripts/tinymce/plugins` und `assets/vendor/tinymce/plugins` prüfen.
 
 ## Best Practices für AddOn-Integratoren
 
