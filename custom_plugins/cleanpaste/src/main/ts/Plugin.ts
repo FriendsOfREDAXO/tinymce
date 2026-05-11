@@ -82,7 +82,17 @@ function matchesPattern(value: string, patterns: string[]): boolean {
 
 /** Class name is produced by a FOR-plugin (always preserve). */
 function isProtectedClass(cls: string): boolean {
-    return /^for-/.test(cls) || cls === 'media';
+    if (/^for-/.test(cls) || cls === 'media') {
+        return true;
+    }
+
+    // for_images figure classes (generic + framework presets)
+    return (
+        /^img-/.test(cls) ||
+        /^uk-(width|float|margin|display|box-shadow|border-rounded)/.test(cls) ||
+        /^(float-(start|end)|mx-auto|w-100)$/.test(cls) ||
+        /^col-/.test(cls)
+    );
 }
 
 /** Attribute belongs to a FOR-plugin's internal state (always preserve). */
@@ -126,7 +136,8 @@ function isInsideProtectedFigure(el: Element): boolean {
     while (cur && cur.nodeType === 1) {
         if (cur.tagName && cur.tagName.toLowerCase() === 'figure') {
             const cls = cur.getAttribute('class') || '';
-            if (/\bfor-[\w-]+\b/.test(cls) || /\bmedia\b/.test(cls)) {
+            const classes = cls.split(/\s+/).filter(Boolean);
+            if (classes.some((name) => isProtectedClass(name))) {
                 return true;
             }
         }
