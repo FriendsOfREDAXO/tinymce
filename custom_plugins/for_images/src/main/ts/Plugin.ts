@@ -921,13 +921,14 @@ const setup = (editor: Editor, _url: string): void => {
       // Extract filename from src (handle both full paths and media paths)
       let filename = src.split('/').pop()?.split('?')[0] || '';
       
-      // Open mediapool with the current image file
-      // Pass the filename as search/select parameter if possible
-      if (filename && typeof openREXMedia === 'function') {
+      // Open mediapool view-only (without opener_input_field)
+      // The correct URL is: index.php?page=mediapool/media&addon=tiny
+      if (filename) {
         try {
-          openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp&search=' + encodeURIComponent(filename));
+          const poolUrl = 'index.php?page=mediapool/media&addon=tiny';
+          window.open(poolUrl, 'mediapool', 'width=1000,height=700,resizable=yes,scrollbars=yes');
           editor.notificationManager.open({ 
-            text: `Medienpool öffnet sich für: ${filename}`, 
+            text: `Medienpool öffnet sich. Suche nach: ${filename}`, 
             type: 'info', 
             timeout: 3000 
           });
