@@ -353,6 +353,31 @@ if ('cke5_convert' === $func) {
 
 // Formular (Add/Edit)
 if ('add' === $func || 'edit' === $func) {
+    if ('edit' === $func && $id > 0) {
+        $normalizeSql = rex_sql::factory();
+        $current = $normalizeSql->getArray(
+            'SELECT profiles FROM ' . rex::getTable('tinymce_stylesets') . ' WHERE id = :id LIMIT 1',
+            ['id' => $id]
+        );
+
+        if ([] !== $current) {
+            $profilesRaw = (string) ($current[0]['profiles'] ?? '');
+            if ('' !== $profilesRaw && false !== strpos($profilesRaw, ',') && false === strpos($profilesRaw, '|')) {
+                $parts = preg_split('/[,|]/', $profilesRaw);
+                if (is_array($parts)) {
+                    $parts = array_values(array_filter(array_map('trim', $parts), static fn (string $v): bool => '' !== $v));
+                    $normalizedProfiles = [] !== $parts ? '|' . implode('|', $parts) . '|' : '';
+
+                    rex_sql::factory()
+                        ->setTable(rex::getTable('tinymce_stylesets'))
+                        ->setWhere(['id' => $id])
+                        ->setValue('profiles', $normalizedProfiles)
+                        ->update();
+                }
+            }
+        }
+    }
+
     $form = rex_form::factory(rex::getTable('tinymce_stylesets'), '', 'id=' . $id);
     $form->addParam('id', $id);
 
@@ -381,8 +406,8 @@ if ('add' === $func || 'edit' === $func) {
     $field->setAttribute('rows', 20);
 
     // Profile-Zuordnung: Mehrfach-Select mit allen vorhandenen Profilen.
-    // Leere Auswahl = in allen Profilen aktiv. Separator bleibt Komma,
-    // damit die bisherige Speicherung (comma-separated) kompatibel bleibt.
+    // Leere Auswahl = in allen Profilen aktiv.
+    // rex_form speichert Multi-Select-Werte standardmäßig als |a|b|.
     $profileOptions = rex_sql::factory()->getArray(
         'SELECT name FROM ' . rex::getTable('tinymce_profiles') . ' ORDER BY name ASC'
     );
@@ -393,7 +418,6 @@ if ('add' === $func || 'edit' === $func) {
     $field->setAttribute('multiple', 'multiple');
     $field->setAttribute('data-live-search', 'true');
     $field->setAttribute('title', rex_i18n::msg('tinymce_stylesets_profiles_all'));
-    $field->setSeparator(',');
     $select = $field->getSelect();
     $select->setSize(6);
     foreach ($profileOptions as $row) {
@@ -404,9 +428,12 @@ if ('add' === $func || 'edit' === $func) {
     }
 
     // Aktiv
-    $field = $form->addCheckboxField('active');
+    $field = $form->addSelectField('active');
     $field->setLabel(rex_i18n::msg('tinymce_stylesets_active'));
-    $field->addOption(rex_i18n::msg('tinymce_stylesets_active_label'), 1);
+    $field->setAttribute('class', 'form-control');
+    $activeSelect = $field->getSelect();
+    $activeSelect->addOption(rex_i18n::msg('tinymce_stylesets_deactivate'), '0');
+    $activeSelect->addOption(rex_i18n::msg('tinymce_stylesets_active_label'), '1');
 
     // Priorität
     $field = $form->addTextField('prio');
@@ -425,6 +452,15 @@ if ('add' === $func || 'edit' === $func) {
         $form->addHiddenField('createuser', rex::requireUser()->getLogin());
         $form->addHiddenField('updateuser', rex::requireUser()->getLogin());
     }
+
+    rex_extension::register('REX_FORM_SAVED', static function (rex_extension_point $ep) use ($form) {
+        if ($form !== $ep->getParam('form')) {
+            return;
+        }
+
+        // Nach Add/Edit immer profiles.js neu erzeugen lassen.
+        rex_addon::get('tinymce')->setConfig('update_profiles', true);
+    });
 
     $content = $form->get();
     $fragment = new rex_fragment();
