@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.9.2
+-------------------------------
+
+### Stylesets: Profil-Gruppierung und Kontext-Menü-Integration
+
+* **Hierarchische Stylesets-Struktur**: Styles werden jetzt nach Profil und Styleset-Zuweisung gruppiert mit visuellen Trennlinien angezeigt.
+* **Trennlinien mit Labels**: Separator-Items zeigen das Styleset-Name und zugehörige Profile (z.B. "─ UIkit3 (light) ─") für bessere Übersichtlichkeit.
+* **Kontext-Menü-Integration**: Stylesets werden automatisch ins Kontext-Menü hinzugefügt (rechtsklick), sofern aktive Stylesets vorhanden sind.
+* **Intelligente Gruppierung**: Formate werden nach ihrer Profil-Zuordnung sortiert und gruppiert, ohne die Filterung nach `selector`/`block`/`inline` zu beeinträchtigen.
+
 Version 8.9.1
 -------------------------------
 

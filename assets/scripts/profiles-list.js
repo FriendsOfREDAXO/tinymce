@@ -119,11 +119,13 @@
     if (!url) return;
 
     var nameEl = document.getElementById('tinymcePreviewName');
+    var descriptionEl = document.getElementById('tinymcePreviewDescription');
     var jsonEl = document.getElementById('tinymcePreviewJson');
 
     var loadingText = findLoadingText();
 
     if (nameEl) nameEl.textContent = '';
+    if (descriptionEl) descriptionEl.textContent = '';
     if (jsonEl) jsonEl.textContent = loadingText;
 
     // show modal (bootstrap)
@@ -139,12 +141,15 @@
       })
       .then(function (data) {
         var profileName = data.name || 'full';
+        var profileDescription = data.description || '';
         var raw = data.extra || '';
 
         var modalBody = document.querySelector('#tinymcePreviewModal .modal-body');
         if (modalBody) {
           // create editor element using existing init system via data-profile
+          var descriptionHtml = profileDescription ? '<p style="margin:0 0 12px 0; color:#666;">' + escapeHtml(profileDescription) + '</p>' : '';
           modalBody.innerHTML = '<h4 style="margin-top:0">' + escapeHtml(profileName) + '</h4>'
+            + descriptionHtml
             + '<textarea id="tinymcePreviewEditor" class="tiny-editor" data-profile="' + escapeHtml(profileName) + '">The quick brown fox jumps over the lazy dog.</textarea>';
         }
 

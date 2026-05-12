@@ -63,6 +63,7 @@ class Assets
 
             // Load active Style-Sets from database
             $styleSetsOptions = self::loadActiveStyleSets();
+            $profileNamesById = self::loadProfileNamesById();
 
             // Global content_style to fix UIkit/Bootstrap focus outlines in editor
             // and ensure a comfortable padding inside the editor iframe.
@@ -77,6 +78,7 @@ class Assets
                 'content_style' => $contentStyle,
             ]));
             \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
+            \rex_view::setJsProperty('tinyProfileNamesById', $profileNamesById);
 
             rex_view::addJsFile(self::assetUrl('vendor/tinymce/tinymce.min.js'));
             rex_view::addJsFile(self::assetUrl('generated/profiles.js'));
@@ -102,10 +104,13 @@ class Assets
             $sql = \rex_sql::factory();
             /** @var list<array<string, mixed>> $styleSets */
             $styleSets = $sql->getArray(
-                'SELECT content_css, style_formats, profiles FROM ' . \rex::getTable('tinymce_stylesets') . ' WHERE active = 1 ORDER BY prio ASC'
+                'SELECT name, content_css, style_formats, profiles FROM ' . \rex::getTable('tinymce_stylesets') . ' WHERE active = 1 ORDER BY prio ASC'
             );
 
             foreach ($styleSets as $set) {
+                // Get styleset name for grouping
+                $stylesetName = isset($set['name']) ? trim((string) $set['name']) : 'Unknown';
+
                 // Parse profile assignment (comma- or pipe-separated, empty = all profiles).
                 // Pipe kommt vor, falls der rex_form-Multi-Select seinen Default-Separator
                 // genutzt hat; Komma ist der aktuell bevorzugte Separator.
@@ -136,7 +141,7 @@ class Assets
                         rex_logger::factory()->warning(
                             'Invalid JSON in style_formats for style-set "{style_set}": {json_error}',
                             [
-                                'style_set' => isset($set['name']) ? (string) $set['name'] : 'unknown',
+                                'style_set' => $stylesetName,
                                 'json_error' => json_last_error_msg(),
                             ],
                         );
@@ -148,6 +153,7 @@ class Assets
                             $styleFormats[] = [
                                 'format' => $format,
                                 'profiles' => $profiles,
+                                'styleset' => $stylesetName,
                             ];
                         }
                     }
@@ -161,6 +167,32 @@ class Assets
             'content_css' => $contentCss,
             'style_formats' => $styleFormats,
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function loadProfileNamesById(): array
+    {
+        $map = [];
+
+        try {
+            $sql = \rex_sql::factory();
+            /** @var list<array<string, mixed>> $profiles */
+            $profiles = $sql->getArray('SELECT id, name FROM ' . \rex::getTable('tinymce_profiles'));
+
+            foreach ($profiles as $profile) {
+                $id = isset($profile['id']) ? (string) ((int) $profile['id']) : '';
+                $name = isset($profile['name']) ? trim((string) $profile['name']) : '';
+                if ('' !== $id && '' !== $name) {
+                    $map[$id] = $name;
+                }
+            }
+        } catch (\Throwable $e) {
+            \rex_logger::logException($e);
+        }
+
+        return $map;
     }
 
     /**
@@ -322,7 +354,7 @@ class Assets
                     'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars', 'snippets', 'for_images'
                 ],
                 'toolbar' => [
-                    'styles', 'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
+                    'styles', 'stylesets', 'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
                     'forecolor', 'backcolor', 'removeformat', 'blocks', 'fontfamily', 'fontsize', 'lineheight', 'language',
                     'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
                     'ltr', 'rtl',

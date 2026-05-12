@@ -50,7 +50,7 @@ if ('install_demo' === $func) {
             $ins->setValue('description', $set['description']);
             $ins->setValue('content_css', $set['content_css']);
             $ins->setValue('style_formats', json_encode($set['style_formats'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-            $ins->setValue('active', 0);
+            $ins->setValue('active', 1);
             $ins->setValue('prio', $maxPrio);
             $ins->setValue('createdate', $now);
             $ins->setValue('updatedate', $now);
@@ -193,7 +193,7 @@ if ('import' === $func && 'POST' === rex_request::server('REQUEST_METHOD', 'stri
                     $ins->setValue('description', $set['description'] ?? '');
                     $ins->setValue('content_css', $set['content_css'] ?? '');
                     $ins->setValue('style_formats', is_array($set['style_formats']) ? json_encode($set['style_formats'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : $set['style_formats']);
-                    $ins->setValue('active', 0);
+                    $ins->setValue('active', 1);
                     $ins->setValue('prio', $maxPrio);
                     $ins->setValue('createdate', $now);
                     $ins->setValue('updatedate', $now);
@@ -267,7 +267,7 @@ if ('cke5_convert' === $func) {
                         $ins->setValue('description', '' !== $newDescription ? $newDescription : 'Aus CKEditor 5 migriert');
                         $ins->setValue('content_css', $newContentCss);
                         $ins->setValue('style_formats', $convFormatsJson);
-                        $ins->setValue('active', 0);
+                        $ins->setValue('active', 1);
                         $ins->setValue('prio', $maxPrio + 1);
                         $ins->setValue('createdate', $now);
                         $ins->setValue('updatedate', $now);

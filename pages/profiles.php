@@ -95,8 +95,12 @@ if ('preview' === $func && $id > 0) {
         rex_response::cleanOutputBuffers();
         header('Content-Type: text/html; charset=utf-8');
         $name = htmlspecialchars((string) $row[0]['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $description = htmlspecialchars((string) ($row[0]['description'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $profile = (string) ($row[0]['profile'] ?? '');
         $body = '<h4 id="tinymcePreviewName" style="margin-top:0">' . $name . '</h4>';
+        if ($description) {
+            $body .= '<p id="tinymcePreviewDescription" style="margin:0 0 12px 0; color:#666;">' . $description . '</p>';
+        }
         $body .= '<div id="tinymcePreviewJson" style="white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:280px; overflow:auto; font-family:monospace;">';
         // show pretty-printed JSON if parsable, fallback to raw
         $rawParsed = @json_decode($profile, true);
@@ -395,6 +399,7 @@ if ('' === $func) {
         . '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
         . '<div class="modal-body">'
         . '<h4 id="tinymcePreviewName" style="margin-top:0"></h4>'
+        . '<p id="tinymcePreviewDescription" style="margin:0 0 12px 0; color:#666;"></p>'
         . '<div id="tinymcePreviewJson" style="white-space:pre-wrap; background:#f7f7f7; padding:12px; border-radius:4px; max-height:280px; overflow:auto; font-family:monospace;">' . rex_i18n::msg('tinymce_loading') . '</div>'
         . '<hr>' // demo button removed - preview will initialize the editor inside this modal
         . '</div>'

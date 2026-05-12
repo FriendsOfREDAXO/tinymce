@@ -366,6 +366,68 @@ $(document).on('click', '[data-yform-be-relation-moveup], [data-yform-be-relatio
     }, 100);
 });
 
+/**
+ * Groups style formats by their profile assignments and styleset.
+ * Adds separators with profile+styleset labels between different groups.
+ *
+ * @param {Array} formatsWithProfiles - Array with {format: {...}, profiles: [...], styleset: "..."}
+ * @returns {Array} - Grouped formats with separators
+ */
+function groupFormatsByProfiles(formatsWithProfiles) {
+    if (!Array.isArray(formatsWithProfiles) || formatsWithProfiles.length === 0) {
+        return [];
+    }
+
+    // Group by profile string + styleset (empty profiles = all profiles)
+    let groupedByKey = {};
+    
+    formatsWithProfiles.forEach(function(item) {
+        if (!item.format) return;
+        
+        // Convert profiles array to a key (sort for consistent grouping)
+        let profileKey = '';
+        if (item.profiles && item.profiles.length > 0) {
+            profileKey = item.profiles.sort().join(', ');
+        }
+        
+        let styleset = item.styleset || 'Default';
+        let groupKey = styleset + '|' + profileKey;
+        
+        if (!groupedByKey[groupKey]) {
+            groupedByKey[groupKey] = {
+                profileKey: profileKey,
+                styleset: styleset,
+                formats: []
+            };
+        }
+        groupedByKey[groupKey].formats.push(item.format);
+    });
+
+    // Convert to ordered array with separators
+    let result = [];
+    let groupKeys = Object.keys(groupedByKey).sort();
+    
+    groupKeys.forEach(function(key, index) {
+        let group = groupedByKey[key];
+        
+        // Add separator with profile label (except for first group)
+        if (index > 0) {
+            let profileLabel = group.profileKey === '' ? 'All Profiles' : group.profileKey;
+            let label = group.styleset + ' (' + profileLabel + ')';
+            result.push({
+                title: '─ ' + label + ' ─',
+                isDisabled: true,
+                onSelect: function() { return false; }
+            });
+        }
+        
+        // Add formats from this group
+        result = result.concat(group.formats);
+    });
+
+    return result;
+}
+
 function tiny_init(container) {
     let profiles = {};
 
@@ -466,6 +528,51 @@ function tiny_init(container) {
         // This ensures style_formats are available when TinyMCE registers the 'styles' button
         if (typeof rex !== 'undefined' && rex.tinyGlobalOptions) {
             let globalOpts = rex.tinyGlobalOptions;
+            let profileNamesById = (typeof rex.tinyProfileNamesById === 'object' && rex.tinyProfileNamesById) ? rex.tinyProfileNamesById : {};
+
+            function normalizeProfileName(value) {
+                if (typeof value !== 'string') {
+                    return '';
+                }
+                return value.trim().toLowerCase();
+            }
+
+            function getNormalizedProfileCandidates(profileValue) {
+                let candidates = [];
+                let profileRaw = (profileValue === undefined || profileValue === null) ? '' : String(profileValue).trim();
+                let normalizedProfile = normalizeProfileName(profileRaw);
+                if (normalizedProfile !== '') {
+                    candidates.push(normalizedProfile);
+                }
+
+                if (profileRaw !== '' && Object.prototype.hasOwnProperty.call(profileNamesById, profileRaw)) {
+                    let mappedName = normalizeProfileName(String(profileNamesById[profileRaw]));
+                    if (mappedName !== '' && candidates.indexOf(mappedName) === -1) {
+                        candidates.push(mappedName);
+                    }
+                }
+
+                return candidates;
+            }
+
+            let profileCandidates = getNormalizedProfileCandidates(profile);
+
+            function normalizeStylesetsInToolbar(toolbarValue) {
+                if (typeof toolbarValue === 'string') {
+                    return toolbarValue.replace(/\bstyles\b/g, 'stylesets');
+                }
+
+                if (Array.isArray(toolbarValue)) {
+                    return toolbarValue.map(function(row) {
+                        if (typeof row !== 'string') {
+                            return row;
+                        }
+                        return row.replace(/\bstyles\b/g, 'stylesets');
+                    });
+                }
+
+                return toolbarValue;
+            }
             
             // Helper function to check if a Style-Set applies to this profile
             // Empty profiles array means it applies to ALL profiles
@@ -473,7 +580,27 @@ function tiny_init(container) {
                 if (!profilesList || profilesList.length === 0) {
                     return true; // Empty = applies to all profiles
                 }
-                return profilesList.indexOf(profile) !== -1;
+
+                for (let i = 0; i < profilesList.length; i++) {
+                    let profileEntry = String(profilesList[i] || '').trim();
+                    if (profileEntry === '') {
+                        continue;
+                    }
+
+                    let normalizedEntry = normalizeProfileName(profileEntry);
+                    if (profileCandidates.indexOf(normalizedEntry) !== -1) {
+                        return true;
+                    }
+
+                    if (Object.prototype.hasOwnProperty.call(profileNamesById, profileEntry)) {
+                        let mappedEntry = normalizeProfileName(String(profileNamesById[profileEntry]));
+                        if (profileCandidates.indexOf(mappedEntry) !== -1) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
             
             // Merge content_css (array) - filter by profile
@@ -514,39 +641,40 @@ function tiny_init(container) {
                 }
             }
             
-            // Merge style_formats - filter by profile
+            // Merge style_formats - filter by profile, group by profile with separators
             // New format: [{format: {...}, profiles: ["uikit"]}]
-            // Legacy format: [{title: "...", items: [...]}]
+            // Format can be a group: {title: "...", items: [...]}
             if (globalOpts.style_formats && globalOpts.style_formats.length > 0) {
-                let filteredFormats = [];
+                let formatsWithProfiles = [];
+                let legacyFormats = [];
+                
                 globalOpts.style_formats.forEach(function(item) {
                     if (item.format && appliesToProfile(item.profiles)) {
-                        // New format with profile filter
-                        filteredFormats.push(item.format);
+                        // New format with profile info - keep for grouping
+                        formatsWithProfiles.push(item);
                     } else if (item.title) {
                         // Legacy format (has title = is a format group) - always include
-                        filteredFormats.push(item);
+                        legacyFormats.push(item);
                     }
                 });
                 
-                if (filteredFormats.length > 0) {
+                if (formatsWithProfiles.length > 0 || legacyFormats.length > 0) {
                     // Enable merging with default formats (Headings, Inline, Blocks, Align)
                     options.style_formats_merge = true;
                     
                     if (!options.style_formats) {
                         options.style_formats = [];
                     }
-                    // Append filtered style formats to existing ones
-                    options.style_formats = options.style_formats.concat(filteredFormats);
                     
-                    // Replace 'styles' with 'stylesets' in toolbar (our custom button)
-                    if (options.toolbar && typeof options.toolbar === 'string') {
-                        // Replace existing 'styles' with 'stylesets'
-                        options.toolbar = options.toolbar.replace(/\bstyles\b/g, 'stylesets');
-                        // If neither exists, add stylesets at the beginning
-                        if (options.toolbar.indexOf('stylesets') === -1) {
-                            options.toolbar = 'stylesets ' + options.toolbar;
-                        }
+                    // Group new formats by profile and add separators
+                    let groupedFormats = groupFormatsByProfiles(formatsWithProfiles);
+                    
+                    // Append grouped formats first, then legacy formats
+                    options.style_formats = options.style_formats.concat(groupedFormats).concat(legacyFormats);
+                    
+                    // Keep user-defined toolbar order; only normalize legacy 'styles' -> 'stylesets'.
+                    if (options.toolbar) {
+                        options.toolbar = normalizeStylesetsInToolbar(options.toolbar);
                     }
                     
                     // Add stylesets to Format menu
@@ -557,6 +685,15 @@ function tiny_init(container) {
                         title: 'Format',
                         items: 'bold italic underline strikethrough superscript subscript codeformat | stylesets blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat'
                     };
+                    
+                    // Add stylesets to context menu if available
+                    if (!options.contextmenu) {
+                        options.contextmenu = 'link image table';
+                    }
+                    // Add stylesets to existing contextmenu if not already there
+                    if (typeof options.contextmenu === 'string' && options.contextmenu.indexOf('stylesets') === -1) {
+                        options.contextmenu = options.contextmenu + ' | stylesets';
+                    }
                     
                 }
             }

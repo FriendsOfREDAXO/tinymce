@@ -49,7 +49,7 @@ function initTinyMceProfileAssistant() {
     const options = rex.tinymceProfileOptions || {};
     // Sort plugin and toolbar lists alphabetically for easier scanning in the assistant.
     const pluginsList = (options.plugins || []).slice().sort((a, b) => String(a).localeCompare(String(b)));
-    const toolbarButtons = (options.toolbar || []).slice().sort((a, b) => String(a).localeCompare(String(b)));
+    const toolbarButtons = Array.from(new Set((options.toolbar || []).concat(['stylesets']))).sort((a, b) => String(a).localeCompare(String(b)));
 
     // Plugins Section – FOR plugins are highlighted as FriendsOfREDAXO custom plugins.
     // Besides the `for_*` naming convention there are legacy custom plugins that predate
@@ -64,7 +64,12 @@ function initTinyMceProfileAssistant() {
     const isAddonPlugin = (name) => addonPluginSet.has(name);
     const isAddonToolbarBtn = (name) => addonToolbarSet.has(name);
     const isForPlugin = (name) => typeof name === 'string' && (name.indexOf('for_') === 0 || forPluginSet.has(name));
-    const isForToolbarBtn = (name) => typeof name === 'string' && (name.indexOf('for_') === 0 || forToolbarSet.has(name));
+    const isForToolbarBtn = (name) => {
+        if (typeof name !== 'string') {
+            return false;
+        }
+        return name === 'stylesets' || name.indexOf('for_') === 0 || forToolbarSet.has(name);
+    };
     let pluginsHtml = '<legend>' + (i18n.plugins || 'Plugins') + ' '
         + '<small class="for-plugin-legend-hint"><span class="for-plugin-badge-inline">FOR</span> ' + (i18n.for_plugins_hint || 'FriendsOfREDAXO custom plugins') + '</small> '
         + '<small class="for-plugin-legend-hint"><span class="for-plugin-badge-inline for-plugin-badge--addon">AddOn</span> ' + (i18n.addon_plugins_hint || 'Plugins aus externen AddOns') + '</small>'
@@ -2111,6 +2116,9 @@ function normalizeToolbarItemValue(value) {
     }
     if (normalized === '|' || normalized.toLowerCase() === 'separator') {
         return '|';
+    }
+    if (normalized.toLowerCase() === 'styles') {
+        return 'stylesets';
     }
     return normalized;
 }
