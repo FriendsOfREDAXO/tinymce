@@ -302,3 +302,265 @@ Für CI ist der übliche Ablauf:
 - Prüfe vor Integrationscode immer `rex_addon::get('tinymce')->isAvailable()`.
 - Verwende eindeutige Pluginnamen mit Präfix, um Kollisionen zu vermeiden.
 - Verlasse dich bei Standardprofilen auf `install/tinymce-profiles.json` statt auf eigene DB-Manipulationen.
+
+## Layout Rules (Strukturoptimierung)
+
+Layout Rules sind ein **nicht-invasives Content-Korrektur-System**, das automatisch häufige HTML-Struktur-Probleme korrigiert. Sie greifen stilschweigend ein und arbeiten mit dem Design-System (z.B. UIkit) zusammen.
+
+### Die 4 Regeln
+
+#### 1. `no_images_in_headings` — Bilder aus Überschriften verschieben
+
+**Was macht es:**
+- Erkennt Bilder (`<img>`, `<figure>`, `<picture>`), die direkt in Überschriften (h1–h6) sind
+- Bewegt die Elemente automatisch **vor** die Überschrift (nicht invasiv, nur Repositionierung)
+
+**Beispiel (vorher):**
+```html
+<h2>
+  <img src="image.jpg" alt="..." />
+  Überschrift
+</h2>
+```
+
+**Beispiel (nachher):**
+```html
+<img src="image.jpg" alt="..." />
+<h2>Überschrift</h2>
+```
+
+**Use-Case:** Verhindert ungültige HTML-Struktur und visuelle Probleme in responsiven Designs.
+
+#### 2. `collapse_empty_paragraphs` — Mehrfache Leerzeilen zusammenfassen
+
+**Was macht es:**
+- Erkennt 2+ hintereinander folgende leere `<p>`-Tags
+- Ersetzt sie durch ein einzelnes `<div>` mit einer konfigurationsfähigen CSS-Klasse (z.B. `uk-margin`)
+
+**Beispiel (vorher):**
+```html
+<p>Text</p>
+<p></p>
+<p></p>
+<p>Mehr Text</p>
+```
+
+**Beispiel (nachher, mit `uk-margin`):**
+```html
+<p>Text</p>
+<div class="uk-margin"></div>
+<p>Mehr Text</p>
+```
+
+**Use-Case:** 
+- Semantisch korrektere HTML-Struktur (keine leeren `<p>` mehr)
+- Visuelle Konsistenz durch Design-System-Abstände
+
+**Konfiguration:** über `for_layout_rules_clear_element_class` (Standard: `uk-margin`)
+
+#### 3. `convert_lines_to_hr` — Minus-Linien in Trennlinien konvertieren
+
+**Was macht es:**
+- Erkennt Minuszeichen-Reihen (`---`, `----`, etc.) in `<p>`-Tags
+- Ersetzt sie durch semantische `<hr>`-Elemente mit konfigurierter CSS-Klasse (z.B. `uk-divider-icon`)
+
+**Beispiel (vorher):**
+```html
+<p>Text</p>
+<p>----</p>
+<p>Mehr Text</p>
+```
+
+**Beispiel (nachher, mit `uk-divider-icon`):**
+```html
+<p>Text</p>
+<hr class="uk-divider-icon" />
+<p>Mehr Text</p>
+```
+
+**Use-Case:**
+- Typografische Konvention: Editor-Nutzer tippen `----` und bekommen ein semantisches HTML-Element
+- Verknüpfung mit Design-System für konsistente Visualisierung
+
+**Konfiguration:** über `for_layout_rules_hr_class` (Standard: `uk-divider-icon`)
+
+#### 4. (Implizit) — Leere Paragraphen am Anfang/Ende entfernen
+
+**Was macht es:**
+- Räumt einzelne leere `<p>`-Tags am Anfang und Ende des Dokuments auf
+- Teil der `applyLayoutRules()`-Logik, aber separat von Regel 2
+
+**Use-Case:** Vermeidung von unnötigen Whitespace-Elementen nach Paste/Import.
+
+### Konfiguration in TinyMCE-Profilen
+
+Layout Rules werden über Profil-Optionen aktiviert:
+
+```javascript
+// Komplettes Beispiel
+for_layout_rules_no_images_in_headings: true,
+for_layout_rules_collapse_empty_paragraphs: true,
+for_layout_rules_convert_lines_to_hr: true,
+for_layout_rules_clear_element_class: 'uk-margin',
+for_layout_rules_hr_class: 'uk-divider-icon'
+```
+
+**Hinweis:** Alle Layout Rules sind **optional**. Wenn nicht angegeben, gelten Defaults:
+- `no_images_in_headings`: immer aktiv (Basis-Struktur-Validität)
+- `collapse_empty_paragraphs`: false (nur in Standard/Full Presets aktiv)
+- `convert_lines_to_hr`: false (optional, muss explizit aktiviert werden)
+- `clear_element_class`: `'uk-margin'` (Standard UIkit-Klasse)
+- `hr_class`: `'uk-divider-icon'` (Standard UIkit-Klasse)
+
+### Profile Assistant Integration
+
+Der Profile Assistant bietet eine **benutzerfreundliche Checkbox-Form** für Layout Rules:
+
+1. **Reiter "Erweiterte Optionen"** → Abschnitt "Layout-Regeln"
+2. Vier Checkboxen für Regel-Aktivierung
+3. Zwei Textfelder für CSS-Klassen
+
+#### Intelligente Presets
+
+Die Presets stellen sinnvolle Defaults ein:
+
+| Preset | `no_images` | `collapse_empty` | `convert_lines` | Clear-Klasse | HR-Klasse |
+|--------|-----------|-----------------|-----------------|-------------|-----------|
+| **Simple** | ✓ | – | – | `uk-margin` | `uk-divider-icon` |
+| **Standard** | ✓ | ✓ | ✓ | `uk-margin` | `uk-divider-icon` |
+| **Full** | ✓ | ✓ | ✓ | `uk-margin-medium` | `uk-divider-icon` |
+
+- **Simple:** Nur Basis-Struktur-Sicherheit (Bilder aus Headings)
+- **Standard:** Ausbalanciert für typische Content-Anforderungen
+- **Full:** Maximale Korrektur, größere vertikale Abstände via `uk-margin-medium`
+
+### Implementierungsdetails
+
+#### Location: `assets/scripts/base.js`
+
+```javascript
+// ~Zeile 841-930
+
+// Layout Rules Konfiguration
+var layoutRules = {
+  no_images_in_headings: options.for_layout_rules_no_images_in_headings ?? true,
+  collapse_empty_paragraphs: options.for_layout_rules_collapse_empty_paragraphs ?? false,
+  clear_element_class: options.for_layout_rules_clear_element_class ?? 'uk-margin',
+  convert_lines_to_hr: options.for_layout_rules_convert_lines_to_hr ?? false,
+  hr_class: options.for_layout_rules_hr_class ?? 'uk-divider-icon'
+};
+
+// Hauptfunktion: applyLayoutRules(html)
+// - Nutzt DOMParser für robuste DOM-Manipulation
+// - Regel 1: Bilder vor h1–h6 verschieben
+// - Regel 2: Mehrfache leere <p> → Clear-Div
+// - Regel 3: Minus-Reihen → <hr>
+// - Regel 4: Leere <p> am Anfang/Ende entfernen
+```
+
+**Event-Handler:**
+```javascript
+editor.on('SetContent BeforeSetContent', function(e) {
+  var modified = applyLayoutRules(e.content);
+  if (modified) {
+    e.content = modified;
+  }
+});
+```
+
+Regeln gelten beim:
+- **Laden** von Inhalt (SetContent, BeforeSetContent)
+- **Einfügen** von Content (Paste)
+- **Speichern** (transparent für Frontend)
+
+#### Profile Assistant Integration
+
+Location: `redaxo/src/addons/tinymce/assets/scripts/profile_builder.js`
+
+- **UI-Form:** Checkboxen und Textfelder nach Image-Width-Legende (~Zeile 249–263)
+- **generateConfig():** Schreibt Layout-Rule-Optionen in Textarea (~Zeile 2730–2754)
+- **loadFromConfig():** Parst Layout-Rule-Optionen aus Konfig (~Zeile 3125–3145)
+- **MANAGED_PROFILE_KEYS:** Registriert 6 neue Keys für Tracking
+
+#### Sprachstrings
+
+**Deutsch (`lang/de_de.lang`):**
+```
+tinymce_layout_rules = Layout-Regeln (Strukturoptimierung)
+tinymce_layout_rules_help = Automatische Korrektur von häufigen Content-Struktur-Problemen.
+tinymce_layout_no_images_in_headings = Bilder aus Überschriften verschieben
+tinymce_layout_no_images_in_headings_help = Bilder in h1-h6 werden davor platziert.
+tinymce_layout_collapse_empty = Mehrfache Leerzeilen zusammenfassen
+tinymce_layout_collapse_empty_help = Mehrere hintereinander folgende leere <p> werden durch ein Clear-Element ersetzt.
+tinymce_layout_delete_empty = Einzelne leere Absätze löschen
+tinymce_layout_delete_empty_help = Entfernt einzelne leere <p> am Anfang und Ende.
+tinymce_layout_lines_to_hr = Minus-Linien → Trennlinie (----)
+tinymce_layout_lines_to_hr_help = Mehrere Minuszeichen werden zu <hr> umgewandelt.
+tinymce_layout_clear_element = Clear-Element CSS-Klasse
+tinymce_layout_hr_class = Trennlinien CSS-Klasse
+```
+
+**Englisch (`lang/en_gb.lang`):**
+```
+tinymce_layout_rules = Layout rules (structure optimization)
+tinymce_layout_rules_help = Automatic correction of common content structure issues.
+tinymce_layout_no_images_in_headings = Move images out of headings
+tinymce_layout_no_images_in_headings_help = Images inside h1-h6 are moved before the heading.
+tinymce_layout_collapse_empty = Collapse multiple empty lines
+tinymce_layout_collapse_empty_help = Multiple consecutive empty <p> tags are replaced with a clear element.
+tinymce_layout_delete_empty = Delete single empty paragraphs
+tinymce_layout_delete_empty_help = Removes single empty <p> tags at the beginning and end.
+tinymce_layout_lines_to_hr = Convert minus lines to horizontal rule (----)
+tinymce_layout_lines_to_hr_help = Multiple minus signs are converted to <hr> tags.
+tinymce_layout_clear_element = Clear element CSS class
+tinymce_layout_hr_class = Horizontal rule CSS class
+```
+
+### Verwendungsbeispiele für AddOn-Entwickler
+
+#### Minimales Profil mit Layout Rules
+
+```json
+{
+  "name": "mein_addon_minimal",
+  "description": "Minimalprofil mit Struktur-Sicherheit",
+  "profile": "plugins: 'autolink lists link'\ntoolbar: 'undo redo | bold italic'\nfor_layout_rules_no_images_in_headings: true"
+}
+```
+
+#### Standard-Profil mit allen Rules
+
+```json
+{
+  "name": "mein_addon_standard",
+  "description": "Vollständiges Profil mit Layout-Korrektur",
+  "profile": "plugins: 'autolink lists link'\ntoolbar: 'undo redo | bold italic'\nfor_layout_rules_no_images_in_headings: true\nfor_layout_rules_collapse_empty_paragraphs: true\nfor_layout_rules_convert_lines_to_hr: true\nfor_layout_rules_clear_element_class: 'uk-margin'\nfor_layout_rules_hr_class: 'uk-divider-icon'"
+}
+```
+
+#### Custom Design-System Integration
+
+Falls dein AddOn ein anderes Design-System nutzt (z.B. Bootstrap):
+
+```json
+{
+  "profile": "...\nfor_layout_rules_clear_element_class: 'my-spacer'\nfor_layout_rules_hr_class: 'my-divider'"
+}
+```
+
+### FAQ
+
+**F: Werden Layout Rules automatisch für alle Profile aktiviert?**
+A: Nein. Nur `no_images_in_headings` ist Basis-Default. Andere Rules müssen explizit aktiviert werden. Presets stellen sinnvolle Defaults bereit.
+
+**F: Kann ich die Standard-CSS-Klassen überschreiben?**
+A: Ja, über `for_layout_rules_clear_element_class` und `for_layout_rules_hr_class`.
+
+**F: Was passiert mit Protected Extras?**
+A: Layout Rules beeinflussen die Protected Extras nicht. Sie werden nach Regelanwendung wieder angehängt.
+
+**F: Wie teste ich Layout Rules lokal?**
+A: Profil mit Rules aktivieren → Backend öffnen → Content mit "problematischen" Strukturen (Bilder in Headings, mehrfache `<p></p>`, Minus-Reihen) einfügen → Ausgabe prüfen.
+
+**F: Können Layout Rules beschädigt werden?**
+A: Nein. Sie arbeiten rein strukturell (Bewegung, Ersetzung) und ändern Textinhalte nicht.

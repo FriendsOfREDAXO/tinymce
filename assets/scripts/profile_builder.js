@@ -285,6 +285,20 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '</label><p class="help-block small" style="margin-left:20px;">' + (i18n.imagewidth_compat_warn_help || 'Zeigt im Editor eine Warnung, wenn der geladene Inhalt noch Bildmarkup aus dem alten CKEditor 5 enthält (z. B. <code>figure.image</code>, <code>image-style-…</code>). Der Redakteur wird gebeten, die betroffenen Bilder mit der neuen Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut zu formatieren. Es wird nichts automatisch konvertiert.') + '</p></div></div></div>';
     settingsHtml += '</div>';
 
+    // Layout Rules
+    settingsHtml += '<br><legend><i class="rex-icon fa-sitemap"></i> ' + (i18n.layout_rules || 'Layout-Regeln (Strukturoptimierung)') + '</legend>';
+    settingsHtml += '<p class="help-block">' + (i18n.layout_rules_help || 'Automatische Korrektur von häufigen Content-Struktur-Problemen. Stilschweigend und nicht-invasiv.') + '</p>';
+    settingsHtml += '<div class="row">';
+    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-images-in-headings" checked> ' + (i18n.layout_no_images_in_headings || 'Bilder aus Überschriften verschieben') + '</label><p class="help-block small">' + (i18n.layout_no_images_in_headings_help || 'Bilder, die in h1-h6 sind, werden davor platziert.') + '</p></div></div>';
+    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-clear-empty" checked> ' + (i18n.layout_collapse_empty || 'Mehrfache Leerzeilen zusammenfassen') + '</label><p class="help-block small">' + (i18n.layout_collapse_empty_help || 'Mehrere hintereinander folgende leere &lt;p&gt; werden durch ein Clear-Element ersetzt.') + '</p></div></div>';
+    settingsHtml += '</div>';
+    settingsHtml += '<div class="row">';
+    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-delete-empty"> ' + (i18n.layout_delete_empty || 'Einzelne leere Absätze löschen') + '</label><p class="help-block small">' + (i18n.layout_delete_empty_help || 'Entfernt einzelne leere &lt;p&gt; am Anfang und Ende.') + '</p></div></div>';
+    settingsHtml += '</div>';
+    settingsHtml += '<div class="row" style="margin-top:10px;">';
+    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.layout_clear_element || 'Clear-Element CSS-Klasse') + '</label><input type="text" class="form-control builder-layout-clear-class" value="uk-margin" placeholder="uk-margin"></div></div>';
+    settingsHtml += '</div>';
+
     // TOC Settings
     settingsHtml += '<div class="row" style="margin-top:10px;">';
     settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_depth || 'TOC Depth') + '</label><input type="number" class="form-control builder-toc-depth" value="3"></div></div>';
@@ -1594,6 +1608,11 @@ function initTinyMceProfileAssistant() {
         $builderBody.find('.builder-toolbar-enabled').prop('checked', true);
         setToolbarRows([['bold', 'italic', 'underline', '|', 'bullist', 'numlist', '|', 'link', 'image', '|', 'code']]);
         updateToolbarSettingsState();
+        // Layout Rules für Simple
+        $builderBody.find('.builder-layout-images-in-headings').prop('checked', true);
+        $builderBody.find('.builder-layout-clear-empty').prop('checked', false);
+        $builderBody.find('.builder-layout-delete-empty').prop('checked', false);
+        $builderBody.find('.builder-layout-lines-to-hr').prop('checked', false);
     });
 
     $builderBody.find('.builder-preset-standard').on('click', function() {
@@ -1601,6 +1620,13 @@ function initTinyMceProfileAssistant() {
         $builderBody.find('.builder-toolbar-enabled').prop('checked', true);
         setToolbarRows([['undo', 'redo', '|', 'bold', 'italic', 'underline', '|', 'bullist', 'numlist', '|', 'link', 'image', 'media', 'table', '|', 'code', 'fullscreen']]);
         updateToolbarSettingsState();
+        // Layout Rules für Standard
+        $builderBody.find('.builder-layout-images-in-headings').prop('checked', true);
+        $builderBody.find('.builder-layout-clear-empty').prop('checked', true);
+        $builderBody.find('.builder-layout-delete-empty').prop('checked', false);
+        $builderBody.find('.builder-layout-lines-to-hr').prop('checked', true);
+        $builderBody.find('.builder-layout-clear-class').val('uk-margin');
+        $builderBody.find('.builder-layout-hr-class').val('uk-divider-icon');
     });
 
     $builderBody.find('.builder-preset-full').on('click', function() {
@@ -1614,6 +1640,13 @@ function initTinyMceProfileAssistant() {
         updateToolbarSettingsState();
         // Enable for_images in Full preset
         $builderBody.find('.builder-imagewidth-enable').prop('checked', true).trigger('change');
+        // Layout Rules für Full (alle aktiviert)
+        $builderBody.find('.builder-layout-images-in-headings').prop('checked', true);
+        $builderBody.find('.builder-layout-clear-empty').prop('checked', true);
+        $builderBody.find('.builder-layout-delete-empty').prop('checked', true);
+        $builderBody.find('.builder-layout-lines-to-hr').prop('checked', true);
+        $builderBody.find('.builder-layout-clear-class').val('uk-margin-medium');
+        $builderBody.find('.builder-layout-hr-class').val('uk-divider-icon');
     });
 
     // Context/Insert Inline Picker Events (toolbar-identisches Verhalten)
@@ -2184,6 +2217,9 @@ const MANAGED_PROFILE_KEYS = new Set([
     'imageeffect_presets', 'image_compat_warn', 'codesample_languages', 'link_rel_list',
     'link_target_list', 'link_default_protocol', 'link_assume_external_targets',
     'link_attributes_postprocess', 'toc_depth', 'toc_header', 'toc_class',
+    'for_layout_rules_no_images_in_headings', 'for_layout_rules_collapse_empty_paragraphs',
+    'for_layout_rules_clear_empty_paragraphs', 'for_layout_rules_convert_lines_to_hr',
+    'for_layout_rules_clear_element_class', 'for_layout_rules_hr_class',
     'skin', 'content_css', 'setup', 'file_picker_callback'
 ]);
 
@@ -2716,6 +2752,36 @@ function generateConfig($textarea, $builderBody) {
         configStr += '\n';
     }
 
+    // Layout Rules
+    const layoutNoImages = $builderBody.find('.builder-layout-images-in-headings').is(':checked');
+    const layoutCollapsEmpty = $builderBody.find('.builder-layout-clear-empty').is(':checked');
+    const layoutDeleteEmpty = $builderBody.find('.builder-layout-delete-empty').is(':checked');
+    const layoutLinesToHr = $builderBody.find('.builder-layout-lines-to-hr').is(':checked');
+    const layoutClearClass = String($builderBody.find('.builder-layout-clear-class').val() || 'uk-margin').trim();
+    const layoutHrClass = String($builderBody.find('.builder-layout-hr-class').val() || 'uk-divider-icon').trim();
+
+    if (layoutNoImages || layoutCollapsEmpty || layoutDeleteEmpty || layoutLinesToHr) {
+        if (layoutNoImages) {
+            configStr += `for_layout_rules_no_images_in_headings: true,\n`;
+        }
+        if (layoutCollapsEmpty) {
+            configStr += `for_layout_rules_collapse_empty_paragraphs: true,\n`;
+            if (layoutClearClass) {
+                configStr += `for_layout_rules_clear_element_class: '${escapeString(layoutClearClass)}',\n`;
+            }
+        }
+        if (layoutDeleteEmpty) {
+            configStr += `for_layout_rules_clear_empty_paragraphs: true,\n`;
+        }
+        if (layoutLinesToHr) {
+            configStr += `for_layout_rules_convert_lines_to_hr: true,\n`;
+            if (layoutHrClass) {
+                configStr += `for_layout_rules_hr_class: '${escapeString(layoutHrClass)}',\n`;
+            }
+        }
+        configStr += '\n';
+    }
+
     if (defaultCodesample) {
         configStr += `codesample_languages: [
  {text: 'HTML/XML', value: 'markup'},
@@ -2864,6 +2930,7 @@ function loadFromConfig($textarea, $builderBody) {
     const forToolbarSet = new Set(profileOptions.for_toolbar_buttons || []);
     const originFor = (value) => {
         if (addonToolbarSet.has(value)) return 'addon';
+        if (value === 'stylesets') return 'for';
         if (forToolbarSet.has(value)) return 'for';
         return 'core';
     };
@@ -3076,6 +3143,26 @@ function loadFromConfig($textarea, $builderBody) {
     }
     if (cfg.image_compat_warn === true) {
         $builderBody.find('.builder-imagewidth-compat-warn').prop('checked', true);
+    }
+
+    // Layout Rules
+    if (cfg.for_layout_rules_no_images_in_headings === true) {
+        $builderBody.find('.builder-layout-images-in-headings').prop('checked', true);
+    }
+    if (cfg.for_layout_rules_collapse_empty_paragraphs === true) {
+        $builderBody.find('.builder-layout-clear-empty').prop('checked', true);
+    }
+    if (cfg.for_layout_rules_clear_empty_paragraphs === true) {
+        $builderBody.find('.builder-layout-delete-empty').prop('checked', true);
+    }
+    if (cfg.for_layout_rules_convert_lines_to_hr === true) {
+        $builderBody.find('.builder-layout-lines-to-hr').prop('checked', true);
+    }
+    if (typeof cfg.for_layout_rules_clear_element_class === 'string') {
+        $builderBody.find('.builder-layout-clear-class').val(cfg.for_layout_rules_clear_element_class);
+    }
+    if (typeof cfg.for_layout_rules_hr_class === 'string') {
+        $builderBody.find('.builder-layout-hr-class').val(cfg.for_layout_rules_hr_class);
     }
 
     $builderBody.find('.builder-protected-extras').val(extractProtectedExtras(source));

@@ -349,3 +349,17 @@ tinymce_profile_restore_info = Last saved version available.
 tinymce_profile_restore = Restore last version
 tinymce_profile_restore_confirm = Restore last version? The current configuration will be saved as the new backup.
 tinymce_profile_restored = Last version of profile "%s" was restored.
+
+# Layout Rules (Structure optimization)
+tinymce_layout_rules = Layout rules (structure optimization)
+tinymce_layout_rules_help = Automatic correction of common content structure issues. Silent and non-invasive.
+tinymce_layout_no_images_in_headings = Move images out of headings
+tinymce_layout_no_images_in_headings_help = Images inside h1-h6 are moved before the heading.
+tinymce_layout_collapse_empty = Collapse multiple empty lines
+tinymce_layout_collapse_empty_help = Multiple consecutive empty <p> tags are replaced with a clear element.
+tinymce_layout_delete_empty = Delete single empty paragraphs
+tinymce_layout_delete_empty_help = Removes single empty <p> tags at the beginning and end.
+tinymce_layout_lines_to_hr = Convert minus lines to horizontal rule (----)
+tinymce_layout_lines_to_hr_help = Multiple minus signs are converted to <hr> tags.
+tinymce_layout_clear_element = Clear element CSS class
+tinymce_layout_hr_class = Horizontal rule CSS class

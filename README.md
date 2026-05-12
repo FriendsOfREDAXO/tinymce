@@ -10,6 +10,7 @@ Stellt den TinyMCE 8 Editor im CMS REDAXO bereit.
 - **for_oembed / for_video:** Moderne Einbettungen mit stabilen Save-Formaten und Editor-Vorschau.
 - **cleanpaste / mediapaste:** Saubere Paste-Pipeline mit Schutz fuer FOR-Markup und optionalem Medienpool-Upload aus der Zwischenablage.
 - **for_toc / for_footnote / for_a11y:** Inhaltsverzeichnis, Fussnoten und Accessibility-Checks direkt im Editor.
+- **Layout Rules:** Automatische, nicht-invasive Struktur-Optimierung (Bilder aus Überschriften verschieben, Leerzeilen-Zusammenfassung, Minus-Linien → HR mit Design-System-Integration).
 
 ## Anwendung:
 

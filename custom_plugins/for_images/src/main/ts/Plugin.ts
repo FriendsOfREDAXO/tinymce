@@ -18,6 +18,14 @@ interface PluginConfig {
   effectPresets: Preset[];
 }
 
+interface PresetType {
+  key: 'width' | 'align' | 'effect';
+  presets: Preset[];
+}
+
+type ImageKeyDownHandler = (e: KeyboardEvent) => void;
+type ImageEventHandler = (e: ClipboardEvent) => void;
+
 /* ================================================================== */
 /*  Default Presets (used if none configured)                          */
 /* ================================================================== */
@@ -40,6 +48,56 @@ const defaultAlignPresets: Preset[] = [
 const defaultEffectPresets: Preset[] = [
   { label: 'Kein Effekt', class: '' },
 ];
+
+/* ================================================================== */
+/*  Config Cache (Performance Optimization)                           */
+/* ================================================================== */
+
+class ConfigCache {
+  private cache: PluginConfig | null = null;
+  private editor: Editor;
+
+  constructor(editor: Editor) {
+    this.editor = editor;
+  }
+
+  get(): PluginConfig {
+    if (this.cache) return this.cache;
+    
+    const getOption = (key: string): any => {
+      let val = this.editor.options.get(key);
+      if (!val || (Array.isArray(val) && val.length === 0)) val = (this.editor as any).settings?.[key];
+      if (!val || (Array.isArray(val) && val.length === 0)) val = (this.editor as any).getParam?.(key, null);
+      return val;
+    };
+
+    const pick = <T>(val: any, fallback: T[]): T[] =>
+      Array.isArray(val) && val.length > 0 ? val : fallback;
+
+    this.cache = {
+      widthPresets: pick(getOption('imagewidth_presets'), defaultWidthPresets),
+      alignPresets: pick(getOption('imagealign_presets'), defaultAlignPresets),
+      effectPresets: pick(getOption('imageeffect_presets'), defaultEffectPresets),
+    };
+    return this.cache;
+  }
+
+  invalidate(): void {
+    this.cache = null;
+  }
+
+  getAllClasses(presets: Preset[]): string[] {
+    const all: string[] = [];
+    presets.forEach(p => {
+      if (p.class) {
+        p.class.split(/\s+/).forEach(c => {
+          if (c && !all.includes(c)) all.push(c);
+        });
+      }
+    });
+    return all;
+  }
+}
 
 /* ================================================================== */
 /*  Figure Helpers                                                     */
@@ -120,9 +178,54 @@ function normalizeFigures(editor: Editor, scope?: ParentNode): void {
 }
 
 /* ================================================================== */
-/*  Class Management                                                   */
+/*  Class Management & Cleanup                                         */
 /* ================================================================== */
 
+/**
+ * Deduplicated cleanup function: strips preset classes and legacy CKE5 markup.
+ * Combines the functionality of stripPresetClasses and stripCke5LegacyClasses.
+ */
+function cleanupFigureClasses(
+  figure: HTMLElement,
+  allPresetClasses: string[],
+  compatMode: boolean
+): void {
+  // Strip all preset classes
+  allPresetClasses.forEach(cls => figure.classList.remove(cls));
+
+  // If compat mode: strip legacy CKE5 classes
+  if (compatMode) {
+    const toRemove: string[] = [];
+    figure.classList.forEach(cls => {
+      if (
+        cls === 'image' ||
+        cls === 'image_resized' ||
+        cls.startsWith('image-style-') ||
+        cls.startsWith('img-width-') ||
+        cls.startsWith('img-height-')
+      ) {
+        toRemove.push(cls);
+      }
+    });
+    toRemove.forEach(cls => figure.classList.remove(cls));
+    
+    // CKE5 inline width="NN%" on figure
+    const inlineWidth = figure.style.width;
+    if (inlineWidth && inlineWidth.includes('%')) {
+      figure.style.removeProperty('width');
+      if (figure.getAttribute('style') === '') figure.removeAttribute('style');
+    }
+  }
+}
+
+function stripPresetClasses(el: HTMLElement, presets: Preset[]): void {
+  const classes = getAllClasses(presets);
+  classes.forEach(cls => el.classList.remove(cls));
+}
+
+/**
+ * Get all classes from a list of presets (extracted from ConfigCache for reusability).
+ */
 function getAllClasses(presets: Preset[]): string[] {
   const all: string[] = [];
   presets.forEach(p => {
@@ -133,40 +236,6 @@ function getAllClasses(presets: Preset[]): string[] {
     }
   });
   return all;
-}
-
-function stripPresetClasses(el: HTMLElement, presets: Preset[]): void {
-  const classes = getAllClasses(presets);
-  classes.forEach(cls => el.classList.remove(cls));
-}
-
-/**
- * Remove legacy CKEditor-5 image classes that conflict with the new
- * preset-based toolbar (image, image_resized, image-style-*, img-width-*,
- * img-height-*) and leftover CKE5 inline width on the figure.
- * Called on every toolbar apply so the markup gets cleaned up the moment
- * the editor reformats an image.
- */
-function stripCke5LegacyClasses(figure: HTMLElement): void {
-  const toRemove: string[] = [];
-  figure.classList.forEach(cls => {
-    if (
-      cls === 'image' ||
-      cls === 'image_resized' ||
-      cls.indexOf('image-style-') === 0 ||
-      cls.indexOf('img-width-') === 0 ||
-      cls.indexOf('img-height-') === 0
-    ) {
-      toRemove.push(cls);
-    }
-  });
-  toRemove.forEach(cls => figure.classList.remove(cls));
-  // CKE5 inline width="NN%" on figure
-  const inlineWidth = figure.style.width;
-  if (inlineWidth && inlineWidth.indexOf('%') !== -1) {
-    figure.style.removeProperty('width');
-    if (figure.getAttribute('style') === '') figure.removeAttribute('style');
-  }
 }
 
 /**
@@ -183,10 +252,8 @@ function detectImgFullWidthClass(presets: Preset[]): string {
 }
 
 function applyImgFullWidth(img: HTMLElement, fullWidthClass: string): void {
-  // Remove old framework classes
   img.classList.remove('uk-width-1-1', 'w-100');
   img.style.removeProperty('width');
-  
   if (fullWidthClass) {
     img.classList.add(fullWidthClass);
   } else {
@@ -194,33 +261,39 @@ function applyImgFullWidth(img: HTMLElement, fullWidthClass: string): void {
   }
 }
 
-function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
+/**
+ * Generic preset application function (unified for width/align/effects).
+ * Handles class management, figure wrapping, and undo tracking.
+ */
+function applyPreset(
+  editor: Editor,
+  img: HTMLElement,
+  preset: Preset,
+  allPresets: Preset[],
+  compatMode: boolean = false
+): void {
   const figure = preset.class ? ensureFigureWrap(editor, img) : getFigureWrap(img);
   const fullWidthClass = detectImgFullWidthClass(allPresets);
-  const compatMode = !!editor.options.get('image_compat_warn');
-  
+  const allClasses = getAllClasses(allPresets);
+
   if (figure) {
-    stripPresetClasses(figure, allPresets);
-    if (compatMode) stripCke5LegacyClasses(figure);
+    cleanupFigureClasses(figure, allClasses, compatMode);
+    
     if (preset.class) {
       preset.class.split(/\s+/).forEach(c => {
         if (c) figure.classList.add(c);
       });
-      // Apply full width to img so it fills the figure
       applyImgFullWidth(img, fullWidthClass);
-    } else {
-      // "Original" selected - remove full width classes from img
-      if (fullWidthClass) {
-        fullWidthClass.split(/\s+/).forEach(c => {
-          if (c) img.classList.remove(c);
-        });
-        if (img.classList.length === 0) img.removeAttribute('class');
-      }
+    } else if (fullWidthClass) {
+      fullWidthClass.split(/\s+/).forEach(c => {
+        if (c) img.classList.remove(c);
+      });
+      if (img.classList.length === 0) img.removeAttribute('class');
     }
+    
     if (figure.classList.length === 0) figure.removeAttribute('class');
   }
 
-  // Only remove inline styles, keep width/height attributes for aspect ratio
   img.style.removeProperty('width');
   img.style.removeProperty('height');
   if (img.getAttribute('style') === '') img.removeAttribute('style');
@@ -229,13 +302,20 @@ function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allP
   editor.undoManager.add();
 }
 
-function toggleEffectClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
-  const compatMode = !!editor.options.get('image_compat_warn');
+/**
+ * Toggle effect class on figure (add if not present, remove if present).
+ */
+function toggleEffectPreset(
+  editor: Editor,
+  img: HTMLElement,
+  preset: Preset,
+  allPresets: Preset[],
+  compatMode: boolean = false
+): void {
   if (!preset.class) {
     const figure = getFigureWrap(img);
     if (figure) {
-      stripPresetClasses(figure, allPresets);
-      if (compatMode) stripCke5LegacyClasses(figure);
+      cleanupFigureClasses(figure, getAllClasses(allPresets), compatMode);
       if (figure.classList.length === 0) figure.removeAttribute('class');
     }
   } else {
@@ -248,12 +328,20 @@ function toggleEffectClass(editor: Editor, img: HTMLElement, preset: Preset, all
     } else {
       classes.forEach(c => figure.classList.add(c));
     }
-    if (compatMode) stripCke5LegacyClasses(figure);
+    if (compatMode) cleanupFigureClasses(figure, getAllClasses(allPresets), true);
     if (figure.classList.length === 0) figure.removeAttribute('class');
   }
 
   editor.nodeChanged();
   editor.undoManager.add();
+}
+
+function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
+  applyPreset(editor, img, preset, allPresets, !!editor.options.get('image_compat_warn'));
+}
+
+function toggleEffectClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
+  toggleEffectPreset(editor, img, preset, allPresets, !!editor.options.get('image_compat_warn'));
 }
 
 function getActivePreset(el: HTMLElement, presets: Preset[]): Preset | null {
@@ -447,22 +535,25 @@ const setup = (editor: Editor, _url: string): void => {
   editor.options.register('imagealign_presets', { processor: 'object[]', default: [] });
   editor.options.register('imageeffect_presets', { processor: 'object[]', default: [] });
   editor.options.register('image_compat_warn', { processor: 'boolean', default: false });
+  // Fix: image_caption muss registriert werden, bevor sie gesetzt wird
+  editor.options.register('image_caption', { processor: 'boolean', default: false });
+
+  // Initialize config cache once
+  const configCache = new ConfigCache(editor);
+  const compatMode = !!editor.options.get('image_compat_warn');
 
   /* ------------------------------------------------------------------
-   *  CKE5-Legacy-Erkennung
-   *  Reine Erkennung + Hinweis – es wird bewusst nichts konvertiert.
-   *  Aktiv nur wenn im Profil `image_compat_warn: true`.
+   *  CKE5-Legacy-Erkennung (Caching für Performance)
    * ------------------------------------------------------------------ */
   let cke5WarningShown = false;
   const hasCke5Markup = (root: HTMLElement | null): boolean => {
     if (!root) return false;
-    if (root.querySelector('figure.image, figure.image_resized')) return true;
-    if (root.querySelector('[class*="image-style-"]')) return true;
-    return false;
+    return !!(root.querySelector('figure.image, figure.image_resized') ||
+              root.querySelector('[class*="image-style-"]'));
   };
+
   const checkCke5Markup = (): void => {
-    if (cke5WarningShown) return;
-    if (!editor.options.get('image_compat_warn')) return;
+    if (cke5WarningShown || !compatMode) return;
     const body = editor.getBody();
     if (!hasCke5Markup(body)) return;
     cke5WarningShown = true;
@@ -534,24 +625,6 @@ const setup = (editor: Editor, _url: string): void => {
     '</g></svg>'
   );
 
-  const getConfig = (): PluginConfig => {
-    const getOption = (key: string): any => {
-      let val = editor.options.get(key);
-      if (!val || (Array.isArray(val) && val.length === 0)) val = (editor as any).settings?.[key];
-      if (!val || (Array.isArray(val) && val.length === 0)) val = (editor as any).getParam?.(key, null);
-      return val;
-    };
-
-    const pick = <T>(val: any, fallback: T[]): T[] =>
-      Array.isArray(val) && val.length > 0 ? val : fallback;
-
-    return {
-      widthPresets: pick(getOption('imagewidth_presets'), defaultWidthPresets),
-      alignPresets: pick(getOption('imagealign_presets'), defaultAlignPresets),
-      effectPresets: pick(getOption('imageeffect_presets'), defaultEffectPresets),
-    };
-  };
-
   editor.on('init', () => {
     const doc = editor.getDoc();
     if (doc) {
@@ -561,22 +634,19 @@ const setup = (editor: Editor, _url: string): void => {
       doc.head.appendChild(style);
     }
     
-    // Ensure all figures have img full width class applied
-    const body = editor.getBody();
-    const config = getConfig();
+    // Use cached config for performance
+    const config = configCache.get();
     const fullWidthClass = detectImgFullWidthClass(config.widthPresets);
+    const body = editor.getBody();
     
     body.querySelectorAll('figure').forEach((figure: Element) => {
       const fig = figure as HTMLElement;
-      
-      // Ensure img inside figure has full width class
       const img = fig.querySelector('img');
       if (img && fig.classList.length > 0) {
         applyImgFullWidth(img as HTMLElement, fullWidthClass);
       }
     });
 
-    // CKE5-Legacy-Hinweis (nur Erkennung, keine Konvertierung)
     checkCke5Markup();
   });
 
@@ -592,10 +662,11 @@ const setup = (editor: Editor, _url: string): void => {
   });
 
   editor.on('ObjectResizeStart', (e: any) => {
-    if (e.target && e.target.nodeName === 'IMG') {
+    if (e.target?.nodeName === 'IMG') {
       e.preventDefault();
     }
   });
+
   editor.options.set('object_resizing', false);
   const hasOption = (editor.options as any).isRegistered;
   if (typeof hasOption === 'function' && hasOption.call(editor.options, 'quickbars_image_toolbar')) {
@@ -703,7 +774,7 @@ const setup = (editor: Editor, _url: string): void => {
     fetch: (callback: (items: any[]) => void) => {
       const img = getSelectedImg(editor);
       if (!img) { callback([]); return; }
-      const config = getConfig();
+      const config = configCache.get();
       const active = getActivePreset(img, config.widthPresets);
       callback(config.widthPresets.map(preset => ({
         type: 'menuitem' as const,
@@ -721,7 +792,7 @@ const setup = (editor: Editor, _url: string): void => {
     onAction: () => {
       const img = getSelectedImg(editor);
       if (!img) return;
-      const config = getConfig();
+      const config = configCache.get();
       const leftPreset = config.alignPresets.find(p => 
         p.class.includes('float-left') || p.class.includes('float-start') || 
         p.class.includes('align-left') || p.class.includes('uk-float-left')
@@ -737,7 +808,7 @@ const setup = (editor: Editor, _url: string): void => {
       const handler = () => {
         const img = getSelectedImg(editor);
         if (!img) { api.setActive(false); return; }
-        const config = getConfig();
+        const config = configCache.get();
         const active = getActivePreset(img, config.alignPresets);
         api.setActive(!!active && (
           active.class.includes('float-left') || active.class.includes('float-start') ||
@@ -755,7 +826,7 @@ const setup = (editor: Editor, _url: string): void => {
     onAction: () => {
       const img = getSelectedImg(editor);
       if (!img) return;
-      const config = getConfig();
+      const config = configCache.get();
       const centerPreset = config.alignPresets.find(p => 
         p.class.includes('margin-auto') || p.class.includes('mx-auto') || 
         p.class.includes('align-center')
@@ -771,7 +842,7 @@ const setup = (editor: Editor, _url: string): void => {
       const handler = () => {
         const img = getSelectedImg(editor);
         if (!img) { api.setActive(false); return; }
-        const config = getConfig();
+        const config = configCache.get();
         const active = getActivePreset(img, config.alignPresets);
         api.setActive(!!active && (
           active.class.includes('margin-auto') || active.class.includes('mx-auto') ||
@@ -789,7 +860,7 @@ const setup = (editor: Editor, _url: string): void => {
     onAction: () => {
       const img = getSelectedImg(editor);
       if (!img) return;
-      const config = getConfig();
+      const config = configCache.get();
       const rightPreset = config.alignPresets.find(p => 
         p.class.includes('float-right') || p.class.includes('float-end') || 
         p.class.includes('align-right') || p.class.includes('uk-float-right')
@@ -805,7 +876,7 @@ const setup = (editor: Editor, _url: string): void => {
       const handler = () => {
         const img = getSelectedImg(editor);
         if (!img) { api.setActive(false); return; }
-        const config = getConfig();
+        const config = configCache.get();
         const active = getActivePreset(img, config.alignPresets);
         api.setActive(!!active && (
           active.class.includes('float-right') || active.class.includes('float-end') ||
@@ -823,7 +894,7 @@ const setup = (editor: Editor, _url: string): void => {
     onAction: () => {
       const img = getSelectedImg(editor);
       if (!img) return;
-      const config = getConfig();
+      const config = configCache.get();
       applyPresetClass(editor, img, { label: '', class: '' }, config.alignPresets);
     }
   });
@@ -835,7 +906,7 @@ const setup = (editor: Editor, _url: string): void => {
     fetch: (callback: (items: any[]) => void) => {
       const img = getSelectedImg(editor);
       if (!img) { callback([]); return; }
-      const config = getConfig();
+      const config = configCache.get();
       const activeEffects = getActiveEffects(img, config.effectPresets);
       callback(config.effectPresets.map(preset => ({
         type: 'togglemenuitem' as const,
@@ -857,7 +928,7 @@ const setup = (editor: Editor, _url: string): void => {
         return;
       }
 
-      const config = getConfig();
+      const config = configCache.get();
       const activeWidth = getActivePreset(img, config.widthPresets);
       const activeAlign = getActivePreset(img, config.alignPresets);
       const activeEffects = getActiveEffects(img, config.effectPresets);
@@ -1110,7 +1181,7 @@ const setup = (editor: Editor, _url: string): void => {
             const imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
 
             // Get current config to know which classes to remove
-            const config = getConfig();
+            const config = configCache.get();
             const figure = getFigureWrap(img);
             
             // Remove all preset classes (width, align, effects) to reset to original
@@ -1193,7 +1264,7 @@ const setup = (editor: Editor, _url: string): void => {
   editor.on('NodeChange', () => {
     const img = getSelectedImg(editor);
     if (!img) return;
-    const config = getConfig();
+    const config = configCache.get();
     const w = getActivePreset(img, config.widthPresets);
     const a = getActivePreset(img, config.alignPresets);
     const effects = getActiveEffects(img, config.effectPresets);

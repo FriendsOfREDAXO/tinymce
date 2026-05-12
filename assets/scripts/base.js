@@ -872,6 +872,7 @@ function tiny_init(container) {
             editor.on('CloseWindow', function() {
                 releaseTinyDialogScrollLock();
             });
+
             // Filter padding nodes (leere <p>-Tags) beim Speichern und für den Quelltext-Dialog.
             // TinyMCE fügt intern leere <p> an den Rändern für den Cursor ein.
             editor.on('GetContent', function (e) {
@@ -880,6 +881,7 @@ function tiny_init(container) {
                 e.content = e.content.replace(/^(\s*<p[^>]*>\s*(?:&nbsp;|\u00a0|<br\/?>)?\s*<\/p>\s*)+/gi, '');
                 e.content = e.content.replace(/(\s*<p[^>]*>\s*(?:&nbsp;|\u00a0|<br\/?>)?\s*<\/p>\s*)+$/gi, '');
             });            
+
             // Call original setup if it existed
             if (originalSetup && typeof originalSetup === 'function') {
                 originalSetup(editor);

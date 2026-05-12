@@ -1,6 +1,23 @@
 Changelog
 =========
 
+Version 8.10.0 (in development)
+-------------------------------
+
+### Layout Rules: Automatische Struktur-Optimierung
+
+* **Layout Rules System**: Vier nicht-invasive Content-Korrektur-Regeln für häufige HTML-Struktur-Probleme:
+  - `no_images_in_headings`: Bilder aus h1–h6 automatisch davor verschieben (Basis-Aktivierung)
+  - `collapse_empty_paragraphs`: Mehrfache leere `<p>` durch ein `<div class="uk-margin">` ersetzen
+  - `convert_lines_to_hr`: Minus-Reihen (`----`) → semantische `<hr>`-Elemente mit CSS-Klasse
+  - Automatisches Entfernen von leeren `<p>` am Anfang/Ende des Dokuments
+* **Profile Assistant Integration**: Checkbox-Form und Textfelder für CSS-Klassen-Konfiguration (Reiter "Erweiterte Optionen")
+* **Intelligente Presets**: Simple/Standard/Full mit vordefinierten Layout-Rules-Einstellungen
+* **Design-System-Integration**: Konfigurierbare CSS-Klassen (`uk-margin`, `uk-divider-icon` als Defaults)
+* **Mehrsprachig**: Deutsche und englische UI-Strings für Layout Rules
+* **DOMParser-basiert**: Robuste HTML-Manipulation, transparente Anwendung beim Laden/Einfügen/Speichern
+* Vollständige Dokumentation in `DEVS.md` mit Verwendungsbeispielen für AddOn-Entwickler
+
 Version 8.9.2
 -------------------------------
 

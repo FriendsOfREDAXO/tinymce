@@ -353,3 +353,17 @@ tinymce_profile_restore_info = Letzte gespeicherte Version verfügbar.
 tinymce_profile_restore = Letzte Version wiederherstellen
 tinymce_profile_restore_confirm = Letzte Version wiederherstellen? Die aktuelle Konfiguration wird dabei als neue Sicherung gespeichert.
 tinymce_profile_restored = Letzte Version von Profil "%s" wurde wiederhergestellt.
+
+# Layout Rules (Strukturoptimierung)
+tinymce_layout_rules = Layout-Regeln (Strukturoptimierung)
+tinymce_layout_rules_help = Automatische Korrektur von häufigen Content-Struktur-Problemen. Stilschweigend und nicht-invasiv.
+tinymce_layout_no_images_in_headings = Bilder aus Überschriften verschieben
+tinymce_layout_no_images_in_headings_help = Bilder, die in h1-h6 sind, werden davor platziert.
+tinymce_layout_collapse_empty = Mehrfache Leerzeilen zusammenfassen
+tinymce_layout_collapse_empty_help = Mehrere hintereinander folgende leere <p> werden durch ein Clear-Element ersetzt.
+tinymce_layout_delete_empty = Einzelne leere Absätze löschen
+tinymce_layout_delete_empty_help = Entfernt einzelne leere <p> am Anfang und Ende.
+tinymce_layout_lines_to_hr = Minus-Linien → Trennlinie (----)
+tinymce_layout_lines_to_hr_help = Mehrere Minuszeichen werden zu <hr> umgewandelt.
+tinymce_layout_clear_element = Clear-Element CSS-Klasse
+tinymce_layout_hr_class = Trennlinien CSS-Klasse
