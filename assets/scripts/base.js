@@ -390,7 +390,7 @@ function groupFormatsByProfiles(formatsWithProfiles) {
             profileKey = item.profiles.sort().join(', ');
         }
         
-        let styleset = item.styleset || 'Default';
+        let styleset = item.styleset || ((rex.tinyGlobalOptions && rex.tinyGlobalOptions.default_styleset_label) ? rex.tinyGlobalOptions.default_styleset_label : '');
         let groupKey = styleset + '|' + profileKey;
         
         if (!groupedByKey[groupKey]) {
@@ -412,7 +412,7 @@ function groupFormatsByProfiles(formatsWithProfiles) {
         
         // Add separator with profile label (except for first group)
         if (index > 0) {
-            let profileLabel = group.profileKey === '' ? 'All Profiles' : group.profileKey;
+            let profileLabel = group.profileKey === '' ? ((rex.tinyGlobalOptions && rex.tinyGlobalOptions.all_profiles_label) ? rex.tinyGlobalOptions.all_profiles_label : '') : group.profileKey;
             let label = group.styleset + ' (' + profileLabel + ')';
             result.push({
                 title: '─ ' + label + ' ─',
@@ -682,7 +682,7 @@ function tiny_init(container) {
                         options.menu = {};
                     }
                     options.menu.format = {
-                        title: 'Format',
+                        title: (typeof globalOpts.menu_format_title === 'string' && globalOpts.menu_format_title !== '') ? globalOpts.menu_format_title : '',
                         items: 'bold italic underline strikethrough superscript subscript codeformat | stylesets blocks fontfamily fontsize align lineheight | forecolor backcolor | removeformat'
                     };
                     

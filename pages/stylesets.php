@@ -239,8 +239,8 @@ if ('cke5_convert' === $func) {
             echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
         } else {
             // Styleset-Namen als Gruppen-Titel verwenden, damit im TinyMCE-Dropdown
-            // nicht bei jedem Set 'CKE5 Migrated' erscheint.
-            $groupTitle = '' !== $newName ? $newName : 'CKE5 Migrated';
+            // nicht bei jedem Set ein allgemeiner Migrations-Titel erscheint.
+            $groupTitle = '' !== $newName ? $newName : rex_i18n::msg('tinymce_stylesets_cke5_migrated');
             $result = Cke5Converter::convert($sourceJson, $groupTitle);
             $convWarnings = $result['warnings'];
             if ([] !== $result['formats']) {
@@ -264,7 +264,7 @@ if ('cke5_convert' === $func) {
                         $ins = rex_sql::factory();
                         $ins->setTable(rex::getTable('tinymce_stylesets'));
                         $ins->setValue('name', $newName);
-                        $ins->setValue('description', '' !== $newDescription ? $newDescription : 'Aus CKEditor 5 migriert');
+                        $ins->setValue('description', '' !== $newDescription ? $newDescription : rex_i18n::msg('tinymce_stylesets_cke5_description_default'));
                         $ins->setValue('content_css', $newContentCss);
                         $ins->setValue('style_formats', $convFormatsJson);
                         $ins->setValue('active', 1);
@@ -319,7 +319,7 @@ if ('cke5_convert' === $func) {
             . '<div class="row">'
             .   '<div class="col-md-6"><div class="form-group">'
             .     '<label for="cke5_name">' . rex_i18n::msg('tinymce_stylesets_name') . '</label>'
-            .     '<input type="text" id="cke5_name" name="cke5_name" class="form-control" value="' . rex_escape($newName) . '" placeholder="z. B. UIkit Buttons (CKE5)">'
+            .     '<input type="text" id="cke5_name" name="cke5_name" class="form-control" value="' . rex_escape($newName) . '" placeholder="' . rex_escape(rex_i18n::msg('tinymce_stylesets_cke5_name_placeholder')) . '">'
             .   '</div></div>'
             .   '<div class="col-md-6"><div class="form-group">'
             .     '<label for="cke5_description">' . rex_i18n::msg('tinymce_stylesets_description') . '</label>'

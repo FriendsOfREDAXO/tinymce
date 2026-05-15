@@ -248,8 +248,14 @@ class Assets
                 'toolbar_row' => \rex_i18n::msg('tinymce_toolbar_row'),
                 'toolbar_add_item' => \rex_i18n::msg('tinymce_toolbar_add_item'),
                 'toolbar_remove_row' => \rex_i18n::msg('tinymce_toolbar_remove_row'),
+                'toolbar_picker' => \rex_i18n::msg('tinymce_toolbar_picker'),
                 'toolbar_item_placeholder' => \rex_i18n::msg('tinymce_toolbar_item_placeholder'),
                 'toolbar_row_empty' => \rex_i18n::msg('tinymce_toolbar_row_empty'),
+                'toolbar_click_to_pick' => \rex_i18n::msg('tinymce_toolbar_click_to_pick'),
+                'no_results' => \rex_i18n::msg('tinymce_no_results'),
+                'clear_all_toolbar' => \rex_i18n::msg('tinymce_clear_all_toolbar'),
+                'delete_toolbar_item' => \rex_i18n::msg('tinymce_delete_toolbar_item'),
+                'confirm_clear_all_toolbar' => \rex_i18n::msg('tinymce_confirm_clear_all_toolbar'),
                 'available_items' => \rex_i18n::msg('tinymce_available_items'),
                 'separator' => \rex_i18n::msg('tinymce_separator'),
                 'selected_toolbar' => \rex_i18n::msg('tinymce_selected_toolbar'),
@@ -342,6 +348,9 @@ class Assets
                 'custom_menu_items' => \rex_i18n::msg('tinymce_custom_menu_items'),
                 'for_plugins_hint' => \rex_i18n::msg('tinymce_for_plugins_hint'),
                 'addon_plugins_hint' => \rex_i18n::msg('tinymce_addon_plugins_hint'),
+                'menu_format_title' => \rex_i18n::msg('tinymce_menu_format_title'),
+                'default_styleset_label' => \rex_i18n::msg('tinymce_default_styleset_label'),
+                'all_profiles_label' => \rex_i18n::msg('tinymce_stylesets_profiles_all'),
             ];
 
             \rex_view::setJsProperty('tinymceProfileI18n', $i18n);

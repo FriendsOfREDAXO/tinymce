@@ -1252,7 +1252,7 @@ function initTinyMceProfileAssistant() {
         
         const $list = $row.find('.builder-toolbar-inline-picker-list');
         if (orderedItems.length === 0 && !selectedPillValue) {
-            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
+            $list.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || '') + '</div>');
             return;
         }
 
@@ -1260,10 +1260,10 @@ function initTinyMceProfileAssistant() {
         
         // Actions section: separator, clear all, and delete
         html += '<div class="builder-toolbar-inline-picker-divider"></div>';
-        html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-clear-all" data-clear-all="true">' + escapeHtml(i18n.clear_all_toolbar || 'Alle loeschen') + '</button>';
+        html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-clear-all" data-clear-all="true">' + escapeHtml(i18n.clear_all_toolbar || '') + '</button>';
         
         if (selectedPillValue) {
-            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-delete" data-delete="' + escapeHtml(selectedPillValue) + '">' + escapeHtml(i18n.delete_toolbar_item || 'Loeschen') + '</button>';
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-delete" data-delete="' + escapeHtml(selectedPillValue) + '">' + escapeHtml(i18n.delete_toolbar_item || '') + '</button>';
         }
         
         html += '<div class="builder-toolbar-inline-picker-divider"></div>';
@@ -1386,8 +1386,8 @@ function initTinyMceProfileAssistant() {
     }
 
     function addToolbarRow(items = []) {
-        const removeLabel = i18n.toolbar_remove_row || 'Remove toolbar row';
-        const pickerLabel = i18n.toolbar_picker || 'Toolbarfeld';
+        const removeLabel = i18n.toolbar_remove_row || '';
+        const pickerLabel = i18n.toolbar_picker || '';
         const $row = $('<div class="builder-toolbar-row">' +
             '<div class="builder-toolbar-row-header">' +
                 '<span class="builder-toolbar-row-title"></span>' +
@@ -1399,7 +1399,7 @@ function initTinyMceProfileAssistant() {
                 '<div class="builder-toolbar-picker-label">' + pickerLabel + '</div>' +
                 '<div class="builder-toolbar-picker-help">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>' +
             '</div>' +
-            '<div class="builder-toolbar-row-empty">' + (i18n.toolbar_row_empty || 'No items yet. Select items from the picker below.') + '</div>' +
+            '<div class="builder-toolbar-row-empty">' + (i18n.toolbar_row_empty || '') + '</div>' +
             '<div class="builder-toolbar-pill-dropzone">' +
                 '<ul class="builder-toolbar-pill-list list-inline" style="margin-bottom: 0;"></ul>' +
                 '<div class="builder-toolbar-inline-picker">' +
@@ -1532,15 +1532,15 @@ function initTinyMceProfileAssistant() {
         });
 
         if (orderedItems.length === 0 && !selectedPillValue) {
-            $pickerList.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || 'Keine Treffer') + '</div>');
+            $pickerList.html('<div class="builder-toolbar-inline-picker-empty">' + escapeHtml(i18n.no_results || '') + '</div>');
             return;
         }
 
         let html = '';
         html += '<div class="builder-toolbar-inline-picker-divider"></div>';
-        html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-clear-all" data-clear-all="true">' + escapeHtml(i18n.clear_all_toolbar || 'Alle loeschen') + '</button>';
+        html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-clear-all" data-clear-all="true">' + escapeHtml(i18n.clear_all_toolbar || '') + '</button>';
         if (selectedPillValue) {
-            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-delete" data-delete="' + escapeHtml(selectedPillValue) + '">' + escapeHtml(i18n.delete_toolbar_item || 'Loeschen') + '</button>';
+            html += '<button type="button" class="builder-toolbar-inline-picker-item builder-toolbar-inline-picker-delete" data-delete="' + escapeHtml(selectedPillValue) + '">' + escapeHtml(i18n.delete_toolbar_item || '') + '</button>';
         }
         html += '<div class="builder-toolbar-inline-picker-divider"></div>';
 
@@ -1732,7 +1732,7 @@ function initTinyMceProfileAssistant() {
             closeAllContextInsertPickers();
             return;
         }
-        const confirmMessage = i18n.confirm_clear_all_toolbar || 'Alle Elemente in dieser Toolbar-Zeile wirklich loeschen?';
+        const confirmMessage = i18n.confirm_clear_all_toolbar || '';
         if (!window.confirm(confirmMessage)) {
             return;
         }
@@ -1849,7 +1849,7 @@ function initTinyMceProfileAssistant() {
             return;
         }
 
-        const confirmMessage = i18n.confirm_clear_all_toolbar || 'Alle Elemente in dieser Toolbar-Zeile wirklich loeschen?';
+        const confirmMessage = i18n.confirm_clear_all_toolbar || '';
         if (!window.confirm(confirmMessage)) {
             return;
         }
@@ -2941,10 +2941,10 @@ function loadFromConfig($textarea, $builderBody) {
     };
     const $toolbarRows = $builderBody.find('.builder-toolbar-rows');
     const setToolbarRows = (rows) => {
-        const removeLabel = loadI18n.toolbar_remove_row || 'Remove toolbar row';
-        const emptyLabel = loadI18n.toolbar_row_empty || 'No items yet. Select items from the picker below.';
-        const rowTitle = loadI18n.toolbar_row || 'Toolbar row';
-        const pickerLabel = loadI18n.toolbar_picker || 'Toolbarfeld';
+        const removeLabel = loadI18n.toolbar_remove_row || '';
+        const emptyLabel = loadI18n.toolbar_row_empty || '';
+        const rowTitle = loadI18n.toolbar_row || '';
+        const pickerLabel = loadI18n.toolbar_picker || '';
         const normalizedRows = Array.isArray(rows) && rows.length > 0 ? rows : [[]];
         $toolbarRows.empty();
         normalizedRows.forEach((items, index) => {

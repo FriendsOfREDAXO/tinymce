@@ -2,59 +2,381 @@
 tinymce_title = TinyMCE
 
 # navigation
-tinymce_main = Översikt & demonstration
-tinymce_demo = TinyMCE demo
-tinymce_mblock_demo = MBlock demo
-tinymce_profiles = Editor Profile
+tinymce_main = Översikt & demo
+tinymce_settings = Inställningar
+tinymce_demo = TinyMCE-demo
+tinymce_mblock_demo = MBlock-demo
+tinymce_profiles = Redigeringsprofiler
 tinymce_help = Hjälp
-tinymce_for_plugins = FOR-plugin
+tinymce_for_plugins = FOR-plugins
 tinymce_profile_demo_locked_badge = Demo (låst)
-tinymce_profile_demo_locked = Demo-profilen är låst och kan inte redigeras, klonas eller tas bort.
+tinymce_profile_demo_locked = Demoprofilen är låst och kan inte redigeras, klonas eller tas bort.
 tinymce_profile_demo_locked_info = Den här profilen uppdateras automatiskt vid varje AddOn-uppdatering och får inte redigeras. Klona den för att göra egna ändringar.
 tinymce_back_to_list = Tillbaka till listan
 
 # heading
-tinymce_subnavigation_header_title = TinyMCE 8 till REDAXO 5
-tinymce_subnavigation_header_photo = Foto av% s på% s
+tinymce_subnavigation_header_title = TinyMCE 8 för REDAXO 5
+tinymce_subnavigation_header_photo = Foto av %s på %s
 
 # profiles list & form
-tinymce_list_profiles = TinyMCE profil
-tinymce_profile_edit = TinyMCE bearbeta profiler
-tinymce_profile_add = Skapa ny TinyMCE profil
+tinymce_list_profiles = TinyMCE-profiler
+tinymce_profile_edit = Redigera TinyMCE-profil
+tinymce_profile_add = Skapa ny TinyMCE-profil
+tinymce_profile_deleted = Profilen har tagits bort
 tinymce_list_function = Funktion
-tinymce_clone = Duplicera
+tinymce_clone = duplicera
 rex_tinymce_profiles_cloned = Profilen har duplicerats
-rex_tinymce_profiles_clone_exception = Ett fel inträffade under dupliceringen
+rex_tinymce_profiles_clone_exception = Ett fel uppstod vid dupliceringen
+
 
 # profiles columns names
-tinymce_name = Profil-namn
+tinymce_name = Profilnamn
 tinymce_name_placeholder = profile_name
-tinymce_description = Profil beskrivning
-tinymce_description_placeholder = Profilens syfte och omfattning
-tinymce_profile_definition = TinyMCE konfiguration (JSON)
-tinymce_extra_definition = Profil option
-tinymce_toolbar = Toolbar element
-tinymce_heading = Heading element
+tinymce_description = Profilbeskrivning
+tinymce_description_placeholder = Avsedd användning och profilens omfattning
+tinymce_profile_definition = TinyMCE-konfiguration (JSON)
+tinymce_extra_definition = Profilalternativ
+tinymce_toolbar = Verktygsfält
+tinymce_heading = Rubrikelement
 tinymce_alignment = Textjustering
-tinymce_fontSize = Teckenstorlekar
-tinymce_insertlink = Välj länkdestination
+tinymce_fontSize = Teckenstorlek
+tinymce_insertlink = Välj länkmål
 tinymce_tab_structure = Struktur
 tinymce_tab_mediapool = Mediapool
-tinymce_link = Redaxo länkar
+tinymce_link = REDAXO-länkar
 tinymce_lang = Språk
-tinymce_image_toolbar = Image-Plugin Toolbar
-tinymce_table_toolbar = Tabell-Plugin Toolbar
-tinymce_height_default = TinyMCE default-höjd
-tinymce_height_default_description = Utan anpassad min och max höjd, höjden anpassas till textinnehåll
-tinymce_min_height = Textarea min-höjd
-tinymce_max_height = Textarea max-höjd
-tinymce_highlight = Marker- och teckenfärg
-tinymce_media_manager_type = Media-Manager-Type
+tinymce_image_toolbar = Verktygsfält för bildplugin
+tinymce_table_toolbar = Verktygsfält för tabellplugin
+tinymce_height_default = TinyMCE-standardhöjd
+tinymce_height_default_description = Utan anpassad min- och maxhöjd anpassas höjden efter textområdets innehåll
+tinymce_min_height = Minsta höjd för textområde
+tinymce_max_height = Maximal höjd för textområde
+tinymce_highlight = Markör- och teckenfärger
+tinymce_media_manager_type = Media Manager-typ
 tinymce_media_category = Mediakategori
-tinymce_upload_default = Image-Drag&Drop-Upload
-tinymce_upload_default_description = Bilder kan läggas i textfältet via drag + drop
+tinymce_upload_default = Drag & drop-uppladdning av bilder
+tinymce_upload_default_description = Bilder kan placeras i textfältet via drag & drop
+
+#migration
+tinymce_migration_message = Profilfixern erbjuder riktade kompatibilitets- och kvalitetsförbättringar för TinyMCE-8-profiler.
+
+tinymce_migration_title = TinyMCE 8 – profilfixer & kompatibilitetskontroll
+tinymce_migration_description = Kontrollerar befintliga profiler för vanliga TinyMCE-8-problem och låter dig reparera dem riktat.
+tinymce_migration_actions = Åtgärder
+tinymce_migration_repair = Reparera
+tinymce_migration_repaired = Profil %s har reparerats.
+tinymce_migration_no_changes = Profil %s behöver inga ändringar.
+tinymce_migration_repaired_count = %s profiler har reparerats.
+
+migration = Profilfixer
+tinymce_profile_name = Profilnamn
+
+tinymce_migration_repair_all = Reparera alla
+tinymce_migration_repair_all_confirm = Reparera alla profiler? Detta kan inte ångras.
+tinymce_migration_needs_fix = Reparation behövs
+tinymce_migration_ok = Ingen åtgärd behövs
+
+tinymce_reset_default_profiles_title = Återställ standardprofiler
+tinymce_reset_default_profiles_description = Återställer de medföljande standardprofilerna till det aktuella AddOn-läget. Befintliga profiler med samma namn skrivs över. Egna profiler lämnas orörda.
+tinymce_reset_default_profiles_button = Återställ standardprofiler
+tinymce_reset_default_profiles_confirm = Följande standardprofiler kommer att skrivas över: full, light, default, demo. Egna profiler behålls. Fortsätta?
+tinymce_reset_default_profiles_success = Standardprofilerna återställdes utan problem.
+tinymce_profile_reset_failed = Standardprofilerna kunde inte återställas. Kontrollera loggarna.
+
+tinymce_profile_export = Exportera
+tinymce_profile_export_filename = tinymce-profile-%s.json
+tinymce_profile_export_all = Exportera alla
+tinymce_profile_export_all_filename = tinymce-profiles.json
+tinymce_profile_import = Importera profiler
+tinymce_profile_import_button = Importera
+tinymce_profile_import_success = %s profiler importerades, %s profiler skrevs över, %s profiler hoppades över.
+tinymce_profile_import_overwrite = Skriv över befintliga profiler
+tinymce_profile_import_invalid = Den uppladdade filen är inte giltig JSON.
+tinymce_profile_import_error = Importen misslyckades.
+tinymce_profile_export_error = Profilen hittades inte.
 tinymce_profile_phpcode = Generera PHP-kod
 tinymce_profile_phpcode_title = Profil som PHP-kod
 tinymce_profile_phpcode_copy = Kopiera kod
 tinymce_profile_phpcode_copied = Kopierat!
+tinymce_preview = Förhandsgranskning
+tinymce_loading = Läser in…
+
+tinymce_demo_title = REDAXO TinyMCE-AddOn-demo
+tinymce_demo_content = Här kan alla funktioner i AddOn:et testas. Inmatningarna sparas inte.
+tinymce_demo_description = TinyMCE är en rich-text-editor som gör det möjligt att skapa formaterat innehåll i ett användarvänligt gränssnitt.
+tinymce_links_documentation = TinyMCE 8-dokumentation
+tinymce_links_github = GitHub-repository
 close = Stäng
+
+# profile assistant
+tinymce_profile_assistant = Profilassistent
+tinymce_presets = Förinställningar
+tinymce_simple = Enkel
+tinymce_standard = Standard
+tinymce_full = Fullständig
+tinymce_plugins = Plugins
+tinymce_toolbar = Verktygsfält
+tinymce_toolbar_help = Hantera ett eller flera verktygsfält. Varje rad motsvarar en TinyMCE-verktygsfältsrad.
+tinymce_toolbar_enabled = Visa verktygsfält
+tinymce_toolbar_enabled_help = Inaktivera detta för att generera <code>toolbar: false</code>. Det håller profiler utan verktygsfält kompatibla med TinyMCE.
+tinymce_toolbar_mode = Verktygsfältsvy
+tinymce_toolbar_mode_help = Styr hur TinyMCE hanterar överskjutande verktygsfältsknappar när utrymmet tar slut.
+tinymce_toolbar_mode_sliding = Sliding (standard)
+tinymce_toolbar_mode_floating = Floating
+tinymce_toolbar_mode_wrap = Wrap
+tinymce_toolbar_mode_scrolling = Scrolling
+tinymce_toolbar_add_row = Lägg till verktygsfältsrad
+tinymce_toolbar_row = Verktygsfältsrad
+tinymce_toolbar_add_item = Lägg till element
+tinymce_toolbar_remove_row = Ta bort rad
+tinymce_toolbar_picker = Verktygsfält
+tinymce_toolbar_click_to_pick = Klicka i fältet och välj i rullgardinsmenyn. Markeringar: Core / FOR / AddOn.
+tinymce_toolbar_item_placeholder = Sök verktygsfältsobjekt eller skriv |
+tinymce_toolbar_row_empty = Inga element ännu. Lägg till poster via det kompakta sökfältet.
+tinymce_no_results = Inga träffar
+tinymce_clear_all_toolbar = Rensa alla
+tinymce_delete_toolbar_item = Ta bort
+tinymce_confirm_clear_all_toolbar = Vill du verkligen ta bort alla element i denna verktygsfältsrad?
+tinymce_available_items = Tillgängliga element
+tinymce_separator = Avdelare
+tinymce_selected_toolbar = Valda verktygsfält (dra för att ordna om)
+tinymce_toolbar_result = Verktygsfältssträng (resultat)
+tinymce_common_settings = Allmänna inställningar
+tinymce_height = Höjd
+tinymce_height_help = Tal = pixlar, annars ett giltigt CSS-värde (<code>px</code>, <code>pt</code>, <code>em</code>). Enligt TinyMCE-dokumentationen stöds <code>%</code>, <code>vh</code> och <code>auto</code> <strong>inte</strong> – för variabel höjd, aktivera Autoresize.
+tinymce_width = Bredd
+tinymce_width_help = Valfritt. Tal = pixlar, annars ett CSS-värde (stöder <code>%</code>, <code>em</code>, <code>vh</code> …). Lämna tomt för full containerbredd.
+tinymce_min_height = Minhöjd (px)
+tinymce_max_height = Maxhöjd (px)
+tinymce_resize_handle = Storleksgrepp
+tinymce_resize_vertical = vertikalt (standard)
+tinymce_resize_off = av
+tinymce_resize_both = båda riktningar
+tinymce_autoresize = Autoresize (editorn växer med innehållet)
+tinymce_autoresize_help = Aktiverar pluginen <code>autoresize</code>. <code>min_height</code>/<code>max_height</code> anger gränserna för automatisk tillväxt; <code>height</code> ignoreras.
+tinymce_link_schema_help = <strong>Länkschema (valfritt):</strong> URL-mönster för den genererade länken. Platshållare: <code>[id]</code> = YForm-postens ID, <code>[field]</code> = valt fältvärde. Exempel: <code>index.php?article_id=5&amp;news=[id]</code> eller <code>/produkt/[id]</code>. Lämna tomt för att bara infoga fältvärdet som länktext.
+tinymce_menubar = Visa menyrad
+tinymce_language = Språk
+tinymce_advanced_settings = Avancerade inställningar
+tinymce_context_toolbar = Kontextverktygsfält (Quickbars)
+tinymce_context_toolbar_help = Visar verktyg direkt vid markören när text är markerad.
+tinymce_auto_hide_toolbar = Dölj verktygsfält automatiskt
+tinymce_image_caption = Bildtexter
+tinymce_image_uploadtab = Flik för bilduppladdning
+tinymce_media_manager_type = Media Manager-typ
+tinymce_relative_urls = Relativa URL:er
+tinymce_remove_script_host = Ta bort script-host
+tinymce_convert_urls = Konvertera URL:er
+tinymce_document_base_url = Dokumentets bas-URL
+tinymce_entity_encoding = Entity Encoding
+tinymce_extras_defaults = Extra inställningar (standard)
+tinymce_default_codesample_languages = Standardspråk för codesample
+tinymce_default_rellist = Standard-RELLISTA
+tinymce_link_defaults = Länkstandarder
+tinymce_link_target_list_label = Tydliga länkmål (target_list, tyska)
+tinymce_link_noreferrer_label = Lägg automatiskt till rel="noopener noreferrer" vid target="_blank"
+tinymce_link_default_https_label = Standardprotokoll: https
+tinymce_link_target_none = Inget mål (samma fönster)
+tinymce_link_target_blank = Nytt fönster
+tinymce_content_langs = Språkmeny (content_langs)
+tinymce_content_langs_help = Lista över språk för knappen <code>language</code> i verktygsfältet respektive formatmenyn. Märker textavsnitt med ett <code>lang</code>-attribut (viktigt för skärmläsare/SEO).
+tinymce_content_langs_title = Titel
+tinymce_content_langs_code = Kod (lang)
+tinymce_content_langs_customcode = Anpassad kod (valfritt)
+tinymce_content_langs_customcode_placeholder = t.ex. en-GB-oxford
+tinymce_content_langs_title_placeholder = Engelska
+tinymce_content_langs_default = Standard
+tinymce_content_langs_add = Lägg till språk
+tinymce_content_langs_presets = Infoga standarduppsättning (de/en/fr/es/it)
+tinymce_content_langs_hint = <strong>Titel</strong>: etikett i menyn. <strong>Kod</strong>: BCP-47-språkkod (t.ex. <code>de</code>, <code>en</code>, <code>de-CH</code>). <strong>Anpassad kod</strong>: valfritt, sätts som <code>data-mce-lang</code>. <strong>Standard</strong>: sätter dessutom <code>language</code> (UI-språk) till denna kod. Lämna tomt för att inaktivera språkmenyn.
+tinymce_autoreplace = Typografi-autoreplace (for_chars_symbols)
+tinymce_autoreplace_help = Live-ersättning medan du skriver. Utlöses av <kbd>mellanslag</kbd>, <kbd>Enter</kbd> och skiljetecken (<code>. , ; : ! ? ) ] &quot; ' /</code>). Fungerar inte i <code>&lt;code&gt;</code>, <code>&lt;pre&gt;</code>, <code>&lt;kbd&gt;</code>, <code>&lt;samp&gt;</code>, <code>&lt;tt&gt;</code>. Alla ersättningar kan ångras.
+tinymce_autoreplace_enabled = Aktivera autoreplace
+tinymce_autoreplace_defaults = Använd standardregler (32 regler: (c)→©, (tm)→™, …→…, ->→→, +/-→±, bråk, …)
+tinymce_autoreplace_custom = Egna regler
+tinymce_autoreplace_type = Typ
+tinymce_autoreplace_from = Från (text eller regex)
+tinymce_autoreplace_to = Till (måltecken)
+tinymce_autoreplace_add = Lägg till regel
+tinymce_autoreplace_examples = Infoga exempel
+tinymce_autoreplace_hint = <strong>Typ</strong>: <code>Text</code> = bokstavlig ersättning, <code>Regex</code> = reguljärt uttryck med backreferences (<code>$1</code>, <code>$2</code>). <strong>Till</strong>: Unicode-escapes som <code>\u00A0</code> (nbsp) eller <code>\u2011</code> (bindestreck utan radbrytning) är tillåtna. Exempel: text <code>(tel)</code> → <code>+49 …</code>; regex <code>\(kw(\d{1,2})\)</code> → <code>KW $1</code>.
+tinymce_toc_depth = Innehållsförteckningens djup
+tinymce_toc_header_tag = Rubriktagg för innehållsförteckning
+tinymce_toc_class = Klass för innehållsförteckning
+tinymce_protected_extras = Skyddade extrafält
+tinymce_protected_extras_help = Råa rader från detta fält läggs till <strong>efter</strong> de genererade alternativen. Använd detta för egna TinyMCE-alternativ eller för att medvetet skriva över värden som assistenten hanterar, utan att de försvinner vid nästa generering.
+tinymce_protected_extras_placeholder = toolbar_sticky: true, toolbar_sticky_offset: 0
+tinymce_generate_config = Generera konfiguration
+tinymce_generate_and_save = Generera & spara
+tinymce_overwrites_existing_config = Skriver över befintlig konfiguration!
+tinymce_none = Ingen
+
+# imagewidth plugin
+tinymce_imagewidth = Bildbreddsplugin
+tinymce_imagewidth_help = Fasta bildbredder istället för manuell storleksändring. Bilder får CSS-klasser i stället för pixelvärden.
+tinymce_imagewidth_enable = Aktivera bildbreddsplugin
+tinymce_imagewidth_framework = CSS-ramverk
+tinymce_imagewidth_general = Allmänt (pixelbaserat)
+tinymce_imagewidth_dialog = Dialogknapp i verktygsfältet
+tinymce_imagewidth_template = Ladda mall
+tinymce_imagewidth_breakpoint = Brytpunkt
+
+tinymce_devs = Utvecklare
+
+tinymce_snippets = Snippets
+tinymce_snippets_name = Namn
+tinymce_snippets_content = Innehåll
+tinymce_snippets_add = Lägg till snippet
+tinymce_snippets_edit = Redigera snippet
+tinymce_snippets_deleted = Snippet borttagen
+tinymce_snippets_toggled = Status ändrad
+tinymce_snippets_no_content = Inget innehåll
+tinymce_snippets_name_empty = Namnet får inte vara tomt!
+tinymce_snippets_active = Aktiv
+tinymce_snippets_active_yes = Aktiv
+tinymce_snippets_active_no = Inaktiv
+tinymce_snippets_toggle = Växla status
+
+# Style-Sets
+stylesets = Style-Sets
+tinymce_stylesets = Style-Sets
+tinymce_stylesets_name = Namn
+tinymce_stylesets_description = Beskrivning
+tinymce_stylesets_content_css = Content CSS
+tinymce_stylesets_content_css_notice = Här måste en URL (absolut sökväg eller CDN-länk) till en CSS-fil anges, t.ex. <code>/assets/addons/project/frontend.css</code> eller <code>https://cdn.jsdelivr.net/npm/uikit@3/dist/css/uikit.min.css</code>. Flera URL:er kan anges kommaseparerat.
+tinymce_stylesets_style_formats = Style Formats (JSON)
+tinymce_stylesets_style_formats_notice = JSON-array med TinyMCE style_formats-definitioner. Se TinyMCE-dokumentationen.
+tinymce_stylesets_profiles = Profiler
+tinymce_stylesets_profiles_notice = Välj de profiler där detta Style-Set ska vara tillgängligt. Ingen markering = aktiv i alla profiler.
+tinymce_stylesets_profiles_all = Alla profiler
+tinymce_stylesets_active = Aktiv
+tinymce_stylesets_active_label = Style-Set är aktivt
+tinymce_stylesets_prio = Prioritet
+tinymce_stylesets_add = Lägg till Style-Set
+tinymce_stylesets_edit = Redigera Style-Set
+tinymce_stylesets_deleted = Style-Set borttaget
+tinymce_stylesets_toggled = Status ändrad
+tinymce_stylesets_name_empty = Namnet får inte vara tomt!
+tinymce_stylesets_activate = Aktivera
+tinymce_stylesets_deactivate = Avaktivera
+tinymce_stylesets_info_title = Info
+tinymce_stylesets_actions_title = Hantera Style-Sets
+tinymce_stylesets_info = Style-Sets gör det möjligt att centralt hantera CSS-ramverksspecifika stilar (UIkit 3, Bootstrap 5 etc.). Aktiva Style-Sets integreras automatiskt i alla TinyMCE-profiler.
+tinymce_stylesets_info_merge = content_css och style_formats från alla aktiva Style-Sets slås samman och är tillgängliga i editorn via rullgardinsmenyn "Styles".
+tinymce_stylesets_demo_install = Installera demo-set
+tinymce_stylesets_demo_info = Med knappen kan fördefinierade Style-Sets för UIkit 3 och Bootstrap 5 installeras.
+tinymce_stylesets_demo_confirm = Vill du installera demo Style-Sets?
+tinymce_stylesets_demo_installed = %s demo Style-Set(s) har installerats.
+tinymce_stylesets_demo_skipped = %s Style-Set(s) hoppades över (namnet finns redan).
+tinymce_stylesets_cke5_title = CKEditor 5-konverterare
+tinymce_stylesets_cke5_info = Konverterar befintliga CKEditor 5-anpassade stilar, länk-decorators eller rubrikalternativ som JSON till ett TinyMCE-Style-Set och sparar dem valfritt direkt som ett nytt set.
+tinymce_stylesets_cke5_intro = Klistra in JSON-definitionen från CKEditor 5-konfigurationen här. Stöd finns bl.a. för <code>[{"key": {"label": "...", "classes": [...]}}]</code>, <code>[{"key": {"label": "...", "attributes": {"class": "..."}}}]</code> samt <code>{"heading": {"options": [...]}}</code>.
+tinymce_stylesets_cke5_source = CKEditor 5 JSON
+tinymce_stylesets_cke5_preview = Förhandsgranskning (TinyMCE style_formats)
+tinymce_stylesets_cke5_convert = Konvertera
+tinymce_stylesets_cke5_save = Spara som nytt Style-Set
+tinymce_stylesets_cke5_saved = Style-Set "%s" skapades från CKEditor 5-konfigurationen.
+tinymce_stylesets_cke5_name_exists = Ett Style-Set med namnet "%s" finns redan.
+tinymce_stylesets_cke5_nothing = Inga stilar kunde extraheras från JSON.
+tinymce_stylesets_cke5_migrated = Migrerad från CKEditor 5
+tinymce_stylesets_cke5_description_default = Migrerad från CKEditor 5
+tinymce_stylesets_cke5_name_placeholder = t.ex. UIkit Buttons (CKE5)
+tinymce_menu_format_title = Format
+tinymce_default_styleset_label = Standard
+tinymce_stylesets_import_export = Import / Export
+tinymce_stylesets_import_export_info = Style-Sets kan exporteras och importeras som JSON-filer för att kunna användas mellan projekt.
+tinymce_stylesets_export = Exportera
+tinymce_stylesets_export_all = Exportera alla
+tinymce_stylesets_import = Importera
+tinymce_stylesets_imported = %s Style-Set(s) har importerats.
+tinymce_stylesets_import_skipped = %s Style-Set(s) hoppades över (namnet finns redan).
+tinymce_stylesets_import_invalid_json = Filen innehåller inte giltig JSON.
+tinymce_stylesets_import_no_file = Välj en fil att importera.
+tinymce_stylesets_import_empty = Inga giltiga Style-Sets hittades i filen.
+
+# paste settings (cleanpaste plugin)
+tinymce_paste_settings = Infogningsrensning
+tinymce_cleanpaste_saved = Inställningarna har sparats.
+
+tinymce_settings_title = URL-status
+tinymce_settings_resolved_asset_base = Automatiskt löst TinyMCE-asset-URL
+tinymce_settings_resolved_plugin_base = Automatiskt löst TinyMCE-plugin-URL
+tinymce_settings_reload_hint = Gör en hård omladdning efter regenerering. Filen <code>profiles.js</code> genereras om i processen.
+tinymce_settings_regenerate = Regenerera profiles.js
+tinymce_settings_saved = profiles.js har regenererats.
+tinymce_settings_saved_profiles_failed = <code>profiles.js</code> kunde inte regenereras. Kontrollera loggarna.
+tinymce_media_upload_settings_saved = Inställningarna för bilduppladdning har sparats.
+
+tinymce_cleanpaste_section_source = Källrensning
+tinymce_cleanpaste_strip_ms_office = Ta bort MS Office-markup
+tinymce_cleanpaste_strip_ms_office_help = Tar bort villkorliga kommentarer, Office-XML-namnrymder (o:p, w:sdtPr osv.) och mso-* CSS-egenskaper.
+tinymce_cleanpaste_strip_google_docs = Ta bort Google Docs-markup
+tinymce_cleanpaste_strip_google_docs_help = Tar bort startFragment/endFragment-kommentarer och interna Google-ID:n.
+
+tinymce_cleanpaste_section_styles = Klasser & stilar
+tinymce_cleanpaste_remove_styles = Ta bort inline-stilar
+tinymce_cleanpaste_remove_styles_help = Tar bort alla style="..."-attribut från infogat innehåll.
+tinymce_cleanpaste_preserve_styles = Behåll style-egenskaper (positivlista)
+tinymce_cleanpaste_preserve_styles_help = En CSS-egenskap per rad. Prefix regex: för reguljära uttryck (t.ex. regex:^border-).
+tinymce_cleanpaste_remove_classes = Ta bort CSS-klasser
+tinymce_cleanpaste_remove_classes_help = Tar bort alla class="..."-attribut från infogat innehåll.
+tinymce_cleanpaste_preserve_classes = Behåll CSS-klasser (positivlista)
+tinymce_cleanpaste_preserve_classes_help = Ett klassnamn per rad. Prefix regex: för reguljära uttryck (t.ex. regex:^uk- eller preserve_class:uikit-card).
+
+tinymce_cleanpaste_section_attributes = Attribut
+tinymce_cleanpaste_remove_ids = Ta bort id-attribut
+tinymce_cleanpaste_remove_ids_help = Tar bort id="..."-attribut från infogat innehåll och undviker därmed dubbla ID:n.
+tinymce_cleanpaste_remove_data_attrs = Ta bort data-* attribut
+tinymce_cleanpaste_remove_data_attrs_help = Tar bort alla data-* attribut från infogat innehåll.
+
+tinymce_cleanpaste_section_whitespace = Tomrader & radbrytningar
+tinymce_cleanpaste_max_br = Maximalt antal på varandra följande <br>
+tinymce_cleanpaste_max_br_help = Begränsar flera på varandra följande radbrytningar. 0 = obegränsat.
+tinymce_cleanpaste_max_empty_paragraphs = Maximalt antal tomma stycken
+tinymce_cleanpaste_max_empty_paragraphs_help = Begränsar flera på varandra följande tomma <p>-taggar. 0 = obegränsat.
+
+tinymce_cleanpaste_section_tags = Tillåtna HTML-taggar (positivlista)
+tinymce_cleanpaste_allowed_tags = Tillåtna taggar
+tinymce_cleanpaste_allowed_tags_help = En tagg per rad (utan vinkelparenteser, t.ex. p, br, strong). Tomt = alla taggar tillåtna. Otillåtna taggar tas bort, men deras innehåll behålls.
+
+# mediapaste plugin (image upload via drag & drop / paste)
+tinymce_media_no_category = Utan kategori
+mediapaste_section_title = Bilduppladdning (drag & drop / klistra in)
+mediapaste_upload_enabled = Aktivera bilduppladdning till mediapoolen
+mediapaste_upload_enabled_help = När detta är aktivt laddas bilder som släpps eller klistras in automatiskt upp till REDAXO-mediapoolen.
+mediapaste_default_category = Standardmediakategori
+mediapaste_category_ask = — Fråga alltid —
+mediapaste_default_category_help = Kategori dit bilderna laddas upp. "Fråga alltid" öppnar en dialog vid uppladdning. För frontend-användare utan mediabehörighet måste en fast kategori väljas.
+mediapaste_media_manager_type = Media Manager-typ för bild-URL
+mediapaste_media_manager_type_help = Valfri Media Manager-typ för bild-URL:en som visas i editorn (t.ex. tiny). Tomt = direkt /media/-URL.
+
+tinymce_insert_menu = Infogningsmeny
+tinymce_insert_menu_help = Bestämmer vilka poster som visas i menyradens "Infoga"-meny. Dra och släpp för att sortera. Enskilda plugins (oEmbed, Video, HTML Embed, checklista, fotnot, tillgänglighet …) hamnar automatiskt i infogningsmenyn så snart de är aktiverade här.
+tinymce_insert_menu_title = Menytitel
+tinymce_insert_menu_result = Menyposter (resultat)
+tinymce_load_from_config = Använd befintlig konfiguration
+tinymce_load_from_config_help = Läser den aktuella konfigurationen från textfältet och fyller i assistentens formulärfält.
+tinymce_loaded_from_config = Konfigurationen har överförts till assistenten.
+tinymce_load_failed = Konfigurationen kunde inte läsas. Fyll i manuellt.
+tinymce_custom_menu_items = Anpassade pluginposter
+tinymce_for_plugins_hint = FriendsOfREDAXO-egna plugins – markerade
+tinymce_addon_plugins_hint = Plugins från externa AddOn – markerade
+
+tinymce_profile_restore_info = Senast sparade version finns tillgänglig.
+tinymce_profile_restore = Återställ senaste versionen
+tinymce_profile_restore_confirm = Återställa senaste versionen? Den aktuella konfigurationen sparas samtidigt som en ny säkerhetskopia.
+tinymce_profile_restored = Senaste versionen av profilen "%s" har återställts.
+
+# Layout Rules (strukturoptimering)
+tinymce_layout_rules = Layoutregler (strukturoptimering)
+tinymce_layout_rules_help = Automatisk korrigering av vanliga problem i innehållsstrukturen. Tyst och icke-invasivt.
+tinymce_layout_no_images_in_headings = Flytta bilder ur rubriker
+tinymce_layout_no_images_in_headings_help = Bilder som ligger i h1-h6 placeras före rubriken.
+tinymce_layout_collapse_empty = Slå ihop flera tomma rader
+tinymce_layout_collapse_empty_help = Flera på varandra följande tomma <p> ersätts med ett clear-element.
+tinymce_layout_delete_empty = Ta bort enstaka tomma stycken
+tinymce_layout_delete_empty_help = Tar bort enstaka tomma <p> i början och slutet.
+tinymce_layout_lines_to_hr = Minusrader → avdelare (----)
+tinymce_layout_lines_to_hr_help = Flera minustecken omvandlas till <hr>.
+tinymce_layout_clear_element = CSS-klass för clear-element
+tinymce_layout_hr_class = CSS-klass för avdelare
