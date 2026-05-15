@@ -30,6 +30,17 @@ Version 8.10 (in development)
   * `link-generic-text`: öffnet den Link-Dialog direkt am betroffenen Element.
 * Nach Anwendung eines Quickfixes wird der Audit automatisch erneut ausgeführt und die Marker werden aktualisiert.
 
+### for_video: Einfügen im Editor robuster gemacht
+
+* Die Plugin-Basis wurde auf den ursprünglichen `for_video`-Workflow zurückgeführt, um Seiteneffekte aus Zwischenständen zu vermeiden.
+* Neu: Videos können als dekorativ markiert werden (`aria-hidden`/`role="presentation"`).
+* Neu: Optionale Verlinkung einer Untertitel-Datei (`.vtt`) inklusive `srclang` und Label im Dialog; beim Speichern wird ein `track kind="captions"` erzeugt.
+
+### for_images: Kollision mit for_video behoben
+
+* Die Figure-Bereinigung in `for_images` entfernt nicht mehr pauschal alle `figure` ohne `img`.
+* Dadurch bleiben `for_video`-Preview-Figures ohne Poster erhalten und werden nicht mehr fälschlich als „leer“ gelöscht.
+
 
 Version 8.9.2
 -------------------------------

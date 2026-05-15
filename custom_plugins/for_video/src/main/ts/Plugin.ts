@@ -28,11 +28,15 @@ interface Preset { label: string; value: string; }
 interface VideoData {
     src: string;
     poster: string;
+    trackSrc: string;
+    trackLang: string;
+    trackLabel: string;
     controls: boolean;
     autoplay: boolean;
     loop: boolean;
     muted: boolean;
     playsinline: boolean;
+    decorative: boolean;
 }
 
 const INTERNAL_CLASSES = ['for-video'];
@@ -160,21 +164,26 @@ function buildPreviewHtml(data: VideoData, userClasses: string[] = []): string {
     const posterImg = posterUrl
         ? `<img class="for-video__poster" src="${escapeAttr(posterUrl)}" alt="" loading="lazy" draggable="false">`
         : '';
+    const accessibilityAttrs = data.decorative ? ' aria-hidden="true" role="presentation"' : '';
 
     const dataAttrs = [
         `data-for-video-src="${escapeAttr(data.src)}"`,
         `data-for-video-poster="${escapeAttr(data.poster)}"`,
+        `data-for-video-track-src="${escapeAttr(data.trackSrc)}"`,
+        `data-for-video-track-lang="${escapeAttr(data.trackLang)}"`,
+        `data-for-video-track-label="${escapeAttr(data.trackLabel)}"`,
         `data-for-video-controls="${data.controls ? '1' : '0'}"`,
         `data-for-video-autoplay="${data.autoplay ? '1' : '0'}"`,
         `data-for-video-loop="${data.loop ? '1' : '0'}"`,
         `data-for-video-muted="${data.muted ? '1' : '0'}"`,
-        `data-for-video-playsinline="${data.playsinline ? '1' : '0'}"`
+        `data-for-video-playsinline="${data.playsinline ? '1' : '0'}"`,
+        `data-for-video-decorative="${data.decorative ? '1' : '0'}"`
     ].join(' ');
 
     const fileLabel = basename(data.src) || 'Video';
 
     return (
-        `<figure class="${escapeAttr(allClasses)}" contenteditable="false" ${dataAttrs}>` +
+        `<figure class="${escapeAttr(allClasses)}" contenteditable="false" ${accessibilityAttrs} ${dataAttrs}>` +
             `<div class="for-video__toolbar" data-for-video-toolbar>` +
                 `<span class="for-video__badge">Video</span>` +
                 `<span class="for-video__url" title="${escapeAttr(data.src)}">${escapeAttr(fileLabel)}</span>` +
@@ -210,11 +219,19 @@ function buildSaveHtml(data: VideoData, userClasses: string[] = []): string {
     if (data.muted || data.autoplay) attrs.push('muted'); // Autoplay braucht muted
     if (data.playsinline) attrs.push('playsinline');
     attrs.push('preload="metadata"');
+    const trackSrc = data.trackSrc ? resolveMediaUrl(data.trackSrc) : '';
+    const trackLang = (data.trackLang || '').trim() || 'de';
+    const trackLabel = (data.trackLabel || '').trim() || 'Untertitel';
+    const trackHtml = trackSrc
+        ? `<track kind="captions" src="${escapeAttr(trackSrc)}" srclang="${escapeAttr(trackLang)}" label="${escapeAttr(trackLabel)}">`
+        : '';
 
     const fileLabel = basename(data.src) || 'Video';
+    const accessibilityAttrs = data.decorative ? ' aria-hidden="true" role="presentation"' : '';
     return (
-        `<figure class="${escapeAttr(cls)}">` +
+        `<figure class="${escapeAttr(cls)}"${accessibilityAttrs}>` +
             `<video ${attrs.join(' ')}>` +
+                trackHtml +
                 `<a href="${escapeAttr(src)}">${escapeAttr(fileLabel)}</a>` +
             `</video>` +
         `</figure>`
@@ -226,14 +243,19 @@ function buildSaveHtml(data: VideoData, userClasses: string[] = []): string {
 function readVideoDataFromFigure(fig: Element): VideoData | null {
     const vid = fig.querySelector('video') as HTMLVideoElement | null;
     if (vid) {
+        const track = vid.querySelector('track[kind="captions"], track[kind="subtitles"], track') as HTMLTrackElement | null;
         return {
             src: vid.getAttribute('src') || '',
             poster: vid.getAttribute('poster') || '',
+            trackSrc: track?.getAttribute('src') || '',
+            trackLang: track?.getAttribute('srclang') || 'de',
+            trackLabel: track?.getAttribute('label') || 'Untertitel',
             controls: vid.hasAttribute('controls'),
             autoplay: vid.hasAttribute('autoplay'),
             loop: vid.hasAttribute('loop'),
             muted: vid.hasAttribute('muted'),
-            playsinline: vid.hasAttribute('playsinline')
+            playsinline: vid.hasAttribute('playsinline'),
+            decorative: fig.getAttribute('data-for-video-decorative') === '1' || fig.getAttribute('aria-hidden') === 'true'
         };
     }
     // Figure ist schon Preview (hat data-Attribute)
@@ -241,11 +263,15 @@ function readVideoDataFromFigure(fig: Element): VideoData | null {
         return {
             src: fig.getAttribute('data-for-video-src') || '',
             poster: fig.getAttribute('data-for-video-poster') || '',
+            trackSrc: fig.getAttribute('data-for-video-track-src') || '',
+            trackLang: fig.getAttribute('data-for-video-track-lang') || 'de',
+            trackLabel: fig.getAttribute('data-for-video-track-label') || 'Untertitel',
             controls: fig.getAttribute('data-for-video-controls') === '1',
             autoplay: fig.getAttribute('data-for-video-autoplay') === '1',
             loop: fig.getAttribute('data-for-video-loop') === '1',
             muted: fig.getAttribute('data-for-video-muted') === '1',
-            playsinline: fig.getAttribute('data-for-video-playsinline') === '1'
+            playsinline: fig.getAttribute('data-for-video-playsinline') === '1',
+            decorative: fig.getAttribute('data-for-video-decorative') === '1' || fig.getAttribute('aria-hidden') === 'true'
         };
     }
     return null;
@@ -314,6 +340,14 @@ function activateVideoInFigure(editor: any, figure: HTMLElement): void {
     if (data.loop) vid.loop = true;
     if (data.muted) vid.muted = true;
     if (data.playsinline) vid.setAttribute('playsinline', '');
+    if (data.trackSrc) {
+        const track = document.createElement('track');
+        track.kind = 'captions';
+        track.src = resolveMediaUrl(data.trackSrc);
+        track.srclang = (data.trackLang || '').trim() || 'de';
+        track.label = (data.trackLabel || '').trim() || 'Untertitel';
+        vid.appendChild(track);
+    }
     vid.setAttribute('preload', 'metadata');
     vid.style.width = '100%';
     vid.style.height = '100%';
@@ -361,8 +395,8 @@ function activePresetValue(figure: HTMLElement | null, presets: Preset[]): strin
 
 function openDialog(editor: any, initial: VideoData | null, onSubmit: (data: VideoData) => void): void {
     const data: VideoData = initial ? { ...initial } : {
-        src: '', poster: '',
-        controls: true, autoplay: false, loop: false, muted: false, playsinline: true
+        src: '', poster: '', trackSrc: '', trackLang: 'de', trackLabel: 'Untertitel',
+        controls: true, autoplay: false, loop: false, muted: false, playsinline: true, decorative: false
     };
 
     const body = {
@@ -372,11 +406,16 @@ function openDialog(editor: any, initial: VideoData | null, onSubmit: (data: Vid
             { type: 'button',  name: 'pickSrc', text: 'Aus Mediapool wählen…', icon: 'browse' },
             { type: 'input',   name: 'poster',  label: 'Poster-Bild (optional)', placeholder: 'z.B. poster.jpg' },
             { type: 'button',  name: 'pickPoster', text: 'Poster aus Mediapool wählen…', icon: 'browse' },
+            { type: 'input',   name: 'trackSrc', label: 'Untertitel-Datei (VTT, optional)', placeholder: 'z.B. movie.de.vtt' },
+            { type: 'button',  name: 'pickTrack', text: 'VTT aus Mediapool wählen…', icon: 'browse' },
+            { type: 'input',   name: 'trackLang', label: 'Untertitel-Sprache (srclang)', placeholder: 'z.B. de' },
+            { type: 'input',   name: 'trackLabel', label: 'Untertitel-Label', placeholder: 'z.B. Deutsch' },
             { type: 'checkbox', name: 'controls', label: 'Controls anzeigen' },
             { type: 'checkbox', name: 'autoplay', label: 'Autoplay (setzt muted)' },
             { type: 'checkbox', name: 'loop',     label: 'Loop (Endlosschleife)' },
             { type: 'checkbox', name: 'muted',    label: 'Stumm (muted)' },
-            { type: 'checkbox', name: 'playsinline', label: 'Inline abspielen (iOS, playsinline)' }
+            { type: 'checkbox', name: 'playsinline', label: 'Inline abspielen (iOS, playsinline)' },
+            { type: 'checkbox', name: 'decorative', label: 'Dekorativ / Inhalt ist an anderer Stelle beschrieben' }
         ]
     };
 
@@ -397,6 +436,10 @@ function openDialog(editor: any, initial: VideoData | null, onSubmit: (data: Vid
             } else if (details.name === 'pickPoster') {
                 pickMediapoolFile((filename) => {
                     api.setData({ poster: filename });
+                });
+            } else if (details.name === 'pickTrack') {
+                pickMediapoolFile((filename) => {
+                    api.setData({ trackSrc: filename });
                 });
             }
         },
@@ -588,16 +631,17 @@ const Plugin = (): void => {
         // --- Schema: figure, video, source, img, div, button, svg/path/rect, span ---
         editor.on('PreInit', () => {
             const schema = editor.schema;
-            // schema.addValidElements('figure[class|contenteditable|data-for-video-src|data-for-video-poster|data-for-video-controls|data-for-video-autoplay|data-for-video-loop|data-for-video-muted|data-for-video-playsinline|data-for-video-active]');
-            // schema.addValidElements('video[src|poster|controls|autoplay|loop|muted|playsinline|preload|width|height|crossorigin]');
-            // schema.addValidElements('source[src|type]');
-            // schema.addValidElements('div[class|style|data-for-video-toolbar]');
-            // schema.addValidElements('span[class|title]');
-            // schema.addValidElements('button[type|class|title|aria-label|data-for-video-stop|data-for-video-select]');
-            // schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
-            // schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
-            // schema.addValidElements('path[d|fill|fill-opacity|stroke|stroke-width]');
-            // schema.addValidElements('rect[x|y|width|height|rx|ry|fill|stroke|stroke-width]');
+            schema.addValidElements('figure[class|contenteditable|data-for-video-src|data-for-video-poster|data-for-video-track-src|data-for-video-track-lang|data-for-video-track-label|data-for-video-controls|data-for-video-autoplay|data-for-video-loop|data-for-video-muted|data-for-video-playsinline|data-for-video-decorative|data-for-video-active|aria-hidden|role]');
+            schema.addValidElements('video[src|poster|controls|autoplay|loop|muted|playsinline|preload|width|height|crossorigin]');
+            schema.addValidElements('source[src|type]');
+            schema.addValidElements('track[kind|src|srclang|label|default]');
+            schema.addValidElements('div[class|style|data-for-video-toolbar]');
+            schema.addValidElements('span[class|title]');
+            schema.addValidElements('button[type|class|title|aria-label|data-for-video-stop|data-for-video-select]');
+            schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
+            schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
+            schema.addValidElements('path[d|fill|fill-opacity|stroke|stroke-width]');
+            schema.addValidElements('rect[x|y|width|height|rx|ry|fill|stroke|stroke-width]');
             schema.addValidChildren('+figure[video|div|a]');
             schema.addValidChildren('+video[source|a|track]');
             schema.addValidChildren('+div[video|div|svg|img|span|button]');
@@ -636,11 +680,15 @@ const Plugin = (): void => {
                 const data: VideoData = {
                     src: fig.attr('data-for-video-src') || '',
                     poster: fig.attr('data-for-video-poster') || '',
+                    trackSrc: fig.attr('data-for-video-track-src') || '',
+                    trackLang: fig.attr('data-for-video-track-lang') || 'de',
+                    trackLabel: fig.attr('data-for-video-track-label') || 'Untertitel',
                     controls: fig.attr('data-for-video-controls') === '1',
                     autoplay: fig.attr('data-for-video-autoplay') === '1',
                     loop: fig.attr('data-for-video-loop') === '1',
                     muted: fig.attr('data-for-video-muted') === '1',
-                    playsinline: fig.attr('data-for-video-playsinline') === '1'
+                    playsinline: fig.attr('data-for-video-playsinline') === '1',
+                    decorative: fig.attr('data-for-video-decorative') === '1' || fig.attr('aria-hidden') === 'true'
                 };
                 if (!data.src) { fig.remove(); return; }
 

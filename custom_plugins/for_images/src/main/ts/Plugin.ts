@@ -172,6 +172,11 @@ function normalizeFigures(editor: Editor, scope?: ParentNode): void {
   const figures = Array.from(root.querySelectorAll('figure'));
   figures.forEach((figure) => {
     if (!figure.querySelector('img')) {
+      const hasElementChildren = figure.children.length > 0;
+      const hasTextContent = (figure.textContent || '').trim() !== '';
+      if (hasElementChildren || hasTextContent) {
+        return;
+      }
       figure.remove();
     }
   });
