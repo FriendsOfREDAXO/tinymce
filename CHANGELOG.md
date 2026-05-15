@@ -6,8 +6,8 @@ Version 8.10 (in development)
 
 ### Hardcoded Texte und Sprachdateien bereinigt
 
-* [Tobias Krais](https://github.com/FriendsOfREDAXO/tinymce/commit/47c106d873ecb7993ef4898cf20f9e0e0c7e2b7c) hat weitere hardcoded UI-Texte im AddOn i18nisiert, darunter Styleset-/Toolbar-Beschriftungen, den Format-Menütitel und CKE5-bezogene Fallback-Texte.
-* Die schwedische Sprachdatei wurde vollständig auf Basis der deutschen Quelldatei neu aufgebaut und auf den aktuellen Schlüsselbestand synchronisiert.
+* [Tobias Krais](https://github.com/FriendsOfREDAXO/tinymce/commit/47c106d873ecb7993ef4898cf20f9e0e0c7e2b7c) hat die Unterstützung für Subfolder verbessert.
+* Lotte hat die Übersetzungen ergänzt und die Sprachdateien auf den aktuellen Stand gebracht.
 * Die Laufzeitkopie unter `public/assets/addons/tinymce/scripts/base.js` wurde mit den aktuellen Text-/Label-Änderungen nachgezogen.
 
 
