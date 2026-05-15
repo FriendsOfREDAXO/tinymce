@@ -73,8 +73,8 @@ if (rex::isBackend() && null !== rex::getUser()) {
             $subject = str_replace('</form>', '<input type="hidden" name="addon" value="tiny"></form>', $subject);
             $subject = str_replace('"#rex-js-page-main">', '"#rex-js-page-main">
                 <ul class="nav nav-tabs tiny-nav">
-                    <li><a href="' . rex_escape($structureUrl) . '">Struktur</a></li>
-                    <li class="active"><a href="#">Medienpool</a></li>
+                    <li><a href="' . rex_escape($structureUrl) . '">' . rex_escape(rex_i18n::msg('tinymce_tab_structure')) . '</a></li>
+                    <li class="active"><a href="#">' . rex_escape(rex_i18n::msg('tinymce_tab_mediapool')) . '</a></li>
                 </ul>', $subject);
             return str_replace('selectMedia', 'selectLink', $subject);
         });
