@@ -287,17 +287,24 @@ const Plugin = (): void => {
             onAction: () => editor.execCommand('forFootnoteInsert'),
         });
 
+        const syncAndResize = (): void => {
+            syncFootnotes(editor);
+            editor.nodeChanged();
+            editor.execCommand?.('mceAutoResize');
+            editor.dispatch?.('ResizeEditor');
+        };
+
         let syncScheduled = false;
         const scheduleSync = (): void => {
             if (syncScheduled) return;
             syncScheduled = true;
             setTimeout(() => {
                 syncScheduled = false;
-                syncFootnotes(editor);
-            }, 80);
+                syncAndResize();
+            }, 0);
         };
 
-        editor.on('KeyUp Undo Redo SetContent', scheduleSync);
+        editor.on('KeyUp Undo Redo SetContent input cut LoadContent', scheduleSync);
 
         // Convert Enter inside a footnote <li> into a soft-break <br> so the user
         // doesn't accidentally create a new empty (un-linked) list item.
@@ -357,6 +364,11 @@ sup.for-footnote-ref a { text-decoration: none; }
 sup.for-footnote-ref { cursor: pointer; }
 `;
             editor.dom.addStyle(css);
+
+            // Ensure initial content (already present in HTML) affects height before first focus.
+            scheduleSync();
+            setTimeout(scheduleSync, 40);
+            setTimeout(syncAndResize, 120);
         });
     });
 };

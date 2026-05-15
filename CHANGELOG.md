@@ -10,6 +10,12 @@ Version 8.10 (in development)
 * Lotte hat die Übersetzungen ergänzt und die Sprachdateien auf den aktuellen Stand gebracht.
 * Die Laufzeitkopie unter `public/assets/addons/tinymce/scripts/base.js` wurde mit den aktuellen Text-/Label-Änderungen nachgezogen.
 
+### for_footnotes: Initiales Sync-/Resize-Verhalten stabilisiert
+
+* Für `for_footnotes` wurde ein gemeinsamer `syncAndResize`-Pfad ergänzt, der nach dem Synchronisieren der Fußnoten explizit `nodeChanged`, `mceAutoResize` und `ResizeEditor` auslöst.
+* Der Sync reagiert jetzt zusätzlich auf `input`, `cut` und `LoadContent` (neben `KeyUp`, `Undo`, `Redo`, `SetContent`), damit Layout- und Höhenänderungen früher greifen.
+* Beim `init` werden gestaffelte Nachläufe (`scheduleSync`/`syncAndResize`) ausgeführt, damit vorhandene Fußnoten im initial geladenen HTML den Editorzustand bereits vor dem ersten Fokus korrekt beeinflussen.
+
 
 Version 8.9.2
 -------------------------------
