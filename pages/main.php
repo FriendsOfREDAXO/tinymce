@@ -92,28 +92,34 @@ $demoHtml = <<<'HTML'
   <a href="https://www.tiny.cloud/docs/tinymce/latest/" target="_blank" rel="noreferrer noopener">TinyMCE-Dokumentation</a>
 </p>
 
-<h2 id="for-toc-a11y-spielwiese">A11y-Spielwiese <small>(absichtliche Fehler)</small></h2>
-<p>Dieser Abschnitt enthält bewusst typische Barrierefreiheits-Probleme, damit der <code>for_a11y</code>-Button in der Toolbar beim Demo-Aufruf wirklich etwas findet. Klick auf <strong>A11y</strong> und lass dich durch die Befunde führen – jeder Befund enthält einen konkreten Hinweis, wie er im Editor zu beheben wäre.</p>
+
+<h2 id="for-toc-a11y-spielwiese">A11y-Spielwiese <small>(absichtliche Fehler für Quickfix-Demo)</small></h2>
+<p>Dieser Abschnitt enthält absichtlich typische Barrierefreiheits-Probleme und Quickfix-Fälle. Nutze den <code>for_a11y</code>-Button, um alle Befunde und die neuen Quickfix-Buttons zu testen.</p>
 
 <h3>WICHTIGER HINWEIS IN VERSALIEN</h3>
 <p>Links zum Testen: <a href="https://example.com/docs">hier klicken</a>, <a href="https://example.com/more">mehr erfahren</a>, <a href="https://example.com/">https://example.com/</a> und <a href="/downloads/jahresbericht.pdf">Jahresbericht 2025</a>.</p>
 <p>Zwei Links mit gleichem Text, aber verschiedenen Zielen: <a href="/produkt/a">Details</a> und <a href="/produkt/b">Details</a>.</p>
 <p>Link öffnet neues Fenster ohne Hinweis: <a href="https://redaxo.org" target="_blank" rel="noopener">REDAXO</a>.</p>
 
-<p><strong>Fettgedruckter Pseudo-Heading</strong></p>
+<p><strong>Fettgedruckter Pseudo-Heading mit zu vielen Leerzeichen     </strong></p>
 <p>Darunter ein normaler Absatz – der fettgedruckte Satz oben sollte eigentlich eine echte Überschrift (h3) sein.</p>
 
 <p>- Punkt eins als Fake-Liste</p>
-<p>- Punkt zwei ebenfalls nur ein Absatz mit Bindestrich</p>
+<p>-   Punkt zwei   mit   zu   vielen   Leerzeichen</p>
 <p>1. Erstens, auch keine echte Nummerierung</p>
+<p>2. Zweitens,    mit   zu   vielen   Leerzeichen</p>
+
+<p>   </p>
+<p>   </p>
+<p>Zwischen diesem Satz und dem vorigen sind zwei leere Absätze – die werden von Screenreadern als „leer, leer" angesagt.</p>
 
 <ul>
   <li>Einzige Position – eine Liste mit nur einem Eintrag</li>
 </ul>
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>Zwischen diesem Satz und dem vorigen sind zwei leere Absätze – die werden von Screenreadern als „leer, leer" angesagt.</p>
+<p>   </p>
+<p>   </p>
+<p>Absätze mit nur Leerzeichen sollten ebenfalls erkannt und entfernt werden können.</p>
 
 <div class="for-footnotes" contenteditable="true">
   <hr>

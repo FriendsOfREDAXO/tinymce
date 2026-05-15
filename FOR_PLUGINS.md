@@ -106,12 +106,16 @@ Beide produzieren semantisch sauberes, Frontend-CSS-freies Markup.
 
 ### `for_a11y` – Accessibility-Checker (on-demand)
 
+
 Open-Source-Alternative zu TinyMCE Premium `a11ychecker`.
 
 - Läuft **nur auf Knopfdruck**, ändert den Inhalt nicht automatisch
 - Schwebendes, **verschiebbares Befund-Panel** (kein Modal, kein Backdrop) – Editor bleibt sichtbar und voll bedienbar
 - Geführter Workflow: ein Befund nach dem anderen, Navigation per **◀ / ▶**
 - Pro Befund: **Ignorieren** / **Element bearbeiten** (springt und selektiert im Editor) / **Neu prüfen**
+- **Quickfix-Buttons:** Für viele Befunde (z.B. Fake-Listen, leere Absätze, generische Linktexte, fette Pseudo-Überschriften, zu viele Leerzeichen) steht ein Quickfix bereit, der das Problem automatisch behebt oder den passenden Editor-Dialog öffnet.
+- **Modularer Aufbau:** Jeder Befundtyp kann einen eigenen Quickfix-Handler registrieren. Neue Autofix-Strategien lassen sich einfach ergänzen.
+- **Demo-Text:** Die Hauptseite enthält eine A11y-Spielwiese mit typischen Fehlern für die Quickfix-Demo.
 - Marker im Editor: rot = Fehler, orange = Warnung, blau-gestrichelt = Hinweis
 - Public API:
   ```javascript
@@ -120,6 +124,7 @@ Open-Source-Alternative zu TinyMCE Premium `a11ychecker`.
   ```
 - Events: `A11ycheckStart`, `A11ycheckStop`, `A11ycheckIgnore`
 - Regeln (einzeln abschaltbar via `a11y_rules`): u. a. fehlendes `alt`, generische Link-Texte, leere/übersprungene Überschriften, Tabellen ohne `<th>`/`<caption>`, `<iframe>` ohne `title`, `target="_blank"` ohne Hinweis
+- **Hinweis:** Aktuell nur Deutsch, Mehrsprachigkeit folgt
 
 ---
 

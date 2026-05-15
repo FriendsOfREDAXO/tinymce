@@ -16,6 +16,20 @@ Version 8.10 (in development)
 * Der Sync reagiert jetzt zusätzlich auf `input`, `cut` und `LoadContent` (neben `KeyUp`, `Undo`, `Redo`, `SetContent`), damit Layout- und Höhenänderungen früher greifen.
 * Beim `init` werden gestaffelte Nachläufe (`scheduleSync`/`syncAndResize`) ausgeführt, damit vorhandene Fußnoten im initial geladenen HTML den Editorzustand bereits vor dem ersten Fokus korrekt beeinflussen.
 
+### for_a11y: Quickfixes direkt im Befund-Panel integriert
+
+* Das `for_a11y`-Panel unterstützt jetzt kontextbezogene Quickfix-Aktionen direkt am jeweiligen Befund (statt nur „Ignorieren“/„Element bearbeiten“).
+* Neu ist eine modulare Quickfix-Registry pro Regel-ID (`rule id -> handler`), damit weitere Autofixes später ohne Umbau der Panel-Logik ergänzt werden können.
+* Für folgende Befundtypen sind Quickfixes integriert:
+  * `list-fake`: Absatz mit manuell getippter Aufzählung wird in eine echte Liste umgewandelt.
+  * `list-single-item`: Liste mit nur einem Eintrag wird in einen normalen Absatz umgewandelt.
+  * `blank-paragraphs`: aufeinanderfolgende leere Absätze werden entfernt.
+  * `text-bold-as-heading`: fetter Pseudo-Absatz wird in eine echte Überschrift (`h3`) umgewandelt.
+  * `text-bold-too-long`: bei langen komplett fett formatierten Absätzen wird die Fettung entfernt.
+  * `text-too-many-spaces`: Mehrfach-Leerzeichen werden bereinigt.
+  * `link-generic-text`: öffnet den Link-Dialog direkt am betroffenen Element.
+* Nach Anwendung eines Quickfixes wird der Audit automatisch erneut ausgeführt und die Marker werden aktualisiert.
+
 
 Version 8.9.2
 -------------------------------

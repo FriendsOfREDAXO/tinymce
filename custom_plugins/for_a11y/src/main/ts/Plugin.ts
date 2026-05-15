@@ -20,6 +20,8 @@
  *    heading-skip           – Heading-Hierarchie-Sprung             (warn)
  *    heading-allcaps        – Überschrift komplett in VERSALIEN     (warn)
  *    text-bold-as-heading   – fetter Absatz als Pseudo-Überschrift  (warn)
+ *    text-bold-too-long     – langer komplett fetter Absatz         (warn)
+ *    text-too-many-spaces   – auffällig viele Mehrfach-Leerzeichen  (info)
  *    list-fake              – Absatz beginnt wie Listeneintrag      (info)
  *    list-single-item       – Liste mit nur einem Eintrag           (info)
  *    blank-paragraphs       – mehrere leere Absätze hintereinander  (info)
@@ -71,6 +73,8 @@ const DEFAULT_RULES: Record<string, boolean> = {
     'heading-skip':          true,
     'heading-allcaps':       true,
     'text-bold-as-heading':  true,
+    'text-bold-too-long':    true,
+    'text-too-many-spaces':  true,
     'list-fake':             true,
     'list-single-item':      true,
     'blank-paragraphs':      true,
@@ -438,7 +442,7 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
     });
 
     /* --- Absätze / Pseudo-Überschriften / Fake-Listen / Leer-Absätze --- */
-    if (rules['text-bold-as-heading'] || rules['list-fake'] || rules['blank-paragraphs']) {
+    if (rules['text-bold-as-heading'] || rules['text-bold-too-long'] || rules['text-too-many-spaces'] || rules['list-fake'] || rules['blank-paragraphs']) {
         const paragraphs = Array.from(body.querySelectorAll('p')) as HTMLElement[];
         let blankRun: HTMLElement[] = [];
         const flushBlankRun = () => {
@@ -464,6 +468,20 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
             }
             flushBlankRun();
 
+            if (rules['text-too-many-spaces']) {
+                const textWithSpaces = (p.textContent || '').replace(/\u00A0/g, ' ');
+                if (/ {2,}/.test(textWithSpaces)) {
+                    findings.push({
+                        id: 'text-too-many-spaces',
+                        severity: 'info',
+                        title: 'Zu viele Leerzeichen im Absatz',
+                        message: 'Mehrere aufeinanderfolgende Leerzeichen erschweren das Lesen und sind meist unbeabsichtigt. Reduziere sie auf ein Leerzeichen.',
+                        element: p,
+                        preview: shortHtml(p)
+                    });
+                }
+            }
+
             // Fetter Pseudo-Heading: ganzer Absatz ist strong/b, Text kurz, kein Fließtext
             if (rules['text-bold-as-heading'] && plain.length <= 120) {
                 const hasNonBoldText = Array.from(p.childNodes).some((n) => {
@@ -482,6 +500,28 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
                         severity: 'warn',
                         title: 'Fetter Absatz als Pseudo-Überschrift',
                         message: 'Ein fett gesetzter Absatz ohne Satzzeichen wirkt wie eine Überschrift, ist für Screenreader aber Fließtext. Markiere den Absatz und wandle ihn über das Format-/Block-Dropdown in eine echte Überschrift (h2/h3/…) um.',
+                        element: p,
+                        preview: shortHtml(p)
+                    });
+                }
+            }
+
+            if (rules['text-bold-too-long'] && plain.length > 120) {
+                const hasNonBoldText = Array.from(p.childNodes).some((n) => {
+                    if (n.nodeType === 3) return (n.nodeValue || '').trim().length > 0;
+                    if (n.nodeType !== 1) return false;
+                    const el = n as Element;
+                    const tag = el.tagName.toLowerCase();
+                    if (tag === 'strong' || tag === 'b') return false;
+                    if (tag === 'br' || tag === 'wbr') return false;
+                    return (el.textContent || '').trim().length > 0;
+                });
+                if (!hasNonBoldText && p.querySelector('strong, b')) {
+                    findings.push({
+                        id: 'text-bold-too-long',
+                        severity: 'warn',
+                        title: 'Langer komplett fett formatierter Absatz',
+                        message: 'Ein langer komplett fett formatierter Absatz ist schwer lesbar. Nutze Fettung nur für kurze Hervorhebungen statt für ganze Absätze.',
                         element: p,
                         preview: shortHtml(p)
                     });
@@ -610,7 +650,185 @@ function runAudit(body: HTMLElement, editor: any): Finding[] {
     return findings;
 }
 
-/* ---------------- UI ---------------- */
+
+// Quickfix-Registry: Regel-ID → Fix-Handler
+type QuickfixHandler = (finding: Finding, editor: any) => void;
+const quickfixRegistry: Record<string, QuickfixHandler> = {};
+
+function parseFakeListParagraph(p: HTMLElement): { listType: 'ul' | 'ol'; itemText: string } | null {
+    if (!p || p.tagName.toLowerCase() !== 'p') return null;
+    const text = (p.textContent || '').trim();
+    const match = text.match(/^([-*•·●○►▶→]|\d{1,2}[.\)]|[a-z][.\)])\s+(.*)$/i);
+    if (!match) return null;
+
+    const marker = match[1] || '';
+    const itemText = (match[2] || text).trim();
+    const listType: 'ul' | 'ol' = /^(\d{1,2}[.\)]|[a-z][.\)])$/i.test(marker) ? 'ol' : 'ul';
+    return { listType, itemText };
+}
+
+// Quickfix: Fake-Liste → in echte Liste umwandeln
+quickfixRegistry['list-fake'] = (finding, editor) => {
+    const p = finding.element;
+    if (!p || p.tagName.toLowerCase() !== 'p') return;
+    const current = parseFakeListParagraph(p);
+    if (!current) return;
+
+    // Zusammenhaengenden Fake-Listenblock gleichen Typs einsammeln (vor/zurueck).
+    let start = p;
+    let prev = p.previousElementSibling as HTMLElement | null;
+    while (prev) {
+        const parsed = parseFakeListParagraph(prev);
+        if (!parsed || parsed.listType !== current.listType) break;
+        start = prev;
+        prev = prev.previousElementSibling as HTMLElement | null;
+    }
+
+    const nodes: HTMLElement[] = [];
+    let cursor: HTMLElement | null = start;
+    while (cursor) {
+        const parsed = parseFakeListParagraph(cursor);
+        if (!parsed || parsed.listType !== current.listType) break;
+        nodes.push(cursor);
+        cursor = cursor.nextElementSibling as HTMLElement | null;
+    }
+    if (!nodes.length) return;
+
+    const list = editor.dom.create(current.listType, {});
+    nodes.forEach((node) => {
+        const parsed = parseFakeListParagraph(node);
+        if (!parsed) return;
+        const li = editor.dom.create('li', {}, parsed.itemText);
+        list.appendChild(li);
+    });
+
+    editor.dom.replace(list, nodes[0]);
+    for (let i = 1; i < nodes.length; i++) {
+        editor.dom.remove(nodes[i]);
+    }
+};
+
+// Quickfix: Leere Absätze entfernen
+quickfixRegistry['blank-paragraphs'] = (finding, editor) => {
+    const p = finding.element;
+    if (!p || p.tagName.toLowerCase() !== 'p') return;
+    let el: HTMLElement | null = p;
+    while (el && el.tagName.toLowerCase() === 'p' && (!el.textContent || el.textContent.trim() === '')) {
+        const next = el.nextElementSibling;
+        editor.dom.remove(el);
+        el = next as HTMLElement;
+    }
+};
+
+// Quickfix: Zu viele Leerzeichen im Absatz reduzieren
+quickfixRegistry['text-too-many-spaces'] = (finding) => {
+    const el = finding.element;
+    if (!el) return;
+    const collapse = (node: Node): void => {
+        if (node.nodeType === 3) {
+            node.textContent = (node.textContent || '').replace(/ {2,}/g, ' ');
+            return;
+        }
+        node.childNodes.forEach(collapse);
+    };
+    collapse(el);
+};
+
+// Quickfix: Fetter Absatz als Überschrift umwandeln
+quickfixRegistry['text-bold-as-heading'] = (finding, editor) => {
+    let el = finding.element;
+    if (!el) return;
+    
+    // Falls es bereits ein Heading ist, nicht nochmal umwandeln
+    const tag = el.tagName.toLowerCase();
+    if (tag.match(/^h[1-6]$/)) return;
+    
+    if (tag !== 'p') return;
+    
+    // Finde den unmittelbar vorherigen Heading-Sibling oder Parent-Heading
+    let prevHeading: HTMLElement | null = null;
+    let cursor: Element | null = el.previousElementSibling;
+    
+    // Suche in vorherigen Siblings
+    while (cursor) {
+        if (cursor.tagName.match(/^h[1-6]$/i)) {
+            prevHeading = cursor as HTMLElement;
+            break;
+        }
+        cursor = cursor.previousElementSibling;
+    }
+    
+    // Falls kein Sibling-Heading, suche im Parent/Ancestors
+    if (!prevHeading) {
+        let parent = el.parentElement;
+        while (parent && parent !== editor.getBody()) {
+            cursor = parent.previousElementSibling;
+            while (cursor) {
+                if (cursor.tagName.match(/^h[1-6]$/i)) {
+                    prevHeading = cursor as HTMLElement;
+                    break;
+                }
+                // Suche auch in Descendants des Siblings
+                const found = cursor.querySelector('h1, h2, h3, h4, h5, h6');
+                if (found && found.tagName.match(/^h[1-6]$/i)) {
+                    prevHeading = found as HTMLElement;
+                    break;
+                }
+                cursor = cursor.previousElementSibling;
+            }
+            if (prevHeading) break;
+            parent = parent.parentElement;
+        }
+    }
+    
+    // Bestimme den neuen Level
+    let newLevel = 2; // Default
+    if (prevHeading) {
+        const prevLevel = parseInt(prevHeading.tagName[1], 10);
+        // Nutze Level+1, aber nicht tiefer als h6
+        newLevel = prevLevel < 6 ? prevLevel + 1 : 6;
+    }
+    
+    // Extrahiere nur reinen Text (keine Tags)
+    const text = el.textContent || '';
+    
+    // Erstelle neue Überschrift mit reinem Text
+    const h = editor.dom.create(`h${newLevel}`, {}, text);
+    editor.dom.replace(h, el);
+};
+
+// Quickfix: Generischer Linktext – öffnet Link-Dialog
+quickfixRegistry['link-generic-text'] = (finding, editor) => {
+    const a = finding.element;
+    if (!a || a.tagName.toLowerCase() !== 'a') return;
+    editor.selection.select(a);
+    editor.execCommand('mceLink');
+};
+
+// Quickfix: Liste mit nur einem Eintrag → Absatz
+quickfixRegistry['list-single-item'] = (finding, editor) => {
+    const list = finding.element;
+    if (!list) return;
+    const tag = list.tagName.toLowerCase();
+    if (tag !== 'ul' && tag !== 'ol') return;
+    const li = list.querySelector('li');
+    if (!li) return;
+    const p = editor.dom.create('p', {}, li.innerHTML);
+    editor.dom.replace(p, list);
+};
+
+// Quickfix: Langer komplett fetter Absatz → Fettung entfernen
+quickfixRegistry['text-bold-too-long'] = (finding) => {
+    const p = finding.element;
+    if (!p || p.tagName.toLowerCase() !== 'p') return;
+    const marks = Array.from(p.querySelectorAll('strong, b'));
+    marks.forEach((node) => {
+        while (node.firstChild) {
+            node.parentNode?.insertBefore(node.firstChild, node);
+        }
+        node.parentNode?.removeChild(node);
+    });
+};
 
 function escHtml(s: string): string {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -682,6 +900,28 @@ const DIALOG_CSS = `
 .for-a11y-dlg__preview--error { border-left-color: #e53935; }
 .for-a11y-dlg__preview--warn  { border-left-color: #fb8c00; }
 .for-a11y-dlg__preview--info  { border-left-color: #1e88e5; }
+.for-a11y-dlg__quickfix {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 12px;
+    border: 1px solid #1976d2;
+    background: #1976d2;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.for-a11y-dlg__quickfix:hover {
+    background: #1565c0;
+    border-color: #1565c0;
+}
+.for-a11y-dlg__quickfix:focus-visible {
+    outline: 2px solid #90caf9;
+    outline-offset: 2px;
+}
 
 .for-a11y-dlg--ok { text-align: center; padding: 20px 0; }
 .for-a11y-dlg--ok .for-a11y-dlg__icon { font-size: 40px; color: #4caf50; margin-bottom: 8px; }
@@ -695,12 +935,178 @@ body.rex-theme-dark .for-a11y-panel__foot { background: #222; border-top-color: 
 body.rex-theme-dark .for-a11y-panel__foot .for-a11y-btn { background: #3a3a3a; color: #eee; border-color: #4a4a4a; }
 body.rex-theme-dark .for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #4a4a4a; }
 body.rex-theme-dark .for-a11y-dlg__preview { background: #222; color: #eee; }
+body.rex-theme-dark .for-a11y-dlg__quickfix {
+    background: #1e88e5;
+    border-color: #1e88e5;
+    color: #fff;
+}
+body.rex-theme-dark .for-a11y-dlg__quickfix:hover {
+    background: #1976d2;
+    border-color: #1976d2;
+}
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel { background: #2d2d2d; color: #eee; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot { background: #222; border-top-color: #3a3a3a; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot .for-a11y-btn { background: #3a3a3a; color: #eee; border-color: #4a4a4a; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-panel__foot .for-a11y-btn:hover:not(:disabled) { background: #4a4a4a; }
     body.rex-has-theme:not(.rex-theme-light) .for-a11y-dlg__preview { background: #222; color: #eee; }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-dlg__quickfix {
+        background: #1e88e5;
+        border-color: #1e88e5;
+        color: #fff;
+    }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-dlg__quickfix:hover {
+        background: #1976d2;
+        border-color: #1976d2;
+    }
+}
+
+/* List-View Styles */
+.for-a11y-list { }
+.for-a11y-list__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.for-a11y-list__th {
+    text-align: left;
+    padding: 8px 10px;
+    background: #f5f5f5;
+    border-bottom: 2px solid #ddd;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    color: #666;
+}
+.for-a11y-list__th--severity { width: 100px; }
+.for-a11y-list__th--title { flex: 1; }
+.for-a11y-list__th--actions { width: 130px; text-align: right; }
+.for-a11y-list__row {
+    border-bottom: 1px solid #eee;
+    transition: background-color .15s ease;
+}
+.for-a11y-list__row:hover {
+    background: #fafafa;
+}
+.for-a11y-list__cell {
+    padding: 10px;
+    vertical-align: top;
+}
+.for-a11y-list__cell--severity {
+    text-align: center;
+}
+.for-a11y-list__cell--title {
+    word-break: break-word;
+}
+.for-a11y-list__link {
+    background: none;
+    border: none;
+    color: #1976d2;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    text-decoration: underline;
+}
+.for-a11y-list__link:hover {
+    color: #1565c0;
+}
+.for-a11y-list__link:focus-visible {
+    outline: 2px solid #90caf9;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+.for-a11y-list__rule {
+    color: #999;
+    font-family: Menlo, Consolas, monospace;
+    font-size: 10px;
+    opacity: .7;
+}
+.for-a11y-list__actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+.for-a11y-btn--sm {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    min-width: auto !important;
+    line-height: 1 !important;
+}
+.for-a11y-btn--list {
+    background: #fffacd !important;
+    color: #666 !important;
+    border-color: #f0e68c !important;
+}
+.for-a11y-btn--list:hover {
+    background: #fff8dc !important;
+    border-color: #ffe4b5 !important;
+}
+.for-a11y-panel__view-toggle {
+    background: transparent;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 4px;
+    line-height: 1;
+    opacity: .85;
+    transition: opacity .15s ease;
+}
+.for-a11y-panel__view-toggle:hover {
+    opacity: 1;
+}
+
+/* Dark mode für List-View */
+body.rex-theme-dark .for-a11y-list__th,
+body.tox-dialog__body-iframe-dark .for-a11y-list__th {
+    background: #3a3a3a;
+    border-bottom-color: #555;
+    color: #aaa;
+}
+body.rex-theme-dark .for-a11y-list__row:hover,
+body.tox-dialog__body-iframe-dark .for-a11y-list__row:hover {
+    background: #383838;
+}
+body.rex-theme-dark .for-a11y-list__row,
+body.tox-dialog__body-iframe-dark .for-a11y-list__row {
+    border-bottom-color: #444;
+}
+body.rex-theme-dark .for-a11y-list__link,
+body.tox-dialog__body-iframe-dark .for-a11y-list__link {
+    color: #64b5f6;
+}
+body.rex-theme-dark .for-a11y-list__link:hover,
+body.tox-dialog__body-iframe-dark .for-a11y-list__link:hover {
+    color: #90caf9;
+}
+body.rex-theme-dark .for-a11y-list__rule,
+body.tox-dialog__body-iframe-dark .for-a11y-list__rule {
+    color: #888;
+}
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-list__th {
+        background: #3a3a3a;
+        border-bottom-color: #555;
+        color: #aaa;
+    }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-list__row:hover {
+        background: #383838;
+    }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-list__row {
+        border-bottom-color: #444;
+    }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-list__link {
+        color: #64b5f6;
+    }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-list__link:hover {
+        color: #90caf9;
+    }
+    body.rex-has-theme:not(.rex-theme-light) .for-a11y-list__rule {
+        color: #888;
+    }
 }
 `;
 
@@ -835,6 +1241,7 @@ function openReportDialog(editor: any, findings: Finding[]): void {
 
     let remaining = findings.slice();
     let currentIndex = 0;
+    let viewMode: 'sequential' | 'list' = 'sequential';
 
     const fireEvent = (name: string, data?: any) => {
         try { editor.fire(name, data || {}); } catch (_e) { /* noop */ }
@@ -866,6 +1273,53 @@ function openReportDialog(editor: any, findings: Finding[]): void {
         fireEvent('A11ycheckStop');
     };
 
+    const renderListViewHtml = (): string => {
+        if (remaining.length === 0) {
+            return `<div class="for-a11y-dlg for-a11y-dlg--ok">` +
+                `<div class="for-a11y-dlg__icon">✓</div>` +
+                `<h3>Keine Probleme gefunden</h3>` +
+                `<p>Der Inhalt ist nach den aktivierten Regeln barrierefrei.</p>` +
+            `</div>`;
+        }
+        let html = `<div class="for-a11y-list">
+            <table class="for-a11y-list__table">
+                <thead>
+                    <tr>
+                        <th class="for-a11y-list__th for-a11y-list__th--severity">Schwere</th>
+                        <th class="for-a11y-list__th for-a11y-list__th--title">Problem</th>
+                        <th class="for-a11y-list__th for-a11y-list__th--actions">Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+        remaining.forEach((f, idx) => {
+            const hasQuickfix = Boolean(quickfixRegistry[f.id]);
+            html += `<tr class="for-a11y-list__row" data-finding-idx="${idx}">
+                <td class="for-a11y-list__cell for-a11y-list__cell--severity">
+                    <span class="for-a11y-dlg__badge for-a11y-dlg__badge--${f.severity}" style="white-space: nowrap;">
+                        ${SEVERITY_ICON[f.severity]} ${escHtml(SEVERITY_LABEL[f.severity])}
+                    </span>
+                </td>
+                <td class="for-a11y-list__cell for-a11y-list__cell--title">
+                    <button type="button" class="for-a11y-list__link" data-act="focus-finding" data-idx="${idx}" title="${escHtml(f.title)}">
+                        <strong>${escHtml(f.title)}</strong>
+                    </button>
+                    <br><small class="for-a11y-list__rule">${escHtml(f.id)}</small>
+                </td>
+                <td class="for-a11y-list__cell for-a11y-list__cell--actions">
+                    <div class="for-a11y-list__actions">
+                        ${hasQuickfix ? `<button type="button" class="for-a11y-btn for-a11y-btn--sm for-a11y-btn--list" data-act="quickfix" data-idx="${idx}" title="Quickfix anwenden">⚡</button>` : ''}
+                        <button type="button" class="for-a11y-btn for-a11y-btn--sm" data-act="ignore-list" data-idx="${idx}" title="Ignorieren">✕</button>
+                        <button type="button" class="for-a11y-btn for-a11y-btn--sm" data-act="edit-list" data-idx="${idx}" title="Element bearbeiten">✎</button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+        html += `</tbody>
+            </table>
+        </div>`;
+        return html;
+    };
+
     const renderBodyHtml = (): string => {
         if (remaining.length === 0) {
             return `<div class="for-a11y-dlg for-a11y-dlg--ok">` +
@@ -875,6 +1329,16 @@ function openReportDialog(editor: any, findings: Finding[]): void {
             `</div>`;
         }
         const f = remaining[currentIndex];
+        // Quickfix-Button nur anzeigen, wenn Handler existiert
+        const hasQuickfix = Boolean(quickfixRegistry[f.id]);
+        let quickfixLabel = 'Quickfix anwenden';
+        if (f.id === 'list-fake') quickfixLabel = 'In Liste umwandeln';
+        if (f.id === 'list-single-item') quickfixLabel = 'In Absatz umwandeln';
+        if (f.id === 'blank-paragraphs') quickfixLabel = 'Leere Absätze entfernen';
+        if (f.id === 'text-bold-as-heading') quickfixLabel = 'In Überschrift umwandeln';
+        if (f.id === 'text-bold-too-long') quickfixLabel = 'Fettung entfernen';
+        if (f.id === 'text-too-many-spaces') quickfixLabel = 'Leerzeichen bereinigen';
+        if (f.id === 'link-generic-text') quickfixLabel = 'Linktext bearbeiten';
         return `<div class="for-a11y-dlg">` +
             `<div class="for-a11y-dlg__progress">Befund ${currentIndex + 1} von ${remaining.length}</div>` +
             `<div class="for-a11y-dlg__head">` +
@@ -887,20 +1351,23 @@ function openReportDialog(editor: any, findings: Finding[]): void {
             `<p class="for-a11y-dlg__msg">${escHtml(f.message)}</p>` +
             `<div class="for-a11y-dlg__preview-label">Betroffenes Element</div>` +
             `<pre class="for-a11y-dlg__preview for-a11y-dlg__preview--${f.severity}">${escHtml(f.preview)}</pre>` +
+            (hasQuickfix ? `<button type="button" class="for-a11y-btn for-a11y-dlg__quickfix" data-act="quickfix">${quickfixLabel}</button>` : '') +
         `</div>`;
     };
 
     const render = () => {
         const hasCurrent = remaining.length > 0;
+        const bodyHtml = viewMode === 'list' ? renderListViewHtml() : renderBodyHtml();
         panel.innerHTML =
             `<div class="for-a11y-panel__drag" data-role="drag">` +
                 `<span class="for-a11y-panel__drag-grip" aria-hidden="true">⠿</span>` +
                 `<span class="for-a11y-panel__drag-title">Barrierefreiheits-Check</span>` +
+                `<button type="button" class="for-a11y-panel__view-toggle" data-act="toggle-view" aria-label="Ansicht umschalten" title="${viewMode === 'sequential' ? 'Zur Liste wechseln' : 'Zur Sequenzansicht wechseln'}">${viewMode === 'sequential' ? '☰' : '⊕'}</button>` +
                 `<button type="button" class="for-a11y-panel__close" data-act="close" aria-label="Schließen" title="Schließen">✕</button>` +
             `</div>` +
-            `<div class="for-a11y-panel__body">${renderBodyHtml()}</div>` +
+            `<div class="for-a11y-panel__body">${bodyHtml}</div>` +
             `<div class="for-a11y-panel__foot">` +
-                (hasCurrent ? (
+                (hasCurrent && viewMode === 'sequential' ? (
                     `<button type="button" class="for-a11y-btn for-a11y-btn--nav" data-act="prev" ${currentIndex <= 0 ? 'disabled' : ''} title="Vorheriger Befund">◀</button>` +
                     `<button type="button" class="for-a11y-btn for-a11y-btn--nav" data-act="next" ${currentIndex >= remaining.length - 1 ? 'disabled' : ''} title="Nächster Befund">▶</button>` +
                     `<button type="button" class="for-a11y-btn" data-act="ignore">Ignorieren</button>` +
@@ -921,12 +1388,58 @@ function openReportDialog(editor: any, findings: Finding[]): void {
 
     // Klick-Delegation
     panel.addEventListener('click', (ev) => {
-        const t = (ev.target as HTMLElement).closest('[data-act]') as HTMLElement | null;
+        const t = (ev.target as HTMLElement).closest('[data-act], .for-a11y-btn--primary') as HTMLElement | null;
         if (!t) return;
-        const act = t.getAttribute('data-act');
+        const act = t.getAttribute('data-act') || (t.classList.contains('for-a11y-btn--primary') ? 'quickfix' : null);
+        
+        // List-View spezifische Actions
+        if (viewMode === 'list') {
+            const idxAttr = t.getAttribute('data-idx');
+            const idx = idxAttr ? parseInt(idxAttr, 10) : -1;
+            if (idx >= 0 && idx < remaining.length) {
+                const f = remaining[idx];
+                switch (act) {
+                    case 'focus-finding':
+                        if (f && f.element && f.element.isConnected) {
+                            try { f.element.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_e) { /* noop */ }
+                            pulseActive(f.element);
+                        }
+                        return;
+                    case 'quickfix':
+                        if (f && f.id && quickfixRegistry[f.id]) {
+                            quickfixRegistry[f.id](f, editor);
+                            remaining = runAudit(editor.getBody() as HTMLElement, editor);
+                            render();
+                        }
+                        return;
+                    case 'ignore-list':
+                        fireEvent('A11ycheckIgnore', { issue: f });
+                        remaining.splice(idx, 1);
+                        applyMarkers(editor, remaining);
+                        render();
+                        return;
+                    case 'edit-list':
+                        if (f && f.element && f.element.isConnected) {
+                            highlightElement(editor, f.element);
+                            closePanel();
+                            return;
+                        }
+                        return;
+                    case 'toggle-view':
+                        viewMode = viewMode === 'sequential' ? 'list' : 'sequential';
+                        render();
+                        return;
+                }
+            }
+        }
+        
+        // Sequential-View Standardlöigik
         const curr = remaining[currentIndex];
         switch (act) {
             case 'close': closePanel(); return;
+            case 'toggle-view':
+                viewMode = viewMode === 'sequential' ? 'list' : 'sequential';
+                break;
             case 'prev':
                 if (currentIndex > 0) currentIndex--;
                 break;
@@ -952,6 +1465,17 @@ function openReportDialog(editor: any, findings: Finding[]): void {
                 remaining = runAudit(editor.getBody() as HTMLElement, editor);
                 currentIndex = 0;
                 applyMarkers(editor, remaining);
+                break;
+            case 'quickfix':
+                if (curr && curr.id && quickfixRegistry[curr.id]) {
+                    quickfixRegistry[curr.id](curr, editor);
+                    // Nach Quickfix neu prüfen
+                    remaining = runAudit(editor.getBody() as HTMLElement, editor);
+                    currentIndex = 0;
+                    applyMarkers(editor, remaining);
+                    render();
+                    focusCurrent();
+                }
                 break;
         }
         render();

@@ -4,13 +4,25 @@ Stellt den TinyMCE 8 Editor im CMS REDAXO bereit.
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/tinymce/blob/assets/screenshot8.png?raw=true)
 
+
 ## Feature-Highlights
 
 - **for_images + image im Team:** Bilder mit dem nativen `image` Plugin einfuegen und mit `for_images` als Figure-Block weiterbearbeiten (Breiten, Ausrichtung, Effekte, Caption, Alt-Text, Mediapool-Aktionen).
 - **for_oembed / for_video:** Moderne Einbettungen mit stabilen Save-Formaten und Editor-Vorschau.
 - **cleanpaste / mediapaste:** Saubere Paste-Pipeline mit Schutz fuer FOR-Markup und optionalem Medienpool-Upload aus der Zwischenablage.
 - **for_toc / for_footnote / for_a11y:** Inhaltsverzeichnis, Fussnoten und Accessibility-Checks direkt im Editor.
+- **A11y-Quickfixes:** Accessibility-Checker (for_a11y) erkennt typische Barrierefreiheits-Probleme und bietet Quickfix-Buttons für viele Befunde (z.B. Fake-Listen, leere Absätze, generische Linktexte, fette Pseudo-Überschriften, zu viele Leerzeichen). Die Quickfix-Logik ist modular aufgebaut und kann leicht um weitere Autofix-Strategien ergänzt werden.
 - **Layout Rules:** Automatische, nicht-invasive Struktur-Optimierung (Bilder aus Überschriften verschieben, Leerzeilen-Zusammenfassung, Minus-Linien → HR mit Design-System-Integration).
+
+### Accessibility-Checker (for_a11y) – Quickfix-Panel
+
+- Schwebendes Panel mit Navigation durch alle Befunde
+- Pro Befund: Quickfix-Button (z.B. „In Liste umwandeln“, „Leere Absätze entfernen“, „Alt-Text bearbeiten“)
+- Modularer Aufbau: Jeder Befundtyp kann einen eigenen Quickfix-Handler registrieren
+- Demo-Text in der Hauptseite enthält absichtlich typische Fehler für die Quickfix-Demo
+- Aktuell nur Deutsch, Mehrsprachigkeit folgt
+
+**Tipp:** Im Demo-Text gezielt die A11y-Spielwiese ausprobieren und die Quickfix-Buttons testen!
 
 ## Anwendung:
 
