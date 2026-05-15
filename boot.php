@@ -65,10 +65,15 @@ if (rex::isBackend() && null !== rex::getUser()) {
     if (str_starts_with(rex_request('page'), 'mediapool/') && ('tiny' === rex_request('addon', 'string', '') || 'REX_MEDIA_tinymce_filelink' === rex_request('opener_input_field', 'string', ''))) {
         rex_extension::register('OUTPUT_FILTER', static function ($ep) {
             $subject = $ep->getSubject();
+            $structureUrl = rex_url::backendPage('insertlink', array_filter([
+                'opener_input_field' => rex_request('opener_input_field', 'string', ''),
+                'clang' => rex_request('clang', 'string', ''),
+            ], static fn ($value) => '' !== $value));
+
             $subject = str_replace('</form>', '<input type="hidden" name="addon" value="tiny"></form>', $subject);
             $subject = str_replace('"#rex-js-page-main">', '"#rex-js-page-main">
                 <ul class="nav nav-tabs tiny-nav">
-                    <li><a href="/redaxo/index.php?page=insertlink&opener_input_field=&clang=1">Struktur</a></li>
+                    <li><a href="' . rex_escape($structureUrl) . '">Struktur</a></li>
                     <li class="active"><a href="#">Medienpool</a></li>
                 </ul>', $subject);
             return str_replace('selectMedia', 'selectLink', $subject);
