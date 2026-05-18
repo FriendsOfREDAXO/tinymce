@@ -90,6 +90,45 @@ my_custom_option: function () { return 'kept'; }
 
 Hinweis: Eingaben mit Top-Level-Kommas werden JS-sicher gesplittet. Als Fallback werden auch property-basierte „eine Zeile pro Eintrag“-Angaben unterstützt.
 
+### Farb-Mapping (color_map_raw, color_cols, custom_colors)
+
+Mit dem Farb-Mapping kann die Farbauswahl von `forecolor` und `backcolor` auf definierte Projektfarben begrenzt werden.
+
+Wichtige Optionen:
+
+- `color_map_raw`: Definiert die Farben als flaches Array aus Paaren `Farbe, Label`.
+- `color_cols`: Anzahl der Spalten im Farbpicker.
+- `custom_colors`: Erlaubt (`true`) oder verbietet (`false`) die freie Farbeingabe.
+
+Beispiel:
+
+```javascript
+color_cols: 4,
+custom_colors: false,
+color_map_raw: [
+  '#1d4ed8', 'Blau',
+  '#0f766e', 'Türkis',
+  '#16a34a', 'Grün',
+  '#ca8a04', 'Gold',
+  '#dc2626', 'Rot',
+  '#7c3aed', 'Violett'
+],
+```
+
+Regeln für `color_map_raw`:
+
+- Immer eine gerade Anzahl von Einträgen (jeweils `Farbe`, dann `Label`).
+- Empfohlen sind Hex-Werte (`#rrggbb` oder `#rgb`).
+- Bei ungültigem JSON oder ungerader Eintragszahl wird das Mapping ignoriert.
+
+Unterstützung im Profil-Assistenten:
+
+- Visueller Mapping-Editor (Zeilen mit Farbe + Label).
+- JSON-Textarea für direkte Bearbeitung von `color_map_raw`.
+- Live-Sync zwischen Tabellen-Editor und JSON-Feld.
+- Demo-Button für ein sofort testbares Farbset.
+- `custom_colors` kann gezielt deaktiviert werden, um nur definierte Corporate-Farben zuzulassen.
+
 ### Migration von TinyMCE 5/6 zu TinyMCE 8
 
 **Updatepfad-Hinweis (ab v8.9.0):**

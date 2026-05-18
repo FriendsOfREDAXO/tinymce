@@ -88,9 +88,6 @@ try {
 // Log update completion
 rex_logger::factory()->log('info', 'TinyMCE addon updated to v' . $this->getVersion());
 
-// Display success message
-echo rex_view::success(
-    'TinyMCE erfolgreich auf <strong>v' . $this->getVersion() . '</strong> aktualisiert.'
-);
+
 
 return true;
