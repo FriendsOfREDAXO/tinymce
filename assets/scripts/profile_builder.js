@@ -53,7 +53,7 @@ function initTinyMceProfileAssistant() {
 
     // Plugins Section – FOR plugins are highlighted as FriendsOfREDAXO custom plugins.
     // Besides the `for_*` naming convention there are legacy custom plugins that predate
-    // the convention (mediapaste, snippets, cleanpaste, phonelink, quote, link_yform, …).
+    // the convention (mediapaste, snippets, cleanpaste, quote, link_yform, …).
     // The server computes the full list of bundled FOR plugins in `for_plugins` /
     // `for_toolbar_buttons`. Plugins registered by OTHER AddOns (writeassist, …) are
     // highlighted separately in green.
@@ -233,6 +233,26 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-noreferrer" checked> ' + (i18n.link_noreferrer_label || 'Bei target="_blank" automatisch rel="noopener noreferrer"') + '</label></div></div>';
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-default-https" checked> ' + (i18n.link_default_https_label || 'Standard-Protokoll: https') + '</label></div></div>';
     settingsHtml += '</div>';
+
+    // Color Mapping
+    settingsHtml += '<br><legend><i class="rex-icon fa-eyedropper"></i> ' + (i18n.color_mapping || 'Farb-Mapping (color_map_raw)') + '</legend>';
+    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
+    settingsHtml += '<div class="row">';
+    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-color-map-enable"> <strong>' + (i18n.color_mapping_enable || 'Eigenes Farb-Mapping aktivieren') + '</strong></label></div></div>';
+    settingsHtml += '<div class="col-md-2"><div class="form-group"><label>' + (i18n.color_cols || 'Spalten (color_cols)') + '</label><input type="number" class="form-control builder-color-cols" min="1" max="20" value="4"></div></div>';
+    settingsHtml += '<div class="col-md-6" style="padding-top: 25px;"><button type="button" class="btn btn-default btn-xs builder-color-map-demo"><i class="rex-icon fa-magic"></i> ' + (i18n.color_mapping_demo || 'Demo-Mapping einfügen') + '</button></div>';
+    settingsHtml += '</div>';
+    settingsHtml += '<div class="row" style="margin-top: 4px; margin-bottom: 6px;"><div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-custom-colors"> ' + (i18n.custom_colors || 'Eigene Farbe in der Farbauswahl erlauben') + '</label></div></div></div>';
+    settingsHtml += '<div class="row" style="margin-bottom: 8px;">';
+    settingsHtml += '<div class="col-md-3"><input type="text" class="form-control input-sm builder-color-map-new-color" placeholder="#1d4ed8"></div>';
+    settingsHtml += '<div class="col-md-5"><input type="text" class="form-control input-sm builder-color-map-new-label" placeholder="Blau"></div>';
+    settingsHtml += '<div class="col-md-4"><button type="button" class="btn btn-default btn-xs builder-color-map-add"><i class="rex-icon fa-plus"></i> ' + (i18n.color_mapping_add || 'Farbe hinzufügen') + '</button></div>';
+    settingsHtml += '</div>';
+    settingsHtml += '<table class="table table-striped table-condensed" id="builder-color-map-table">';
+    settingsHtml += '<thead><tr><th style="width: 30%;">' + (i18n.color_mapping_color || 'Farbe') + '</th><th style="width: 50%;">' + (i18n.color_mapping_label || 'Label') + '</th><th style="width: 20%;"></th></tr></thead><tbody></tbody></table>';
+    settingsHtml += '<div class="form-group"><label>' + (i18n.color_map_raw_label || 'color_map_raw (JSON-Array)') + '</label><textarea class="form-control builder-color-map-raw" rows="4" placeholder="[\"#1d4ed8\", \"Blau\", \"#0f766e\", \"Türkis\"]"></textarea>';
+    settingsHtml += '<p class="help-block">' + (i18n.color_map_raw_help || 'Gerade Anzahl an Einträgen: immer Farbe, dann Label. Beispiel: [\"#1d4ed8\",\"Blau\",\"#0f766e\",\"Türkis\"].') + '</p></div>';
+    settingsHtml += '</div></div>';
 
     // YForm Link Configuration
     settingsHtml += '<br><legend>Link YForm Configuration</legend>';
@@ -2122,6 +2142,124 @@ function initTinyMceProfileAssistant() {
         addAutoreplaceRow('regex', '\\(kw(\\d{1,2})\\)', 'KW $1');
     });
 
+    const $colorMapTable = $builderBody.find('#builder-color-map-table tbody');
+
+    function normalizeColorToken(color) {
+        const raw = String(color || '').trim();
+        if (!raw) {
+            return '';
+        }
+        if (/^[0-9a-fA-F]{3,8}$/.test(raw)) {
+            return '#' + raw.toLowerCase();
+        }
+        if (/^#[0-9a-fA-F]{3,8}$/.test(raw)) {
+            return raw.toLowerCase();
+        }
+        return raw;
+    }
+
+    function addColorMapRow(color, label) {
+        const normalizedColor = normalizeColorToken(color);
+        const normalizedLabel = String(label || '').trim();
+        if (!normalizedColor || !normalizedLabel) {
+            return;
+        }
+        const swatch = /^#[0-9a-fA-F]{3,8}$/.test(normalizedColor) ? normalizedColor : '#999999';
+        const row = '<tr>' +
+            '<td><div style="display:flex; gap:6px; align-items:center;"><span style="display:inline-block; width:16px; height:16px; border:1px solid #ccc; border-radius:2px; background:' + swatch + ';"></span><input type="text" class="form-control input-sm builder-color-map-row-color" value="' + normalizedColor.replace(/"/g, '&quot;') + '"></div></td>' +
+            '<td><input type="text" class="form-control input-sm builder-color-map-row-label" value="' + normalizedLabel.replace(/"/g, '&quot;') + '"></td>' +
+            '<td><button type="button" class="btn btn-danger btn-xs builder-color-map-remove"><i class="rex-icon fa-times"></i></button></td>' +
+            '</tr>';
+        $colorMapTable.append(row);
+    }
+
+    function readColorMapRows() {
+        const result = [];
+        $colorMapTable.find('tr').each(function () {
+            const color = normalizeColorToken($(this).find('.builder-color-map-row-color').val());
+            const label = String($(this).find('.builder-color-map-row-label').val() || '').trim();
+            if (!color || !label) {
+                return;
+            }
+            result.push(color, label);
+        });
+        return result;
+    }
+
+    function writeColorMapTextareaFromRows() {
+        const colorMap = readColorMapRows();
+        if (colorMap.length === 0) {
+            $builderBody.find('.builder-color-map-raw').val('');
+            return;
+        }
+        $builderBody.find('.builder-color-map-raw').val(JSON.stringify(colorMap, null, 2));
+    }
+
+    function writeColorMapRowsFromArray(colorMap) {
+        $colorMapTable.empty();
+        if (!Array.isArray(colorMap)) {
+            return;
+        }
+        for (let i = 0; i < colorMap.length; i += 2) {
+            addColorMapRow(colorMap[i], colorMap[i + 1]);
+        }
+    }
+
+    function syncColorMapRowsFromTextarea() {
+        const raw = String($builderBody.find('.builder-color-map-raw').val() || '').trim();
+        if (!raw) {
+            $colorMapTable.empty();
+            return;
+        }
+        const parsed = parseColorMapRawInput(raw);
+        if (!parsed) {
+            return;
+        }
+        writeColorMapRowsFromArray(parsed);
+    }
+
+    $builderBody.find('.builder-color-map-add').on('click', function () {
+        const color = $builderBody.find('.builder-color-map-new-color').val();
+        const label = $builderBody.find('.builder-color-map-new-label').val();
+        addColorMapRow(color, label);
+        writeColorMapTextareaFromRows();
+        $builderBody.find('.builder-color-map-enable').prop('checked', true);
+        $builderBody.find('.builder-color-map-new-color').val('');
+        $builderBody.find('.builder-color-map-new-label').val('');
+    });
+
+    $builderBody.on('click', '.builder-color-map-remove', function () {
+        $(this).closest('tr').remove();
+        writeColorMapTextareaFromRows();
+    });
+
+    $builderBody.on('input', '.builder-color-map-row-color, .builder-color-map-row-label', function () {
+        const $row = $(this).closest('tr');
+        const colorVal = normalizeColorToken($row.find('.builder-color-map-row-color').val());
+        if (/^#[0-9a-fA-F]{3,8}$/.test(colorVal)) {
+            $row.find('span').first().css('background', colorVal);
+        }
+        writeColorMapTextareaFromRows();
+    });
+
+    $builderBody.find('.builder-color-map-raw').on('input', function () {
+        syncColorMapRowsFromTextarea();
+    });
+
+    $builderBody.find('.builder-color-map-demo').on('click', function () {
+        $builderBody.find('.builder-color-map-enable').prop('checked', true);
+        $builderBody.find('.builder-color-cols').val('4');
+        $builderBody.find('.builder-color-map-raw').val(JSON.stringify([
+            '#1d4ed8', 'Blau',
+            '#0f766e', 'Türkis',
+            '#16a34a', 'Grün',
+            '#ca8a04', 'Gold',
+            '#dc2626', 'Rot',
+            '#7c3aed', 'Violett'
+        ], null, 2));
+        syncColorMapRowsFromTextarea();
+    });
+
     $arTable.on('click', '.ar-remove', function () {
         $(this).closest('tr').remove();
     });
@@ -2134,6 +2272,7 @@ function initTinyMceProfileAssistant() {
         if (existing.length > 0) {
             loadFromConfig($textarea, $builderBody);
         }
+        syncColorMapRowsFromTextarea();
     }, 50);
 }
 
@@ -2204,6 +2343,26 @@ function parseWidthValue(raw) {
     return null;
 }
 
+function parseColorMapRawInput(raw) {
+    const value = String(raw || '').trim();
+    if (!value) {
+        return null;
+    }
+    try {
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) {
+            return null;
+        }
+        const normalized = parsed.map((item) => String(item));
+        if (normalized.length === 0 || normalized.length % 2 !== 0) {
+            return null;
+        }
+        return normalized;
+    } catch (e) {
+        return null;
+    }
+}
+
 const MANAGED_PROFILE_KEYS = new Set([
     'license_key', 'language', 'branding', 'statusbar', 'menubar', 'toolbar', 'toolbar_mode',
     'quickbars_selection_toolbar', 'quickbars_insert_toolbar',
@@ -2213,6 +2372,8 @@ const MANAGED_PROFILE_KEYS = new Set([
     'height', 'min_height', 'max_height', 'autoresize_bottom_margin', 'width', 'resize',
     'image_caption', 'image_uploadtab', 'relative_urls', 'remove_script_host',
     'document_base_url', 'entity_encoding', 'convert_urls', 'object_resizing',
+    'custom_colors',
+    'color_cols', 'color_map_raw',
     'extended_valid_elements', 'imagewidth_presets', 'imagealign_presets',
     'imageeffect_presets', 'image_compat_warn', 'codesample_languages', 'link_rel_list',
     'link_target_list', 'link_default_protocol', 'link_assume_external_targets',
@@ -2509,6 +2670,11 @@ function generateConfig($textarea, $builderBody) {
     const linkTargetList = $builderBody.find('.builder-link-target-list').is(':checked');
     const linkNoreferrer = $builderBody.find('.builder-link-noreferrer').is(':checked');
     const linkDefaultHttps = $builderBody.find('.builder-link-default-https').is(':checked');
+    const customColorsEnabled = $builderBody.find('.builder-custom-colors').is(':checked');
+    const colorMapEnabled = $builderBody.find('.builder-color-map-enable').is(':checked');
+    const colorColsRaw = parseInt($builderBody.find('.builder-color-cols').val(), 10);
+    const colorCols = Number.isFinite(colorColsRaw) && colorColsRaw > 0 ? colorColsRaw : null;
+    const colorMapRaw = parseColorMapRawInput($builderBody.find('.builder-color-map-raw').val());
 
     // Image Width (preset-based)
     const imagewidthEnabled = $builderBody.find('.builder-imagewidth-enable').is(':checked');
@@ -2826,6 +2992,17 @@ function generateConfig($textarea, $builderBody) {
 },\n`;
     }
 
+    if (!customColorsEnabled) {
+        configStr += 'custom_colors: false,\n';
+    }
+
+    if (colorMapEnabled && Array.isArray(colorMapRaw) && colorMapRaw.length > 0) {
+        if (colorCols !== null) {
+            configStr += `color_cols: ${colorCols},\n`;
+        }
+        configStr += `color_map_raw: ${JSON.stringify(colorMapRaw)},\n`;
+    }
+
     configStr += `toc_depth: ${tocDepth},\n`;
     configStr += `toc_header: "${tocHeader}",\n`;
     configStr += `toc_class: "${tocClass}",\n\n`;
@@ -3125,6 +3302,22 @@ function loadFromConfig($textarea, $builderBody) {
     }
     if (typeof cfg.toc_class === 'string') {
         $builderBody.find('.builder-toc-class').val(cfg.toc_class);
+    }
+
+    // Color mapping
+    if (cfg.custom_colors === false) {
+        $builderBody.find('.builder-custom-colors').prop('checked', false);
+    } else {
+        $builderBody.find('.builder-custom-colors').prop('checked', true);
+    }
+
+    if (Array.isArray(cfg.color_map_raw) && cfg.color_map_raw.length > 0) {
+        $builderBody.find('.builder-color-map-enable').prop('checked', true);
+        $builderBody.find('.builder-color-map-raw').val(JSON.stringify(cfg.color_map_raw, null, 2));
+        $builderBody.find('.builder-color-map-raw').trigger('input');
+        if (typeof cfg.color_cols === 'number' && Number.isFinite(cfg.color_cols) && cfg.color_cols > 0) {
+            $builderBody.find('.builder-color-cols').val(cfg.color_cols);
+        }
     }
 
     // for_images presets

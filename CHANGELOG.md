@@ -10,6 +10,21 @@ Version 8.10 (in development)
 * Lotte hat die Übersetzungen ergänzt und die Sprachdateien auf den aktuellen Stand gebracht.
 * Die Laufzeitkopie unter `public/assets/addons/tinymce/scripts/base.js` wurde mit den aktuellen Text-/Label-Änderungen nachgezogen.
 
+### Profil-Assistent: Color-Mapping für Farbauswahl erweitert
+
+* Der Profil-Assistent unterstützt jetzt `color_map_raw` und `color_cols` direkt im UI (inkl. Demo-Mapping für schnelle Tests).
+* Neu: Visueller Mapping-Editor mit Farbe/Label-Zeilen, Live-Sync zum JSON-Textarea und Roundtrip beim Laden bestehender Profile.
+* Neu: Option `custom_colors` ist im Assistenten steuerbar, damit die freie Farbeingabe im TinyMCE-Farbpicker gezielt deaktiviert werden kann.
+* `color_map_raw`, `color_cols` und `custom_colors` sind als verwaltete Keys eingebunden und bleiben beim Generieren konsistent.
+
+### Link-Widget: Telefonlinks direkt im Core-Dialog verbessert
+
+* Das dedizierte `phonelink`-Plugin wird nicht mehr aktiv registriert; der normale TinyMCE-Linkdialog ist wieder der zentrale Einstiegspunkt.
+* Für Alt-Profile werden veraltete `phonelink`-Einträge defensiv aus Plugin-Liste, `external_plugins`, Toolbar, Contextmenü und Menüdefinitionen entfernt.
+* Der Core-Link-Flow bleibt bewusst konservativ: Nur explizite `tel:`-Werte werden bereinigt, reine Nummern werden nicht automatisch umgewandelt (wichtig für numerische REDAXO-IDs).
+* Neu: Als expliziter Opt-in stehen `phonelink` (Toolbar-Button mit Telefonsymbol) und der Menüeintrag „Telefonlink“ bereit; damit lassen sich Telefonlinks gezielt ohne Nummern-Automatik einfügen.
+* Runtime- und Source-Assets wurden für den Profile-Assistant-Workflow synchronisiert, um Abweichungen zwischen `redaxo/src` und `assets/addons` zu vermeiden.
+
 ### for_footnotes: Initiales Sync-/Resize-Verhalten stabilisiert
 
 * Für `for_footnotes` wurde ein gemeinsamer `syncAndResize`-Pfad ergänzt, der nach dem Synchronisieren der Fußnoten explizit `nodeChanged`, `mceAutoResize` und `ResizeEditor` auslöst.

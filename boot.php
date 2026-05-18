@@ -15,7 +15,6 @@ if (rex::isBackend() && is_object(rex::getUser())) {
     // Plugin registrations: plugin name, file path, button/feature names (optional)
     $customPlugins = [
         'link_yform' => ['link_yform/plugin.min.js', ['link_yform']],
-        'phonelink' => ['phonelink/plugin.min.js', ['phonelink']],
         'quote' => ['quote/plugin.min.js', ['quote']],
         'snippets' => ['snippets/plugin.min.js', ['snippets']],
         'cleanpaste' => ['cleanpaste/plugin.min.js', []],

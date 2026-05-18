@@ -26,7 +26,7 @@ async function build() {
 
     // Build mit esbuild
     await esbuild.build({
-      entryPoints: ['src/main/ts/Plugin.ts'],
+      entryPoints: ['src/main/ts/Main.ts'],
       bundle: true,
       minify: true,
       format: 'iife',

@@ -368,6 +368,7 @@ class Assets
                     'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
                     'ltr', 'rtl',
                     'table', 'link', 'image', 'media', 'codesample', 'charmap', 'emoticons', 'anchor',
+                    'phonelink',
                     'hr', 'pagebreak', 'nonbreaking', 'insertdatetime',
                     'searchreplace', 'visualblocks', 'visualchars',
                     'fullscreen', 'preview', 'code', 'help',
@@ -393,6 +394,7 @@ class Assets
                     'for_chars_symbols'    => 'Zeichen, Symbole & Emoji',
                     'for_chars_symbols_invisibles' => 'Unsichtbare Zeichen anzeigen',
                     'for_abbr'             => 'Abkürzung (abbr)',
+                    'phonelink'            => 'Telefonlink',
                 ],
                 'external_plugins' => [],
                 // Names of plugins registered by OTHER AddOns (not bundled with

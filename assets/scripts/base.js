@@ -738,6 +738,112 @@ function tiny_init(container) {
             options['external_plugins'] = forceCanonicalTinyPluginUrls(options['external_plugins'], tinyAssetPrefix);
         }
 
+        function removeTokenFromStringList(value, token) {
+            if (typeof value !== 'string' || value.trim() === '') {
+                return value;
+            }
+
+            let cleaned = value
+                .split(/\s+/)
+                .filter(Boolean)
+                .filter(function(part) { return part !== token; })
+                .join(' ')
+                .replace(/\|\s+\|/g, '|')
+                .replace(/^\|\s*/, '')
+                .replace(/\s*\|$/, '')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+
+            return cleaned;
+        }
+
+        function replaceTokenInStringList(value, oldToken, newToken) {
+            if (typeof value !== 'string' || value.trim() === '') {
+                return value;
+            }
+
+            let replaced = value
+                .split(/\s+/)
+                .filter(Boolean)
+                .map(function(part) {
+                    return part === oldToken ? newToken : part;
+                })
+                .join(' ')
+                .replace(/\|\s+\|/g, '|')
+                .replace(/^\|\s*/, '')
+                .replace(/\s*\|$/, '')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+
+            return replaced;
+        }
+
+        function removeTokenFromToolbar(value, token) {
+            if (typeof value === 'string') {
+                return removeTokenFromStringList(value, token);
+            }
+
+            if (Array.isArray(value)) {
+                return value
+                    .map(function(row) {
+                        if (typeof row !== 'string') {
+                            return row;
+                        }
+                        return removeTokenFromStringList(row, token);
+                    })
+                    .filter(function(row) {
+                        return typeof row !== 'string' || row.trim() !== '';
+                    });
+            }
+
+            return value;
+        }
+
+        // The dedicated phonelink plugin is deprecated.
+        // Strip stale profile config values so old profiles continue to work cleanly.
+        if (Array.isArray(options.plugins)) {
+            options.plugins = options.plugins.filter(function(pluginName) {
+                return String(pluginName || '').trim() !== 'phonelink';
+            });
+        } else if (typeof options.plugins === 'string') {
+            options.plugins = removeTokenFromStringList(options.plugins, 'phonelink');
+        }
+
+        if (options.external_plugins && Object.prototype.hasOwnProperty.call(options.external_plugins, 'phonelink')) {
+            delete options.external_plugins.phonelink;
+        }
+
+        options.toolbar = (function(value) {
+            if (typeof value === 'string') {
+                return replaceTokenInStringList(value, 'tel_link', 'phonelink');
+            }
+
+            if (Array.isArray(value)) {
+                return value.map(function(row) {
+                    if (typeof row !== 'string') {
+                        return row;
+                    }
+                    return replaceTokenInStringList(row, 'tel_link', 'phonelink');
+                });
+            }
+
+            return value;
+        })(options.toolbar);
+
+        if (typeof options.contextmenu === 'string') {
+            options.contextmenu = replaceTokenInStringList(options.contextmenu, 'tel_link', 'phonelink');
+        }
+
+        if (options.menu && typeof options.menu === 'object') {
+            Object.keys(options.menu).forEach(function(menuKey) {
+                let menuDef = options.menu[menuKey];
+                if (!menuDef || typeof menuDef !== 'object' || typeof menuDef.items !== 'string') {
+                    return;
+                }
+                menuDef.items = replaceTokenInStringList(menuDef.items, 'tel_link', 'phonelink');
+            });
+        }
+
         let activePlugins = [];
         if (Array.isArray(options.plugins)) {
             activePlugins = options.plugins.map(function(pluginName) {
@@ -758,6 +864,147 @@ function tiny_init(container) {
         
         // Create a new setup function that handles editor events and calls the original
         options['setup'] = function(editor) {
+            function normalizePhoneInput(rawValue) {
+                if (typeof rawValue !== 'string') {
+                    return '';
+                }
+
+                let value = rawValue.trim();
+                if (value === '') {
+                    return '';
+                }
+
+                value = value.replace(/^tel:/i, '').trim();
+                let normalizedValue = value.replace(/[^\d+()\-./\s]/g, '').trim();
+
+                return normalizedValue;
+            }
+
+            function getSelectedTelValue() {
+                let node = editor.selection ? editor.selection.getNode() : null;
+                let linkNode = node ? editor.dom.getParent(node, 'a[href]') : null;
+                if (!linkNode) {
+                    return '';
+                }
+
+                let href = linkNode.getAttribute('href') || '';
+                if (!/^tel:/i.test(href)) {
+                    return '';
+                }
+
+                return href.replace(/^tel:/i, '').trim();
+            }
+
+            function openTelLinkDialog() {
+                let initialPhone = getSelectedTelValue();
+
+                editor.windowManager.open({
+                    title: 'Telefonlink einfügen',
+                    body: {
+                        type: 'panel',
+                        items: [
+                            {
+                                type: 'input',
+                                name: 'phone',
+                                label: 'Telefonnummer',
+                                placeholder: '+49 221 1234567'
+                            }
+                        ]
+                    },
+                    initialData: {
+                        phone: initialPhone
+                    },
+                    buttons: [
+                        {
+                            type: 'cancel',
+                            name: 'cancel',
+                            text: 'Abbrechen'
+                        },
+                        {
+                            type: 'submit',
+                            name: 'save',
+                            text: 'Einfügen',
+                            buttonType: 'primary'
+                        }
+                    ],
+                    onSubmit: function(api) {
+                        let data = api.getData();
+                        let normalizedPhone = normalizePhoneInput(data.phone || '');
+                        if (normalizedPhone === '') {
+                            api.close();
+                            return;
+                        }
+
+                        editor.execCommand('mceInsertLink', false, {
+                            href: 'tel:' + normalizedPhone
+                        });
+                        api.close();
+                    }
+                });
+            }
+
+            function normalizePhoneHref(rawHref) {
+                if (typeof rawHref !== 'string') {
+                    return rawHref;
+                }
+
+                let href = rawHref.trim();
+                if (href === '') {
+                    return href;
+                }
+
+                let isTelHref = /^tel:/i.test(href);
+                // Do not auto-convert plain numbers to tel: because numeric values
+                // can also represent REDAXO IDs. Only normalize explicit tel: links.
+                if (!isTelHref) {
+                    return href;
+                }
+
+                let numberPart = isTelHref ? href.slice(4) : href;
+                let normalizedNumber = numberPart.replace(/[^\d+()\-./\s]/g, '').trim();
+
+                if (normalizedNumber === '') {
+                    return href;
+                }
+
+                return 'tel:' + normalizedNumber;
+            }
+
+            // Keep phone link handling conservative: only normalize explicit tel: values.
+            editor.on('BeforeExecCommand', function(event) {
+                if (!event || event.command !== 'mceInsertLink') {
+                    return;
+                }
+
+                if (typeof event.value === 'string') {
+                    event.value = normalizePhoneHref(event.value);
+                    return;
+                }
+
+                if (!event.value || typeof event.value !== 'object' || typeof event.value.href !== 'string') {
+                    return;
+                }
+
+                event.value.href = normalizePhoneHref(event.value.href);
+            });
+
+            editor.ui.registry.addIcon('phonelink', '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 10.8c1.6 3.1 3.5 5 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.1 21 3 13.9 3 5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2z"/></svg>');
+
+            editor.ui.registry.addButton('phonelink', {
+                icon: 'phonelink',
+                tooltip: 'Telefonlink einfügen',
+                onAction: function() {
+                    openTelLinkDialog();
+                }
+            });
+
+            editor.ui.registry.addMenuItem('phonelink', {
+                text: 'Telefonlink',
+                onAction: function() {
+                    openTelLinkDialog();
+                }
+            });
+
             // Register custom Style-Sets button and menu item
             if (options.style_formats && options.style_formats.length > 0) {
                 

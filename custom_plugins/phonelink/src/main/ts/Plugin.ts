@@ -1,79 +1,268 @@
-import {Editor, TinyMCE} from 'tinymce';
+import { Editor, TinyMCE } from 'tinymce';
 
 declare const tinymce: TinyMCE;
 
-const setup = (editor: Editor, url: string): void => {
-    editor.ui.registry.addIcon('phonelink', '<svg width="24" height="24"><path d="m0,0h24v24H0V0Z" fill="none" stroke-width="0"/><path d="m5,4h4l2,5-2.5,1.5c1.071,2.1715,2.8285,3.929,5,5l1.5-2.5,5,2v4c0,1.1046-.8954,2-2,2-8.0724-.4906-14.5094-6.9276-15-15,0-1.1046.8954-2,2-2" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="m11.5-.7296h13.3295v13.3295h-13.3295V-.7296Z" fill="none" stroke-width="0"/><path d="m16.4986,7.6014l3.3324-3.3324" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1108"/><path d="m17.6094,2.6028l.2571-.2977c1.0846-1.0845,2.843-1.0843,3.9275.0003s1.0843,2.843-.0003,3.9275l-.2966.2577" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1108"/><path d="m18.7202,9.2676l-.2205.2966c-1.0966,1.0844-2.8617,1.0844-3.9583,0-1.0845-1.0723-1.0943-2.8207-.022-3.9052.0073-.0074.0146-.0147.022-.022l.291-.2571" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1108"/></svg>');
-    editor.ui.registry.addButton('phonelink', {
-        text: '',
-        icon: 'phonelink',
-        onAction: () => openDialog()
+const PLUGIN = 'phonelink';
+const PHONE_ICON = 'phonelink-icon';
+const LOCK_ATTR = 'data-phone-locked';
+const PHONE_ATTR = 'data-phone-number';
+
+type PhoneDialogData = {
+    phoneNumber: string;
+    phoneLabel: string;
+    phoneTitle: string;
+};
+
+const translate = (editor: Editor, key: string, fallback: string): string => {
+    const text = editor.translate(key);
+    return text === key ? fallback : text;
+};
+
+const normalizePhoneNumber = (value: string): string =>
+    value.replace(/[^\d+()\-./\s]/g, '').trim();
+
+const extractPhoneFromHref = (href: string | null): string => {
+    if (href === null || href.trim() === '') {
+        return '';
+    }
+
+    return href.toLowerCase().startsWith('tel:') ? href.slice(4) : href;
+};
+
+const findPhoneLinkFromNode = (node: Node | null): HTMLAnchorElement | null => {
+    if (!(node instanceof Element)) {
+        return null;
+    }
+
+    const link = node.closest('a');
+    return link instanceof HTMLAnchorElement ? link : null;
+};
+
+const isProtectedPhoneLink = (link: HTMLAnchorElement | null): boolean => {
+    if (link === null) {
+        return false;
+    }
+
+    const href = link.getAttribute('href') || '';
+    return link.getAttribute(LOCK_ATTR) === '1' || href.toLowerCase().startsWith('tel:');
+};
+
+const findCurrentPhoneLink = (editor: Editor): HTMLAnchorElement | null => {
+    const link = findPhoneLinkFromNode(editor.selection.getNode());
+    return isProtectedPhoneLink(link) ? link : null;
+};
+
+const protectPhoneLink = (link: HTMLAnchorElement): void => {
+    const currentNumber = normalizePhoneNumber(
+        link.getAttribute(PHONE_ATTR) || extractPhoneFromHref(link.getAttribute('href'))
+    );
+
+    if (currentNumber === '') {
+        return;
+    }
+
+    link.setAttribute(PHONE_ATTR, currentNumber);
+    link.setAttribute(LOCK_ATTR, '1');
+    link.setAttribute('href', 'tel:' + currentNumber);
+};
+
+const enforceProtectedPhoneLinks = (editor: Editor): void => {
+    const links = editor.dom.select('a[' + LOCK_ATTR + '="1"],a[href^="tel:"],a[href^="TEL:"]');
+    links.forEach((node) => {
+        if (node instanceof HTMLAnchorElement) {
+            protectPhoneLink(node);
+        }
+    });
+};
+
+const removeCurrentPhoneLink = (editor: Editor): void => {
+    const existing = findCurrentPhoneLink(editor);
+    if (existing === null) {
+        return;
+    }
+
+    editor.undoManager.transact(() => {
+        editor.dom.remove(existing, true);
     });
 
-    const setContent = (editor, html) => {
-        editor.focus();
-        editor.undoManager.transact(() => {
-            editor.insertContent(html);
-        });
-        editor.selection.setCursorLocation();
-        editor.nodeChanged();
-    };
+    editor.nodeChanged();
+};
 
-    const openDialog = () => {
-        editor.windowManager.open({
-            title: 'Phone link',
-            size: 'normal',
-            body: {
-                type: 'panel',
-                items: [
-                    {
-                        type: 'input',
-                        label: 'Phone number',
-                        name: 'phoneNumber'
-                    },
-                    {
-                        type: 'input',
-                        label: 'Text to display',
-                        name: 'phoneLabel'
-                    },
-                    {
-                        type: 'input',
-                        label: 'Title',
-                        name: 'phoneTitle'
-                    }
-                ]
-            },
-            buttons: [
+const openDialog = (editor: Editor, existing: HTMLAnchorElement | null = null): void => {
+    const current = existing || findCurrentPhoneLink(editor);
+    const selectedText = editor.selection.getContent({ format: 'text' }).trim();
+
+    const initialNumber = normalizePhoneNumber(
+        current ? (current.getAttribute(PHONE_ATTR) || extractPhoneFromHref(current.getAttribute('href'))) : selectedText
+    );
+
+    const initialLabel = current ? (current.textContent || '') : selectedText;
+    const initialTitle = current ? (current.getAttribute('title') || '') : '';
+
+    editor.windowManager.open<PhoneDialogData>({
+        title: translate(editor, 'Phone link', 'Telefon-Link'),
+        size: 'normal',
+        body: {
+            type: 'panel',
+            items: [
                 {
-                    type: 'cancel',
-                    name: 'cancel',
-                    text: 'Cancel'
+                    type: 'input',
+                    label: translate(editor, 'Phone number', 'Telefonnummer'),
+                    name: 'phoneNumber'
                 },
                 {
-                    type: 'submit',
-                    name: 'save',
-                    text: 'Save',
-                    primary: true
+                    type: 'input',
+                    label: translate(editor, 'Text to display', 'Anzeigetext'),
+                    name: 'phoneLabel'
+                },
+                {
+                    type: 'input',
+                    label: translate(editor, 'Title', 'Titel'),
+                    name: 'phoneTitle'
                 }
-            ],
-            initialData: {
-                phoneNumber: (editor.selection.getNode() && editor.selection.getNode().getAttribute('href') ? editor.selection.getNode().getAttribute('href').replace('tel:', '') : editor.selection.getContent()),
-                phoneLabel: editor.selection.getContent(),
-                phoneTitle: '',
+            ]
+        },
+        buttons: [
+            {
+                type: 'cancel',
+                name: 'cancel',
+                text: translate(editor, 'Cancel', 'Abbrechen')
             },
-            onSubmit: api => {
-                const data = api.getData();
-
-                const hrefLink = '<a title="' + data.phoneTitle + '" href="tel:' + data.phoneNumber + '">' + data.phoneLabel + '</a>';
-
-                setContent(editor, hrefLink);
-                api.close();
+            {
+                type: 'submit',
+                name: 'save',
+                text: translate(editor, 'Save', 'Speichern'),
+                primary: true
             }
-        });
-    };
+        ],
+        initialData: {
+            phoneNumber: initialNumber,
+            phoneLabel: initialLabel,
+            phoneTitle: initialTitle
+        },
+        onSubmit: (api) => {
+            const data = api.getData();
+            const number = normalizePhoneNumber(data.phoneNumber || '');
+
+            if (number === '') {
+                editor.windowManager.alert(translate(editor, 'Phone number required', 'Telefonnummer ist erforderlich.'));
+                return;
+            }
+
+            const label = (data.phoneLabel || '').trim() || number;
+            const title = (data.phoneTitle || '').trim();
+
+            editor.undoManager.transact(() => {
+                if (current !== null) {
+                    current.innerHTML = editor.dom.encode(label);
+                    current.setAttribute(PHONE_ATTR, number);
+                    current.setAttribute(LOCK_ATTR, '1');
+                    current.setAttribute('href', 'tel:' + number);
+                    current.setAttribute('title', title);
+                    if (title === '') {
+                        current.removeAttribute('title');
+                    }
+                    editor.selection.select(current);
+                    return;
+                }
+
+                const attrs: Record<string, string> = {
+                    href: 'tel:' + number,
+                    [LOCK_ATTR]: '1',
+                    [PHONE_ATTR]: number
+                };
+
+                if (title !== '') {
+                    attrs.title = title;
+                }
+
+                editor.insertContent(editor.dom.createHTML('a', attrs, editor.dom.encode(label)));
+            });
+
+            enforceProtectedPhoneLinks(editor);
+            editor.nodeChanged();
+            api.close();
+        }
+    });
+};
+
+const registerUi = (editor: Editor): void => {
+    editor.addCommand('mcePhoneLink', () => openDialog(editor));
+    editor.addCommand('mcePhoneLinkRemove', () => removeCurrentPhoneLink(editor));
+
+    editor.ui.registry.addIcon(PHONE_ICON, '<svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.27 1.12.37 2.32.59 3.57.59.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.22 2.45.59 3.57.11.35.02.75-.25 1.02l-2.22 2.2z"/></svg>');
+
+    editor.ui.registry.addButton(PLUGIN, {
+        icon: PHONE_ICON,
+        tooltip: translate(editor, 'Phone link', 'Telefon-Link'),
+        onAction: () => editor.execCommand('mcePhoneLink')
+    });
+
+    editor.ui.registry.addMenuItem(PLUGIN, {
+        icon: PHONE_ICON,
+        text: translate(editor, 'Phone link', 'Telefon-Link'),
+        onAction: () => editor.execCommand('mcePhoneLink')
+    });
+
+    editor.ui.registry.addMenuItem('phonelink_remove', {
+        icon: 'unlink',
+        text: translate(editor, 'Remove phone link', 'Telefon-Link entfernen'),
+        onAction: () => editor.execCommand('mcePhoneLinkRemove')
+    });
+
+    editor.ui.registry.addContextToolbar('phonelink_context', {
+        predicate: (node) => isProtectedPhoneLink(findPhoneLinkFromNode(node)),
+        items: 'phonelink phonelink_remove',
+        position: 'node',
+        scope: 'node'
+    });
+
+    editor.ui.registry.addContextMenu('phonelink', {
+        update: (node) => isProtectedPhoneLink(findPhoneLinkFromNode(node))
+            ? ['phonelink', 'phonelink_remove']
+            : []
+    });
+};
+
+const setup = (editor: Editor): void => {
+    editor.on('PreInit', () => {
+        editor.schema.addValidElements('a[href|title|target|rel|class|' + LOCK_ATTR + '|' + PHONE_ATTR + ']');
+    });
+
+    editor.on('BeforeExecCommand', (event) => {
+        if (event.command !== 'mceLink') {
+            return;
+        }
+
+        const link = findCurrentPhoneLink(editor);
+        if (link === null) {
+            return;
+        }
+
+        event.preventDefault();
+        openDialog(editor, link);
+    });
+
+    editor.on('click', (event) => {
+        const link = findPhoneLinkFromNode(event.target as Node | null);
+        if (!isProtectedPhoneLink(link)) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        editor.selection.select(link);
+        openDialog(editor, link);
+    });
+
+    editor.on('SetContent BeforeGetContent Undo Redo', () => {
+        enforceProtectedPhoneLinks(editor);
+    });
+
+    registerUi(editor);
 };
 
 export default (): void => {
-    tinymce.PluginManager.add('phonelink', setup);
-    tinymce.PluginManager.requireLangPack('phonelink', 'de');
+    tinymce.PluginManager.add(PLUGIN, setup);
+    tinymce.PluginManager.requireLangPack(PLUGIN, 'de');
 };

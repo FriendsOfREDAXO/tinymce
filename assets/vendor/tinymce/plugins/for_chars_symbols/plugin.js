@@ -1398,6 +1398,14 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         return beforeText;
     }
 
+    function escapeHtmlAttr(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
     function runAutoreplace(editor, rules) {
         if (!rules || rules.length === 0 || isAutoreplaceBlocked(editor)) { return; }
         var rng = editor.selection.getRng();
@@ -1421,8 +1429,6 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
             editor.selection.setRng(next);
         });
     }
-
-    /* ---------------- Plugin-Registrierung ---------------- */
 
     // eslint-disable-next-line no-undef
     tinymce.PluginManager.add('for_chars_symbols', function (editor) {
@@ -1453,6 +1459,8 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         if (autoreplaceRules.length > 0) {
             editor.on('keydown', function (e) {
                 if (!isAutoreplaceTriggerEvent(e)) { return; }
+
+                var triggerKey = getAutoreplaceTriggerKey(e);
                 runAutoreplace(editor, autoreplaceRules);
             });
         }
