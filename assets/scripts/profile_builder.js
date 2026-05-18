@@ -236,7 +236,7 @@ function initTinyMceProfileAssistant() {
 
     // Color Mapping
     settingsHtml += '<br><legend><i class="rex-icon fa-eyedropper"></i> ' + (i18n.color_mapping || 'Farb-Mapping (color_map_raw)') + '</legend>';
-    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
+    settingsHtml += '<div class="panel panel-default builder-color-section"><div class="panel-body">';
     settingsHtml += '<div class="row">';
     settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-color-map-enable"> <strong>' + (i18n.color_mapping_enable || 'Eigenes Farb-Mapping aktivieren') + '</strong></label></div></div>';
     settingsHtml += '<div class="col-md-2"><div class="form-group"><label>' + (i18n.color_cols || 'Spalten (color_cols)') + '</label><input type="number" class="form-control builder-color-cols" min="1" max="20" value="4"></div></div>';
@@ -606,6 +606,14 @@ function initTinyMceProfileAssistant() {
             opacity: 0.65;
             filter: grayscale(0.2);
             cursor: not-allowed;
+        }
+        .builder-color-section.is-disabled {
+            opacity: 0.55;
+            filter: grayscale(0.4);
+            cursor: not-allowed;
+        }
+        .builder-color-section.is-disabled .panel-body {
+            pointer-events: none;
         }
         .builder-toolbar-row {
             border: 1px solid var(--tpa-dropzone-border);
@@ -1376,6 +1384,26 @@ function initTinyMceProfileAssistant() {
     function updateInput() {
         const serializedRows = getToolbarRows().map((row) => row.join(' '));
         $toolbarInput.val(serializedRows.join('\n'));
+        updateColorSectionState();
+    }
+
+    function updateColorSectionState() {
+        const flat = [].concat.apply([], getToolbarRows());
+        $contextSelectedList.find('li').each(function() {
+            const v = $(this).data('value');
+            if (v) { flat.push(v); }
+        });
+        $insertSelectedList.find('li').each(function() {
+            const v = $(this).data('value');
+            if (v) { flat.push(v); }
+        });
+        const hasColor = flat.indexOf('forecolor') !== -1 || flat.indexOf('backcolor') !== -1;
+        const $section = $builderBody.find('.builder-color-section');
+        if ($section.length === 0) {
+            return;
+        }
+        $section.toggleClass('is-disabled', !hasColor);
+        $section.find(':input').prop('disabled', !hasColor);
     }
 
     function addToolbarItemRow($row, value = '', insertIndex = null) {
@@ -1463,6 +1491,7 @@ function initTinyMceProfileAssistant() {
             items.push($(this).data('value'));
         });
         $contextInput.val(items.join(' '));
+        updateColorSectionState();
     }
 
     function updateInsertInput() {
@@ -1471,6 +1500,7 @@ function initTinyMceProfileAssistant() {
             items.push($(this).data('value'));
         });
         $insertInput.val(items.join(' '));
+        updateColorSectionState();
     }
 
     function getContextInsertMeta($list) {
@@ -2760,8 +2790,28 @@ function generateConfig($textarea, $builderBody) {
 
     // Insert Menu (menubar > Insert)
     const insertMenuItems = escapeString($builderBody.find('.builder-insert-menu-input').val() || '');
+
+    // Has forecolor/backcolor anywhere? If not, disable color UI in editor entirely.
+    const _flatToolbarTokens = [].concat.apply([], toolbarRows);
+    const _ctxStr = contextToolbar ? String(contextToolbarSelection || '') : '';
+    const _insStr = String(insertMenuItems || '');
+    const hasColorAnywhere =
+        _flatToolbarTokens.indexOf('forecolor') !== -1 ||
+        _flatToolbarTokens.indexOf('backcolor') !== -1 ||
+        /\bforecolor\b/.test(_ctxStr) || /\bbackcolor\b/.test(_ctxStr) ||
+        /\bforecolor\b/.test(_insStr) || /\bbackcolor\b/.test(_insStr);
+
+    // Build menu overrides (insert + format). TinyMCE merges per-key, others stay default.
+    const _menuEntries = [];
     if (menubar && insertMenuItems) {
-        configStr += `menu: {\n  insert: { title: 'Insert', items: '${insertMenuItems}' }\n},\n`;
+        _menuEntries.push(`insert: { title: 'Insert', items: '${insertMenuItems}' }`);
+    }
+    if (menubar && !hasColorAnywhere) {
+        // Default Format menu minus forecolor/backcolor
+        _menuEntries.push(`format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | language | removeformat' }`);
+    }
+    if (_menuEntries.length > 0) {
+        configStr += `menu: {\n  ${_menuEntries.join(',\n  ')}\n},\n`;
     }
 
     if (plugins.length > 0) {
@@ -2992,11 +3042,15 @@ function generateConfig($textarea, $builderBody) {
 },\n`;
     }
 
-    if (!customColorsEnabled) {
+    if (!customColorsEnabled || !hasColorAnywhere) {
         configStr += 'custom_colors: false,\n';
     }
+    if (!hasColorAnywhere) {
+        // No color toolbar items -> empty palette so any leftover access (e.g. via API) has nothing to pick
+        configStr += 'color_map: [],\n';
+    }
 
-    if (colorMapEnabled && Array.isArray(colorMapRaw) && colorMapRaw.length > 0) {
+    if (hasColorAnywhere && colorMapEnabled && Array.isArray(colorMapRaw) && colorMapRaw.length > 0) {
         if (colorCols !== null) {
             configStr += `color_cols: ${colorCols},\n`;
         }
