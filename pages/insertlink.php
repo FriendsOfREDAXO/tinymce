@@ -4,4 +4,4 @@
         </ul>
 <?php
 require_once rex_path::addon('structure', 'pages/linkmap.php');
-?>
+            ?>
