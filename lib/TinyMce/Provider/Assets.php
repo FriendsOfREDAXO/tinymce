@@ -170,10 +170,11 @@ class Assets
     }
 
     /**
-     * @return array<string, string>
+     * @return array<int|string, string>
      */
     private static function loadProfileNamesById(): array
     {
+        /** @var array<int|string, string> $map */
         $map = [];
 
         try {
