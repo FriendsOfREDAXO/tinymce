@@ -95,7 +95,10 @@ async function buildPlugin(p){
     const full = path.join(pluginDir, rel);
     if (!fs.existsSync(full)) continue;
 
-    const outfile = path.join(outDir, p + '.min.js');
+    // TinyMCE/profiles expect `plugin.min.js` (and an accompanying `plugin.js`)
+    // inside the plugin directory, not `<pluginname>.min.js`. Match the naming
+    // produced by each plugin's own build.js so the fallback is interchangeable.
+    const outfile = path.join(outDir, 'plugin.min.js');
     log('bundle', path.relative(addonRoot, full), '->', path.relative(addonRoot, outfile));
     try{
       await esbuild.build({
@@ -106,7 +109,16 @@ async function buildPlugin(p){
         target: ['es2017'],
         outfile,
         sourcemap: false,
+        // Plugins import from `tinymce`; the per-plugin build scripts mark it
+        // external so the global `tinymce` runtime is reused. Mirror that here
+        // to avoid inlining the entire TinyMCE package into each plugin bundle.
+        external: ['tinymce'],
       });
+
+      // Provide an unminified alias used by some profiles / dev tooling.
+      try {
+        fs.copyFileSync(outfile, path.join(outDir, 'plugin.js'));
+      } catch (_e) { /* ignore */ }
 
       const langsSrc = path.join(pluginDir, 'langs');
       if (fs.existsSync(langsSrc)){

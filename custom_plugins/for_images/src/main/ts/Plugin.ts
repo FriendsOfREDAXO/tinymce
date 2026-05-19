@@ -1135,6 +1135,23 @@ const setup = (editor: Editor, _url: string): void => {
         editor.selection.select(img);
       } catch (e) { /* ignore */ }
 
+      // `mceImage` is only registered when the built-in `image` plugin is
+      // active in the profile. Profiles can toggle plugins independently,
+      // so guard explicitly and tell the user how to fix it instead of
+      // silently doing nothing.
+      const imageAvailable =
+        (editor.plugins && (editor.plugins as Record<string, unknown>).image) ||
+        (typeof editor.queryCommandSupported === 'function' && editor.queryCommandSupported('mceImage'));
+
+      if (!imageAvailable) {
+        editor.notificationManager.open({
+          text: 'Bild-Dialog nicht verfügbar – bitte das Plugin "image" im Profil aktivieren.',
+          type: 'warning',
+          timeout: 5000
+        });
+        return;
+      }
+
       editor.execCommand('mceImage');
     }
   });
