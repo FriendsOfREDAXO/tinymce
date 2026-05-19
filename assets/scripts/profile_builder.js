@@ -14,28 +14,15 @@ function initTinyMceProfileAssistant() {
     $builderContainer.append($builderHeader);
     $builderContainer.append($builderBody);
     
-    // Toggle Button
+    // Toggle Button – die bestehende Konfiguration wird beim Init automatisch
+    // in den Assistenten geladen (siehe loadFromConfig-Aufruf am Ende), daher
+    // gibt es keinen separaten "Konfiguration übernehmen"-Button mehr.
     const $toggleBtn = $('<button type="button" class="btn btn-info" style="margin-bottom: 10px;"><i class="rex-icon fa-magic"></i> ' + (i18n.profile_assistant || 'Profile Assistant') + '</button>');
     $toggleBtn.on('click', function() {
         $builderContainer.slideToggle();
     });
 
-    // Load-from-config Button (populates the builder with the current textarea config)
-    const $loadBtn = $('<button type="button" class="btn btn-default" style="margin-bottom: 10px; margin-left: 6px;" title="' + (i18n.load_from_config_help || '') + '"><i class="rex-icon fa-upload"></i> ' + (i18n.load_from_config || 'Load from current config') + '</button>');
-    $loadBtn.on('click', function() {
-        const loaded = loadFromConfig($textarea, $builderBody);
-        if (loaded) {
-            if (!$builderContainer.is(':visible')) {
-                $builderContainer.slideDown();
-            }
-            alert(i18n.loaded_from_config || 'Configuration loaded into the assistant.');
-        } else {
-            alert(i18n.load_failed || 'Could not parse configuration.');
-        }
-    });
-
     $textarea.before($toggleBtn);
-    $textarea.before($loadBtn);
     $textarea.before($builderContainer);
 
     // Presets
