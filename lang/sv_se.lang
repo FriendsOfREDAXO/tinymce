@@ -212,9 +212,10 @@ tinymce_overwrites_existing_config = Skriver över befintlig konfiguration!
 tinymce_none = Ingen
 
 # imagewidth plugin
-tinymce_imagewidth = Bildbreddsplugin
-tinymce_imagewidth_help = Fasta bildbredder istället för manuell storleksändring. Bilder får CSS-klasser i stället för pixelvärden.
-tinymce_imagewidth_enable = Aktivera bildbreddsplugin
+tinymce_imagewidth = FOR Images
+tinymce_imagewidth_help = Avancerad bildformatering via CSS-klasser i stället för manuell storleksändring: fasta bredder, justering (vänster/höger/centrerad), effekt-klasser (t.ex. skugga, ram, rundning) och &lt;figure&gt;-wrapping med bildtext. Presets för UIkit, Bootstrap och allmänna pixelvärden – inklusive mediapool-ersättning direkt i editorn.
+tinymce_imagewidth_enable = Aktivera FOR Images
+tinymce_imagewidth_plugin_hint = Det här alternativet är kopplat till plugin <code>for_images</code>: om <code>for_images</code> inaktiveras i steg 2 (Plugins) inaktiveras även det här blocket automatiskt – och vice versa.
 tinymce_imagewidth_framework = CSS-ramverk
 tinymce_imagewidth_general = Allmänt (pixelbaserat)
 tinymce_imagewidth_dialog = Dialogknapp i verktygsfältet

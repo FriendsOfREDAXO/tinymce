@@ -263,9 +263,10 @@ function initTinyMceProfileAssistant() {
     settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-yform-add"><i class="rex-icon fa-plus"></i> Add Item</button>';
     settingsHtml += '</div></div>';
 
-    // Image Width Plugin (Preset-based)
-    settingsHtml += '<br><legend><i class="rex-icon fa-image"></i> ' + (i18n.imagewidth || 'Bildformatierung') + '</legend>';
-    settingsHtml += '<p class="help-block">' + (i18n.imagewidth_help || 'Bilder werden in &lt;figure&gt; gewrappt. Breite, Ausrichtung und Effekte als CSS-Klassen.') + '</p>';
+    // FOR Images plugin (preset-based image formatting)
+    settingsHtml += '<br><legend><i class="rex-icon fa-image"></i> ' + (i18n.imagewidth || 'FOR Images') + ' <small class="text-muted" style="font-weight:normal;">(for_images)</small></legend>';
+    settingsHtml += '<p class="help-block">' + (i18n.imagewidth_help || 'Erweiterte Bildformatierung über CSS-Klassen statt manuellem Resize: feste Breiten, Ausrichtung (links/rechts/zentriert), Effekt-Klassen (z. B. Schatten, Rahmen, Rundungen) und &lt;figure&gt;-Wrapping mit Caption. Presets für UIkit, Bootstrap und allgemeine Pixelwerte – inklusive Mediapool-Ersetzen direkt im Editor.') + '</p>';
+    settingsHtml += '<p class="help-block small"><i class="rex-icon fa-info-circle"></i> ' + (i18n.imagewidth_plugin_hint || 'Diese Option ist an das Plugin <code>for_images</code> gekoppelt: Wird <code>for_images</code> in Schritt 2 (Plugins) deaktiviert, wird dieser Block ebenfalls automatisch deaktiviert – und umgekehrt.') + '</p>';
     settingsHtml += '<div class="row">';
     settingsHtml += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-imagewidth-enable"> ' + (i18n.imagewidth_enable || 'Aktivieren') + '</label></div></div>';
     settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.imagewidth_template || 'Vorlage laden') + '</label>';
@@ -1942,6 +1943,13 @@ function initTinyMceProfileAssistant() {
 
     $builderBody.on('change', '.builder-plugin[value="quickbars"]', function() {
         $builderBody.find('.builder-context-toolbar').prop('checked', $(this).is(':checked')).trigger('change');
+    });
+
+    // Issue: for_images aus der Pluginliste entfernen -> auch im Assistenten-Block
+    // "Bildbreiten / for_images" deaktivieren (sonst bliebe das Plugin via
+    // imagewidthEnabled in der serialize-Stufe wieder in der Pluginliste).
+    $builderBody.on('change', '.builder-plugin[value="for_images"]', function() {
+        $builderBody.find('.builder-imagewidth-enable').prop('checked', $(this).is(':checked')).trigger('change');
     });
 
     setToolbarRows([]);

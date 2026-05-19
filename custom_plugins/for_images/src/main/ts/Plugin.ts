@@ -1151,7 +1151,14 @@ const setup = (editor: Editor, _url: string): void => {
     }
   });
 
-  /* SWAP FROM MEDIAPOOL BUTTON */
+  /* SWAP FROM MEDIAPOOL BUTTON
+   *
+   * Delegates to TinyMCE's built-in image dialog (`mceImage`) which uses
+   * the editor's `file_picker_callback` to open the REDAXO mediapool.
+   * The standard dialog updates src/alt on the currently selected image,
+   * which is exactly what we want here. Avoids reinventing the swap flow
+   * (and the URL-converter / DomPurify edge cases that come with it).
+   */
   editor.ui.registry.addButton('imageswappool', {
     icon: 'for_imageswappool_icon',
     tooltip: 'Austauschen aus Medienpool',
@@ -1162,106 +1169,13 @@ const setup = (editor: Editor, _url: string): void => {
         return;
       }
 
-      if (typeof openREXMedia !== 'function') {
-        editor.notificationManager.open({ 
-          text: 'Medienpool ist nicht verfügbar.', 
-          type: 'error', 
-          timeout: 3000 
-        });
-        return;
-      }
-
+      // Ensure the selection is on the IMG (not the wrapping FIGURE/FIGCAPTION)
+      // so the standard image dialog picks it up as "edit existing image".
       try {
-        const mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
+        editor.selection.select(img);
+      } catch (e) { /* ignore */ }
 
-        // Use jQuery to listen for media selection if available
-        if (typeof $ !== 'undefined' && $ && typeof $.fn.on === 'function') {
-          $(mediaPool).on('rex:selectMedia', function (event: any, filename: string) {
-            event.preventDefault();
-            mediaPool.close();
-
-            // Determine the correct path based on file extension
-            const extension = filename.split('.').pop()?.toLowerCase() || '';
-            const useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
-            const imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
-
-            // Get current config to know which classes to remove
-            const config = configCache.get();
-            const figure = getFigureWrap(img);
-            
-            // Remove all preset classes (width, align, effects) to reset to original
-            if (figure) {
-              stripPresetClasses(figure, config.widthPresets);
-              stripPresetClasses(figure, config.alignPresets);
-              stripPresetClasses(figure, config.effectPresets);
-              // Also remove any legacy CKE5 classes
-              stripCke5LegacyClasses(figure);
-              // Remove all attributes/styles
-              if (figure.classList.length === 0) figure.removeAttribute('class');
-            }
-            
-            // Remove old inline dimensions from img
-            img.removeAttribute('width');
-            img.removeAttribute('height');
-            img.style.removeProperty('width');
-            img.style.removeProperty('height');
-            if (img.getAttribute('style') === '') img.removeAttribute('style');
-            
-            // Update the image src with new image
-            img.setAttribute('src', imagePath);
-            
-            // Wait for image to load, then update editor
-            const onImageLoad = () => {
-              img.removeEventListener('load', onImageLoad);
-              img.removeEventListener('error', onImageError);
-              editor.nodeChanged();
-              editor.undoManager.add();
-            };
-            
-            const onImageError = () => {
-              img.removeEventListener('load', onImageLoad);
-              img.removeEventListener('error', onImageError);
-              editor.nodeChanged();
-              editor.undoManager.add();
-            };
-            
-            img.addEventListener('load', onImageLoad);
-            img.addEventListener('error', onImageError);
-            
-            // Try to fetch media metadata (alt text, etc.)
-            if (typeof $ !== 'undefined' && $.getJSON) {
-              $.getJSON(
-                'index.php?rex-api-call=tinymce_media_meta&file=' + encodeURIComponent(filename)
-              ).done(function (meta: any) {
-                if (meta && meta.alt) {
-                  img.setAttribute('alt', meta.alt);
-                }
-              }).fail(function () {
-                // If metadata fetch fails, just keep existing alt or leave empty
-              });
-            }
-            
-            editor.notificationManager.open({
-              text: `Bild erfolgreich aktualisiert: ${filename}`,
-              type: 'success',
-              timeout: 3000
-            });
-          });
-        } else {
-          // Fallback if jQuery is not available
-          editor.notificationManager.open({ 
-            text: 'jQuery ist nicht verfügbar. Bitte verwenden Sie den Standard-Medienpool.', 
-            type: 'warning', 
-            timeout: 5000 
-          });
-        }
-      } catch (e) {
-        editor.notificationManager.open({ 
-          text: 'Medienpool konnte nicht geöffnet werden.', 
-          type: 'error', 
-          timeout: 3000 
-        });
-      }
+      editor.execCommand('mceImage');
     }
   });
 

@@ -255,46 +255,35 @@ Empfohlene lokale Checks vor einem PR/Commit:
 
 ## Build-Prozess im Detail
 
-Der Build besteht aus zwei Schritten: Vendor-Dateien bereitstellen und Custom-Plugins bauen/synchronisieren.
+Der Build besteht aus zwei klar getrennten Strängen: TinyMCE-Core (Vendor) und Custom-Plugins. **Die beiden Asset-Bäume dürfen sich nicht überlappen.**
+
+### Asset-Layout (verbindlich)
+
+| Verzeichnis | Inhalt | Quelle | Eigentümer-Skript |
+| --- | --- | --- | --- |
+| `assets/vendor/tinymce/` | NUR upstream TinyMCE aus dem npm-Paket `tinymce` (Core, Themes, Icons, Models, Skins, Core-Plugins) | `node_modules/tinymce` | `scripts/vendor-copy.js` |
+| `assets/scripts/tinymce/plugins/` | Alle Custom-Plugins dieses AddOns (Build-Output aus `custom_plugins/*`) | `custom_plugins/<name>/` | `scripts/build-plugins.js` + per-plugin `build-copy` |
+| Externe Plugins anderer AddOns | werden zur Laufzeit über `PluginRegistry::addPlugin()` als `external_plugins`-URL registriert | – | – |
+
+**Regel:** Niemals Custom-Plugins nach `assets/vendor/tinymce/plugins/` kopieren. Dieser Pfad ist reserviert für upstream Core-Plugins. Andernfalls überschreibt das nächste `vendor:copy` Custom-Dateien, und es entstehen Dubletten mit divergierenden Cache-Bustern.
 
 ### Typische Abläufe
 
-- Vollständiger Build:
-    - `pnpm run build`
-    - Führt intern `build:staging` und danach `build:sync` aus.
-- Nur Plugins neu bauen:
-    - `pnpm run plugins:build`
-- Nur Vendor-Dateien aktualisieren:
-    - `pnpm run vendor:copy`
-- Aufräumen:
-    - `pnpm run clean-build`
+- Vollständiger Build: `pnpm run build` (führt intern `build:staging` und `build:sync` aus)
+- Nur Custom-Plugins: `pnpm run plugins:build`
+- Nur Vendor: `pnpm run vendor:copy`
+- Aufräumen: `pnpm run clean-build` (löscht `build/` und räumt versehentlich im Vendor-Baum gelandete Custom-Plugin-Ordner auf)
 
 ### Was die Skripte machen
 
-- `vendor-copy.js`
-    - kopiert TinyMCE-Vendor-Dateien in das AddOn-Asset-Ziel.
-- `build-plugins.js`
-    - baut Plugins aus `custom_plugins/*` (minifiziert/bündelt).
-- `sync-build-to-assets.js`
-    - synchronisiert Build-Ergebnisse in die endgültigen `assets/`-Ziele.
-- `clean-build.js`
-    - entfernt Build-Artefakte für einen sauberen Neuaufbau.
-
-### Wann welcher Build nötig ist
-
-- Änderung in `custom_plugins/*`:
-    - mindestens `pnpm run plugins:build`, empfohlen `pnpm run build`.
-- Änderung an Vendor-Versionen oder Vendor-Dateien:
-    - `pnpm run vendor:copy`, danach empfohlen `pnpm run build`.
-- Nur PHP-Logik (ohne JS/Assets):
-    - kein vollständiger Node-Build zwingend, aber rexstan + kurzer Backend-Test.
+- `vendor-copy.js`: kopiert `node_modules/tinymce` nach `assets/vendor/tinymce/` (bzw. `build/vendor/tinymce/` im Staging). Fasst sonst nichts an.
+- `build-plugins.js`: iteriert über `custom_plugins/*`, ruft pro Plugin `pnpm run build` auf und kopiert das Ergebnis ausschließlich nach `assets/scripts/tinymce/plugins/<name>/` (bzw. `build/plugins/<name>/`). Schreibt nie in den Vendor-Baum.
+- `sync-build-to-assets.js`: spiegelt `build/vendor/tinymce/` → `assets/vendor/tinymce/` und `build/plugins/` → `assets/scripts/tinymce/plugins/`. Keine Cross-Kopien.
+- `clean-build.js`: entfernt `build/` und löscht in `assets/vendor/tinymce/plugins/` alle Unterordner, deren Namen einem Eintrag in `custom_plugins/` entsprechen (Altlast-Cleanup).
 
 ### CI-Hinweis
 
-Für CI ist der übliche Ablauf:
-
-- `pnpm install && pnpm run build`
-- anschließend Artefakte unter `assets/scripts/tinymce/plugins` und `assets/vendor/tinymce/plugins` prüfen.
+`pnpm install && pnpm run build`. Sanity-Check danach: `assets/vendor/tinymce/plugins/` darf KEINE Namen aus `custom_plugins/` enthalten.
 
 ## Best Practices für AddOn-Integratoren
 

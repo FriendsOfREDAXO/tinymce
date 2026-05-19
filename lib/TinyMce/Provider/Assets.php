@@ -334,6 +334,7 @@ class Assets
                 'imagewidth' => \rex_i18n::msg('tinymce_imagewidth'),
                 'imagewidth_help' => \rex_i18n::rawMsg('tinymce_imagewidth_help'),
                 'imagewidth_enable' => \rex_i18n::msg('tinymce_imagewidth_enable'),
+                'imagewidth_plugin_hint' => \rex_i18n::rawMsg('tinymce_imagewidth_plugin_hint'),
                 'imagewidth_framework' => \rex_i18n::msg('tinymce_imagewidth_framework'),
                 'imagewidth_general' => \rex_i18n::msg('tinymce_imagewidth_general'),
                 'imagewidth_dialog' => \rex_i18n::msg('tinymce_imagewidth_dialog'),

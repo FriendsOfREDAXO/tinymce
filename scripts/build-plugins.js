@@ -1,4 +1,23 @@
 #!/usr/bin/env node
+/**
+ * Build pipeline for the addon's CUSTOM TinyMCE plugins.
+ *
+ * Source:   custom_plugins/<name>/
+ * Target:   assets/scripts/tinymce/plugins/<name>/  (or build/plugins/<name>/ with --staging)
+ *
+ * IMPORTANT: This script must NEVER write into assets/vendor/tinymce/.
+ *   - assets/vendor/tinymce/  contains ONLY upstream TinyMCE core
+ *     (npm package `tinymce`), maintained exclusively by scripts/vendor-copy.js.
+ *   - Our custom plugins are loaded via `external_plugins` URLs that point
+ *     into assets/scripts/tinymce/plugins/<name>/plugin.min.js
+ *
+ * Why the separation matters:
+ *   - Mixing custom plugins into the vendor tree made plugin updates from
+ *     upstream destructive (custom files would be deleted by vendor-copy).
+ *   - It also produced duplicate plugin.min.js with diverging cache busters.
+ *   - And it gave the false impression that those plugins ship with TinyMCE.
+ */
+
 const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
@@ -8,83 +27,68 @@ const fg = require('fast-glob');
 
 const addonRoot = path.resolve(__dirname, '..');
 const customRoot = path.join(addonRoot, 'custom_plugins');
-const destRoot = path.join(addonRoot, 'assets', 'scripts', 'tinymce', 'plugins');
 
-function log(...args){ console.log('[build-plugins]', ...args); }
+const args = process.argv.slice(2);
+const staging = args.includes('--staging');
 
+const destRoot = staging
+  ? path.join(addonRoot, 'build', 'plugins')
+  : path.join(addonRoot, 'assets', 'scripts', 'tinymce', 'plugins');
+
+function log(...a){ console.log('[build-plugins]', ...a); }
 async function ensureDir(dir){ await fsp.mkdir(dir, { recursive: true }); }
 async function removeDir(dir){ if (fs.existsSync(dir)) await fsp.rm(dir, { recursive: true, force: true }); }
 
 async function copyRecursive(src, dest){
-  // copy everything from src into dest (dir -> dir)
   if (!fs.existsSync(src)) return;
   await ensureDir(dest);
-  // prefer fs.cp if available
   if (fsp.cp) return fsp.cp(src, dest, { recursive: true });
   const files = await fg(['**/*'], { cwd: src, dot: true, onlyFiles: false });
   for (const f of files){
     const s = path.join(src, f);
     const d = path.join(dest, f);
     const st = await fsp.stat(s);
-    if (st.isDirectory()){
-      await ensureDir(d);
-    } else {
-      await ensureDir(path.dirname(d));
-      await fsp.copyFile(s, d);
-    }
+    if (st.isDirectory()) await ensureDir(d);
+    else { await ensureDir(path.dirname(d)); await fsp.copyFile(s, d); }
   }
 }
-
-const args = process.argv.slice(2);
-const staging = args.includes('--staging');
 
 async function buildPlugin(p){
   const pluginDir = path.join(customRoot, p);
   if (!fs.existsSync(pluginDir)) return;
 
-  log('processing', p);
-
-  const stagingRoot = path.join(addonRoot, staging ? 'build' : 'assets');
-  const vendorOut = path.join(stagingRoot, 'vendor', 'tinymce', 'plugins', p);
-  const outDir = path.join(staging ? path.join(addonRoot, 'build', 'plugins') : destRoot, p);
-
+  const outDir = path.join(destRoot, p);
   await removeDir(outDir);
   await ensureDir(outDir);
 
-  // Possible prebuilt locations to copy from
+  // Prefer prebuilt artifacts produced by the plugin's own build script.
   const candidates = [
     path.join(pluginDir, 'dist', p),
     path.join(pluginDir, 'dist'),
     path.join(pluginDir, 'build'),
-    path.join(pluginDir, 'lib')
+    path.join(pluginDir, 'lib'),
   ];
 
   for (const c of candidates){
     if (fs.existsSync(c)){
-      log('copying prebuilt from', c, '->', outDir);
+      log('copy prebuilt', path.relative(addonRoot, c), '->', path.relative(addonRoot, outDir));
       await copyRecursive(c, outDir);
-      // also place in vendor plugins so Tiny can load plugin via regular plugin path
-      try{
-        await removeDir(vendorOut);
-        await copyRecursive(c, vendorOut);
-        log('copied prebuilt into vendor ->', vendorOut);
-      }catch(e){ log('failed to copy prebuilt into vendor for', p, e.message); }
       return;
     }
   }
 
-  // If no prebuilt artifact, try to bundle a common entrypoint with esbuild.
-  // Wichtig: Main.ts kommt VOR Plugin.ts, weil Plugin.ts in der TinyMCE-Konvention
-  // nur die Setup-Funktion exportiert (`export default (): void => {...}`), während
-  // Main.ts diese tatsächlich aufruft (`Plugin();`). Würde esbuild Plugin.ts als
-  // Entry nehmen, fehlt im IIFE-Output der Aufruf und das Plugin registriert sich nie.
+  // Fallback: bundle a known entrypoint with esbuild.
+  // Main.ts MUST come before Plugin.ts: TinyMCE convention is that Plugin.ts
+  // only exports the setup function (`export default (): void => {...}`),
+  // while Main.ts actually invokes it (`Plugin();`). Picking Plugin.ts as the
+  // IIFE entry would produce a bundle that never registers itself.
   const entryCandidates = [
     'src/main/ts/Main.ts',
     'src/main/ts/api/Main.ts',
     'src/main/ts/Plugin.ts',
     'src/main/index.ts',
     'src/main.js',
-    'src/index.js'
+    'src/index.js',
   ];
 
   for (const rel of entryCandidates){
@@ -92,7 +96,7 @@ async function buildPlugin(p){
     if (!fs.existsSync(full)) continue;
 
     const outfile = path.join(outDir, p + '.min.js');
-    log('bundling', full, '->', outfile);
+    log('bundle', path.relative(addonRoot, full), '->', path.relative(addonRoot, outfile));
     try{
       await esbuild.build({
         entryPoints: [full],
@@ -100,27 +104,16 @@ async function buildPlugin(p){
         minify: true,
         format: 'iife',
         target: ['es2017'],
-        outfile: outfile,
-        sourcemap: false
+        outfile,
+        sourcemap: false,
       });
 
-      // copy languages if present
       const langsSrc = path.join(pluginDir, 'langs');
       if (fs.existsSync(langsSrc)){
         await copyRecursive(langsSrc, path.join(outDir, 'langs'));
-        try{ await ensureDir(vendorOut); await copyRecursive(langsSrc, path.join(vendorOut, 'langs')); }catch(e){}
       }
-
-      // copy built file into vendor plugins (minified + plugin.js fallback)
-      try{
-        await ensureDir(vendorOut);
-        await fsp.copyFile(outfile, path.join(vendorOut, p + '.min.js')).catch(()=>{});
-        await fsp.copyFile(outfile, path.join(vendorOut, 'plugin.js')).catch(()=>{});
-        log('wrote plugin files into vendor ->', vendorOut);
-      }catch(e){ log('failed to write vendor plugin files for', p, e.message); }
-
       return;
-    }catch(err){
+    } catch (err){
       log('esbuild failed for', p, err.message || err);
     }
   }
@@ -129,16 +122,13 @@ async function buildPlugin(p){
 }
 
 async function main(){
-  const args = process.argv.slice(2);
   if (args.includes('--clean')){
-    const target = staging ? path.join(addonRoot, 'build', 'plugins') : destRoot;
-    log('cleaning plugin assets in', target);
-    await removeDir(target);
+    log('cleaning', path.relative(addonRoot, destRoot));
+    await removeDir(destRoot);
     return;
   }
 
-  const ensureRoot = staging ? path.join(addonRoot, 'build', 'plugins') : destRoot;
-  await ensureDir(ensureRoot);
+  await ensureDir(destRoot);
 
   if (!fs.existsSync(customRoot)){
     log('no custom_plugins dir found, nothing to do');
@@ -149,6 +139,7 @@ async function main(){
   const plugins = items.filter(i => i.isDirectory()).map(i => i.name);
 
   for (const p of plugins){
+    log('processing', p);
     const pluginDir = path.join(customRoot, p);
     const packageJson = path.join(pluginDir, 'package.json');
 
@@ -156,17 +147,18 @@ async function main(){
       try{
         const pkg = JSON.parse(await fsp.readFile(packageJson, 'utf8'));
         if (pkg.scripts && pkg.scripts.build){
-          log('running build script for', p);
-          try{ execSync('pnpm run build', { stdio: 'inherit', cwd: pluginDir }); }
-          catch(e){ log('plugin build failed for', p, '- continuing (error ignored)'); }
+          log('  run plugin build script');
+          try { execSync('pnpm run build', { stdio: 'inherit', cwd: pluginDir }); }
+          catch (e) { log('  plugin build failed for', p, '- continuing (error ignored)'); }
         }
-      }catch(e){ log('failed reading package.json for', p, e.message); }
+      } catch (e) { log('failed reading package.json for', p, e.message); }
     }
 
     await buildPlugin(p);
   }
 
-  log('done');
+  log('done. Custom plugins are now in', path.relative(addonRoot, destRoot));
+  log('Vendor tree (assets/vendor/tinymce/) was NOT touched - that is intentional.');
 }
 
 main().catch(e => { console.error(e); process.exitCode = 1; });
