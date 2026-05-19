@@ -85,7 +85,7 @@ function initTinyMceProfileAssistant() {
     const toolbarSuggestions = toolbarButtons.slice();
     toolbarSuggestions.push('|');
 
-    let toolbarHtml = '<legend>' + (i18n.toolbar || 'Toolbar') + '</legend><p class="help-block">' + (i18n.toolbar_help || 'Manage one or more toolbars. Each row becomes one TinyMCE toolbar line.') + '</p>';
+    let toolbarHtml = '<legend class="builder-subsection-title"><i class="rex-icon fa-wrench"></i> ' + (i18n.toolbar || 'Toolbar') + '</legend><p class="help-block">' + (i18n.toolbar_help || 'Manage one or more toolbars. Each row becomes one TinyMCE toolbar line.') + '</p>';
     toolbarHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-toolbar-enabled" checked> <strong>' + (i18n.toolbar_enabled || 'Show toolbar') + '</strong></label><p class="help-block">' + (i18n.toolbar_enabled_help || 'Disable this to generate <code>toolbar: false</code>. This keeps profiles without a toolbar compatible with TinyMCE.') + '</p></div>';
     toolbarHtml += '<div class="builder-toolbar-settings">';
     toolbarHtml += '<div class="row"><div class="col-md-4"><div class="form-group"><label>' + (i18n.toolbar_mode || 'Toolbar view') + '</label><select class="form-control builder-toolbar-mode">';
@@ -98,225 +98,258 @@ function initTinyMceProfileAssistant() {
     toolbarHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.toolbar_result || 'Toolbar String (Result)') + '</label><textarea class="form-control builder-toolbar-input" rows="3" readonly></textarea></div>';
     toolbarHtml += '</div>';
 
-    // Common Settings
-    let settingsHtml = '<br><legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="text" class="form-control builder-height" value="400" placeholder="400, 400px, 20em"><p class="help-block" style="margin-top:4px;">' + (i18n.height_help || 'Zahl = Pixel, sonst gültiger CSS-Wert (<code>px</code>, <code>pt</code>, <code>em</code>). Laut TinyMCE-Doku sind <code>%</code>, <code>vh</code> und <code>auto</code> <strong>nicht</strong> unterstützt – für variable Höhe bitte Autoresize anhaken.') + '</p></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.width || 'Breite') + '</label><input type="text" class="form-control builder-width" placeholder="auto, 100%, 800, 50vh"><p class="help-block" style="margin-top:4px;">' + (i18n.width_help || 'Optional. Zahl = Pixel, sonst CSS-Wert (unterstützt <code>%</code>, <code>em</code>, <code>vh</code> …). Leer lassen = volle Container-Breite.') + '</p></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.language || 'Language') + '</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="checkbox" style="margin-top: 25px;"><label><input type="checkbox" class="builder-menubar" checked> ' + (i18n.menubar || 'Show Menubar') + '</label></div></div>';
-    settingsHtml += '</div>';
+    // Heading-Helper fuer die Gruppen-Ueberschriften (Schritt 1..5).
+    // Visuelles Styling kommt aus css/profile_builder.css (Balken + Darkmode).
+    const groupTitle = (num, icon, label) =>
+        '<h3 class="builder-group-title">'
+        + '<span class="builder-group-num">' + num + '</span>'
+        + '<i class="rex-icon ' + icon + '"></i>'
+        + '<span class="builder-group-label">' + label + '</span>'
+        + '</h3>';
 
-    // Resize & Autoresize
-    settingsHtml += '<div class="row">';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.resize_handle || 'Resize-Handle') + '</label><select class="form-control builder-resize"><option value="true" selected>' + (i18n.resize_vertical || 'vertikal (Standard)') + '</option><option value="false">' + (i18n.resize_off || 'aus') + '</option><option value="both">' + (i18n.resize_both || 'beide Richtungen') + '</option></select></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.min_height || 'Min-Höhe (px)') + '</label><input type="number" class="form-control builder-min-height" placeholder="100" min="0"></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.max_height || 'Max-Höhe (px)') + '</label><input type="number" class="form-control builder-max-height" placeholder="" min="0"></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="checkbox" style="margin-top: 25px;"><label><input type="checkbox" class="builder-autoresize"> <strong>' + (i18n.autoresize || 'Autoresize (Editor wächst mit Inhalt)') + '</strong></label><p class="help-block" style="margin-top:4px;">' + (i18n.autoresize_help || 'Aktiviert das <code>autoresize</code>-Plugin. <code>min_height</code>/<code>max_height</code> setzen die Grenzen des automatischen Wachstums, <code>height</code> wird ignoriert.') + '</p></div></div>';
-    settingsHtml += '</div>';
+    // ===== GRUPPE 1: GRUNDEINSTELLUNGEN =====
+    // Editor-Geometrie, UI-Verhalten, URL-/Encoding-Optionen – alles "global wirkende".
+    let group1Html = groupTitle('1', 'fa-cog', i18n.group_basics || 'Grundeinstellungen');
 
-    // Advanced Settings
-    settingsHtml += '<br><legend>' + (i18n.advanced_settings || 'Advanced Settings') + '</legend><div class="row">';
-    
+    // 1a) Editor-Geometrie & Sprache
+    group1Html += '<legend>' + (i18n.common_settings || 'Common Settings') + '</legend><div class="row">';
+    group1Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.height || 'Height') + '</label><input type="text" class="form-control builder-height" value="400" placeholder="400, 400px, 20em"><p class="help-block">' + (i18n.height_help || 'Zahl = Pixel, sonst gültiger CSS-Wert (<code>px</code>, <code>pt</code>, <code>em</code>). Laut TinyMCE-Doku sind <code>%</code>, <code>vh</code> und <code>auto</code> <strong>nicht</strong> unterstützt – für variable Höhe bitte Autoresize anhaken.') + '</p></div></div>';
+    group1Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.width || 'Breite') + '</label><input type="text" class="form-control builder-width" placeholder="auto, 100%, 800, 50vh"><p class="help-block">' + (i18n.width_help || 'Optional. Zahl = Pixel, sonst CSS-Wert (unterstützt <code>%</code>, <code>em</code>, <code>vh</code> …). Leer lassen = volle Container-Breite.') + '</p></div></div>';
+    group1Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.language || 'Language') + '</label><input type="text" class="form-control builder-lang" value="de"></div></div>';
+    group1Html += '</div>';
+
+    // 1b) Resize & Autoresize
+    group1Html += '<div class="row">';
+    group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.resize_handle || 'Resize-Handle') + '</label><select class="form-control builder-resize"><option value="true" selected>' + (i18n.resize_vertical || 'vertikal (Standard)') + '</option><option value="false">' + (i18n.resize_off || 'aus') + '</option><option value="both">' + (i18n.resize_both || 'beide Richtungen') + '</option></select></div></div>';
+    group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.min_height || 'Min-Höhe (px)') + '</label><input type="number" class="form-control builder-min-height" placeholder="100" min="0"></div></div>';
+    group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.max_height || 'Max-Höhe (px)') + '</label><input type="number" class="form-control builder-max-height" placeholder="" min="0"></div></div>';
+    group1Html += '<div class="col-md-3"><div class="checkbox builder-checkbox-align"><label><input type="checkbox" class="builder-autoresize"> <strong>' + (i18n.autoresize || 'Autoresize (Editor wächst mit Inhalt)') + '</strong></label><p class="help-block">' + (i18n.autoresize_help || 'Aktiviert das <code>autoresize</code>-Plugin. <code>min_height</code>/<code>max_height</code> setzen die Grenzen des automatischen Wachstums, <code>height</code> wird ignoriert.') + '</p></div></div>';
+    group1Html += '</div>';
+
+    // 1c) Editor-Chrome: Menueleiste & Auto-Hide Toolbar
+    group1Html += '<div class="row">';
+    group1Html += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-menubar" checked> ' + (i18n.menubar || 'Show Menubar') + '</label></div></div>';
+    group1Html += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-auto-hide-toolbar"> ' + (i18n.auto_hide_toolbar || 'Auto-Hide Toolbar') + '</label><p class="help-block">' + (i18n.auto_hide_toolbar_help || 'Menue-, Werkzeug- und Statusleiste werden eingeklappt und erst beim <strong>Hovern</strong> oder wenn der Editor den <strong>Fokus</strong> bekommt eingeblendet. Spart vertikalen Platz in kompakten Formularen.') + '</p></div></div>';
+    group1Html += '</div>';
+
+    // 1d) URL- und Encoding-Optionen (frueher quer ueber "Advanced" verteilt)
+    group1Html += '<br><legend class="builder-subsection-title"><i class="rex-icon fa-link"></i> ' + (i18n.url_encoding_options || 'URL & Encoding') + '</legend><div class="row">';
+    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-relative-urls"> ' + (i18n.relative_urls || 'Relative URLs') + '</label></div></div>';
+    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-remove-script-host" checked> ' + (i18n.remove_script_host || 'Remove Script Host') + '</label></div></div>';
+    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls" checked> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
+    group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.document_base_url || 'Document Base URL') + '</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
+    group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.entity_encoding || 'Entity Encoding') + '</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
+    group1Html += '</div>';
+    group1Html += '</div>';
+
+    // ===== GRUPPE 3: TOOLBARS & MENUES (Erweiterungen zur Haupt-Toolbar) =====
+    // Haupt-Toolbar steckt bereits in toolbarHtml (oberhalb). Hier nur Context-Toolbar
+    // und Insert-Menue, beide jetzt gleichrangig nebeneinander – das Insert-Menue ist
+    // nicht mehr als Sub-Block der Context-Toolbar verschachtelt.
+    // Untergruppe von Schritt 3 – kein eigener Schritt-Header, nur ein Sub-Legend.
+    let group3ExtrasHtml = '<legend class="builder-subsection-title"><i class="rex-icon fa-th-list"></i> ' + (i18n.group_toolbar_extras || 'Context-Toolbar & Einfügen-Menü') + '</legend>';
+
     // Context Toolbar
-    settingsHtml += '<div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar"> <strong>' + (i18n.context_toolbar || 'Context Toolbar (Quickbars)') + '</strong></label><p class="help-block">' + (i18n.context_toolbar_help || 'Shows tools directly at the cursor when text is selected.') + '</p></div></div>';
-    settingsHtml += '<div class="col-md-12 builder-context-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
-    
-    // Context Toolbar Builder - use same toolbar-row pattern
-    settingsHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.context_items || 'Context Toolbar Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
-    settingsHtml += '<div class="builder-context-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
-    settingsHtml += '<div class="builder-toolbar-pill-dropzone">';
-    settingsHtml += '<ul class="builder-toolbar-pill-list builder-context-pill-list" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
-    settingsHtml += '<div class="builder-toolbar-inline-picker builder-context-inline-picker">';
-    settingsHtml += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-context-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
-    settingsHtml += '<div class="builder-toolbar-inline-picker-list builder-context-inline-picker-list"></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '</div>';
-    settingsHtml += '</div></div>';
-    
-    settingsHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.context_result || 'Context Toolbar Code') + '</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
-    
-    settingsHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar-insert"> ' + (i18n.show_insert_toolbar || 'Show Insert Toolbar') + '</label></div>';
-    settingsHtml += '<div class="col-md-12 builder-insert-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
-    settingsHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.insert_items || 'Insert Menu Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
-    settingsHtml += '<div class="builder-insert-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
-    settingsHtml += '<div class="builder-toolbar-pill-dropzone">';
-    settingsHtml += '<ul class="builder-toolbar-pill-list builder-insert-pill-list" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
-    settingsHtml += '<div class="builder-toolbar-inline-picker builder-insert-inline-picker">';
-    settingsHtml += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-insert-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
-    settingsHtml += '<div class="builder-toolbar-inline-picker-list builder-insert-inline-picker-list"></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '</div>';
-    settingsHtml += '</div></div>';
-    
-    settingsHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.insert_result || 'Insert Menu Code') + '</label><input type="text" class="form-control builder-insert-menu-input" value="" readonly></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '</div>';
+    group3ExtrasHtml += '<div class="row"><div class="col-md-12">';
+    group3ExtrasHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar"> <strong>' + (i18n.context_toolbar || 'Context Toolbar (Quickbars)') + '</strong></label><p class="help-block">' + (i18n.context_toolbar_help || 'Shows tools directly at the cursor when text is selected.') + '</p></div>';
+    group3ExtrasHtml += '<div class="builder-context-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
+    group3ExtrasHtml += '<div class="panel panel-primary"><div class="panel-heading">' + (i18n.context_items || 'Context Toolbar Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
+    group3ExtrasHtml += '<div class="builder-context-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
+    group3ExtrasHtml += '<div class="builder-toolbar-pill-dropzone">';
+    group3ExtrasHtml += '<ul class="builder-toolbar-pill-list builder-context-pill-list" id="builder-context-selected-items" style="margin-bottom: 0;"></ul>';
+    group3ExtrasHtml += '<div class="builder-toolbar-inline-picker builder-context-inline-picker">';
+    group3ExtrasHtml += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-context-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    group3ExtrasHtml += '<div class="builder-toolbar-inline-picker-list builder-context-inline-picker-list"></div>';
+    group3ExtrasHtml += '</div></div></div></div>';
+    group3ExtrasHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.context_result || 'Context Toolbar Code') + '</label><input type="text" class="form-control builder-context-toolbar-selection" value="bold italic | link h2 h3 blockquote" readonly></div>';
+    group3ExtrasHtml += '</div>';
+    group3ExtrasHtml += '</div></div>';
 
-    // Auto Hide Toolbar
-    settingsHtml += '<div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-auto-hide-toolbar"> ' + (i18n.auto_hide_toolbar || 'Auto-Hide Toolbar') + '</label></div></div>';
+    // Insert Menue – eigenstaendig, nicht mehr in Context-Toolbar verschachtelt
+    group3ExtrasHtml += '<div class="row" style="margin-top:10px;"><div class="col-md-12">';
+    group3ExtrasHtml += '<div class="checkbox"><label><input type="checkbox" class="builder-context-toolbar-insert"> <strong>' + (i18n.show_insert_toolbar || 'Show Insert Toolbar') + '</strong></label></div>';
+    group3ExtrasHtml += '<div class="builder-insert-toolbar-options" style="display:none; padding-left: 20px; margin-bottom: 15px; border-left: 3px solid #eee;">';
+    group3ExtrasHtml += '<div class="panel panel-default"><div class="panel-heading">' + (i18n.insert_items || 'Insert Menu Items (Drag to reorder)') + '</div><div class="panel-body builder-dropzone-panel-body">';
+    group3ExtrasHtml += '<div class="builder-insert-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
+    group3ExtrasHtml += '<div class="builder-toolbar-pill-dropzone">';
+    group3ExtrasHtml += '<ul class="builder-toolbar-pill-list builder-insert-pill-list" id="builder-insert-selected-items" style="margin-bottom: 0;"></ul>';
+    group3ExtrasHtml += '<div class="builder-toolbar-inline-picker builder-insert-inline-picker">';
+    group3ExtrasHtml += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-insert-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    group3ExtrasHtml += '<div class="builder-toolbar-inline-picker-list builder-insert-inline-picker-list"></div>';
+    group3ExtrasHtml += '</div></div></div></div>';
+    group3ExtrasHtml += '<div class="form-group" style="display:none;"><label>' + (i18n.insert_result || 'Insert Menu Code') + '</label><input type="text" class="form-control builder-insert-menu-input" value="" readonly></div>';
+    group3ExtrasHtml += '</div>';
+    group3ExtrasHtml += '</div></div>';
 
-    // Image Options
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-caption" checked> ' + (i18n.image_caption || 'Image Caption') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-uploadtab"> ' + (i18n.image_uploadtab || 'Image Upload Tab') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.media_manager_type || 'Media Manager Type') + '</label><input type="text" class="form-control builder-media-type" placeholder="tiny"></div></div>';
-    
-    // URL Options
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-relative-urls"> ' + (i18n.relative_urls || 'Relative URLs') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-remove-script-host" checked> ' + (i18n.remove_script_host || 'Remove Script Host') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls" checked> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
-    
-    settingsHtml += '</div><div class="row" style="margin-top:10px;">';
-    
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.document_base_url || 'Document Base URL') + '</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.entity_encoding || 'Entity Encoding') + '</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
-    
-    settingsHtml += '</div>';
+    // ===== GRUPPE 4: PRESETS & DEFAULTS =====
+    // Sammelt alles, was Inhalte/Formate vor-konfiguriert (Sprachmenue, Farben,
+    // Link-Defaults, Codesample/RelList, YForm-Link).
+    let group4Html = groupTitle('4', 'fa-magic', i18n.group_presets || 'Presets & Defaults');
 
-    // Content Languages (für Sprach-Menü / language-Toolbar-Button)
-    settingsHtml += '<br><legend><i class="rex-icon fa-language"></i> ' + (i18n.content_langs || 'Sprach-Menü (content_langs)') + '</legend>';
-    settingsHtml += '<p class="help-block">' + (i18n.content_langs_help || 'Liste der Sprachen für den <code>language</code>-Toolbar-Button bzw. das Format-Menü. Markiert Textabschnitte mit einem <code>lang</code>-Attribut (wichtig für Screenreader/SEO).') + '</p>';
-    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
-    settingsHtml += '<table class="table table-striped" id="builder-contentlangs-table"><thead><tr>';
-    settingsHtml += '<th style="width:30%">' + (i18n.content_langs_title || 'Titel') + '</th>';
-    settingsHtml += '<th style="width:20%">' + (i18n.content_langs_code || 'Code (lang)') + '</th>';
-    settingsHtml += '<th style="width:25%">' + (i18n.content_langs_customcode || 'Custom-Code (optional)') + '</th>';
-    settingsHtml += '<th style="width:15%">' + (i18n.content_langs_default || 'Standard') + '</th>';
-    settingsHtml += '<th style="width:10%"></th>';
-    settingsHtml += '</tr></thead><tbody></tbody></table>';
-    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-contentlangs-add"><i class="rex-icon fa-plus"></i> ' + (i18n.content_langs_add || 'Sprache hinzufügen') + '</button> ';
-    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-contentlangs-presets"><i class="rex-icon fa-magic"></i> ' + (i18n.content_langs_presets || 'Standard-Set einfügen (de/en/fr/es/it)') + '</button>';
-    settingsHtml += '<p class="help-block" style="margin-top:8px;">' + (i18n.content_langs_hint || '<strong>Titel</strong>: Beschriftung im Menü. <strong>Code</strong>: BCP-47-Sprachcode (z. B. <code>de</code>, <code>en</code>, <code>de-CH</code>). <strong>Custom-Code</strong>: optional, wird als <code>data-mce-lang</code> gesetzt. <strong>Standard</strong>: setzt zusätzlich <code>language</code> (UI-Sprache) auf diesen Code. Leer lassen = Sprach-Menü deaktiviert.') + '</p>';
-    settingsHtml += '</div></div>';
+    // 4a) Content Languages
+    group4Html += '<legend><i class="rex-icon fa-language"></i> ' + (i18n.content_langs || 'Sprach-Menü (content_langs)') + '</legend>';
+    group4Html += '<p class="help-block">' + (i18n.content_langs_help || 'Liste der Sprachen für den <code>language</code>-Toolbar-Button bzw. das Format-Menü. Markiert Textabschnitte mit einem <code>lang</code>-Attribut (wichtig für Screenreader/SEO).') + '</p>';
+    group4Html += '<div class="panel panel-default"><div class="panel-body">';
+    group4Html += '<table class="table table-striped" id="builder-contentlangs-table"><thead><tr>';
+    group4Html += '<th style="width:30%">' + (i18n.content_langs_title || 'Titel') + '</th>';
+    group4Html += '<th style="width:20%">' + (i18n.content_langs_code || 'Code (lang)') + '</th>';
+    group4Html += '<th style="width:25%">' + (i18n.content_langs_customcode || 'Custom-Code (optional)') + '</th>';
+    group4Html += '<th style="width:15%">' + (i18n.content_langs_default || 'Standard') + '</th>';
+    group4Html += '<th style="width:10%"></th>';
+    group4Html += '</tr></thead><tbody></tbody></table>';
+    group4Html += '<button type="button" class="btn btn-default btn-xs builder-contentlangs-add"><i class="rex-icon fa-plus"></i> ' + (i18n.content_langs_add || 'Sprache hinzufügen') + '</button> ';
+    group4Html += '<button type="button" class="btn btn-default btn-xs builder-contentlangs-presets"><i class="rex-icon fa-magic"></i> ' + (i18n.content_langs_presets || 'Standard-Set einfügen (de/en/fr/es/it)') + '</button>';
+    group4Html += '<p class="help-block" style="margin-top:8px;">' + (i18n.content_langs_hint || '<strong>Titel</strong>: Beschriftung im Menü. <strong>Code</strong>: BCP-47-Sprachcode (z. B. <code>de</code>, <code>en</code>, <code>de-CH</code>). <strong>Custom-Code</strong>: optional, wird als <code>data-mce-lang</code> gesetzt. <strong>Standard</strong>: setzt zusätzlich <code>language</code> (UI-Sprache) auf diesen Code. Leer lassen = Sprach-Menü deaktiviert.') + '</p>';
+    group4Html += '</div></div>';
 
-    // Typografie-Autoreplace (for_chars_symbols)
-    settingsHtml += '<br><legend><i class="rex-icon fa-magic"></i> ' + (i18n.autoreplace || 'Typografie-Autoreplace (for_chars_symbols)') + '</legend>';
-    settingsHtml += '<p class="help-block">' + (i18n.autoreplace_help || 'Live-Ersetzung beim Tippen. Ausgelöst durch <kbd>Leer</kbd>, <kbd>Enter</kbd> und Satzzeichen (<code>. , ; : ! ? ) ] " \' /</code>). Greift nicht in <code>&lt;code&gt;</code>, <code>&lt;pre&gt;</code>, <code>&lt;kbd&gt;</code>, <code>&lt;samp&gt;</code>, <code>&lt;tt&gt;</code>. Alle Ersetzungen sind Undo-fähig.') + '</p>';
-    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
-    settingsHtml += '<div class="row"><div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-enabled"> <strong>' + (i18n.autoreplace_enabled || 'Autoreplace aktivieren') + '</strong></label></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-defaults" checked> ' + (i18n.autoreplace_defaults || 'Default-Regeln nutzen (32 Regeln: (c)→©, (tm)→™, …→…, ->→→, +/-→±, Brüche, …)') + '</label></div></div></div>';
-    settingsHtml += '<div class="row"><div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-disable-emoticons"> ' + (i18n.disable_emoticons || 'Emoji-Tab im Picker ausblenden') + '</label></div></div></div>';
-    settingsHtml += '<hr>';
-    settingsHtml += '<label>' + (i18n.autoreplace_custom || 'Eigene Regeln') + '</label>';
-    settingsHtml += '<table class="table table-striped" id="builder-autoreplace-table"><thead><tr>';
-    settingsHtml += '<th style="width:10%">' + (i18n.autoreplace_type || 'Typ') + '</th>';
-    settingsHtml += '<th style="width:40%">' + (i18n.autoreplace_from || 'Von (Text oder Regex)') + '</th>';
-    settingsHtml += '<th style="width:40%">' + (i18n.autoreplace_to || 'Nach (Ziel-Zeichen)') + '</th>';
-    settingsHtml += '<th style="width:10%"></th>';
-    settingsHtml += '</tr></thead><tbody></tbody></table>';
-    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-autoreplace-add"><i class="rex-icon fa-plus"></i> ' + (i18n.autoreplace_add || 'Regel hinzufügen') + '</button> ';
-    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-autoreplace-examples"><i class="rex-icon fa-magic"></i> ' + (i18n.autoreplace_examples || 'Beispiele einfügen') + '</button>';
-    settingsHtml += '<p class="help-block" style="margin-top:8px;">' + (i18n.autoreplace_hint || '<strong>Typ</strong>: <code>Text</code> = wörtliche Ersetzung, <code>Regex</code> = regulärer Ausdruck mit Backreferences (<code>$1</code>, <code>$2</code>). <strong>Nach</strong>: Unicode-Escapes wie <code>\\u00A0</code> (nbsp) oder <code>\\u2011</code> (geschützter Bindestrich) sind erlaubt. Beispiele: Text <code>(tel)</code> → <code>+49 …</code>; Regex <code>\\(kw(\\d{1,2})\\)</code> → <code>KW $1</code>.') + '</p>';
-    settingsHtml += '</div></div>';
+    // 4b) Color Mapping
+    group4Html += '<br><legend><i class="rex-icon fa-eyedropper"></i> ' + (i18n.color_mapping || 'Farb-Mapping (color_map_raw)') + '</legend>';
+    group4Html += '<div class="panel panel-default builder-color-section"><div class="panel-body">';
+    group4Html += '<div class="row">';
+    group4Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-color-map-enable"> <strong>' + (i18n.color_mapping_enable || 'Eigenes Farb-Mapping aktivieren') + '</strong></label></div></div>';
+    group4Html += '<div class="col-md-2"><div class="form-group"><label>' + (i18n.color_cols || 'Spalten (color_cols)') + '</label><input type="number" class="form-control builder-color-cols" min="1" max="20" value="4"></div></div>';
+    group4Html += '<div class="col-md-6" style="padding-top: 25px;"><button type="button" class="btn btn-default btn-xs builder-color-map-demo"><i class="rex-icon fa-magic"></i> ' + (i18n.color_mapping_demo || 'Demo-Mapping einfügen') + '</button></div>';
+    group4Html += '</div>';
+    group4Html += '<div class="row" style="margin-top: 4px; margin-bottom: 6px;"><div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-custom-colors"> ' + (i18n.custom_colors || 'Eigene Farbe in der Farbauswahl erlauben') + '</label></div></div></div>';
+    group4Html += '<div class="row" style="margin-bottom: 8px;">';
+    group4Html += '<div class="col-md-3"><input type="text" class="form-control input-sm builder-color-map-new-color" placeholder="#1d4ed8"></div>';
+    group4Html += '<div class="col-md-5"><input type="text" class="form-control input-sm builder-color-map-new-label" placeholder="Blau"></div>';
+    group4Html += '<div class="col-md-4"><button type="button" class="btn btn-default btn-xs builder-color-map-add"><i class="rex-icon fa-plus"></i> ' + (i18n.color_mapping_add || 'Farbe hinzufügen') + '</button></div>';
+    group4Html += '</div>';
+    group4Html += '<table class="table table-striped table-condensed" id="builder-color-map-table">';
+    group4Html += '<thead><tr><th style="width: 30%;">' + (i18n.color_mapping_color || 'Farbe') + '</th><th style="width: 50%;">' + (i18n.color_mapping_label || 'Label') + '</th><th style="width: 20%;"></th></tr></thead><tbody></tbody></table>';
+    group4Html += '<div class="form-group"><label>' + (i18n.color_map_raw_label || 'color_map_raw (JSON-Array)') + '</label><textarea class="form-control builder-color-map-raw" rows="4" placeholder="[\"#1d4ed8\", \"Blau\", \"#0f766e\", \"Türkis\"]"></textarea>';
+    group4Html += '<p class="help-block">' + (i18n.color_map_raw_help || 'Gerade Anzahl an Einträgen: immer Farbe, dann Label. Beispiel: [\"#1d4ed8\",\"Blau\",\"#0f766e\",\"Türkis\"].') + '</p></div>';
+    group4Html += '</div></div>';
 
-    // Extras (Codesample, RelList, TOC)
-    settingsHtml += '<br><legend>' + (i18n.extras_defaults || 'Extras (Defaults)') + '</legend><div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-codesample" checked> ' + (i18n.default_codesample_languages || 'Default Codesample Languages') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-rellist" checked> ' + (i18n.default_rellist || 'Default Rel List') + '</label></div></div>';
-    settingsHtml += '</div>';
+    // 4c) Link-Defaults
+    group4Html += '<br><legend><i class="rex-icon fa-link"></i> ' + (i18n.link_defaults || 'Link-Defaults') + '</legend><div class="row">';
+    group4Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-target-list" checked> ' + (i18n.link_target_list_label || 'Klare Link-Ziele (target_list, dt.)') + '</label></div></div>';
+    group4Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-noreferrer" checked> ' + (i18n.link_noreferrer_label || 'Bei target="_blank" automatisch rel="noopener noreferrer"') + '</label></div></div>';
+    group4Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-default-https" checked> ' + (i18n.link_default_https_label || 'Standard-Protokoll: https') + '</label></div></div>';
+    group4Html += '</div>';
 
-    // Link-Defaults (target_list, noreferrer, https)
-    settingsHtml += '<br><legend>' + (i18n.link_defaults || 'Link-Defaults') + '</legend><div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-target-list" checked> ' + (i18n.link_target_list_label || 'Klare Link-Ziele (target_list, dt.)') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-noreferrer" checked> ' + (i18n.link_noreferrer_label || 'Bei target="_blank" automatisch rel="noopener noreferrer"') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-link-default-https" checked> ' + (i18n.link_default_https_label || 'Standard-Protokoll: https') + '</label></div></div>';
-    settingsHtml += '</div>';
+    // 4d) Extras (Codesample, RelList)
+    group4Html += '<br><legend>' + (i18n.extras_defaults || 'Extras (Defaults)') + '</legend><div class="row">';
+    group4Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-codesample" checked> ' + (i18n.default_codesample_languages || 'Default Codesample Languages') + '</label></div></div>';
+    group4Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-default-rellist" checked> ' + (i18n.default_rellist || 'Default Rel List') + '</label></div></div>';
+    group4Html += '</div>';
 
-    // Color Mapping
-    settingsHtml += '<br><legend><i class="rex-icon fa-eyedropper"></i> ' + (i18n.color_mapping || 'Farb-Mapping (color_map_raw)') + '</legend>';
-    settingsHtml += '<div class="panel panel-default builder-color-section"><div class="panel-body">';
-    settingsHtml += '<div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-color-map-enable"> <strong>' + (i18n.color_mapping_enable || 'Eigenes Farb-Mapping aktivieren') + '</strong></label></div></div>';
-    settingsHtml += '<div class="col-md-2"><div class="form-group"><label>' + (i18n.color_cols || 'Spalten (color_cols)') + '</label><input type="number" class="form-control builder-color-cols" min="1" max="20" value="4"></div></div>';
-    settingsHtml += '<div class="col-md-6" style="padding-top: 25px;"><button type="button" class="btn btn-default btn-xs builder-color-map-demo"><i class="rex-icon fa-magic"></i> ' + (i18n.color_mapping_demo || 'Demo-Mapping einfügen') + '</button></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '<div class="row" style="margin-top: 4px; margin-bottom: 6px;"><div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-custom-colors"> ' + (i18n.custom_colors || 'Eigene Farbe in der Farbauswahl erlauben') + '</label></div></div></div>';
-    settingsHtml += '<div class="row" style="margin-bottom: 8px;">';
-    settingsHtml += '<div class="col-md-3"><input type="text" class="form-control input-sm builder-color-map-new-color" placeholder="#1d4ed8"></div>';
-    settingsHtml += '<div class="col-md-5"><input type="text" class="form-control input-sm builder-color-map-new-label" placeholder="Blau"></div>';
-    settingsHtml += '<div class="col-md-4"><button type="button" class="btn btn-default btn-xs builder-color-map-add"><i class="rex-icon fa-plus"></i> ' + (i18n.color_mapping_add || 'Farbe hinzufügen') + '</button></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '<table class="table table-striped table-condensed" id="builder-color-map-table">';
-    settingsHtml += '<thead><tr><th style="width: 30%;">' + (i18n.color_mapping_color || 'Farbe') + '</th><th style="width: 50%;">' + (i18n.color_mapping_label || 'Label') + '</th><th style="width: 20%;"></th></tr></thead><tbody></tbody></table>';
-    settingsHtml += '<div class="form-group"><label>' + (i18n.color_map_raw_label || 'color_map_raw (JSON-Array)') + '</label><textarea class="form-control builder-color-map-raw" rows="4" placeholder="[\"#1d4ed8\", \"Blau\", \"#0f766e\", \"Türkis\"]"></textarea>';
-    settingsHtml += '<p class="help-block">' + (i18n.color_map_raw_help || 'Gerade Anzahl an Einträgen: immer Farbe, dann Label. Beispiel: [\"#1d4ed8\",\"Blau\",\"#0f766e\",\"Türkis\"].') + '</p></div>';
-    settingsHtml += '</div></div>';
+    // 4e) YForm Link
+    group4Html += '<br><legend><i class="rex-icon fa-database"></i> ' + (i18n.link_yform_section || 'Link YForm Configuration') + '</legend>';
+    group4Html += '<div class="panel panel-default"><div class="panel-body">';
+    group4Html += '<div class="form-group"><label>Dropdown Title</label><input type="text" class="form-control builder-yform-title" value="YForm Datensätze"></div>';
+    group4Html += '<table class="table table-striped" id="builder-yform-table"><thead><tr><th>Title</th><th>Table</th><th>Field</th><th>Link-Schema (opt.)</th><th></th></tr></thead><tbody></tbody></table>';
+    group4Html += '<p class="help-block" style="margin-top:4px;">' + (i18n.link_schema_help || '<strong>Link-Schema (optional):</strong> URL-Muster für den erzeugten Link. Platzhalter: <code>[id]</code> = ID des YForm-Datensatzes, <code>[field]</code> = gewählter Feldwert. Beispiele: <code>index.php?article_id=5&amp;news=[id]</code> oder <code>/produkt/[id]</code>. Leer lassen = es wird nur der Feldwert als Link-Text eingefügt.') + '</p>';
+    group4Html += '<button type="button" class="btn btn-default btn-xs builder-yform-add"><i class="rex-icon fa-plus"></i> Add Item</button>';
+    group4Html += '</div></div>';
 
-    // YForm Link Configuration
-    settingsHtml += '<br><legend>Link YForm Configuration</legend>';
-    settingsHtml += '<div class="panel panel-default"><div class="panel-body">';
-    settingsHtml += '<div class="form-group"><label>Dropdown Title</label><input type="text" class="form-control builder-yform-title" value="YForm Datensätze"></div>';
-    settingsHtml += '<table class="table table-striped" id="builder-yform-table"><thead><tr><th>Title</th><th>Table</th><th>Field</th><th>Link-Schema (opt.)</th><th></th></tr></thead><tbody></tbody></table>';
-    settingsHtml += '<p class="help-block" style="margin-top:4px;">' + (i18n.link_schema_help || '<strong>Link-Schema (optional):</strong> URL-Muster für den erzeugten Link. Platzhalter: <code>[id]</code> = ID des YForm-Datensatzes, <code>[field]</code> = gewählter Feldwert. Beispiele: <code>index.php?article_id=5&amp;news=[id]</code> oder <code>/produkt/[id]</code>. Leer lassen = es wird nur der Feldwert als Link-Text eingefügt.') + '</p>';
-    settingsHtml += '<button type="button" class="btn btn-default btn-xs builder-yform-add"><i class="rex-icon fa-plus"></i> Add Item</button>';
-    settingsHtml += '</div></div>';
+    // ===== GRUPPE 5: ERWEITERTE OPTIONEN =====
+    // Plugin-spezifische Konfiguration: Typografie-Autoreplace, FOR Images (inkl.
+    // frueher verstreuten Bild-Optionen), Layout-Regeln, TOC, Protected Extras.
+    let group5Html = groupTitle('5', 'fa-wrench', i18n.group_advanced || 'Erweiterte Optionen');
 
-    // FOR Images plugin (preset-based image formatting)
-    settingsHtml += '<br><legend><i class="rex-icon fa-image"></i> ' + (i18n.imagewidth || 'FOR Images') + ' <small class="text-muted" style="font-weight:normal;">(for_images)</small></legend>';
-    settingsHtml += '<p class="help-block">' + (i18n.imagewidth_help || 'Erweiterte Bildformatierung über CSS-Klassen statt manuellem Resize: feste Breiten, Ausrichtung (links/rechts/zentriert), Effekt-Klassen (z. B. Schatten, Rahmen, Rundungen) und &lt;figure&gt;-Wrapping mit Caption. Presets für UIkit, Bootstrap und allgemeine Pixelwerte – inklusive Mediapool-Ersetzen direkt im Editor.') + '</p>';
-    settingsHtml += '<p class="help-block small"><i class="rex-icon fa-info-circle"></i> ' + (i18n.imagewidth_plugin_hint || 'Diese Option ist an das Plugin <code>for_images</code> gekoppelt: Wird <code>for_images</code> in Schritt 2 (Plugins) deaktiviert, wird dieser Block ebenfalls automatisch deaktiviert – und umgekehrt.') + '</p>';
-    settingsHtml += '<div class="row">';
-    settingsHtml += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-imagewidth-enable"> ' + (i18n.imagewidth_enable || 'Aktivieren') + '</label></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.imagewidth_template || 'Vorlage laden') + '</label>';
-    settingsHtml += '<select class="form-control builder-imagewidth-template" disabled>';
-    settingsHtml += '<option value="">-- Auswählen --</option>';
-    settingsHtml += '<option value="uikit">UIkit 3</option>';
-    settingsHtml += '<option value="bootstrap">Bootstrap 5</option>';
-    settingsHtml += '<option value="general">Allgemein (Pixel)</option>';
-    settingsHtml += '</select></div></div>';
-    settingsHtml += '<div class="col-md-3"><div class="form-group"><label>Breakpoint (UIkit/BS)</label>';
-    settingsHtml += '<select class="form-control builder-imagewidth-breakpoint" disabled>';
-    settingsHtml += '<option value="">Alle Viewports</option>';
-    settingsHtml += '<option value="@s">UIkit @s (≥640px)</option>';
-    settingsHtml += '<option value="@m" selected>UIkit @m (≥960px)</option>';
-    settingsHtml += '<option value="@l">UIkit @l (≥1200px)</option>';
-    settingsHtml += '<option value="sm">Bootstrap sm (≥576px)</option>';
-    settingsHtml += '<option value="md">Bootstrap md (≥768px)</option>';
-    settingsHtml += '<option value="lg">Bootstrap lg (≥992px)</option>';
-    settingsHtml += '</select></div></div>';
-    settingsHtml += '</div>';
-    // Preset Textareas
-    settingsHtml += '<div class="builder-imagewidth-presets" style="display:none; margin-top:10px;">';
-    settingsHtml += '<div class="row">';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Breiten-Presets (JSON)</label>';
-    settingsHtml += '<textarea class="form-control builder-imagewidth-width-presets" rows="6" placeholder=\'[{"label":"Klein","class":"uk-width-small@m"}]\'></textarea>';
-    settingsHtml += '<p class="help-block small">Array: [{label, class}]</p></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Ausrichtungs-Presets (JSON)</label>';
-    settingsHtml += '<textarea class="form-control builder-imagewidth-align-presets" rows="6" placeholder=\'[{"label":"Links","class":"uk-float-left uk-margin-right"}]\'></textarea>';
-    settingsHtml += '<p class="help-block small">Array: [{label, class}]</p></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>Effekt-Presets (JSON)</label>';
-    settingsHtml += '<textarea class="form-control builder-imagewidth-effect-presets" rows="6" placeholder=\'[{"label":"Schatten","class":"uk-box-shadow-medium"}]\'></textarea>';
-    settingsHtml += '<p class="help-block small">Multi-Select, kombinierbar</p></div></div>';
-    settingsHtml += '</div>';
-    // CKE5-Legacy-Hinweis
-    settingsHtml += '<div class="row" style="margin-top:6px;"><div class="col-md-12"><div class="checkbox"><label>';
-    settingsHtml += '<input type="checkbox" class="builder-imagewidth-compat-warn"> ' + (i18n.imagewidth_compat_warn || 'Auf veraltetes CKE5-Bildmarkup hinweisen');
-    settingsHtml += '</label><p class="help-block small" style="margin-left:20px;">' + (i18n.imagewidth_compat_warn_help || 'Zeigt im Editor eine Warnung, wenn der geladene Inhalt noch Bildmarkup aus dem alten CKEditor 5 enthält (z. B. <code>figure.image</code>, <code>image-style-…</code>). Der Redakteur wird gebeten, die betroffenen Bilder mit der neuen Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut zu formatieren. Es wird nichts automatisch konvertiert.') + '</p></div></div></div>';
-    settingsHtml += '</div>';
+    // 5a) Typografie-Autoreplace (for_chars_symbols)
+    group5Html += '<legend><i class="rex-icon fa-magic"></i> ' + (i18n.autoreplace || 'Typografie-Autoreplace (for_chars_symbols)') + '</legend>';
+    group5Html += '<p class="help-block">' + (i18n.autoreplace_help || 'Live-Ersetzung beim Tippen. Ausgelöst durch <kbd>Leer</kbd>, <kbd>Enter</kbd> und Satzzeichen (<code>. , ; : ! ? ) ] " \' /</code>). Greift nicht in <code>&lt;code&gt;</code>, <code>&lt;pre&gt;</code>, <code>&lt;kbd&gt;</code>, <code>&lt;samp&gt;</code>, <code>&lt;tt&gt;</code>. Alle Ersetzungen sind Undo-fähig.') + '</p>';
+    group5Html += '<div class="panel panel-default"><div class="panel-body">';
+    group5Html += '<div class="row"><div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-enabled"> <strong>' + (i18n.autoreplace_enabled || 'Autoreplace aktivieren') + '</strong></label></div></div>';
+    group5Html += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-autoreplace-defaults" checked> ' + (i18n.autoreplace_defaults || 'Default-Regeln nutzen (32 Regeln: (c)→©, (tm)→™, …→…, ->→→, +/-→±, Brüche, …)') + '</label></div></div></div>';
+    group5Html += '<div class="row"><div class="col-md-12"><div class="checkbox"><label><input type="checkbox" class="builder-disable-emoticons"> ' + (i18n.disable_emoticons || 'Emoji-Tab im Picker ausblenden') + '</label></div></div></div>';
+    group5Html += '<hr>';
+    group5Html += '<label>' + (i18n.autoreplace_custom || 'Eigene Regeln') + '</label>';
+    group5Html += '<table class="table table-striped" id="builder-autoreplace-table"><thead><tr>';
+    group5Html += '<th style="width:10%">' + (i18n.autoreplace_type || 'Typ') + '</th>';
+    group5Html += '<th style="width:40%">' + (i18n.autoreplace_from || 'Von (Text oder Regex)') + '</th>';
+    group5Html += '<th style="width:40%">' + (i18n.autoreplace_to || 'Nach (Ziel-Zeichen)') + '</th>';
+    group5Html += '<th style="width:10%"></th>';
+    group5Html += '</tr></thead><tbody></tbody></table>';
+    group5Html += '<button type="button" class="btn btn-default btn-xs builder-autoreplace-add"><i class="rex-icon fa-plus"></i> ' + (i18n.autoreplace_add || 'Regel hinzufügen') + '</button> ';
+    group5Html += '<button type="button" class="btn btn-default btn-xs builder-autoreplace-examples"><i class="rex-icon fa-magic"></i> ' + (i18n.autoreplace_examples || 'Beispiele einfügen') + '</button>';
+    group5Html += '<p class="help-block" style="margin-top:8px;">' + (i18n.autoreplace_hint || '<strong>Typ</strong>: <code>Text</code> = wörtliche Ersetzung, <code>Regex</code> = regulärer Ausdruck mit Backreferences (<code>$1</code>, <code>$2</code>). <strong>Nach</strong>: Unicode-Escapes wie <code>\\u00A0</code> (nbsp) oder <code>\\u2011</code> (geschützter Bindestrich) sind erlaubt. Beispiele: Text <code>(tel)</code> → <code>+49 …</code>; Regex <code>\\(kw(\\d{1,2})\\)</code> → <code>KW $1</code>.') + '</p>';
+    group5Html += '</div></div>';
 
-    // Layout Rules
-    settingsHtml += '<br><legend><i class="rex-icon fa-sitemap"></i> ' + (i18n.layout_rules || 'Layout-Regeln (Strukturoptimierung)') + '</legend>';
-    settingsHtml += '<p class="help-block">' + (i18n.layout_rules_help || 'Automatische Korrektur von häufigen Content-Struktur-Problemen. Stilschweigend und nicht-invasiv.') + '</p>';
-    settingsHtml += '<div class="row">';
-    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-images-in-headings" checked> ' + (i18n.layout_no_images_in_headings || 'Bilder aus Überschriften verschieben') + '</label><p class="help-block small">' + (i18n.layout_no_images_in_headings_help || 'Bilder, die in h1-h6 sind, werden davor platziert.') + '</p></div></div>';
-    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-clear-empty" checked> ' + (i18n.layout_collapse_empty || 'Mehrfache Leerzeilen zusammenfassen') + '</label><p class="help-block small">' + (i18n.layout_collapse_empty_help || 'Mehrere hintereinander folgende leere &lt;p&gt; werden durch ein Clear-Element ersetzt.') + '</p></div></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '<div class="row">';
-    settingsHtml += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-delete-empty"> ' + (i18n.layout_delete_empty || 'Einzelne leere Absätze löschen') + '</label><p class="help-block small">' + (i18n.layout_delete_empty_help || 'Entfernt einzelne leere &lt;p&gt; am Anfang und Ende.') + '</p></div></div>';
-    settingsHtml += '</div>';
-    settingsHtml += '<div class="row" style="margin-top:10px;">';
-    settingsHtml += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.layout_clear_element || 'Clear-Element CSS-Klasse') + '</label><input type="text" class="form-control builder-layout-clear-class" value="uk-margin" placeholder="uk-margin"></div></div>';
-    settingsHtml += '</div>';
+    // 5b) FOR Images – inkl. der frueher in "Advanced" verstreuten Bild-Optionen
+    group5Html += '<br><legend><i class="rex-icon fa-image"></i> ' + (i18n.imagewidth || 'FOR Images') + ' <small class="text-muted" style="font-weight:normal;">(for_images)</small></legend>';
+    group5Html += '<p class="help-block">' + (i18n.imagewidth_help || 'Erweiterte Bildformatierung über CSS-Klassen statt manuellem Resize: feste Breiten, Ausrichtung (links/rechts/zentriert), Effekt-Klassen (z. B. Schatten, Rahmen, Rundungen) und &lt;figure&gt;-Wrapping mit Caption. Presets für UIkit, Bootstrap und allgemeine Pixelwerte – inklusive Mediapool-Ersetzen direkt im Editor.') + '</p>';
+    group5Html += '<p class="help-block small"><i class="rex-icon fa-info-circle"></i> ' + (i18n.imagewidth_plugin_hint || 'Diese Option ist an das Plugin <code>for_images</code> gekoppelt: Wird <code>for_images</code> in Schritt 2 (Plugins) deaktiviert, wird dieser Block ebenfalls automatisch deaktiviert – und umgekehrt.') + '</p>';
+    // 5b.1) Allgemeine Bild-Optionen (vorher in "Advanced" versteckt)
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-caption" checked> ' + (i18n.image_caption || 'Image Caption') + '</label></div></div>';
+    group5Html += '<div class="col-md-4"><div class="checkbox"><label><input type="checkbox" class="builder-image-uploadtab"> ' + (i18n.image_uploadtab || 'Image Upload Tab') + '</label></div></div>';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.media_manager_type || 'Media Manager Type') + '</label><input type="text" class="form-control builder-media-type" placeholder="tiny"></div></div>';
+    group5Html += '</div>';
+    // 5b.2) FOR-Images Aktivierung + Template
+    group5Html += '<div class="row" style="margin-top:10px;">';
+    group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-imagewidth-enable"> ' + (i18n.imagewidth_enable || 'Aktivieren') + '</label></div></div>';
+    group5Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.imagewidth_template || 'Vorlage laden') + '</label>';
+    group5Html += '<select class="form-control builder-imagewidth-template" disabled>';
+    group5Html += '<option value="">-- Auswählen --</option>';
+    group5Html += '<option value="uikit">UIkit 3</option>';
+    group5Html += '<option value="bootstrap">Bootstrap 5</option>';
+    group5Html += '<option value="general">Allgemein (Pixel)</option>';
+    group5Html += '</select></div></div>';
+    group5Html += '<div class="col-md-3"><div class="form-group"><label>Breakpoint (UIkit/BS)</label>';
+    group5Html += '<select class="form-control builder-imagewidth-breakpoint" disabled>';
+    group5Html += '<option value="">Alle Viewports</option>';
+    group5Html += '<option value="@s">UIkit @s (≥640px)</option>';
+    group5Html += '<option value="@m" selected>UIkit @m (≥960px)</option>';
+    group5Html += '<option value="@l">UIkit @l (≥1200px)</option>';
+    group5Html += '<option value="sm">Bootstrap sm (≥576px)</option>';
+    group5Html += '<option value="md">Bootstrap md (≥768px)</option>';
+    group5Html += '<option value="lg">Bootstrap lg (≥992px)</option>';
+    group5Html += '</select></div></div>';
+    group5Html += '</div>';
+    // 5b.3) Preset Textareas
+    group5Html += '<div class="builder-imagewidth-presets" style="display:none; margin-top:10px;">';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>Breiten-Presets (JSON)</label>';
+    group5Html += '<textarea class="form-control builder-imagewidth-width-presets" rows="6" placeholder=\'[{"label":"Klein","class":"uk-width-small@m"}]\'></textarea>';
+    group5Html += '<p class="help-block small">Array: [{label, class}]</p></div></div>';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>Ausrichtungs-Presets (JSON)</label>';
+    group5Html += '<textarea class="form-control builder-imagewidth-align-presets" rows="6" placeholder=\'[{"label":"Links","class":"uk-float-left uk-margin-right"}]\'></textarea>';
+    group5Html += '<p class="help-block small">Array: [{label, class}]</p></div></div>';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>Effekt-Presets (JSON)</label>';
+    group5Html += '<textarea class="form-control builder-imagewidth-effect-presets" rows="6" placeholder=\'[{"label":"Schatten","class":"uk-box-shadow-medium"}]\'></textarea>';
+    group5Html += '<p class="help-block small">Multi-Select, kombinierbar</p></div></div>';
+    group5Html += '</div>';
+    // 5b.4) CKE5-Legacy-Hinweis
+    group5Html += '<div class="row" style="margin-top:6px;"><div class="col-md-12"><div class="checkbox"><label>';
+    group5Html += '<input type="checkbox" class="builder-imagewidth-compat-warn"> ' + (i18n.imagewidth_compat_warn || 'Auf veraltetes CKE5-Bildmarkup hinweisen');
+    group5Html += '</label><p class="help-block small" style="margin-left:20px;">' + (i18n.imagewidth_compat_warn_help || 'Zeigt im Editor eine Warnung, wenn der geladene Inhalt noch Bildmarkup aus dem alten CKEditor 5 enthält (z. B. <code>figure.image</code>, <code>image-style-…</code>). Der Redakteur wird gebeten, die betroffenen Bilder mit der neuen Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut zu formatieren. Es wird nichts automatisch konvertiert.') + '</p></div></div></div>';
+    group5Html += '</div>';
 
-    // TOC Settings
-    settingsHtml += '<div class="row" style="margin-top:10px;">';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_depth || 'TOC Depth') + '</label><input type="number" class="form-control builder-toc-depth" value="3"></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_header_tag || 'TOC Header Tag') + '</label><input type="text" class="form-control builder-toc-header" value="div"></div></div>';
-    settingsHtml += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_class || 'TOC Class') + '</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
-    settingsHtml += '</div>';
+    // 5c) Layout-Regeln
+    group5Html += '<br><legend><i class="rex-icon fa-sitemap"></i> ' + (i18n.layout_rules || 'Layout-Regeln (Strukturoptimierung)') + '</legend>';
+    group5Html += '<p class="help-block">' + (i18n.layout_rules_help || 'Automatische Korrektur von häufigen Content-Struktur-Problemen. Stilschweigend und nicht-invasiv.') + '</p>';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-images-in-headings" checked> ' + (i18n.layout_no_images_in_headings || 'Bilder aus Überschriften verschieben') + '</label><p class="help-block small">' + (i18n.layout_no_images_in_headings_help || 'Bilder, die in h1-h6 sind, werden davor platziert.') + '</p></div></div>';
+    group5Html += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-clear-empty" checked> ' + (i18n.layout_collapse_empty || 'Mehrfache Leerzeilen zusammenfassen') + '</label><p class="help-block small">' + (i18n.layout_collapse_empty_help || 'Mehrere hintereinander folgende leere &lt;p&gt; werden durch ein Clear-Element ersetzt.') + '</p></div></div>';
+    group5Html += '</div>';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-6"><div class="checkbox"><label><input type="checkbox" class="builder-layout-delete-empty"> ' + (i18n.layout_delete_empty || 'Einzelne leere Absätze löschen') + '</label><p class="help-block small">' + (i18n.layout_delete_empty_help || 'Entfernt einzelne leere &lt;p&gt; am Anfang und Ende.') + '</p></div></div>';
+    group5Html += '</div>';
+    group5Html += '<div class="row" style="margin-top:10px;">';
+    group5Html += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.layout_clear_element || 'Clear-Element CSS-Klasse') + '</label><input type="text" class="form-control builder-layout-clear-class" value="uk-margin" placeholder="uk-margin"></div></div>';
+    group5Html += '</div>';
 
-    settingsHtml += '<br><legend>' + (i18n.protected_extras || 'Protected extras') + '</legend>';
-    settingsHtml += '<p class="help-block">' + (i18n.protected_extras_help || 'Raw option lines entered here are appended after the generated options. Use this to keep custom TinyMCE settings or to intentionally override assistant-managed values.') + '</p>';
-    settingsHtml += '<textarea class="form-control builder-protected-extras" rows="8" placeholder="' + (i18n.protected_extras_placeholder || "toolbar_sticky: true,\ntoolbar_sticky_offset: 0") + '"></textarea>';
+    // 5d) TOC – jetzt mit eigenem Legend, vorher als verwaiste Row an Layout-Regeln drangehaengt
+    group5Html += '<br><legend><i class="rex-icon fa-list-ol"></i> ' + (i18n.toc_settings || 'Inhaltsverzeichnis (for_toc)') + '</legend>';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_depth || 'TOC Depth') + '</label><input type="number" class="form-control builder-toc-depth" value="3"></div></div>';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_header_tag || 'TOC Header Tag') + '</label><input type="text" class="form-control builder-toc-header" value="div"></div></div>';
+    group5Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_class || 'TOC Class') + '</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
+    group5Html += '</div>';
+
+    // 5e) Protected Extras
+    group5Html += '<br><legend>' + (i18n.protected_extras || 'Protected extras') + '</legend>';
+    group5Html += '<p class="help-block">' + (i18n.protected_extras_help || 'Raw option lines entered here are appended after the generated options. Use this to keep custom TinyMCE settings or to intentionally override assistant-managed values.') + '</p>';
+    group5Html += '<textarea class="form-control builder-protected-extras" rows="8" placeholder="' + (i18n.protected_extras_placeholder || "toolbar_sticky: true,\ntoolbar_sticky_offset: 0") + '"></textarea>';
+
+    // Backwards-compatible alias: einige Stellen weiter unten erwarten settingsHtml.
+    // Wir setzen es auf die Plugin-/Defaults-Bloecke (Group 4 + 5); die Gruppen 1 und 3
+    // werden separat im finalen $builderBody.html(...) eingefuegt.
+    let settingsHtml = group4Html + group5Html;
 
     // Apply Button(s): Generieren und Generieren+Speichern
     let actionsHtml = '<hr>'
@@ -324,7 +357,30 @@ function initTinyMceProfileAssistant() {
         + '<button type="button" class="btn btn-save builder-apply-save"><i class="rex-icon fa-save"></i> ' + (i18n.generate_and_save || 'Generate & Save') + '</button> '
         + '<span class="text-muted">' + (i18n.overwrites_existing_config || 'Overwrites existing configuration!') + '</span>';
 
-    $builderBody.html(presetsHtml + pluginsHtml + toolbarHtml + settingsHtml + actionsHtml);
+    // Lineare 5-Schritte-Reihenfolge:
+    //   Quick-Start-Presets -> 1. Grundeinstellungen -> 2. Plugins ->
+    //   3. Toolbar (Haupt) + 3b Context/Insert -> 4. Presets & Defaults ->
+    //   5. Erweiterte Optionen -> Apply-Buttons
+    // settingsHtml entspricht inhaltlich (group4Html + group5Html) und bleibt als
+    // Backwards-compat-Alias bestehen.
+    // Schritt-2-Header steht vor der Plugin-Liste (pluginsHtml beginnt mit einem
+    // eigenen <legend>Plugins</legend> als Untertitel, ohne Schritt-Nummer).
+    const group2HeaderHtml = groupTitle('2', 'fa-puzzle-piece', i18n.group_plugins || 'Plugins');
+    // Schritt-3-Header steht vor der Haupt-Toolbar (toolbarHtml enthaelt nur das
+    // eigene <legend>Toolbar</legend> als Untertitel) und gruppiert Haupt-Toolbar
+    // + Context-Toolbar/Insert-Menue zu einem visuellen Block.
+    const group3HeaderHtml = groupTitle('3', 'fa-th-list', i18n.group_toolbars || 'Toolbars & Menüs');
+    $builderBody.html(
+        presetsHtml
+        + group1Html
+        + group2HeaderHtml
+        + pluginsHtml
+        + group3HeaderHtml
+        + toolbarHtml
+        + group3ExtrasHtml
+        + settingsHtml
+        + actionsHtml,
+    );
 
     // Context Toolbar Toggle
     $builderBody.on('change', '.builder-context-toolbar', function() {
@@ -1939,6 +1995,24 @@ function initTinyMceProfileAssistant() {
         $builderBody.find('.builder-imagewidth-enable').prop('checked', $(this).is(':checked')).trigger('change');
     });
 
+    // Bi-direktionale Kopplung zwischen Autoresize-Checkbox (Schritt 1) und dem
+    // gleichnamigen Plugin in Schritt 2. Ohne diese Sync bliebe das Plugin in
+    // der Liste sichtbar abgewaehlt, obwohl die Option aktiv ist (und umgekehrt).
+    $builderBody.on('change', '.builder-autoresize', function() {
+        const enabled = $(this).is(':checked');
+        const $plugin = $builderBody.find('.builder-plugin[value="autoresize"]');
+        if ($plugin.length && $plugin.is(':checked') !== enabled) {
+            $plugin.prop('checked', enabled);
+        }
+    });
+    $builderBody.on('change', '.builder-plugin[value="autoresize"]', function() {
+        const enabled = $(this).is(':checked');
+        const $cb = $builderBody.find('.builder-autoresize');
+        if ($cb.length && $cb.is(':checked') !== enabled) {
+            $cb.prop('checked', enabled);
+        }
+    });
+
     setToolbarRows([]);
     updateToolbarSettingsState();
 
@@ -3062,38 +3136,31 @@ function generateConfig($textarea, $builderBody) {
     
     configStr += 'setup: function (editor) {\n';
     if (autoHideToolbar) {
-        configStr += `    editor.on('init', function() {
+        configStr += `    // Auto-Hide: Menue/Toolbar/Statusleiste nur sichtbar, solange der Editor
+    // den Fokus hat. Wird per CSS-Klasse + :focus-within umgesetzt – robuster
+    // als display:none-Inline, weil TinyMCE die UI mehrfach neu rendert.
+    editor.on('PostRender', function () {
         var container = editor.getContainer();
-        var header = container.querySelector('.tox-editor-header');
-        var statusbar = container.querySelector('.tox-statusbar');
-        
-        if (header) header.style.display = 'none';
-        if (statusbar) statusbar.style.display = 'none';
-        
-        var show = function() {
-            if (header) header.style.display = '';
-            if (statusbar) statusbar.style.display = '';
-        };
-        
-        var hide = function() {
-            if (header) header.style.display = 'none';
-            if (statusbar) statusbar.style.display = 'none';
-        };
-        
-        editor.on('focus', show);
-        container.addEventListener('focusin', show);
-        
-        var hideTimeout;
-        var scheduleHide = function() {
-            hideTimeout = setTimeout(function() {
-                if (!container.contains(document.activeElement) && !editor.hasFocus()) {
-                    hide();
-                }
-            }, 100);
-        };
-        
-        editor.on('blur', scheduleHide);
-        container.addEventListener('focusout', scheduleHide);
+        if (!container) { return; }
+        container.classList.add('tmce-autohide');
+        if (document.getElementById('tmce-autohide-style')) { return; }
+        var style = document.createElement('style');
+        style.id = 'tmce-autohide-style';
+        style.textContent = ''
+            + '.tmce-autohide .tox-editor-header,'
+            + '.tmce-autohide .tox-statusbar { '
+            + 'max-height: 0; overflow: hidden; opacity: 0; '
+            + 'padding-top: 0 !important; padding-bottom: 0 !important; '
+            + 'border: 0 !important; '
+            + 'transition: max-height .15s ease, opacity .15s ease; }'
+            + '.tmce-autohide:focus-within .tox-editor-header,'
+            + '.tmce-autohide:hover .tox-editor-header,'
+            + '.tmce-autohide:focus-within .tox-statusbar,'
+            + '.tmce-autohide:hover .tox-statusbar { '
+            + 'max-height: 400px; opacity: 1; '
+            + 'padding-top: revert !important; padding-bottom: revert !important; '
+            + 'border: revert !important; }';
+        document.head.appendChild(style);
     });\n`;
     }
     configStr += '},\n';
@@ -3278,6 +3345,14 @@ function loadFromConfig($textarea, $builderBody) {
     }
     if (typeof cfg.menubar !== 'undefined') {
         $builderBody.find('.builder-menubar').prop('checked', !!cfg.menubar);
+    }
+
+    // Auto-Hide Toolbar wird ueber einen setup()-Block serialisiert (siehe
+    // generateConfig). Da das in cfg nicht als eigenes Feld landet, erkennen
+    // wir den Zustand am Roh-Source des Profils anhand der CSS-Marker-Klasse
+    // bzw. (Legacy) am display:none-Inline-Toggle frueherer Versionen.
+    if (/tmce-autohide/.test(source) || /tox-editor-header[^]*display\s*=\s*['"]none['"]/.test(source)) {
+        $builderBody.find('.builder-auto-hide-toolbar').prop('checked', true);
     }
 
     // Context toolbar (quickbars)

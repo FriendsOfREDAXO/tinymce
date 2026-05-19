@@ -454,6 +454,7 @@ class Assets
 
             \rex_view::setJsProperty('tinymceProfileOptions', $options);
 
+            rex_view::addCssFile(self::assetUrl('css/profile_builder.css'));
             rex_view::addJsFile(self::assetUrl('scripts/profile.js'));
             rex_view::addJsFile(self::assetUrl('scripts/profile_builder.js'));
             rex_view::addJsFile(self::assetUrl('scripts/profiles-list.js'));

@@ -1,0 +1,147 @@
+/*
+ * TinyMCE Profile Builder – Assistant-spezifisches Styling.
+ *
+ * Hauptabschnitte (`builder-group-title`) werden als farbige Balken dargestellt,
+ * damit die fünf Schritte klar voneinander getrennt sind. Untertitel
+ * (`builder-subsection-title`) bleiben kleiner, mit dezenter Border-bottom.
+ *
+ * Light + Dark (explicit) + Auto-Dark gem. REDAXO-Recipe.
+ */
+
+.builder-group-title,
+.builder-subsection-title {
+    --tmce-builder-bar-bg: #2980b9;
+    --tmce-builder-bar-fg: #ffffff;
+    --tmce-builder-bar-shadow: rgba(41, 128, 185, 0.18);
+    --tmce-builder-subtitle-fg: #2c3e50;
+    --tmce-builder-subtitle-border: #dce4ec;
+    --tmce-builder-subtitle-icon: #2980b9;
+}
+
+body.rex-theme-dark .builder-group-title,
+body.rex-theme-dark .builder-subsection-title {
+    --tmce-builder-bar-bg: #1f6391;
+    --tmce-builder-bar-fg: #f4f8fb;
+    --tmce-builder-bar-shadow: rgba(0, 0, 0, 0.45);
+    --tmce-builder-subtitle-fg: #e8f0f7;
+    --tmce-builder-subtitle-border: #3a4654;
+    --tmce-builder-subtitle-icon: #5ea9d9;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .builder-group-title,
+    body.rex-has-theme:not(.rex-theme-light) .builder-subsection-title {
+        --tmce-builder-bar-bg: #1f6391;
+        --tmce-builder-bar-fg: #f4f8fb;
+        --tmce-builder-bar-shadow: rgba(0, 0, 0, 0.45);
+        --tmce-builder-subtitle-fg: #e8f0f7;
+        --tmce-builder-subtitle-border: #3a4654;
+        --tmce-builder-subtitle-icon: #5ea9d9;
+    }
+}
+
+/* Hauptabschnitt-Balken (Schritt 1..5) */
+.builder-group-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 32px 0 18px;
+    padding: 12px 18px;
+    background: var(--tmce-builder-bar-bg);
+    color: var(--tmce-builder-bar-fg);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px var(--tmce-builder-bar-shadow);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: none;
+    border: 0;
+}
+
+.builder-group-title .rex-icon {
+    font-size: 20px;
+    line-height: 1;
+    opacity: 0.9;
+}
+
+.builder-group-title .builder-group-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    margin-right: 4px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 13px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Erstes Balken-Element direkt am Container-Anfang nicht doppelt nach oben distanzieren */
+.builder-group-title:first-child {
+    margin-top: 8px;
+}
+
+/* Untertitel-Legends innerhalb eines Abschnitts */
+.builder-subsection-title {
+    margin: 24px 0 10px;
+    padding: 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tmce-builder-subtitle-fg);
+    border-bottom: 1px solid var(--tmce-builder-subtitle-border);
+    line-height: 1.4;
+    width: 100%;
+}
+
+.builder-subsection-title .rex-icon {
+    color: var(--tmce-builder-subtitle-icon);
+    margin-right: 6px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Kompakte Form-Darstellung im Assistant                              */
+/* ------------------------------------------------------------------ */
+
+#tinymce-profile-assistant .form-group {
+    margin-bottom: 10px;
+}
+
+#tinymce-profile-assistant .form-group label {
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+#tinymce-profile-assistant .help-block {
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 4px;
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+body.rex-theme-dark #tinymce-profile-assistant .help-block {
+    color: #9aa6b2;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) #tinymce-profile-assistant .help-block {
+        color: #9aa6b2;
+    }
+}
+
+#tinymce-profile-assistant .checkbox {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+/* Checkbox in derselben Reihe wie Inputs – an Input-Baseline ausrichten */
+#tinymce-profile-assistant .builder-checkbox-align {
+    margin-top: 26px;
+}
+
+/* Row-Abstände im Assistant etwas straffen */
+#tinymce-profile-assistant .row + .row {
+    margin-top: 6px;
+}
