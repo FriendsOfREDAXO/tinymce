@@ -1062,6 +1062,18 @@ function tiny_init(container) {
                     }
                 });
                 
+                // FIX: TinyMCE 8 HTML5-Schema beschränkt <span> auf [class|title] und
+                // strippt deshalb beim Serialisieren das style-Attribut (z. B. forecolor,
+                // backcolor, font-size). Wir erweitern die span-Regel hier explizit, damit
+                // inline-styled Spans (Farben, Größen, etc.) im getContent()-Output erhalten
+                // bleiben. Ohne diesen Patch verlieren Color-Toolbars und Style-Formate mit
+                // inline:'span' ihre style-Attribute beim Speichern.
+                editor.on('PreInit', function() {
+                    if (editor.schema && typeof editor.schema.addValidElements === 'function') {
+                        editor.schema.addValidElements('span[class|style|title|id|lang|dir|data-mce-*]');
+                    }
+                });
+
                 // Register all formats so they work when applied.
                 // Only include defined properties in the spec â€“ passing undefined values
                 // can confuse TinyMCE's internal format detection logic.
