@@ -26,7 +26,11 @@ async function build() {
 
     // Build mit esbuild
     await esbuild.build({
-      entryPoints: ['src/main/ts/Plugin.ts'],
+      // Wichtig: Main.ts als Entry — Plugin.ts exportiert nur die Setup-Funktion
+      // (`export default (): void => { ... }`), Main.ts ruft sie tatsaechlich auf
+      // (`Plugin();`). Ohne diesen Aufruf landet im IIFE-Bundle keine Registrierung
+      // und tinymce.PluginManager.add wird nie aufgerufen.
+      entryPoints: ['src/main/ts/Main.ts'],
       bundle: true,
       minify: true,
       format: 'iife',
