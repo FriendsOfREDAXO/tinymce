@@ -1,318 +1,544 @@
 # FriendsOfREDAXO-Plugins für TinyMCE
 
-Dieses AddOn liefert neben den Standard-Plugins von TinyMCE eine Reihe eigener **FOR-Plugins** (`for_*`). Sie sind open-source, speziell für REDAXO optimiert und decken Funktionen ab, für die sonst teils kommerzielle TinyMCE-Premium-Plugins nötig wären.
+Dieses AddOn liefert neben den Standard-Plugins von TinyMCE eine Reihe eigener **FOR-Plugins** (`for_*`). Sie sind Open Source, speziell für REDAXO optimiert und decken Funktionen ab, für die sonst teils kommerzielle TinyMCE-Premium-Plugins oder externe Editor-Frameworks (wie CKEditor 5) nötig wären.
 
-Im **Profil-Assistenten** erscheinen alle FOR-Plugins mit einem farbigen **„FOR"-Badge** und sind bei Plugin-Liste, Toolbar-Buttons und Custom-Menu-Items optisch hervorgehoben.
+Im **Profil-Assistenten** erscheinen alle Plugins dieses AddOns mit einem farbigen **Badge** (orange = FOR, blau = REDAXO/Klassiker) und sind in Plugin-Liste, Toolbar-Buttons und Custom-Menu-Items optisch hervorgehoben.
 
-> **Diese Seite ist die Kurzvorstellung.** Detaillierte Konfiguration, Frontend-CSS-Einbindung, CSS-Variablen und Profil-Beispiele stehen in der [Hilfe-Seite (README)](#).
+> Diese Datei beschreibt die **mitgelieferten Plugins im Detail**. Für die allgemeine Bedienung (Profile, Style-Sets, Snippets, Konfiguration) siehe die [README.md](README.md). Für Entwickler-Details (Build, Extension Points, eigene Plugins registrieren) siehe [DEVS.md](DEVS.md).
+
+## Gruppen-Übersicht
+
+| Gruppe | Plugins |
+| --- | --- |
+| Medien & Einbettung | `for_images`, `for_oembed`, `for_video`, `mediapaste` |
+| Struktur & Navigation | `for_toc`, `for_footnote` |
+| Listen, Embeds & Content | `for_checklist`, `for_checklist_feature`, `for_htmlembed`, `for_markdown` |
+| Sprache & Typografie | `for_chars_symbols`, `for_abbr`, `quote`, `phonelink` |
+| Barrierefreiheit | `for_a11y` |
+| Paste-Pipeline | `cleanpaste`, `mediapaste` |
+| REDAXO-Integration | `snippets`, `link_yform` |
+
+| Plugin | Zweck | Toolbar/Menü |
+| --- | --- | --- |
+| `for_images` | Bilder als Figure-Workflow (Mediapool-Show/Swap, Presets, Caption) – zusammen mit Core `image` | `for_images` |
+| `for_oembed` | YouTube-/Vimeo-Einbettung mit Live-Preview, **CKE5-kompatibles Save-Format** `<figure class="media"><oembed>` | `for_oembed` |
+| `for_video` | Lokale Videos aus dem Mediapool (HTML5 `<video>`) | `for_video` |
+| `for_htmlembed` | Geschützte HTML-/JS-Einbettung (iframe, Widgets, Tracking) | `for_htmlembed` |
+| `for_checklist` / `_feature` | Todo-Listen bzw. Feature-Listen, CKE5-Import (`ul.todo-list`) | `for_checklist`, `for_checklist_feature` |
+| `for_footnote` | Fußnoten mit Auto-Nummerierung & bidirektionalen Links | `for_footnote_insert`, `for_footnote_update` |
+| `for_toc` | Live-Inhaltsverzeichnis aus den Headings | `for_toc_insert`, `for_toc_update` |
+| `for_a11y` | Accessibility-Checker on demand mit Quickfix-Buttons | `for_a11y` |
+| `for_markdown` | Markdown → HTML per Dialog (markdown-it 14, GFM, Tasklisten) | `for_markdown_paste` |
+| `for_chars_symbols` | Zeichen + Emoji + Typografie als Panel, optionales Autoreplace | `for_chars_symbols`, `for_chars_symbols_invisibles` |
+| `for_abbr` | `<abbr>`-Auszeichnung + optionales Glossar | `for_abbr` |
+| `link_yform` | YForm-Datensätze direkt verlinken | Link-Dialog-Erweiterung |
+| `phonelink` | `tel:`-Links mit Normalisierung | `phonelink` |
+| `quote` | Semantisches `<blockquote>` + `<footer>`/`<cite>` | `quote` |
+| `cleanpaste` | Office-/Word-Cleanup, schützt FOR-Markup | – (PastePreProcess) |
+| `mediapaste` | Auto-Upload eingefügter Bilder in den Mediapool | – (Paste-Handler) |
+| `snippets` | HTML-Bausteine aus REDAXO-Snippet-Verwaltung | `snippets` |
 
 ---
 
-## Übersicht
+## Medien & Einbettung
 
-| Plugin | Zweck | Toolbar-Button / Menü-Eintrag |
-|---|---|---|
-| `for_images` | Erweiterte Bildbearbeitung als Figure-Workflow (Mediapool-Show/Swap, Presets, Caption) - empfohlen zusammen mit `image` | `for_images` |
-| `for_oembed` | oEmbed-Einbettungen (YouTube, Vimeo, …) mit Vorschau | `for_oembed` |
-| `for_video` | Lokale Videos aus dem Mediapool einbinden (HTML5 `<video>`) | `for_video` |
-| `for_htmlembed` | HTML-Snippets sicher einbetten (iframe-ähnliches Pattern, ohne Inline-Script-Risiken) | `for_htmlembed` |
-| `for_checklist` | Aufzählungen mit Checkboxen (Task-Listen) | `for_checklist` |
-| `for_checklist_feature` | Feature-Listen mit Checkboxen | `for_checklist_feature` |
-| `for_footnote` | Fußnoten im Text mit automatischer Nummerierung & Rück-Verweisen | `for_footnote_insert`, `for_footnote_update` |
-| `for_toc` | **Inhaltsverzeichnis** aus den Überschriften – Live-Sync beim Bearbeiten | `for_toc_insert`, `for_toc_update` |
-| `for_a11y` | **Accessibility-Checker** on demand – prüft den Inhalt gegen WCAG-nahe Regeln | `for_a11y` |
-| `for_markdown` | **Markdown-Import** per Dialog – CommonMark + GFM, Tasklisten werden zu Feature-Listen, fenced Code zu Codesample | `for_markdown_paste` |
-| `for_chars_symbols` | **Zeichen, Symbole & Emoji** – Picker mit Kategorien, Suche, Live-Typografie-Helfer (DE-/CH-/EN-/FR-Quotes, en-/em-dash, nbsp vor Einheiten, shy-Trennvorschlag), **Aktions-Favoriten** pro Typografie-Aktion, Zeichen- und Aktions-Favoriten + Zuletzt verwendet pro Browser, optionales **Autoreplace** beim Tippen (`(c)`→©, `->`→→, `1/2`→½, eigene Regeln inkl. Regex) | `for_chars_symbols` |
-| `for_abbr` | **Abkürzungen & Fremdwörter** als `<abbr title="…">` auszeichnen – wichtig für Screenreader und SEO. Dialog mit Anzeigetext, Langform und optionalem `lang`-Attribut. Erkennt bestehende `<abbr>` für Edit/Remove. Optionales **Glossar** via `for_abbr_glossary` schlägt passende Langform automatisch vor. Context-Toolbar + Shortcut <kbd>Ctrl/Cmd + Alt + A</kbd> | `for_abbr` |
-| `link_yform` | Verlinkt YForm-Datensätze direkt aus dem Editor – Tabellen-/Feldauswahl und konfigurierbares Link-Schema im Profil-Assistenten | Erweiterung des Link-Dialogs |
-| `phonelink` | Fügt Telefonnummern als `tel:`-Links ein (inkl. Normalisierung auf RFC-3966-gültige Zeichen) | `phonelink` |
-| `quote` | Formatierte Zitate (`<blockquote>`) mit optionalem Autor/`<cite>` einfügen | `quote` |
-| `cleanpaste` | Paste-Bereinigung: entfernt Word-/Office-Rauschen, normalisiert Klassen und Attribute, schützt das Markup der `for_*`-Plugins (Klassen `for-*`/`media`, Attribute `data-for-*`) | kein Button – greift in `PastePreProcess` |
-| `mediapaste` | Erkennt beim Einfügen eingebettete Bilder aus der Zwischenablage und lädt sie in den Mediapool hoch | Auto-Upload beim Paste |
-| `snippets` | Fügt wiederverwendbare HTML-Bausteine aus der REDAXO-Snippet-Verwaltung ein | `snippets` (Menü-Eintrag) |
+### `for_images` – Bilder im Figure-Workflow
 
-Die Plugins ohne `for_`-Präfix (`link_yform`, `phonelink`, `quote`, `cleanpaste`, `mediapaste`, `snippets`) sind Bestandteil dieses AddOns und werden dem gleichen Pflege-Standard wie die `for_*`-Plugins unterzogen. Ihre Namen bleiben aus Gründen der Rückwärtskompatibilität mit bestehenden Profilen erhalten; im Profil-Assistenten erscheinen sie identisch (gleiches blaues „REDAXO"-Badge) wie die `for_*`-Familie.
+Ergänzt das Core-Plugin `image` und übernimmt den erweiterten Figure-Workflow.
+
+- **Mediapool-Aktionen am Bild:** „Im Mediapool anzeigen" und „Aus Mediapool austauschen" (über `mceImage`-Dialog, ohne Verlust bestehender Klassen)
+- **Image-Width-Presets** (z. B. 25 %, 50 %, 100 %) statt Pixel-Resize
+- **Ausrichtungs-Presets:** links, rechts, zentriert, keine
+- **Effekt-Presets:** Schatten, Rundungen, Rahmen (togglebar)
+- **Alt-Text-Workflow:** Dialog mit Statusanzeige am Toolbar-Button
+- **Caption-Workflow:** `figcaption` einfügen, aktualisieren, entfernen
+- **Figure-Wrapper statt Inline-Style:** Preset-Klassen sitzen auf der `figure`, sauberes Save-Format
+- **Robuster Block:** Delete/Cut/Copy behandeln Bild + Caption als Einheit
+- **Responsive Klassen-Strategie:** UIkit, Bootstrap oder projektindividuelle Presets
+
+**Empfehlung:** Immer **zusammen mit dem Core-Plugin `image`** aktivieren – `image` liefert die Basis-Bildfunktionalität, `for_images` die Figure-Toolbar mit Presets/Mediapool.
+
+**Profil-Konfiguration:**
+
+```javascript
+plugins: 'for_images image ...',
+imagewidth_presets: [
+    { label: 'Original', class: '' },
+    { label: 'Klein',    class: 'uk-width-small@m' },
+    { label: 'Mittel',   class: 'uk-width-medium@m' },
+    { label: '50%',      class: 'uk-width-1-2@m' },
+    { label: '100%',     class: 'uk-width-1-1' },
+],
+imagealign_presets: [
+    { label: 'Keine',      class: '' },
+    { label: 'Links',      class: 'uk-float-left uk-margin-right uk-margin-bottom' },
+    { label: 'Rechts',     class: 'uk-float-right uk-margin-left uk-margin-bottom' },
+    { label: 'Zentriert',  class: 'uk-display-block uk-margin-auto' },
+],
+imageeffect_presets: [
+    { label: 'Schatten klein',  class: 'uk-box-shadow-small' },
+    { label: 'Schatten mittel', class: 'uk-box-shadow-medium' },
+    { label: 'Abgerundet',      class: 'uk-border-rounded' },
+    { label: 'Rahmen',          class: 'uk-border' },
+],
+```
+
+Templates im Profil-Assistenten: **UIkit 3**, **Bootstrap 5**, **Allgemein** (generische CSS-Klassen, siehe Frontend-CSS unten).
+
+**HTML-Ausgabe:**
+
+```html
+<figure class="uk-float-left uk-margin-right uk-margin-bottom uk-width-medium@m">
+    <img class="uk-width-1-1" src="/media/bild.jpg" alt="Beschreibung" width="800" height="600">
+    <figcaption>Optionale Bildunterschrift</figcaption>
+</figure>
+```
+
+**Frontend-CSS für die „Allgemein"-Vorlage** (ohne UIkit/Bootstrap):
+
+```php
+echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('css/for_images.css') . '">';
+```
+
+Enthält Breiten (`img-width-small/medium/large/full/25/50/75`), Ausrichtung (`img-align-*`), Effekte (`img-shadow-*`, `img-rounded`, `img-border`) und automatisches Float-Clearing auf Mobilgeräten.
 
 ---
 
-## Die FOR-Plugins im Detail
+### `for_oembed` – oEmbed-Einbettungen mit Live-Preview
 
-### `for_images` – Bilder aus dem Mediapool
+Nachfolger des kommerziellen TinyMCE-Premium-Plugins `mediaembed`. Save-Format ist **CKEditor-5-kompatibel** – Inhalte lassen sich 1:1 zwischen REDAXO/TinyMCE und CKE5-basierten Systemen austauschen.
 
-Ergaenzt das Core-Plugin `image` und bietet:
+- **Paste-Erkennung:** Eine YouTube-/Vimeo-URL einfügen → wird sofort zum Embed-Block.
+- **Toolbar-Button & Menü:** `for_oembed`. Doppelklick / Context-Toolbar zum Bearbeiten.
+- **Provider:** YouTube (watch / shorts / embed / youtu.be / nocookie), Vimeo (vimeo.com, player.vimeo.com). Erweiterbar im `parseUrl`-Modul.
+- **Live-Preview im Editor:** echter iframe + Overlay (`contenteditable="false"`) – Video spielt im Editor nicht ab, Cursor bleibt sauber.
+- **Save-Format:**
 
-- **Mediapool-Aktionen direkt am Bild:** "Im Medienpool anzeigen" und "Aus Medienpool austauschen".
-- **Image-Width-Presets** aus der Profilkonfiguration (z. B. 25 %, 50 %, 100 %) statt manuellem Pixel-Resize.
-- **Ausrichtungs-Presets und Buttons:** links, rechts, zentriert, keine.
-- **Effekt-Presets:** Schatten, Rundungen, Rahmen (togglebar).
-- **Alt-Text-Workflow:** Dialog + Statusanzeige am Toolbar-Button.
-- **Caption-Workflow:** `figcaption` einfuegen/entfernen/bearbeiten.
-- **Figure-Wrapper statt Inline-Styling:** Preset-Klassen auf `figure`, sauberes Save-Format.
-- **Robustes Tauschverhalten:** Beim Bildtausch werden inkompatible Preset-/Legacy-Klassen entfernt, damit keine Verzerrungen entstehen.
-- **Robustes Block-Verhalten:** Delete/Cut/Copy behandeln Bild + Caption als eine Einheit.
-- **Responsive Klassen-Strategie:** UIkit-, Bootstrap- oder projektindividuelle Presets.
+  ```html
+  <figure class="media">
+    <oembed url="https://www.youtube.com/watch?v=…"></oembed>
+  </figure>
+  ```
 
-> **Empfehlung:** `for_images` zusammen mit dem nativen `image` Plugin verwenden. `image` bleibt fuer die Basis-Bildfunktionen wichtig, `for_images` liefert den erweiterten Figure- und Mediapool-Workflow.
+- **Reverse-Import:** Vorhandene CKE5-Inhalte mit `<oembed>` werden beim Laden in die Preview entfaltet.
 
-### `for_oembed` – oEmbed-Einbettungen
+**Frontend-Rendering – PHP-Renderer (empfohlen):**
 
-Nachfolger des kommerziellen TinyMCE-Premium-Plugins.
+```php
+use FriendsOfRedaxo\TinyMce\Renderer\OembedRenderer;
 
-- Unterstützt YouTube, Vimeo und weitere oEmbed-Provider
-- Zeigt eine **echte Vorschau im Editor** statt nur Platzhalter
-- Speichert ein semantisches Wrapper-Markup, sodass Frontend-Lazy-Loading / Cookie-Consent-Wrapper leicht anzubringen ist
-- Alternativer Ersatz für das Core-Plugin `media`
+echo OembedRenderer::render($article->getValue('art_text'));
+```
 
-### `for_video` – Lokale Videos
+**Frontend-Rendering – JS-Helper:**
 
-Für MP4/WebM-Dateien aus dem Mediapool.
+```php
+echo '<script src="' . rex_addon::get('tinymce')->getAssetsUrl('js/for_oembed.js') . '" defer></script>';
+```
 
-- HTML5-`<video>`-Tag mit `controls`
-- Optional Poster-Bild, `muted`, `autoplay`, `loop`, `playsinline`
+**Optionale Vidstack-Integration:** Ist das [`vidstack`-AddOn](https://github.com/FriendsOfREDAXO/vidstack) installiert, nutzt der Renderer automatisch `<media-player>`-Komponenten statt iframe.
+
+```php
+echo OembedRenderer::registerFrontendAssets();
+```
+
+---
+
+### `for_video` – Lokale Videos aus dem Mediapool
+
+Für MP4/WebM-Dateien aus dem REDAXO-Mediapool.
+
+- HTML5-`<video controls>`
+- Optional: Poster-Bild, `muted`, `autoplay`, `loop`, `playsinline`
 - Saubere `<source>`-Listen für mehrere Formate
+- Mediapool-Picker zur Dateiauswahl
 
-### `for_htmlembed` – Sichere HTML-Einbettungen
+---
 
-Für Custom-Snippets, Drittanbieter-Widgets, iframes.
+### `mediapaste` – Bilder beim Paste automatisch hochladen
 
-- Einbetten im Editor als **ruhige Vorschau-Box** (kein Skript-Ausführen beim Editieren)
-- Kein `tiny_mce_wiris`/Script-Tag-Chaos in der Quelle
-- Guten Schutz gegen Broken-HTML beim Re-Edit
+Bilder per Drag & Drop, Copy-Image im Browser oder Screenshot-Clipboard landen direkt im REDAXO-Medienpool. Kein manueller Upload-Umweg.
 
-### `for_checklist` & `for_checklist_feature`
+- **Drag & Drop:** Bilddateien werden automatisch hochgeladen, der Original-Dateiname bleibt erhalten.
+- **Copy Image aus Browser:** binäre Bilddaten aus der Zwischenablage werden hochgeladen, externe URLs werden nicht eingefügt. Dateiname aus dem `<img src="…">` im Clipboard-HTML extrahiert.
+- **Screenshots/Clipboard-Binaries:** werden mit `image-<timestamp>.<ext>` benannt.
+- **Kategorie-Picker:** Dialog zur Auswahl der Medienkategorie unter Berücksichtigung der REDAXO-Rechte (`rex_media_perm`).
+- **Default-Kategorie:** Profil kann eine feste Kategorie vorgeben – dann entfällt der Dialog.
+- **Formate:** JPG, PNG, GIF, WebP, AVIF, SVG (`images_file_types` wird intern entsprechend erweitert).
+- **TinyMCE-interne Blob-Namen** (`mceclip*`, `blobid*`, `imagetools*`) werden durch saubere Dateinamen ersetzt.
 
-- `for_checklist` – interaktive Task-Listen (Checkbox-Listen)
-- `for_checklist_feature` – statische Feature-Listen mit Icon-Varianten (`check`, `cross`, `star`, konfigurierbar)
+**Einstellungen** unter **TinyMCE → Einstellungen → Bild-Upload**:
 
-Beide produzieren semantisch sauberes, Frontend-CSS-freies Markup.
+- Upload generell ein/aus
+- Default-Kategorie: `-1` = Dialog, `0` = Root, `>0` = feste ID
+- Optionaler Media-Manager-Type (z. B. `tiny`)
+
+> Hinweis SVG: Wenn ein Dateityp nicht hochgeladen werden kann, **Erlaubte Dateitypen** in der REDAXO-Systemeinstellung prüfen.
+
+---
+
+## Struktur & Navigation
+
+### `for_toc` – Inhaltsverzeichnis mit Live-Sync
+
+- Button **Inhaltsverzeichnis einfügen** scannt alle Überschriften (h1–h6) und erzeugt einen `<nav class="for-toc">`-Block.
+- **Stabile Slug-IDs** auf den Überschriften (`for-toc-<slug>`, kollisionsfrei). Bestehende IDs bleiben beim Re-Edit erhalten.
+- **Live-Sync** wie bei `for_footnote`: beim Tippen / Einfügen / Undo wird die TOC synchron gehalten.
+- **Einstellungen pro TOC** (Dialog): Titel, Ab-/Bis-Ebene, nummeriert (`<ol>`) vs. unsortiert (`<ul>`). Gespeichert als `data-for-toc-*`.
+- **Context-Toolbar** am aktiven TOC-Block: Aktualisieren, Einstellungen, Entfernen.
+- **Hierarchische Nummerierung** bei `<ol>` über CSS-Counters (`1`, `1.1`, `1.1.1` …). Filler-Einträge zählen nicht mit.
+- **Editor-Parität:** Counter-Regeln werden zusätzlich über `editor.dom.addStyle()` in den Editor-Iframe injiziert.
+- **Frontend-CSS** unter `assets/css/for_toc.css`, framework-agnostisch über CSS-Variablen (`--for-toc-*`) inkl. Dark-Mode und optionaler `.for-toc--sticky`-Variante.
+- **Optionales Frontend-JS** `for_toc.js` für Active-Section-Highlighting via IntersectionObserver.
+
+**Wichtige CSS-Variablen:**
+
+| Variable | Zweck |
+| --- | --- |
+| `--for-toc-bg`, `--for-toc-border-color` | Hintergrund & Akzent-Border |
+| `--for-toc-link-color` / `-hover-color` / `-active-color` | Link-Farben inkl. `aria-current` |
+| `--for-toc-list-indent` | Einrückung der Unter-Listen |
+| `--for-toc-number-separator` | Trennzeichen zwischen Ebenen (Default `.`) |
+| `--for-toc-number-suffix` | Zeichen nach der Nummer |
+| `--for-toc-number-color`, `--for-toc-number-font-weight` | Styling der Nummern |
+| `--for-toc-sticky-top`, `--for-toc-sticky-max-height` | für `.for-toc--sticky` |
+
+---
 
 ### `for_footnote` – Fußnoten
 
-- Fußnote per Dialog hinzufügen, automatische Nummerierung `[1]`, `[2]`, …
-- Referenzen im Text und Fußnoten-Block am Ende werden beim Save synchronisiert
-- Klick auf eine Fußnote im Text springt im Frontend zum Eintrag, Rück-Link zurück
+Freie, eigenständige Implementierung – kein Ersatz und keine API-Kompatibilität zum kommerziellen TinyMCE-Premium-Plugin.
 
-### `for_toc` – Inhaltsverzeichnis
+- **Toolbar:** `for_footnote_insert`, `for_footnote_update`
+- **Menü:** `for_footnote` (für das Insert-Menü)
+- **Commands:** `forFootnoteInsert`, `forFootnoteUpdate`
+- **Automatische Nummerierung** nach DOM-Reihenfolge
+- **Bidirektionale Verlinkung** (Nummer ↔ Eintrag)
+- Automatische Sektion `<div class="for-footnotes">` am Dokumentende
+- **Enter → Soft-Break** innerhalb eines Fußnoteneintrags (keine verschachtelten `<li>`)
+- **Waisen-Cleanup** über den Update-Button
 
-- Button **Inhaltsverzeichnis einfügen** scannt alle Überschriften (h1–h6) im Editor und erzeugt einen `<nav class="for-toc">`-Block mit verschachtelter Liste.
-- **Stabile Slug-IDs** auf den Überschriften (`for-toc-<slug>`, kollisionsfrei). Bestehende IDs bleiben beim Re-Edit erhalten.
-- **Live-Sync** wie `for_footnote`: beim Tippen/Einfügen/Undo wird die TOC automatisch aktualisiert – neue/umbenannte/gelöschte Überschriften werden synchron gehalten.
-- **Einstellungen pro TOC** (Dialog): Titel, Ab-/Bis-Ebene (h1–h6), nummeriert (`<ol>`) vs. unsortiert (`<ul>`). Werte werden als `data-for-toc-*` am Block gespeichert.
-- **Context-Toolbar** bei aktivem TOC-Block: Aktualisieren, Einstellungen, Entfernen.
-- Klick auf einen TOC-Link im Editor scrollt zum Ziel-Heading.
-- **Hierarchische Nummerierung** bei geordneten TOCs (`<ol>`) über CSS-Counters – Ausgabe `1` / `1.1` / `1.1.1` …, Filler-Einträge für übersprungene Heading-Ebenen zählen nicht mit. **Editor-Parität:** Die gleichen Counter-Regeln werden über `editor.dom.addStyle` direkt im Editor-Iframe angewendet, der Redakteur sieht also dasselbe Bild wie im Frontend.
-- **Frontend-CSS** framework-agnostisch über CSS-Variablen (`--for-toc-*`) inkl. Dark-Mode und optionaler `.for-toc--sticky`-Variante für Sidebar-TOCs. Nummerierung lässt sich pro Projekt anpassen (`--for-toc-number-separator`, `--for-toc-number-suffix`, `--for-toc-number-color`, `--for-toc-number-font-weight`, `--for-toc-number-min-width`, `--for-toc-number-gap`).
-- Optionales Frontend-JS `for_toc.js` für Active-Section-Highlighting via IntersectionObserver (setzt `for-toc__link--active` und `aria-current="true"`).
+**HTML-Ausgabe:**
 
-### `for_a11y` – Accessibility-Checker (on-demand)
+```html
+<p>
+  Text<sup class="for-footnote-ref" data-for-fn-id="abc1z" id="for-fnref-abc1z">
+    <a href="#for-fn-abc1z">[1]</a>
+  </sup>
+  mit Fußnote.
+</p>
 
+<div class="for-footnotes">
+  <hr>
+  <ol>
+    <li id="for-fn-abc1z" data-for-fn-id="abc1z">
+      <a class="for-footnote-back" href="#for-fnref-abc1z">^</a>
+      <span class="for-footnote-text">Fußnoten-Text</span>
+    </li>
+  </ol>
+</div>
+```
 
-Open-Source-Alternative zu TinyMCE Premium `a11ychecker`.
+**Frontend-CSS:** `assets/css/for_footnotes.css` – framework-agnostisch über CSS-Variablen (`--for-footnotes-*`, `--for-footnote-ref-*`, `--for-footnote-back-*`) inkl. Dark-Mode-Fallback.
 
-- Läuft **nur auf Knopfdruck**, ändert den Inhalt nicht automatisch
-- Schwebendes, **verschiebbares Befund-Panel** (kein Modal, kein Backdrop) – Editor bleibt sichtbar und voll bedienbar
-- Geführter Workflow: ein Befund nach dem anderen, Navigation per **◀ / ▶**
-- Pro Befund: **Ignorieren** / **Element bearbeiten** (springt und selektiert im Editor) / **Neu prüfen**
-- **Quickfix-Buttons:** Für viele Befunde (z.B. Fake-Listen, leere Absätze, generische Linktexte, fette Pseudo-Überschriften, zu viele Leerzeichen) steht ein Quickfix bereit, der das Problem automatisch behebt oder den passenden Editor-Dialog öffnet.
-- **Modularer Aufbau:** Jeder Befundtyp kann einen eigenen Quickfix-Handler registrieren. Neue Autofix-Strategien lassen sich einfach ergänzen.
-- **Demo-Text:** Die Hauptseite enthält eine A11y-Spielwiese mit typischen Fehlern für die Quickfix-Demo.
-- Marker im Editor: rot = Fehler, orange = Warnung, blau-gestrichelt = Hinweis
-- Public API:
-  ```javascript
-  tinymce.activeEditor.plugins.for_a11y.toggleaudit();
-  const issues = tinymce.activeEditor.plugins.for_a11y.getReport();
+---
+
+## Listen, Embeds & Content
+
+### `for_checklist` / `for_checklist_feature` – Moderne Checklisten
+
+Moderne Checkliste im Editor – ohne klassische Form-Checkbox. Die Checkbox wird als reines CSS-`::before`-Element gerendert und ist vollständig über CSS-Variablen anpassbar. **Beim Einfügen von CKEditor-5-Inhalten** werden `ul.todo-list`-Strukturen automatisch in das neue Format konvertiert.
+
+- **Zwei Varianten – zwei Buttons:**
+  - `for_checklist` – **To-Do-Liste**: erledigte Einträge durchgestrichen und ausgegraut.
+  - `for_checklist_feature` – **Feature-/Benefit-Liste**: neue Einträge sofort als „erfüllt" markiert, kein Strikethrough, grüner Check, offene Einträge mit gestricheltem Rahmen.
+- Klick auf den gleichen Button in einer bestehenden Liste hebt sie auf; Klick auf den anderen Button wechselt die Variante ohne Datenverlust.
+- **Command:** `forChecklistToggle` (Parameter `'todo'` oder `'feature'`).
+- **HTML-Ausgabe:** `<ul class="for-checklist"><li class="for-checklist__item" data-checked="true|false">…</li></ul>`.
+- **CKE5-Import:** `ul.todo-list` → `ul.for-checklist`, inkl. Übernahme des Checked-Zustands.
+- Toggle per Klick auf die Checkbox-Zone in einer `undoManager.transact`-Transaktion.
+- Modernes Design: abgerundete Checkbox, Hover-/Checked-Zustand, SVG-Häkchen, Dark-Mode (`prefers-color-scheme`), Print-Variante.
+
+**Frontend-CSS:** `assets/css/for_checklist.css` mit umfangreichen Variablen (`--for-checkbox-*`, `--for-checklist-*`, `--for-checklist-feature-*`).
+
+---
+
+### `for_htmlembed` – Geschützte HTML-Einbettung
+
+Geschützte HTML-/JS-Einbettung für Widgets, Tracking-Pixel, Social-Embeds, `<iframe>`, Mini-Apps. Der Code-Block ist im Editor **nicht direkt editierbar** (`contenteditable="false"`), nur als Ganzes verschiebbar/löschbar, und wird über einen separaten Dialog bearbeitet.
+
+- Toolbar-Button & Menüeintrag `for_htmlembed`
+- Commands: `forHtmlEmbedInsert`, `forHtmlEmbedEdit`
+- **Doppelklick** öffnet den Bearbeiten-Dialog
+- **Context-Toolbar** mit Edit- und Remove-Button
+- Save-Format unverändert:
+
+  ```html
+  <div class="for-htmlembed" contenteditable="false">
+    <!-- beliebiger HTML/JS/CSS-Code -->
+  </div>
   ```
-- Events: `A11ycheckStart`, `A11ycheckStop`, `A11ycheckIgnore`
-- Regeln (einzeln abschaltbar via `a11y_rules`): u. a. fehlendes `alt`, generische Link-Texte, leere/übersprungene Überschriften, Tabellen ohne `<th>`/`<caption>`, `<iframe>` ohne `title`, `target="_blank"` ohne Hinweis
-- **Hinweis:** Aktuell nur Deutsch, Mehrsprachigkeit folgt
+
+- Editor-Chrome (dashed border + Badge) nur im Editor-Iframe sichtbar; im Frontend bleibt nur ein schlichtes `<div>`.
+- Setzt `xss_sanitization: false` und `allow_script_urls: true` auf den Editor, sobald geladen – damit `<script>`, `<iframe>`, `<style>` und `on*`-Attribute nicht entfernt werden. **Nur aktivieren, wenn Redakteure beliebigen Code einbetten dürfen sollen.**
+- Die Textarea im Dialog erhält die Klasse `rex-js-code-editor` – das [code-AddOn](https://github.com/FriendsOfRedaxo/code) klinkt sich automatisch ein, sonst Monospace-Fallback.
 
 ---
 
 ### `for_markdown` – Markdown-Import per Dialog
 
-Dialog-basierter Markdown → HTML Konverter. Redakteure öffnen bewusst den Dialog, fügen Markdown ein, das Ergebnis wird als sauberes HTML an der Cursor-Position eingesetzt. Kein Autodetect, keine Paste-Interception, keine Kollision mit dem `markdowneditor`-AddOn.
+Dialog-basierter Markdown → HTML Konverter. Kein Autodetect, keine Paste-Interception – der Redakteur öffnet den Dialog, fügt Markdown ein, das Ergebnis wird an der Cursor-Position eingesetzt. Kollisionsfrei zum `markdowneditor`-AddOn (eigener Namespace `for_markdown*` / `for-markdown-*`).
 
-- **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebündelt – kein CDN, offline-fähig
-- **CommonMark + GFM:** Tables, Autolinks (`linkify`), SmartQuotes (`typographer`), harte Zeilenumbrüche (`breaks`), fenced Code
-- **Tasklisten → `for_checklist`:** `- [ ]` / `- [x]` → `<ul class="for-checklist for-checklist--feature"><li class="for-checklist__item" data-checked="…">…</li></ul>`
-- **Fenced Code → `codesample`:** ```` ```php …``` ```` → `<pre class="language-php"><code>…</code></pre>` (weiter editierbar per Core-`codesample`-Plugin)
-- **Toolbar/Menü:** `for_markdown_paste` – Label „Markdown einfügen…"
-- **Command:** `forMarkdownOpenDialog` – aus eigenen Buttons / Shortcuts auslösbar
-- **Namespace:** komplett `for_markdown*` / `for-markdown-*`
+- **Engine:** [markdown-it 14](https://github.com/markdown-it/markdown-it) gebündelt im Plugin-Bundle – kein CDN, offline-fähig.
+- **CommonMark + GFM:** Tables, Autolinks (`linkify`), SmartQuotes (`typographer`), harte Zeilenumbrüche (`breaks`), fenced Code.
+- **Tasklisten → `for_checklist`:** `- [ ]` / `- [x]` → `<ul class="for-checklist for-checklist--feature">…</ul>`.
+- **Fenced Code → `codesample`-kompatibel:** ` ```php …``` ` → `<pre class="language-php"><code>…</code></pre>` (weiter editierbar per Core-`codesample`).
+- **Toolbar/Menü:** `for_markdown_paste` (Label „Markdown einfügen…").
+- **Command:** `forMarkdownOpenDialog` – aus eigenen Buttons / Shortcuts auslösbar.
 
----
-
-
-Ersatz für `forced_root_block: false` unter TinyMCE 6/7/8 – dort ist diese Option entfernt worden. Das Plugin lässt den `forced_root_block` (Default `div`) im Editor aktiv (damit Edits stabil bleiben) und entfernt den Wrapper erst beim Auslesen/Speichern.
-
-- Reines Content-Processing-Plugin – kein Button, kein Menüeintrag, keine Toolbar-Einträge
-- Ideal für Felder, in denen TinyMCE nur den **Inhalt** liefern soll und das äußere Tag (`h2`, `h3`, `span`, …) vom Modul vorgegeben wird
-- Entfernt den Wrapper nur, wenn genau **ein** Root-Element mit reinem Inline-Inhalt vorhanden ist – bei mehreren Blöcken bleibt der Content unangetastet
-- Paste-/Insert-sicher: programmatisches `setContent`, Zwischenablage-Inhalte und Auswahl-Operationen werden nicht zusätzlich umhüllt
+`for_markdown` erzeugt ausschließlich Markup der anderen Plugins (`for-checklist`, `language-*`) und normales semantisches HTML – keine eigene CSS-Datei nötig.
 
 ---
+
+## Sprache & Typografie
 
 ### `for_chars_symbols` – Zeichen, Symbole & Emoji
 
 Unified Picker für Sonderzeichen, native Emojis und Typografie. Als **schwebendes, draggable Panel** – kein blockierendes Modal, bleibt offen, damit mehrere Zeichen/Emojis in Folge eingefügt werden können.
 
-- **Vier Tabs:** „★ Favoriten / ⏱ Zuletzt verwendet" (erster Tab), „Zeichen", „Emoji" (kuratiert, nach Kategorien), „Typografie" (Aktionen auf der Markierung).
+- **Tabs:** „★ Favoriten / ⏱ Zuletzt verwendet", „Zeichen", „Emoji" (nach Kategorien), „Typografie" (Aktionen auf der Markierung).
 - **Live-Suche** pro Tab – Name, Zeichen oder Codepoint (`U+…`).
 - **Favoriten + Zuletzt verwendet** persistent im Browser (`localStorage`), max. 24 Einträge.
 - **Echte Unicode-Zeichen** statt HTML-Entities (`\u00A0`, `\u00AD`, `\u202F` …) – nichts wird escaped.
-- **Direkt-Einfüge-Menu-Items** für Einfügen-Menüs: `fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp` oder gesammelt via `fcs_insert_invisibles`.
-- **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht alle sonst unsichtbaren Zeichen (nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm) im WYSIWYG mit einem dezenten Label-Marker (`[nbsp]`, `[shy]`, …) sichtbar. Die Marker sind `data-mce-bogus="1"` – werden niemals gespeichert.
-- **Typografie-Aktionen** auf der Markierung: Anführungszeichen DE/DE-CH/EN/FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
-- **Aktions-Favoriten:** jede Typografie-Aktion lässt sich über den Stern ☆ als Favorit markieren. Favoriten erscheinen gebündelt oben im Favoriten-Tab (separat von den Zeichen-Favoriten) und sind pro Browser persistent.
-- **Autoreplace (optional):** `for_chars_symbols_autoreplace: true` aktiviert Live-Ersetzungen beim Tippen, getriggert durch Space/Enter/Satzzeichen. Eingebaute Regeln: `(c)`→©, `(r)`→®, `(tm)`→™, `(p)`→℗, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `2^3`→2³ (Ziffer + `^` + 0-9 → Superscript). Eigene Regeln per `for_chars_symbols_autoreplace_rules` (siehe unten). Nicht aktiv in `<code>`, `<pre>`, `<kbd>`, `<samp>`.
+- **Direkt-Einfüge-Menu-Items:** `fcs_insert_nbsp`, `fcs_insert_nnbsp`, `fcs_insert_shy`, `fcs_insert_zwsp` oder gesammelt via `fcs_insert_invisibles`.
+- **Kontextmenü-Einträge** für geschützte/weiche Trenner.
+- **Invisibles-Toggle** `for_chars_symbols_invisibles`: macht nbsp, nnbsp, shy, zwsp, zwj, zwnj, lrm, rlm im WYSIWYG mit Label-Marker sichtbar. Marker sind `data-mce-bogus="1"` – werden niemals gespeichert.
+- **Typografie-Aktionen:** Anführungszeichen DE / DE-CH / EN / FR, en-/em-dash-Normalisierung, NBSP vor Einheiten (`5 kg` → `5 kg`), Soft-Hyphen-Vorschläge, Telefonnummern normalisieren (E.164/national).
+- **Aktions-Favoriten:** jede Typografie-Aktion lässt sich über den Stern ☆ als Favorit markieren und erscheint separat oben im Favoriten-Tab.
 - **Shortcut:** `Strg/⌘ + Shift + I` öffnet den Picker.
-- **Locale:** `for_chars_symbols_locale` – `de` (Default), `de-ch`, `en`, `fr`.
-- **Autoreplace-Konfiguration (im Profilassistent, `extra`-YAML):**
 
-  ```yaml
-  for_chars_symbols_autoreplace: true
-  for_chars_symbols_autoreplace_defaults: true  # optional, Default: true
-  for_chars_symbols_autoreplace_rules:
-    # einfache Ersetzung (Array-Kurzform)
+**Optionen:**
+
+| Option | Default | Zweck |
+| --- | --- | --- |
+| `for_chars_symbols_locale` | `de` | `de`, `de-ch`, `en`, `fr` – Anführungszeichen & Quote-Normalisierung |
+| `for_chars_symbols_autoreplace` | `false` | Live-Ersetzungen beim Tippen aktivieren |
+| `for_chars_symbols_autoreplace_defaults` | `true` | Eingebaute Standardregeln nutzen |
+| `for_chars_symbols_autoreplace_rules` | `[]` | Eigene Regeln (Array/Objekt/Regex) |
+
+**Autoreplace-Standardregeln** (Auszug): `(c)`→©, `(r)`→®, `(tm)`→™, `(p)`→℗, `...`→…, `->`/`-->`→→, `<-`/`<--`→←, `==>`→⇒, `+/-`→±, `!=`→≠, `<=`→≤, `>=`→≥, `~=`→≈, `1/2`→½, `1/4`→¼, `3/4`→¾, `2^3`→2³. Nicht aktiv in `<code>`, `<pre>`, `<kbd>`, `<samp>`.
+
+**Eigene Regeln (YAML im Profil):**
+
+```yaml
+for_chars_symbols_autoreplace: true
+for_chars_symbols_autoreplace_rules:
     - ["(tel)",  "+49 2843 999999"]
     - ["(mail)", "info@example.com"]
-    # Objekt-Form
     - { from: "(zvk)", to: "Zahlung per Vorkasse" }
-    # Regex mit Backreference ($1..$9):
     - { re: "\\(kw(\\d{1,2})\\)", to: "KW $1" }
-  ```
+```
 
-  `for_chars_symbols_autoreplace_defaults: false` deaktiviert die eingebauten Standardregeln (nur eigene Regeln aktiv). Custom-Regeln überschreiben Defaults bei identischem `from`.
-- **Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
+Pflege im Profil-Assistenten ab v8.5.3 ohne YAML-Handarbeit – Repeater-Tabelle „Typografie-Autoreplace".
+
+**Commands:** `forCharsSymbolsOpen`, `forCharsSymbolsToggleInvisibles`.
 
 ---
 
-### `for_abbr` – Abkürzungen & Fremdwörter (abbr-Element)
+### `for_abbr` – Abkürzungen & Fremdwörter
 
-Semantisches `<abbr title="…">`-Markup für Abkürzungen, Fachbegriffe und Fremdwörter. Screenreader können die Langform vorlesen, Browser zeigen sie beim Hovern als Tooltip — wichtig für Barrierefreiheit (WCAG 3.1.4 *Abkürzungen*) und SEO.
+Semantisches `<abbr title="…">`-Markup für Abkürzungen, Fachbegriffe und Fremdwörter — wichtig für Screenreader (WCAG 3.1.4 *Abkürzungen*) und SEO.
 
 - **Toolbar-Button / Menüeintrag / Context-Toolbar:** `for_abbr` (Toggle-Button mit Active-State auf bestehenden `<abbr>`).
-- **Dialog:** Anzeigetext + Langform (→ `title`) + optionales `lang`-Attribut (z. B. `en` für englische Fremdwörter — Screenreader wechselt dann die Aussprache).
-- **Edit-Modus:** Cursor in/auf einem `<abbr>` → beim Öffnen werden die Felder aus dem Element befüllt. Zusätzlicher *Entfernen*-Button unwrappt das Element und behält den Textinhalt.
-- **Optionales Glossar** via Editor-Option `for_abbr_glossary` – eine Liste bekannter Abkürzungen. Sobald der Anzeigetext im Dialog einer Glossar-Term entspricht (case-insensitive), werden `title` und optional `lang` automatisch vorbefüllt:
+- **Dialog:** Anzeigetext + Langform (→ `title`) + optionales `lang` (z. B. `en` für englische Fremdwörter – Screenreader wechselt dann die Aussprache).
+- **Edit-Modus:** Cursor in/auf `<abbr>` → Felder aus dem Element. Zusätzlicher *Entfernen*-Button unwrappt.
+- **Shortcut:** <kbd>Ctrl/Cmd + Alt + A</kbd>.
+- **Optionales Glossar** via `for_abbr_glossary`: bekannte Abkürzungen werden im Dialog automatisch vorgeschlagen.
 
-  ```yaml
-  for_abbr_glossary:
-    - { term: HTML,  title: 'Hypertext Markup Language',    lang: en }
-    - { term: CSS,   title: 'Cascading Style Sheets',       lang: en }
+```yaml
+for_abbr_glossary:
+    - { term: HTML,  title: 'Hypertext Markup Language',            lang: en }
+    - { term: CSS,   title: 'Cascading Style Sheets',               lang: en }
     - { term: WCAG,  title: 'Web Content Accessibility Guidelines', lang: en }
     - { term: DSGVO, title: 'Datenschutz-Grundverordnung' }
     - { term: z. B., title: 'zum Beispiel' }
-  ```
-
-- **Shortcut:** <kbd>Ctrl/Cmd + Alt + A</kbd>.
+```
 
 ---
 
-## Plugins ohne `for_`-Präfix
+### `quote` – Formatierte Zitate
 
-Diese Plugins sind fester Bestandteil des AddOns, wurden aber vor Einführung des `for_*`-Namespaces entwickelt. Sie behalten ihre ursprünglichen Namen, damit bestehende Profile nicht umgeschrieben werden müssen – funktional und in der Pflege sind sie den `for_*`-Plugins gleichgestellt.
+Fügt ein semantisch sauberes `<blockquote>` mit optionalem Autor und `<cite>` ein.
+
+- **Toolbar-Button / Menüeintrag:** `quote`
+- **Dialog-Felder:** Quote-Text (Textarea), Autor, Cite-Quelle
+- **Saubere HTML5-Ausgabe:** `<blockquote><p>…</p><footer>Autor, <cite>Quelle</cite></footer></blockquote>`; ist nur Autor oder nur Cite gesetzt, wird der Footer reduziert; sind beide leer, kein Footer.
+- Zeilenumbrüche im Zitat-Text werden zu `<br>`.
+- HTML-Escaping aller Eingaben – Redakteure können keine versteckten Tags einschleusen.
+- Keine Inline-Styles, keine Framework-Abhängigkeit – das Ziel-Stylesheet entscheidet über das Aussehen.
+
+---
+
+### `phonelink` – `tel:`-Links mit Normalisierung
+
+Dialog zum Einfügen einer Telefonnummer als anklickbarer `tel:`-Link.
+
+- **Toolbar-Button / Menüeintrag:** `phonelink` (eigenes SVG-Icon)
+- **Dialog-Felder:** *Phone number*, *Text to display*, *Title*
+- **Href-Normalisierung:** Die Nummer wird im `href` auf RFC-3966-gültige Zeichen reduziert (`+`, Ziffern, `-.()`). Leerzeichen, `/` oder Buchstaben wandern nicht in den Link.
+- **Anzeigetext bleibt** wie eingegeben (Klammern, Leerzeichen, nationale Formatierung erlaubt).
+- **Aktuelle Auswahl** wird als initialer *Text to display* übernommen. Bei aktivem `tel:`-Link-Selektor wird die Nummer aus dem `href` rekonstruiert.
+- Ergänzt sich mit der *Typografie-Aktion* „Telefonnummer normalisieren" in `for_chars_symbols`.
+
+---
+
+## Barrierefreiheit
+
+### `for_a11y` – Accessibility-Checker mit Quickfix-Panel
+
+Open-Source-Alternative zu TinyMCE Premium `a11ychecker`.
+
+- Läuft **nur auf Knopfdruck**, ändert den Inhalt nicht automatisch.
+- Schwebendes, **verschiebbares Befund-Panel** (kein Modal, kein Backdrop) – Editor bleibt sichtbar und bedienbar.
+- Geführter Workflow: ein Befund nach dem anderen, Navigation per **◀ / ▶**.
+- Pro Befund: **Ignorieren** / **Element bearbeiten** / **Neu prüfen**.
+- **Quickfix-Buttons:** Für viele Befunde (Fake-Listen, leere Absätze, generische Linktexte, fette Pseudo-Überschriften, zu viele Leerzeichen, Alt-Text fehlt) gibt es einen Auto-Fix bzw. einen passenden Editor-Dialog.
+- **Modularer Aufbau:** Jeder Befundtyp kann einen eigenen Quickfix-Handler registrieren. Eigene Autofix-Strategien lassen sich einfach ergänzen.
+- Marker im Editor: rot = Fehler, orange = Warnung, blau-gestrichelt = Hinweis.
+- **Regeln** (einzeln abschaltbar via `a11y_rules`): u. a. fehlendes `alt`, generische Link-Texte, leere/übersprungene Überschriften, Tabellen ohne `<th>`/`<caption>`, `<iframe>` ohne `title`, `target="_blank"` ohne Hinweis.
+
+**Public API:**
+
+```javascript
+tinymce.activeEditor.plugins.for_a11y.toggleaudit();
+const issues = tinymce.activeEditor.plugins.for_a11y.getReport();
+```
+
+**Events:** `A11ycheckStart`, `A11ycheckStop`, `A11ycheckIgnore`.
+
+> Aktuell nur deutsche Texte – Mehrsprachigkeit folgt.
+
+---
+
+## Paste-Pipeline
+
+### `cleanpaste` – Office-/Word-Cleanup (PowerPaste-Ersatz)
+
+Freier Ersatz für das kostenpflichtige PowerPaste. Bereinigt eingefügten Text automatisch von Office-/Google-Docs-Markup, unerwünschten Klassen, Styles und leeren Elementen.
+
+- **Office-Cleanup:** Entfernt MS Word / Outlook / Google-Docs-Markup (`MsoNormal`, `docs-*`, `<o:p>`, mso-Conditionals, Smart Tags) bereits auf String-Ebene.
+- **DOM-Cleanup:** Entfernt konfigurierbar `class`, `style`, `id`, `data-*`-Attribute.
+- **BR-Reduktion** und **Leer-Paragraphen-Entfernung**.
+- **Positiv-Listen mit Regex** pro Profil – alles andere wird verworfen (z. B. `^uk-.*` für UIkit-Klassen).
+- **Schutz-Liste (nicht überschreibbar)** für `for_*`-Plugin-Markup: Klassen mit Präfix `for-*` sowie `media` bleiben immer erhalten, Attribute mit Präfix `data-for-*` sowie `data-mce-selected` werden nie entfernt. Verhindert Kollisionen mit `for_oembed`, `for_video`, `for_images`, `for_checklist`, `for_toc`, `for_footnote`.
+- Greift in `PastePreProcess` – kein sichtbarer Button.
+
+**Konfiguration** unter **TinyMCE → Paste-Einstellungen** (zentral, in `profiles.js` eingebettet – funktioniert auch im Frontend):
+
+- Erlaubte Tags / Klassen / Inline-Styles / IDs / `data-*`-Attribute (jeweils Regex-fähig)
+- Cleanup-Stufen: BR-Reduktion, Leer-Paragraph-Entfernung, Office-Strip, DOM-Cleanup
+
+---
+
+### `mediapaste`
+
+Siehe [Medien & Einbettung](#mediapaste--bilder-beim-paste-automatisch-hochladen).
+
+---
+
+## REDAXO-Integration
 
 ### `link_yform` – YForm-Datensätze verlinken
 
 Erweitert den Link-Dialog um eine Auswahl über YForm-Tabellen.
 
 - Auswahl von **Tabelle + Datensatz + Feld** direkt im Link-Dialog
-- Optionales **Link-Schema** pro Tabelle (z. B. `index.php?article_id=5&news=[id]` oder `/produkt/[id]`) mit Platzhaltern `[id]` (Datensatz-ID) und `[field]` (Feldwert). Leer = es wird nur der reine Feldwert als Link-Text eingefügt.
-- Konfiguration der verfügbaren Tabellen/Felder/Schemata im Profil-Assistenten (Abschnitt *YForm Link-Konfiguration*)
-- Voraussetzung: YForm-AddOn installiert und aktiv
+- **Konfigurierbares Link-Schema** pro Tabelle mit Platzhaltern – Default ist der interne Marker `tabellenname://id`, der dann im `OUTPUT_FILTER` durch echte URLs ersetzt wird.
+- Konfiguration im Profil-Assistenten (Abschnitt *YForm Link-Konfiguration*) oder direkt im Profil:
 
-### `phonelink` – Telefonnummern als `tel:`-Links
+```javascript
+link_yform_tables: {
+    title: 'YForm Datensätze',
+    items: [
+        { title: 'Projekt verlinken',       table: 'rex_yf_project', field: 'title' },
+        { title: 'Veranstaltung verlinken', table: 'rex_yf_event',   field: 'name', url: '/event:' },
+    ]
+}
+```
 
-Dialog zum Einfügen einer Telefonnummer als anklickbarer `tel:`-Link.
+| Key | Typ | Beschreibung |
+| --- | --- | --- |
+| `title` | String | Titel im Menü (optional) |
+| `table` | String | YForm-Tabelle |
+| `field` | String | Feldname für den Linktext |
+| `url` | String | Optional: Schema für den internen Platzhalter-Link. Standard `tabellenname://`. |
 
-- **Toolbar-Button / Menüeintrag:** `phonelink`
-- Normalisiert die Nummer auf RFC-3966-gültige Zeichen (`+`, Ziffern, `-.()`)
-- Anzeigetext bleibt wie vom Redakteur eingegeben
-- Ergänzt sich mit der *Typografie-Aktion* „Telefonnummer normalisieren" in `for_chars_symbols` (E.164/national als Text-Transform)
+**URL-Ersetzung im Frontend** – Beispiel `boot.php`:
 
-### `quote` – Formatierte Zitate
+```php
+rex_extension::register('OUTPUT_FILTER', function (rex_extension_point $ep) {
+    return preg_replace_callback(
+        '@(rex_yf_project|rex_yf_event)://(\d+)@',
+        function (array $matches): string {
+            [$_, $table, $id] = $matches;
+            return $table === 'rex_yf_project'
+                ? rex_getUrl('', '', ['project_id' => $id])
+                : '/index.php?id=' . $id;
+        },
+        $ep->getSubject(),
+    );
+});
+```
 
-Fügt einen `<blockquote>`-Block mit optionalem `<footer>`/`<cite>` ein.
+Voraussetzung: YForm-AddOn installiert und aktiv.
 
-- **Toolbar-Button / Menüeintrag:** `quote`
-- Dialog-Felder für Zitat-Text, Autor und Quelle
-- Sauberes, semantisches HTML5-Markup – keine Inline-Styles, keine Framework-Abhängigkeit
+---
 
-### `cleanpaste` – Paste-Bereinigung
+### `snippets` – HTML-Bausteine aus der Snippet-Verwaltung
 
-Hook in den `PastePreProcess`-Handler. Entfernt Word-/Office-Rauschen und normalisiert Klassen/Attribute beim Einfügen.
+Bindet die REDAXO-Snippet-Verwaltung an TinyMCE an. Redakteure können wiederverwendbare HTML-Bausteine direkt aus dem Editor auswählen und einfügen.
 
-- Kein sichtbarer Button – wirkt automatisch, sobald das Plugin im Profil aktiv ist
-- **Konfigurierbare Whitelist** `paste_preserve_classes` für projekteigene Klassen-Präfixe
-- **Interne Schutzliste** (nicht überschreibbar) für `for_*`-Plugin-Markup: Klassen mit Präfix `for-*` sowie `media` bleiben immer erhalten, Attribute mit Präfix `data-for-*` sowie `data-mce-selected` werden nie entfernt – verhindert Kollisionen mit `for_oembed`, `for_video`, `for_images`, `for_checklist`, `for_toc` und `for_footnotes`
-- Ersetzt bei den meisten Anwendungen das kommerzielle `powerpaste`
+- **Menüeintrag:** `snippets` (Standard im *Einfügen*-Menü)
+- Snippets werden zentral im Backend gepflegt – Änderungen wirken sofort auf alle Editor-Instanzen.
+- Nur-Lese-Ausgabe: das Plugin selbst ändert keine Snippet-Inhalte, es fügt sie an Cursor-Position ein.
+- Ideal für wiederkehrende Blöcke (Call-to-Action-Boxen, Disclaimer-Texte, Info-Kästen).
 
-### `mediapaste` – Medien beim Paste automatisch hochladen
-
-Erkennt beim Einfügen eingebettete Bilder (z. B. aus der Zwischenablage, Word, Mails) und lädt sie in den REDAXO-Mediapool.
-
-- Greift in `paste_data_images` / `images_upload_handler`
-- Kategorie-Auswahl (Mediapool-Kategorie) über den Profil-Assistenten oder per Option `category_id`
-- Fortschritts-/Fehler-Anzeige als TinyMCE-Alertbanner
-- Unterstützte Formate orientieren sich an `images_file_types` (Default: `jpg,jpeg,png,gif,webp,svg,avif`)
-
-### `snippets` – Snippet-Verwaltung im Editor
-
-Bindet die REDAXO-*Snippet-Verwaltung* an TinyMCE an. Redakteure können wiederverwendbare HTML-Bausteine direkt aus dem Editor auswählen und einfügen.
-
-- **Menüeintrag:** `snippets` (Default im „Einfügen"-Menü)
-- Snippets werden zentral im Backend gepflegt – Änderungen wirken auf alle Editor-Instanzen
-- Nur-Lese-Ausgabe: das Plugin selbst ändert keine Snippet-Inhalte, es fügt sie ein
+```javascript
+plugins: 'snippets ...',
+menu: {
+    insert: { title: 'Einfügen', items: '... snippets ...' }
+},
+```
 
 ---
 
 ## Verwendung im Profil
 
-Alle FOR-Plugins werden im Profil wie normale TinyMCE-Plugins aktiviert:
+Alle Plugins werden im Profil wie normale TinyMCE-Plugins aktiviert:
 
 ```javascript
-plugins: 'lists link for_images for_oembed for_video for_footnote for_a11y',
-toolbar: 'bold italic | for_images for_oembed for_video | for_footnote for_a11y',
+plugins: 'lists link image for_images for_oembed for_video for_footnote for_a11y for_toc cleanpaste',
+toolbar: 'bold italic | for_images for_oembed for_video | for_footnote for_a11y for_toc',
 menu: {
     insert: {
         title: 'Einfügen',
-        items: 'for_images for_oembed for_video for_htmlembed | for_checklist for_footnote | charmap hr'
+        items: 'for_images for_oembed for_video for_htmlembed | for_checklist for_footnote for_toc_insert | charmap hr'
     }
 }
 ```
 
-| `markdowneditor` (als Toggle im Editor) | `for_markdown` (Dialog-Import) |
-Der **Profil-Assistent** übernimmt das für dich: Plugins per Klick hinzufügen, Toolbar und Einfügen-Menü per Drag & Drop sortieren.
+**Core-Plugins sinnvoll kombinieren:**
 
-Für **Frontend-CSS-Einbindung** (`for_images.css`, `for_footnotes.css`, `for_checklist.css`) und die zugehörigen **CSS-Variablen** siehe die Hilfe-Seite (README).
+| Core | Empfohlene Ergänzung |
+| --- | --- |
+| `image` | + `for_images` (beide aktivieren) |
+| `media` | → `for_oembed` + `for_video` |
+| `paste` | + `cleanpaste` + `mediapaste` |
+| `charmap` / `emoticons` | → `for_chars_symbols` (ersetzt beide) |
+| `markdowneditor` (AddOn, Editor-Toggle) | + `for_markdown` (Dialog-Import) |
 
----
-
-## Empfehlung: Core-Plugins sinnvoll kombinieren
-
-Wenn du die FOR-Varianten nutzt, empfiehlt sich folgende Kombination:
-
-| Core | Ersatz durch |
-|---|---|
-| `image` | `image` + `for_images` (zusammen nutzen) |
-| `media` | `for_oembed` + `for_video` |
+Der **Profil-Assistent** übernimmt das per Klick: Plugins hinzufügen, Toolbar und Einfügen-Menü per Drag & Drop sortieren.
 
 ---
 
-## Quellen & Entwicklung
-
-Die Plugin-Quelldateien liegen unter `custom_plugins/<plugin>/src/main/ts/Plugin.ts`. Build pro Plugin:
-
-```bash
-cd custom_plugins/for_a11y
-pnpm build
-```
-
-Alle Plugins zusammen:
-
-```bash
-pnpm run plugins:build
-```
-
-Die Plugin-Bundles werden automatisch nach `assets/scripts/tinymce/plugins/` und `assets/vendor/tinymce/plugins/` kopiert.
+Entwickler-Themen wie Quellpfade, Build-Pipeline, Sync-Layout und Extension Points sind in [DEVS.md](DEVS.md) dokumentiert.
