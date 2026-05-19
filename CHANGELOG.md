@@ -9,6 +9,14 @@ Version 8.10.3
 * Beim Klick auf den Swap-Button im `for_images`-Plugin (Bild aus Mediapool austauschen) wurde das ausgewählte Bild nicht mehr übernommen.
 * Fix: Der Swap-Button delegiert jetzt direkt an die Standard-Bild-Dialog-Pipeline von TinyMCE (`editor.execCommand('mceImage')`). Diese nutzt den ohnehin in `base.js` registrierten `file_picker_callback`, der den REDAXO-Mediapool öffnet und Alt-Text/`src` über die bewährte URL-Converter-Strecke setzt. Die eigene `openREXMedia` + `setAttribute`-Spur ist damit entfernt.
 
+### for_images: Interne Aufräumarbeiten (Plugin.ts)
+
+* `imageshowpool`-Button entrümpelt: nur noch ein schlanker `window.open`-Aufruf, ohne überflüssige try/catch- und Info-Notification-Schleife.
+* `stripPresetClasses`-Helfer entfernt – einzige verbliebene Aufrufstelle nutzt jetzt direkt `cleanupFigureClasses`, was die Klassenbereinigung in einer einzigen API bündelt.
+* `normalizeFigures` macht den Doppelpass nicht mehr (zwei `querySelectorAll`), sondern walkt `img, figure` in einer einzigen Traversierung.
+* Figure-as-Block-Handler (Cut/Copy/Delete/Backspace) nutzen jetzt zwei kleine Helper (`writeFigureToClipboard`, `removeFigureBlock`) statt dieselbe `undoManager.transact + setData`-Sequenz vier Mal zu duplizieren.
+* Netto ~40 Zeilen weniger in `Plugin.ts`, gleiches Verhalten.
+
 ### Build-Pipeline: klare Trennung Core / Custom
 
 * Custom-Plugins aus `custom_plugins/*` werden ab sofort **ausschließlich** nach `assets/scripts/tinymce/plugins/` gebaut. Der Pfad `assets/vendor/tinymce/` ist reserviert für upstream TinyMCE aus dem npm-Paket `tinymce` (Core, Themes, Models, Skins, Core-Plugins) und wird nur noch von `scripts/vendor-copy.js` beschrieben.
