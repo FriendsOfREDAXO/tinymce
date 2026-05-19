@@ -4,31 +4,28 @@ Changelog
 Version 8.10.3
 ---------------
 
-### for_images: „Aus Mediapool austauschen“ greift wieder
+### Fixes
 
-* Beim Klick auf den Swap-Button im `for_images`-Plugin (Bild aus Mediapool austauschen) wurde das ausgewählte Bild nicht mehr übernommen.
-* Fix: Der Swap-Button delegiert jetzt direkt an die Standard-Bild-Dialog-Pipeline von TinyMCE (`editor.execCommand('mceImage')`). Diese nutzt den ohnehin in `base.js` registrierten `file_picker_callback`, der den REDAXO-Mediapool öffnet und Alt-Text/`src` über die bewährte URL-Converter-Strecke setzt. Die eigene `openREXMedia` + `setAttribute`-Spur ist damit entfernt.
+* **for_images:** „Aus Mediapool austauschen“ funktioniert wieder – Swap-Button delegiert jetzt an `mceImage` und nutzt damit den Standard-`file_picker_callback`.
+* **Issue #171:** Deaktivierte `for_*`-Plugins werden nicht mehr initialisiert. `base.js` filtert `external_plugins` jetzt gegen die `plugins:`-Liste des Profils.
 
-### for_images: Interne Aufräumarbeiten (Plugin.ts)
+### Profil-Assistent
 
-* `imageshowpool`-Button entrümpelt: nur noch ein schlanker `window.open`-Aufruf, ohne überflüssige try/catch- und Info-Notification-Schleife.
-* `stripPresetClasses`-Helfer entfernt – einzige verbliebene Aufrufstelle nutzt jetzt direkt `cleanupFigureClasses`, was die Klassenbereinigung in einer einzigen API bündelt.
-* `normalizeFigures` macht den Doppelpass nicht mehr (zwei `querySelectorAll`), sondern walkt `img, figure` in einer einzigen Traversierung.
-* Figure-as-Block-Handler (Cut/Copy/Delete/Backspace) nutzen jetzt zwei kleine Helper (`writeFigureToClipboard`, `removeFigureBlock`) statt dieselbe `undoManager.transact + setData`-Sequenz vier Mal zu duplizieren.
-* Netto ~40 Zeilen weniger in `Plugin.ts`, gleiches Verhalten.
+* Pluginliste ↔ Optionen sind jetzt bidirektional gekoppelt: `for_images` deaktivieren entfernt automatisch den Bildbreiten-Block; `autoresize`-Checkbox ↔ `autoresize`-Plugin synchron.
+* **Auto-Hide Toolbar** neu implementiert: Menü/Toolbar/Statusleiste klappen via CSS `:focus-within`/`:hover` ein/aus statt per fragilem Inline-`display:none`. Status wird beim Reload korrekt erkannt.
+* Sub-Bereich „Bild- und FOR Images Einstellungen“ umbenannt (vorher „Bildbreiten“).
+* Schritt 1 kompakter gruppiert: Menüleiste + Auto-Hide Toolbar in einer Zeile, URL/Encoding in einer statt zwei Zeilen, einheitliche Bar-Style-Gruppentitel mit Light/Dark-Mode-Support.
 
-### Build-Pipeline: klare Trennung Core / Custom
+### Build-Pipeline
 
-* Custom-Plugins aus `custom_plugins/*` werden ab sofort **ausschließlich** nach `assets/scripts/tinymce/plugins/` gebaut. Der Pfad `assets/vendor/tinymce/` ist reserviert für upstream TinyMCE aus dem npm-Paket `tinymce` (Core, Themes, Models, Skins, Core-Plugins) und wird nur noch von `scripts/vendor-copy.js` beschrieben.
-* Bisher kopierten `build-plugins.js`, `sync-build-to-assets.js` sowie jedes `custom_plugins/<name>/package.json` (`build-copy`) das Build-Ergebnis zusätzlich nach `assets/vendor/tinymce/plugins/<name>/`. Folge: jedes Update von upstream TinyMCE hätte Custom-Dateien überschrieben, parallel existierten zwei Kopien mit divergierenden Cache-Bustern.
-* `scripts/clean-build.js` räumt vorhandene Altlasten: alle Unterordner in `assets/vendor/tinymce/plugins/`, deren Namen einem Eintrag in `custom_plugins/` entsprechen, werden gelöscht. Einmaliger Cleanup im Repo bereits erfolgt.
-* Details siehe `DEVS.md` → Abschnitt „Build-Prozess im Detail“.
+* Custom-Plugins werden nur noch nach `assets/scripts/tinymce/plugins/` gebaut; `assets/vendor/tinymce/` ist ab sofort reserviert für upstream TinyMCE. `clean-build.js` räumt Altlasten. Details in `DEVS.md`.
 
-### Issue #171: Deaktivierte `for_*`-Plugins blieben aktiv
+### Intern (`for_images`)
 
-* `external_plugins` aus `PluginRegistry` wurde in `base.js` unverändert in jedes Profil gemerged. TinyMCE lädt und **initialisiert** alle Einträge aus `external_plugins`, unabhängig von der `plugins:`-Liste – dadurch waren z. B. `for_images`-Buttons (Mediapool-Ersetzen) auch dann sichtbar, wenn das Plugin im Profil nicht aktiviert war.
-* Neu: `base.js` filtert `external_plugins` jetzt gegen die `plugins`-Liste des jeweiligen Profils. Nur tatsächlich aktive Custom-Plugins werden initialisiert.
-* Profile-Assistant: Wird `for_images` oben aus der Pluginliste entfernt, wird automatisch auch der untere Block „Bildbreiten / for_images“ (`.builder-imagewidth-enable`) deaktiviert. Vorher blieb die Option sichtbar angekreuzt und die serialize-Stufe hat `for_images` beim Speichern wieder in die Pluginliste geschrieben – das wirkte für User wie ein Bug.
+* `Plugin.ts` entrümpelt: einheitliche Klassenbereinigung über `cleanupFigureClasses`, einfacher Traversal in `normalizeFigures`, Cut/Copy/Delete-Handler durch zwei Helper konsolidiert (~40 Zeilen weniger, gleiches Verhalten).
+
+Version 8.10.2
+---------------
 
 ### cleanpaste: Optionales Bereinigen interner Pastes
 
