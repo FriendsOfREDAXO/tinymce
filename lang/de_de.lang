@@ -312,6 +312,8 @@ tinymce_cleanpaste_strip_ms_office = MS Office Markup entfernen
 tinymce_cleanpaste_strip_ms_office_help = Entfernt bedingte Kommentare, Office-XML-Namespace-Tags (o:p, w:sdtPr usw.) und mso-* CSS-Eigenschaften.
 tinymce_cleanpaste_strip_google_docs = Google Docs Markup entfernen
 tinymce_cleanpaste_strip_google_docs_help = Entfernt startFragment/endFragment-Kommentare und interne Google-IDs.
+tinymce_cleanpaste_clean_internal_paste = Auch interne Pastes bereinigen
+tinymce_cleanpaste_clean_internal_paste_help = Standardmäßig werden Copy/Paste-Vorgänge innerhalb desselben Editors (z. B. Style-Sets, Snippets, eingefärbte Schrift) nicht bereinigt, damit diese Formatierungen erhalten bleiben. Aktivieren, wenn auch beim editor-internen Einfügen Inline-Styles, Klassen usw. konsequent gemäß den Regeln oben entfernt werden sollen.
 
 tinymce_cleanpaste_section_styles = Klassen & Styles
 tinymce_cleanpaste_remove_styles = Inline-Styles entfernen

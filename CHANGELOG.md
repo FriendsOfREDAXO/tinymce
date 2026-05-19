@@ -4,6 +4,13 @@ Changelog
 Version 8.10.2
 ---------------
 
+### cleanpaste: Optionales Bereinigen interner Pastes
+
+* Neue Option **„Auch interne Pastes bereinigen“** (`clean_internal_paste`, Default `false`) in den Paste-Settings.
+* Bisheriges Verhalten bleibt Standard: Copy/Paste innerhalb desselben Editors wird nicht bereinigt, damit Style-Sets, Snippets und bewusst gesetzte Inline-Formate (z. B. eingefärbte Schrift) erhalten bleiben.
+* Mit aktivierter Option werden auch interne Pastes durch die normale `cleanpaste`-Pipeline geschickt – z. B. verliert eine kopierte eingefärbte Passage beim erneuten Einfügen ihre Inline-Styles (sofern `Inline-Styles entfernen` aktiv ist).
+* Lang-Keys für `de_de`, `en_gb` und `sv_se` ergänzt.
+
 ### Span-Inline-Styles (Farbe) bleiben beim Speichern erhalten
 
 * TinyMCE 8 reduziert das `<span>`-Schema serverseitig auf `[class|title]`, wodurch Inline-Styles wie `style="color:…"` beim Serialisieren entfernt wurden.

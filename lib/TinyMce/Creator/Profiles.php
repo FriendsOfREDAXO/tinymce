@@ -92,6 +92,7 @@ class Profiles
                 'max_br'                 => 2,
                 'max_empty_paragraphs'   => 2,
                 'allowed_tags'           => [],
+                'clean_internal_paste'   => false,
             ]);
             $cleanPasteConfigJs = json_encode($cleanPasteCfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
