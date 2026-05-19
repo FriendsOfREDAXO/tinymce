@@ -320,12 +320,15 @@ const Plugin = (): void => {
         });
 
         editor.on('PreInit', () => {
+            // Wichtig: span hier NICHT auf [class] reduzieren, sonst werden Color-/Style-Attribute beim
+            // Serialisieren entfernt. Wir erweitern das Schema additiv und lassen globale span-Regeln
+            // (siehe base.js) unangetastet, indem wir die volle, sichere Attributliste verwenden.
             editor.schema.addValidElements(
                 'sup[class|id|' + DATA_ATTR + '|contenteditable],' +
                 'div[class],' +
                 'a[class|href|contenteditable],' +
                 'li[id|' + DATA_ATTR + '],' +
-                'span[class]'
+                'span[class|style|title|id|lang|dir|data-mce-*]'
             );
         });
 

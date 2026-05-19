@@ -1068,11 +1068,18 @@ function tiny_init(container) {
                 // inline-styled Spans (Farben, Größen, etc.) im getContent()-Output erhalten
                 // bleiben. Ohne diesen Patch verlieren Color-Toolbars und Style-Formate mit
                 // inline:'span' ihre style-Attribute beim Speichern.
-                editor.on('PreInit', function() {
+                // Wichtig: Einige Plugins (for_footnotes, for_video) registrieren eigene
+                // PreInit-Handler, die span auf [class] bzw. [class|title] reduzieren und
+                // dabei unser style-Recht überschreiben. Deshalb patchen wir das Schema
+                // sowohl in PreInit (Default-Fall) als auch in init (läuft NACH allen
+                // Plugin-PreInits und gewinnt damit gegen die einschränkenden Aufrufe).
+                function patchSpanSchemaForStyles() {
                     if (editor.schema && typeof editor.schema.addValidElements === 'function') {
                         editor.schema.addValidElements('span[class|style|title|id|lang|dir|data-mce-*]');
                     }
-                });
+                }
+                editor.on('PreInit', patchSpanSchemaForStyles);
+                editor.on('init', patchSpanSchemaForStyles);
 
                 // Register all formats so they work when applied.
                 // Only include defined properties in the spec â€“ passing undefined values

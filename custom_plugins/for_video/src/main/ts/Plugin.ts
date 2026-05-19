@@ -636,7 +636,8 @@ const Plugin = (): void => {
             schema.addValidElements('source[src|type]');
             schema.addValidElements('track[kind|src|srclang|label|default]');
             schema.addValidElements('div[class|style|data-for-video-toolbar]');
-            schema.addValidElements('span[class|title]');
+            // span nicht reduzieren – sonst verlieren forecolor/backcolor und inline-Styles ihre Attribute.
+            schema.addValidElements('span[class|style|title|id|lang|dir|data-mce-*]');
             schema.addValidElements('button[type|class|title|aria-label|data-for-video-stop|data-for-video-select]');
             schema.addValidElements('img[class|src|alt|loading|referrerpolicy|draggable]');
             schema.addValidElements('svg[viewBox|width|height|xmlns|focusable|aria-hidden]');
