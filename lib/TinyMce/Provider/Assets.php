@@ -170,10 +170,11 @@ class Assets
     }
 
     /**
-     * @return array<string, string>
+     * @return array<int|string, string>
      */
     private static function loadProfileNamesById(): array
     {
+        /** @var array<int|string, string> $map */
         $map = [];
 
         try {
@@ -219,6 +220,7 @@ class Assets
             'max_br'                 => 2,
             'max_empty_paragraphs'   => 2,
             'allowed_tags'           => [],
+            'clean_internal_paste'   => false,
         ]);
 
         \rex_view::setJsProperty('tinyCleanPasteConfig', $cfg);

@@ -26,6 +26,7 @@ if ($send) {
         'allowed_tags'           => array_values(array_filter(
             array_map('trim', explode("\n", rex_request::request('allowed_tags', 'string', '')))
         )),
+        'clean_internal_paste'   => (bool) rex_request::request('clean_internal_paste', 'boolean', false),
     ];
     $addon->setConfig('cleanpaste_settings', $settings);
 
@@ -50,7 +51,8 @@ if ($send) {
  *   remove_data_attrs: bool,
  *   max_br: int,
  *   max_empty_paragraphs: int,
- *   allowed_tags: list<string>
+ *   allowed_tags: list<string>,
+ *   clean_internal_paste: bool
  * } $cfg */
 $cfg = $addon->getConfig('cleanpaste_settings', [
     'strip_ms_office'        => true,
@@ -64,6 +66,7 @@ $cfg = $addon->getConfig('cleanpaste_settings', [
     'max_br'                 => 2,
     'max_empty_paragraphs'   => 2,
     'allowed_tags'           => [],
+    'clean_internal_paste'   => false,
 ]);
 
 echo $message;
@@ -103,6 +106,20 @@ $formUrl = rex_url::currentBackendPage([], false);
                                 </label>
                             </div>
                             <p class="help-block"><?= $addon->i18n('cleanpaste_strip_google_docs_help') ?></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="clean_internal_paste" value="1"
+                                        <?= $cfg['clean_internal_paste'] ? 'checked' : '' ?>>
+                                    <?= $addon->i18n('cleanpaste_clean_internal_paste') ?>
+                                </label>
+                            </div>
+                            <p class="help-block"><?= $addon->i18n('cleanpaste_clean_internal_paste_help') ?></p>
                         </div>
                     </div>
                 </div>

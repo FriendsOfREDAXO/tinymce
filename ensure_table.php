@@ -1,4 +1,5 @@
 <?php
+
 // ensure_table.php
 // A minimal, autoload-free snippet that can be included from install.php and update.php
 // to ensure the required tinymce_profiles table exists.

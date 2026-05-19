@@ -73,11 +73,15 @@ async function buildPlugin(p){
     }
   }
 
-  // If no prebuilt artifact, try to bundle a common entrypoint with esbuild
+  // If no prebuilt artifact, try to bundle a common entrypoint with esbuild.
+  // Wichtig: Main.ts kommt VOR Plugin.ts, weil Plugin.ts in der TinyMCE-Konvention
+  // nur die Setup-Funktion exportiert (`export default (): void => {...}`), während
+  // Main.ts diese tatsächlich aufruft (`Plugin();`). Würde esbuild Plugin.ts als
+  // Entry nehmen, fehlt im IIFE-Output der Aufruf und das Plugin registriert sich nie.
   const entryCandidates = [
-    'src/main/ts/Plugin.ts',
     'src/main/ts/Main.ts',
     'src/main/ts/api/Main.ts',
+    'src/main/ts/Plugin.ts',
     'src/main/index.ts',
     'src/main.js',
     'src/index.js'

@@ -312,6 +312,8 @@ tinymce_cleanpaste_strip_ms_office = Ta bort MS Office-markup
 tinymce_cleanpaste_strip_ms_office_help = Tar bort villkorliga kommentarer, Office-XML-namnrymder (o:p, w:sdtPr osv.) och mso-* CSS-egenskaper.
 tinymce_cleanpaste_strip_google_docs = Ta bort Google Docs-markup
 tinymce_cleanpaste_strip_google_docs_help = Tar bort startFragment/endFragment-kommentarer och interna Google-ID:n.
+tinymce_cleanpaste_clean_internal_paste = Rensa även interna klistringar
+tinymce_cleanpaste_clean_internal_paste_help = Som standard rensas inte kopiera/klistra in inom samma editor (t.ex. style-sets, snippets, färgad text) så att dessa format behålls. Aktivera för att även ta bort inline-stilar, klasser m.m. vid interna klistringar enligt reglerna ovan.
 
 tinymce_cleanpaste_section_styles = Klasser & stilar
 tinymce_cleanpaste_remove_styles = Ta bort inline-stilar

@@ -19,6 +19,7 @@ interface CleanPasteConfig {
     max_br: number;                   // 0 = no limit
     max_empty_paragraphs: number;     // 0 = no limit
     allowed_tags: string[];           // empty array = allow all tags
+    clean_internal_paste: boolean;    // if true, also clean pastes originating inside TinyMCE itself
 }
 
 /* ================================================================== */
@@ -38,6 +39,7 @@ const defaultConfig: CleanPasteConfig = {
     max_br: 2,
     max_empty_paragraphs: 2,
     allowed_tags: [],
+    clean_internal_paste: false,
 };
 
 /* ================================================================== */
@@ -388,11 +390,15 @@ const Plugin = (): void => {
         }
 
         editor.on('PastePreProcess', (e: { content: string; internal?: boolean }) => {
-            // Skip cleanup for internal pastes (cut/copy/paste inside the same editor).
-            // Otherwise styles applied via Style-Sets or content inserted via the
-            // snippets plugin would lose their classes/styles when the user copies
-            // and re-pastes them inside the editor.
-            if (e.internal) {
+            // Skip cleanup for internal pastes (cut/copy/paste inside the same editor)
+            // by default. Otherwise styles applied via Style-Sets or content inserted
+            // via the snippets plugin would lose their classes/styles when the user
+            // copies and re-pastes them inside the editor.
+            //
+            // Opt-in via config flag `clean_internal_paste`: when enabled, internal
+            // pastes are also bereinigt (so z.B. eingefärbte Schrift verliert beim
+            // Copy/Paste innerhalb des Editors ihre Inline-Farbe).
+            if (e.internal && !config.clean_internal_paste) {
                 return;
             }
             if (e.content) {

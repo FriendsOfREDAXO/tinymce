@@ -1,6 +1,28 @@
 Changelog
 =========
 
+Version 8.10.2
+---------------
+
+### cleanpaste: Optionales Bereinigen interner Pastes
+
+* Neue Option **„Auch interne Pastes bereinigen“** (`clean_internal_paste`, Default `false`) in den Paste-Settings.
+* Bisheriges Verhalten bleibt Standard: Copy/Paste innerhalb desselben Editors wird nicht bereinigt, damit Style-Sets, Snippets und bewusst gesetzte Inline-Formate (z. B. eingefärbte Schrift) erhalten bleiben.
+* Mit aktivierter Option werden auch interne Pastes durch die normale `cleanpaste`-Pipeline geschickt – z. B. verliert eine kopierte eingefärbte Passage beim erneuten Einfügen ihre Inline-Styles (sofern `Inline-Styles entfernen` aktiv ist).
+* Lang-Keys für `de_de`, `en_gb` und `sv_se` ergänzt.
+
+### Span-Inline-Styles (Farbe) bleiben beim Speichern erhalten
+
+* TinyMCE 8 reduziert das `<span>`-Schema serverseitig auf `[class|title]`, wodurch Inline-Styles wie `style="color:…"` beim Serialisieren entfernt wurden.
+* Neu: In `assets/scripts/base.js` wird das Span-Schema in `PreInit` **und** `init` defensiv um `style|id|lang|dir|data-mce-*` ergänzt (`editor.schema.addValidElements(...)`), sodass Plugin-Reduktionen unsere Regel nicht mehr überschreiben.
+* `for_footnotes` und `for_video` ergänzen ihre Span-Schema-Regeln jetzt **additiv** (`span[class|style|title|id|lang|dir|data-mce-*]`) statt das Schema auf `[class|title]` zu reduzieren.
+
+### Ladeoptimierung: `quote` und `link_yform` registrieren sich wieder zuverlässig
+
+* Die plugin-eigenen `build.js`-Skripte von `quote` und `link_yform` bündelten bisher `src/main/ts/Plugin.ts` als Entry-Point. Plugin.ts exportiert in der TinyMCE-Konvention jedoch nur die Setup-Funktion (`export default (): void => { … }`) – `tinymce.PluginManager.add(...)` wurde damit nie aufgerufen.
+* Entry-Point in beiden `build.js` auf `src/main/ts/Main.ts` umgestellt (ruft `Plugin()` korrekt auf). Die kaputten vorgebauten `dist/`-Artefakte wurden entfernt und neu erzeugt.
+* `scripts/build-plugins.js` priorisiert im Fallback-Pfad jetzt `Main.ts` vor `Plugin.ts`, damit dieser Fehler bei neuen Plugins nicht erneut auftritt.
+
 Version 8.10 (in development)
 -------------------------------
 

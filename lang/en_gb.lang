@@ -307,8 +307,8 @@ tinymce_cleanpaste_section_source = Source cleanup
 tinymce_cleanpaste_strip_ms_office = Remove MS Office markup
 tinymce_cleanpaste_strip_ms_office_help = Removes conditional comments, Office XML namespace tags (o:p, w:sdtPr etc.) and mso-* CSS properties.
 tinymce_cleanpaste_strip_google_docs = Remove Google Docs markup
-tinymce_cleanpaste_strip_google_docs_help = Removes startFragment/endFragment comments and internal Google IDs.
-
+tinymce_cleanpaste_strip_google_docs_help = Removes startFragment/endFragment comments and internal Google IDs.tinymce_cleanpaste_clean_internal_paste = Also clean internal pastes
+tinymce_cleanpaste_clean_internal_paste_help = By default, copy/paste operations inside the same editor (e.g. style-sets, snippets, coloured text) are not cleaned so those formats survive. Enable to also strip inline styles, classes etc. on editor-internal pastes according to the rules above.
 tinymce_cleanpaste_section_styles = Classes & styles
 tinymce_cleanpaste_remove_styles = Remove inline styles
 tinymce_cleanpaste_remove_styles_help = Removes all style="..." attributes from pasted content.
