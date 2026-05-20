@@ -115,10 +115,21 @@ async function buildPlugin(p){
         external: ['tinymce'],
       });
 
-      // Provide an unminified alias used by some profiles / dev tooling.
+      // Also produce a real unminified `plugin.js` companion (used by some
+      // profiles / dev tooling). Run a second esbuild pass with `minify: false`
+      // so the file actually differs from `plugin.min.js`.
       try {
-        fs.copyFileSync(outfile, path.join(outDir, 'plugin.js'));
-      } catch (_e) { /* ignore */ }
+        await esbuild.build({
+          entryPoints: [full],
+          bundle: true,
+          minify: false,
+          format: 'iife',
+          target: ['es2017'],
+          outfile: path.join(outDir, 'plugin.js'),
+          sourcemap: false,
+          external: ['tinymce'],
+        });
+      } catch (_e) { /* ignore – plugin.min.js is the canonical artifact */ }
 
       const langsSrc = path.join(pluginDir, 'langs');
       if (fs.existsSync(langsSrc)){
