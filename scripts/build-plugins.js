@@ -159,9 +159,26 @@ async function main(){
       try{
         const pkg = JSON.parse(await fsp.readFile(packageJson, 'utf8'));
         if (pkg.scripts && pkg.scripts.build){
-          log('  run plugin build script');
-          try { execSync('pnpm run build', { stdio: 'inherit', cwd: pluginDir }); }
-          catch (e) { log('  plugin build failed for', p, '- continuing (error ignored)'); }
+          // In staging mode, avoid running the plugin's `build` script, because
+          // it typically chains `build-copy` and writes directly into
+          // `assets/scripts/tinymce/plugins/...`. That would dirty the working
+          // tree and defeat the purpose of `--staging` (output to `build/`
+          // only). Run the plain `build.js` if present, which just produces
+          // `dist/<name>/` and lets `buildPlugin()` copy it into `build/`.
+          if (staging){
+            const buildJs = path.join(pluginDir, 'build.js');
+            if (fs.existsSync(buildJs)){
+              log('  run plugin build.js (staging, no build-copy)');
+              try { execSync('node build.js', { stdio: 'inherit', cwd: pluginDir }); }
+              catch (e) { log('  plugin build.js failed for', p, '- continuing (error ignored)'); }
+            } else {
+              log('  skip plugin build script in staging (no build.js found)');
+            }
+          } else {
+            log('  run plugin build script');
+            try { execSync('pnpm run build', { stdio: 'inherit', cwd: pluginDir }); }
+            catch (e) { log('  plugin build failed for', p, '- continuing (error ignored)'); }
+          }
         }
       } catch (e) { log('failed reading package.json for', p, e.message); }
     }

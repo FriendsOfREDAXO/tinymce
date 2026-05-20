@@ -6,7 +6,7 @@ Version 8.10.3
 
 ### Fixes
 
-* **for_images:** „Aus Mediapool austauschen“ funktioniert wieder – Swap-Button delegiert jetzt an `mceImage` und nutzt damit den Standard-`file_picker_callback`.
+* **for_images:** „Aus Mediapool austauschen“ – Swap-Button delegiert jetzt an `mceImage` und nutzt damit den Standard-`file_picker_callback`.
 * **Issue #171:** Deaktivierte `for_*`-Plugins werden nicht mehr initialisiert. `base.js` filtert `external_plugins` jetzt gegen die `plugins:`-Liste des Profils.
 
 ### Profil-Assistent
@@ -23,6 +23,10 @@ Version 8.10.3
 ### Intern (`for_images`)
 
 * `Plugin.ts` entrümpelt: einheitliche Klassenbereinigung über `cleanupFigureClasses`, einfacher Traversal in `normalizeFigures`, Cut/Copy/Delete-Handler durch zwei Helper konsolidiert (~40 Zeilen weniger, gleiches Verhalten).
+
+### Docs
+
+Überarbeitet und besser strukturiert 
 
 Version 8.10.2
 ---------------
