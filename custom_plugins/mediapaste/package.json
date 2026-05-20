@@ -4,7 +4,7 @@
   "description": "Upload images dropped or pasted into TinyMCE directly to the REDAXO mediapool",
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/mediapaste/ ../../assets/scripts/tinymce/plugins/mediapaste/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/mediapaste/ ../../assets/vendor/tinymce/plugins/mediapaste/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/mediapaste/ ../../assets/scripts/tinymce/plugins/mediapaste/"
   },
   "keywords": ["tinymce", "upload", "paste", "mediapool", "redaxo"],
   "author": "FriendsOfREDAXO",

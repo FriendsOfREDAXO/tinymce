@@ -208,8 +208,9 @@ tinymce_overwrites_existing_config = Overwrites existing configuration!
 tinymce_none = None
 
 # imagewidth plugin
-tinymce_imagewidth = Image Width Plugin
-tinymce_imagewidth_help = Fixed image widths via CSS classes instead of manual resizing.
+tinymce_imagewidth = Image and FOR Images settings
+tinymce_imagewidth_help = Advanced image formatting via CSS classes instead of manual resizing: fixed widths, alignment (left/right/center), effect classes (e. g. shadow, border, rounding) and &lt;figure&gt; wrapping with caption. Presets for UIkit, Bootstrap and generic pixel values – including Mediapool replace directly from the editor.
+tinymce_imagewidth_plugin_hint = This option is coupled to the <code>for_images</code> plugin: if <code>for_images</code> is disabled in step 2 (Plugins), this block is automatically disabled too – and vice versa.
 
 tinymce_settings_title = URL status
 tinymce_settings_resolved_asset_base = Auto-resolved TinyMCE asset URL
@@ -219,7 +220,7 @@ tinymce_settings_regenerate = Regenerate profiles.js
 tinymce_settings_saved = profiles.js has been regenerated.
 tinymce_settings_saved_profiles_failed = <code>profiles.js</code> could not be regenerated. Please check logs.
 tinymce_media_upload_settings_saved = Image upload settings have been saved.
-tinymce_imagewidth_enable = Enable Image Width Plugin
+tinymce_imagewidth_enable = Enable FOR Images
 tinymce_imagewidth_framework = CSS Framework
 tinymce_imagewidth_general = General (pixel-based)
 tinymce_imagewidth_dialog = Dialog button in toolbar

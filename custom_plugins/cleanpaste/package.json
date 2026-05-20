@@ -4,7 +4,7 @@
   "description": "Automatically cleans pasted content from MS Office, Google Docs and other external sources",
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/cleanpaste/ ../../assets/scripts/tinymce/plugins/cleanpaste/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/cleanpaste/ ../../assets/vendor/tinymce/plugins/cleanpaste/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/cleanpaste/ ../../assets/scripts/tinymce/plugins/cleanpaste/"
   },
   "keywords": ["tinymce", "paste", "clean", "office"],
   "author": "FriendsOfREDAXO",

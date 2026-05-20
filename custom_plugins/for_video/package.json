@@ -4,7 +4,7 @@
   "description": "Local video plugin for TinyMCE (FriendsOfREDAXO) — <video> insertion from mediapool with poster, presets and click-to-play preview",
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_video/ ../../assets/scripts/tinymce/plugins/for_video/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_video/ ../../assets/vendor/tinymce/plugins/for_video/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_video/ ../../assets/scripts/tinymce/plugins/for_video/"
   },
   "keywords": ["tinymce", "video", "mediapool", "redaxo"],
   "author": "FriendsOfREDAXO",

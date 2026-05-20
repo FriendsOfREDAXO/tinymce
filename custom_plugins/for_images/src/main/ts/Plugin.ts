@@ -1,7 +1,6 @@
 import { Editor, TinyMCE } from 'tinymce';
 
 declare const tinymce: TinyMCE;
-declare const openREXMedia: any;
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -158,25 +157,24 @@ function normalizeFigures(editor: Editor, scope?: ParentNode): void {
     return;
   }
 
-  // Re-wrap standalone images (e.g. paste fallback that drops <figure>)
-  const standaloneImages = Array.from(root.querySelectorAll('img')).filter((img) => {
-    const parent = img.parentElement;
-    return !(parent && parent.nodeName === 'FIGURE');
-  });
-
-  standaloneImages.forEach((img) => {
-    ensureFigureWrap(editor, img as HTMLElement);
-  });
-
-  // Remove broken figure wrappers that have no image
-  const figures = Array.from(root.querySelectorAll('figure'));
-  figures.forEach((figure) => {
-    if (!figure.querySelector('img')) {
-      const hasElementChildren = figure.children.length > 0;
-      const hasTextContent = (figure.textContent || '').trim() !== '';
-      if (hasElementChildren || hasTextContent) {
-        return;
+  // Single-pass traversal: re-wrap standalone <img> AND remove empty <figure>
+  // in one DOM walk instead of two separate querySelectorAll passes.
+  Array.from(root.querySelectorAll('img, figure')).forEach((el) => {
+    if (el.nodeName === 'IMG') {
+      const parent = el.parentElement;
+      if (!(parent && parent.nodeName === 'FIGURE')) {
+        ensureFigureWrap(editor, el as HTMLElement);
       }
+      return;
+    }
+    // FIGURE
+    const figure = el as HTMLElement;
+    if (figure.querySelector('img')) {
+      return;
+    }
+    const hasElementChildren = figure.children.length > 0;
+    const hasTextContent = (figure.textContent || '').trim() !== '';
+    if (!hasElementChildren && !hasTextContent) {
       figure.remove();
     }
   });
@@ -221,11 +219,6 @@ function cleanupFigureClasses(
       if (figure.getAttribute('style') === '') figure.removeAttribute('style');
     }
   }
-}
-
-function stripPresetClasses(el: HTMLElement, presets: Preset[]): void {
-  const classes = getAllClasses(presets);
-  classes.forEach(cls => el.classList.remove(cls));
 }
 
 /**
@@ -679,71 +672,65 @@ const setup = (editor: Editor, _url: string): void => {
   }
   editor.options.set('image_caption', false);
 
-  /* GROUPED FIGURE HANDLERS (DELETE/CUT/COPY) */
-  // Treat image + figure + figcaption as one logical block.
+  /* GROUPED FIGURE HANDLERS (DELETE/CUT/COPY)
+   * Treat image + figure + figcaption as one logical block.
+   * All clipboard/delete operations on a selected image inside a <figure>
+   * are routed through these two small helpers to avoid repetition.
+   */
   const getSelectedFigure = (): HTMLElement | null => {
     const img = getSelectedImg(editor);
-    if (!img) {
-      return null;
-    }
+    if (!img) return null;
     const figure = getFigureWrap(img);
     return figure && figure.nodeName === 'FIGURE' ? figure : null;
   };
 
   const selectFigureForClipboard = (): boolean => {
     const figure = getSelectedFigure();
-    if (!figure) {
-      return false;
-    }
+    if (!figure) return false;
     editor.selection.select(figure, true);
     editor.nodeChanged();
     return true;
   };
 
+  const writeFigureToClipboard = (figure: HTMLElement, data: DataTransfer): void => {
+    data.setData('text/html', figure.outerHTML);
+    data.setData('text/plain', figure.textContent || '');
+  };
+
+  const removeFigureBlock = (figure: HTMLElement): void => {
+    editor.undoManager.transact(() => {
+      editor.dom.remove(figure);
+    });
+    editor.nodeChanged();
+  };
+
   editor.on('copy', (e: ClipboardEvent) => {
     const figure = getSelectedFigure();
-    if (!figure || !e.clipboardData) {
-      return;
-    }
-
-    e.clipboardData.setData('text/html', figure.outerHTML);
-    e.clipboardData.setData('text/plain', figure.textContent || '');
+    if (!figure || !e.clipboardData) return;
+    writeFigureToClipboard(figure, e.clipboardData);
     e.preventDefault();
   });
 
   editor.on('cut', (e: ClipboardEvent) => {
     const figure = getSelectedFigure();
-    if (!figure || !e.clipboardData) {
-      return;
-    }
-
-    e.clipboardData.setData('text/html', figure.outerHTML);
-    e.clipboardData.setData('text/plain', figure.textContent || '');
+    if (!figure || !e.clipboardData) return;
+    writeFigureToClipboard(figure, e.clipboardData);
     e.preventDefault();
-
-    editor.undoManager.transact(() => {
-      editor.dom.remove(figure);
-    });
-    editor.nodeChanged();
+    removeFigureBlock(figure);
   });
 
   editor.on('keydown', (e: any) => {
     const key = String(e.key || '').toLowerCase();
 
-    // If an image inside a figure is selected, Delete/Backspace removes the whole figure block.
     if (key === 'delete' || key === 'backspace') {
       const figure = getSelectedFigure();
       if (figure) {
         e.preventDefault();
-        editor.undoManager.transact(() => {
-          editor.dom.remove(figure);
-        });
-        editor.nodeChanged();
+        removeFigureBlock(figure);
         return;
       }
     }
 
-    // Ensure Ctrl/Cmd+C/X works on the whole figure, not only on the img node.
     if ((e.ctrlKey || e.metaKey) && (key === 'c' || key === 'x')) {
       selectFigureForClipboard();
     }
@@ -757,18 +744,11 @@ const setup = (editor: Editor, _url: string): void => {
       return;
     }
 
-    if (command === 'delete' || command === 'forwarddelete' || command === 'mceDelete') {
+    if (command === 'delete' || command === 'forwarddelete' || command === 'mcedelete') {
       const figure = getSelectedFigure();
-      if (!figure) {
-        return;
-      }
-
+      if (!figure) return;
       e.preventDefault();
-      editor.undoManager.transact(() => {
-        editor.dom.remove(figure);
-      });
-      editor.nodeChanged();
-      return;
+      removeFigureBlock(figure);
     }
   });
 
@@ -982,7 +962,7 @@ const setup = (editor: Editor, _url: string): void => {
           applyPresetClass(editor, img, alignPreset, config.alignPresets);
           const figure = getFigureWrap(img);
           if (figure) {
-            stripPresetClasses(figure, config.effectPresets);
+            cleanupFigureClasses(figure, getAllClasses(config.effectPresets), false);
             config.effectPresets.filter(p => p.class).forEach(p => {
               if (data['effect_' + p.class.replace(/\s+/g, '_')]) {
                 p.class.split(/\s+/).forEach(c => { if (c) figure.classList.add(c); });
@@ -1110,48 +1090,35 @@ const setup = (editor: Editor, _url: string): void => {
     }
   });
 
-  /* SHOW IN MEDIAPOOL BUTTON */
+  /* SHOW IN MEDIAPOOL BUTTON
+   *
+   * Opens the REDAXO mediapool in a popup, pre-filtered on the file name
+   * of the currently selected image. No notifications / try-catch noise:
+   * window.open() is synchronous and either returns a window ref or null.
+   */
   editor.ui.registry.addButton('imageshowpool', {
     icon: 'gallery',
     tooltip: 'Zeige Medium im Medienpool',
     onAction: () => {
       const img = getSelectedImg(editor);
-      if (!img) {
+      const filename = img?.getAttribute('src')?.split('/').pop()?.split('?')[0] || '';
+      if (!filename) {
         editor.notificationManager.open({ text: 'Bitte zuerst ein Bild auswählen.', type: 'warning', timeout: 3000 });
         return;
       }
-
-      const src = img.getAttribute('src');
-      if (!src) {
-        editor.notificationManager.open({ text: 'Bildquelle nicht gefunden.', type: 'warning', timeout: 3000 });
-        return;
-      }
-
-      // Extract filename from src (handle both full paths and media paths)
-      let filename = src.split('/').pop()?.split('?')[0] || '';
-      
-      // Open mediapool with file_name parameter to highlight current image
-      if (filename) {
-        try {
-          const poolUrl = 'index.php?page=mediapool/media&file_name=' + encodeURIComponent(filename);
-          window.open(poolUrl, 'mediapool', 'width=1000,height=700,resizable=yes,scrollbars=yes');
-          editor.notificationManager.open({ 
-            text: `Medienpool öffnet sich für: ${filename}`, 
-            type: 'info', 
-            timeout: 3000 
-          });
-        } catch (e) {
-          editor.notificationManager.open({ 
-            text: 'Medienpool konnte nicht geöffnet werden.', 
-            type: 'error', 
-            timeout: 3000 
-          });
-        }
-      }
+      const poolUrl = 'index.php?page=mediapool/media&file_name=' + encodeURIComponent(filename);
+      window.open(poolUrl, 'mediapool', 'width=1000,height=700,resizable=yes,scrollbars=yes');
     }
   });
 
-  /* SWAP FROM MEDIAPOOL BUTTON */
+  /* SWAP FROM MEDIAPOOL BUTTON
+   *
+   * Delegates to TinyMCE's built-in image dialog (`mceImage`) which uses
+   * the editor's `file_picker_callback` to open the REDAXO mediapool.
+   * The standard dialog updates src/alt on the currently selected image,
+   * which is exactly what we want here. Avoids reinventing the swap flow
+   * (and the URL-converter / DomPurify edge cases that come with it).
+   */
   editor.ui.registry.addButton('imageswappool', {
     icon: 'for_imageswappool_icon',
     tooltip: 'Austauschen aus Medienpool',
@@ -1162,106 +1129,30 @@ const setup = (editor: Editor, _url: string): void => {
         return;
       }
 
-      if (typeof openREXMedia !== 'function') {
-        editor.notificationManager.open({ 
-          text: 'Medienpool ist nicht verfügbar.', 
-          type: 'error', 
-          timeout: 3000 
+      // Ensure the selection is on the IMG (not the wrapping FIGURE/FIGCAPTION)
+      // so the standard image dialog picks it up as "edit existing image".
+      try {
+        editor.selection.select(img);
+      } catch (e) { /* ignore */ }
+
+      // `mceImage` is only registered when the built-in `image` plugin is
+      // active in the profile. Profiles can toggle plugins independently,
+      // so guard explicitly and tell the user how to fix it instead of
+      // silently doing nothing.
+      const imageAvailable =
+        (editor.plugins && (editor.plugins as Record<string, unknown>).image) ||
+        (typeof editor.queryCommandSupported === 'function' && editor.queryCommandSupported('mceImage'));
+
+      if (!imageAvailable) {
+        editor.notificationManager.open({
+          text: 'Bild-Dialog nicht verfügbar – bitte das Plugin "image" im Profil aktivieren.',
+          type: 'warning',
+          timeout: 5000
         });
         return;
       }
 
-      try {
-        const mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
-
-        // Use jQuery to listen for media selection if available
-        if (typeof $ !== 'undefined' && $ && typeof $.fn.on === 'function') {
-          $(mediaPool).on('rex:selectMedia', function (event: any, filename: string) {
-            event.preventDefault();
-            mediaPool.close();
-
-            // Determine the correct path based on file extension
-            const extension = filename.split('.').pop()?.toLowerCase() || '';
-            const useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
-            const imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
-
-            // Get current config to know which classes to remove
-            const config = configCache.get();
-            const figure = getFigureWrap(img);
-            
-            // Remove all preset classes (width, align, effects) to reset to original
-            if (figure) {
-              stripPresetClasses(figure, config.widthPresets);
-              stripPresetClasses(figure, config.alignPresets);
-              stripPresetClasses(figure, config.effectPresets);
-              // Also remove any legacy CKE5 classes
-              stripCke5LegacyClasses(figure);
-              // Remove all attributes/styles
-              if (figure.classList.length === 0) figure.removeAttribute('class');
-            }
-            
-            // Remove old inline dimensions from img
-            img.removeAttribute('width');
-            img.removeAttribute('height');
-            img.style.removeProperty('width');
-            img.style.removeProperty('height');
-            if (img.getAttribute('style') === '') img.removeAttribute('style');
-            
-            // Update the image src with new image
-            img.setAttribute('src', imagePath);
-            
-            // Wait for image to load, then update editor
-            const onImageLoad = () => {
-              img.removeEventListener('load', onImageLoad);
-              img.removeEventListener('error', onImageError);
-              editor.nodeChanged();
-              editor.undoManager.add();
-            };
-            
-            const onImageError = () => {
-              img.removeEventListener('load', onImageLoad);
-              img.removeEventListener('error', onImageError);
-              editor.nodeChanged();
-              editor.undoManager.add();
-            };
-            
-            img.addEventListener('load', onImageLoad);
-            img.addEventListener('error', onImageError);
-            
-            // Try to fetch media metadata (alt text, etc.)
-            if (typeof $ !== 'undefined' && $.getJSON) {
-              $.getJSON(
-                'index.php?rex-api-call=tinymce_media_meta&file=' + encodeURIComponent(filename)
-              ).done(function (meta: any) {
-                if (meta && meta.alt) {
-                  img.setAttribute('alt', meta.alt);
-                }
-              }).fail(function () {
-                // If metadata fetch fails, just keep existing alt or leave empty
-              });
-            }
-            
-            editor.notificationManager.open({
-              text: `Bild erfolgreich aktualisiert: ${filename}`,
-              type: 'success',
-              timeout: 3000
-            });
-          });
-        } else {
-          // Fallback if jQuery is not available
-          editor.notificationManager.open({ 
-            text: 'jQuery ist nicht verfügbar. Bitte verwenden Sie den Standard-Medienpool.', 
-            type: 'warning', 
-            timeout: 5000 
-          });
-        }
-      } catch (e) {
-        editor.notificationManager.open({ 
-          text: 'Medienpool konnte nicht geöffnet werden.', 
-          type: 'error', 
-          timeout: 3000 
-        });
-      }
+      editor.execCommand('mceImage');
     }
   });
 

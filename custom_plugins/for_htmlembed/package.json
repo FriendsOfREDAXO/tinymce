@@ -4,7 +4,7 @@
   "description": "Protected HTML/JS embed plugin for TinyMCE (FriendsOfREDAXO) — non-editable code block with edit dialog",
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_htmlembed/ ../../assets/scripts/tinymce/plugins/for_htmlembed/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_htmlembed/ ../../assets/vendor/tinymce/plugins/for_htmlembed/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_htmlembed/ ../../assets/scripts/tinymce/plugins/for_htmlembed/"
   },
   "keywords": ["tinymce", "embed", "html", "redaxo"],
   "author": "FriendsOfREDAXO",

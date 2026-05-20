@@ -853,6 +853,24 @@ function tiny_init(container) {
             activePlugins = options.plugins.split(/\s+/).filter(Boolean);
         }
 
+        // Issue #171: external_plugins entries are loaded AND initialized by TinyMCE
+        // regardless of the `plugins:` list. Without filtering, every registered custom
+        // plugin (e.g. for_images) would activate in every profile and add its buttons/
+        // toolbars even when the profile explicitly disabled it. Drop entries that are
+        // not part of the profile's active plugin list.
+        if (options.external_plugins && typeof options.external_plugins === 'object') {
+            let filteredExternal = {};
+            for (let extName in options.external_plugins) {
+                if (!Object.prototype.hasOwnProperty.call(options.external_plugins, extName)) {
+                    continue;
+                }
+                if (activePlugins.indexOf(extName) !== -1) {
+                    filteredExternal[extName] = options.external_plugins[extName];
+                }
+            }
+            options.external_plugins = filteredExternal;
+        }
+
         if (activePlugins.indexOf('quickbars') === -1) {
             delete options.quickbars_selection_toolbar;
             delete options.quickbars_insert_toolbar;

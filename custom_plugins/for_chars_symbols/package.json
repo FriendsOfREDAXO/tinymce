@@ -4,7 +4,7 @@
   "description": "Characters, symbols, native emojis and typography helpers picker for TinyMCE (FriendsOfREDAXO)",
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_chars_symbols/ ../../assets/scripts/tinymce/plugins/for_chars_symbols/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_chars_symbols/ ../../assets/vendor/tinymce/plugins/for_chars_symbols/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_chars_symbols/ ../../assets/scripts/tinymce/plugins/for_chars_symbols/"
   },
   "keywords": ["tinymce", "charmap", "emoji", "typography", "redaxo"],
   "author": "FriendsOfREDAXO",

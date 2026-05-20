@@ -4,7 +4,7 @@
   "description": "Markdown paste/import plugin for TinyMCE (FriendsOfREDAXO, free & open-source)",
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_markdown/ ../../assets/scripts/tinymce/plugins/for_markdown/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_markdown/ ../../assets/vendor/tinymce/plugins/for_markdown/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_markdown/ ../../assets/scripts/tinymce/plugins/for_markdown/"
   },
   "keywords": ["tinymce", "markdown", "redaxo"],
   "author": "FriendsOfREDAXO",

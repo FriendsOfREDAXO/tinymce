@@ -1,6 +1,33 @@
 Changelog
 =========
 
+Version 8.10.3
+---------------
+
+### Fixes
+
+* **for_images:** „Aus Mediapool austauschen“ – Swap-Button delegiert jetzt an `mceImage` und nutzt damit den Standard-`file_picker_callback`.
+* **Issue #171:** Deaktivierte `for_*`-Plugins werden nicht mehr initialisiert. `base.js` filtert `external_plugins` jetzt gegen die `plugins:`-Liste des Profils.
+
+### Profil-Assistent
+
+* Pluginliste ↔ Optionen sind jetzt bidirektional gekoppelt: `for_images` deaktivieren entfernt automatisch den Bildbreiten-Block; `autoresize`-Checkbox ↔ `autoresize`-Plugin synchron.
+* **Auto-Hide Toolbar** neu implementiert: Menü/Toolbar/Statusleiste klappen via CSS `:focus-within`/`:hover` ein/aus statt per fragilem Inline-`display:none`. Status wird beim Reload korrekt erkannt.
+* Sub-Bereich „Bild- und FOR Images Einstellungen“ umbenannt (vorher „Bildbreiten“).
+* Schritt 1 kompakter gruppiert: Menüleiste + Auto-Hide Toolbar in einer Zeile, URL/Encoding in einer statt zwei Zeilen, einheitliche Bar-Style-Gruppentitel mit Light/Dark-Mode-Support.
+
+### Build-Pipeline
+
+* Custom-Plugins werden nur noch nach `assets/scripts/tinymce/plugins/` gebaut; `assets/vendor/tinymce/` ist ab sofort reserviert für upstream TinyMCE. `clean-build.js` räumt Altlasten. Details in `DEVS.md`.
+
+### Intern (`for_images`)
+
+* `Plugin.ts` entrümpelt: einheitliche Klassenbereinigung über `cleanupFigureClasses`, einfacher Traversal in `normalizeFigures`, Cut/Copy/Delete-Handler durch zwei Helper konsolidiert (~40 Zeilen weniger, gleiches Verhalten).
+
+### Docs
+
+Überarbeitet und besser strukturiert 
+
 Version 8.10.2
 ---------------
 

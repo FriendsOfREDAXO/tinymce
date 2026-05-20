@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "node build.js && pnpm build-copy",
-    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_abbr/ ../../assets/scripts/tinymce/plugins/for_abbr/ && mkdir -p ../../assets/vendor/tinymce/plugins/ && cp -r dist/for_abbr/ ../../assets/vendor/tinymce/plugins/for_abbr/"
+    "build-copy": "mkdir -p ../../assets/scripts/tinymce/plugins/ && cp -r dist/for_abbr/ ../../assets/scripts/tinymce/plugins/for_abbr/"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
