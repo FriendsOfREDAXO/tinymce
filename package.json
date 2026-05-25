@@ -5,8 +5,8 @@
     "custom_plugins/*"
   ],
   "dependencies": {
-    "tinymce": "^8.5.0",
-    "tinymce-i18n": "^26.4.6"
+    "tinymce": "^8.5.1",
+    "tinymce-i18n": "^26.5.18"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
