@@ -6,13 +6,15 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
 
 jobs:
   php-lint:
     name: PHP Lint
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    if: github.event_name != 'issue_comment' && (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
 
     strategy:
       matrix:
@@ -40,7 +42,7 @@ jobs:
   php-cs-fixer:
     name: PHP-CS-Fixer (dry-run)
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    if: github.event_name != 'issue_comment' && (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
 
     steps:
       - uses: actions/checkout@v5
@@ -64,7 +66,7 @@ jobs:
   rexstan:
     name: rexstan
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    if: github.event_name != 'issue_comment' && (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
     permissions:
       contents: read
 
@@ -146,3 +148,118 @@ jobs:
 
       - name: Run rexstan
         run: redaxo_cms/redaxo/bin/console rexstan:analyze "redaxo/src/addons/${ADDON_KEY}"
+
+  php-cs-fixer-autofix:
+    name: PHP-CS-Fixer (autofix via /fix-cs)
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/fix-cs') &&
+      (
+        github.event.comment.author_association == 'OWNER' ||
+        github.event.comment.author_association == 'MEMBER' ||
+        github.event.comment.author_association == 'COLLABORATOR'
+      )
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Read PR context
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.issue.number;
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+
+            core.setOutput('number', String(pr.number));
+            core.setOutput('headRef', pr.head.ref);
+            core.setOutput('headRepo', pr.head.repo.full_name);
+
+      - name: Abort for fork pull requests
+        if: steps.pr.outputs.headRepo != github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.issue.number;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: 'Auto-Fix wurde nicht ausgefuehrt: Fork-PRs werden aus Sicherheitsgruenden nicht automatisch gepusht. Bitte local php-cs-fixer ausfuehren und committen.'
+            });
+
+      - name: Checkout PR branch
+        if: steps.pr.outputs.headRepo == github.repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.pr.outputs.headRef }}
+          fetch-depth: 0
+
+      - name: Setup PHP
+        if: steps.pr.outputs.headRepo == github.repository
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: php-cs-fixer
+
+      - name: Run PHP-CS-Fixer (write mode)
+        if: steps.pr.outputs.headRepo == github.repository
+        run: |
+          if [ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ]; then
+            php-cs-fixer fix --ansi --config=.php-cs-fixer.php
+          elif [ -f .php_cs.dist ] || [ -f .php_cs ]; then
+            php-cs-fixer fix --ansi
+          else
+            echo "Kein php-cs-fixer-Konfig vorhanden, verwende @PSR12"
+            php-cs-fixer fix --ansi --rules=@PSR12
+          fi
+
+      - name: Commit and push fixes
+        if: steps.pr.outputs.headRepo == github.repository
+        id: commit
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "style: apply php-cs-fixer"
+            git push origin "HEAD:${{ steps.pr.outputs.headRef }}"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment result (fixed)
+        if: steps.pr.outputs.headRepo == github.repository && steps.commit.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.issue.number;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: 'php-cs-fixer wurde ausgefuehrt und die Aenderungen wurden auf den PR-Branch gepusht.'
+            });
+
+      - name: Comment result (clean)
+        if: steps.pr.outputs.headRepo == github.repository && steps.commit.outputs.changed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.issue.number;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: 'php-cs-fixer wurde ausgefuehrt. Keine Aenderungen erforderlich.'
+            });
