@@ -214,6 +214,25 @@ Default-Klassen: `uk-margin` (Clear) und `uk-divider-icon` (HR) â€“ pro Profil Ã
 
 Issues, Pull Requests und Plugin-Ideen sind willkommen. Beim Beisteuern bitte die Hinweise in [DEVS.md](DEVS.md) beachten (Stilregeln, Build-Layout, Tests).
 
+### PR-Kommando fuer PHP-CS-Fixer
+
+Bei Pull Requests kann per Kommentar ein Auto-Fix gestartet werden:
+
+```text
+/fix-cs
+```
+
+Was passiert dann:
+
+- GitHub Action fuehrt php-cs-fixer im Write-Mode auf dem PR-Branch aus.
+- Falls Aenderungen entstehen, werden sie automatisch committed und auf denselben Branch gepusht.
+- Anschliessend schreibt die Action einen Ergebnis-Kommentar in den PR.
+
+Hinweise:
+
+- Das Kommando ist auf Kommentare von `OWNER`, `MEMBER` und `COLLABORATOR` beschraenkt.
+- Fork-PRs werden aus Sicherheitsgruenden nicht automatisch gepusht.
+
 ## Lizenzen
 
 | Komponente | Lizenz |

@@ -57,7 +57,7 @@ class Profiles
             $extraKeys = [];
             foreach ($extras as $key => $value) {
                 $extraKeys[$key] = "\"$key\":\"$key\"";
-                $extraValues[$key] = $value;
+                $extraValues[$key] = $value ?: '';
             }
 
             $profiles = json_encode($jsonProfiles);
