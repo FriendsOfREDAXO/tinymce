@@ -136,10 +136,11 @@ function initTinyMceProfileAssistant() {
     group1Html += '<br><legend class="builder-subsection-title"><i class="rex-icon fa-link"></i> ' + (i18n.url_encoding_options || 'URL & Encoding') + '</legend><div class="row">';
     group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-relative-urls"> ' + (i18n.relative_urls || 'Relative URLs') + '</label></div></div>';
     group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-remove-script-host" checked> ' + (i18n.remove_script_host || 'Remove Script Host') + '</label></div></div>';
-    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls" checked> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
+    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls"> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
     group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.document_base_url || 'Document Base URL') + '</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
     group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.entity_encoding || 'Entity Encoding') + '</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
     group1Html += '</div>';
+    group1Html += '<div class="row"><div class="col-md-12"><p class="help-block" style="margin-top:-5px;">' + (i18n.convert_urls_help || '<strong>Empfehlung:</strong> <code>Convert URLs</code> deaktiviert lassen. Aus dem Mediapool werden URLs als <code>/media/datei.pdf</code> eingefügt – ohne Konvertierung bleiben sie genau so erhalten. Mit aktiver Konvertierung kann TinyMCE sie unerwartet zu absoluten URLs mit Protokoll und Hostname umschreiben (siehe Issue #175).') + '</p></div></div>';
     group1Html += '</div>';
 
     // ===== GRUPPE 3: TOOLBARS & MENUES (Erweiterungen zur Haupt-Toolbar) =====

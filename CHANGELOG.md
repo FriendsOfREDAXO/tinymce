@@ -1,6 +1,19 @@
 Changelog
 =========
 
+Version 8.10.5
+---------------
+
+### Fixes
+
+* **Issue #175 – Absolute URLs (Protokoll + Domain) bei Mediapool-Links:** Neue Default-Profile setzen jetzt `convert_urls: false`. Damit bleiben aus dem Mediapool eingefügte URLs wie `/media/datei.pdf` verbatim erhalten und werden nicht mehr durch TinyMCEs URL-Konvertierung zu `https://domain.test/media/datei.pdf` umgeschrieben. Der Profil-Assistent setzt die Option ebenfalls per Default auf `false` und enthält einen erklärenden Hinweis. **Bestehende Profile bleiben unverändert** – wer den Issue-Effekt sieht, ergänzt im Profil-Extra `convert_urls: false` (die alten Optionen `relative_urls`, `remove_script_host`, `document_base_url` greifen dann nicht mehr und können entfernt werden).
+
+Version 8.10.4
+---------------
+
+* Update TinyMCE auf Version 8.5.1 ([#173](https://github.com/FriendsOfREDAXO/tinymce/pull/173), @github-actions[bot]).
+* Update `Profiles.php` ([#174](https://github.com/FriendsOfREDAXO/tinymce/pull/174), [@dtpop](https://github.com/dtpop)).
+
 Version 8.10.3
 ---------------
 
