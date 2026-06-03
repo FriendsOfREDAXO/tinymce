@@ -516,7 +516,7 @@ function tiny_init(container) {
         // editor runs in the backend while the content is served from the
         // frontend, so TinyMCE's automatic conversion would resolve URLs against
         // the backend URL and produce wrong absolute paths (e.g.
-        // https://domain.test/redaxo/... instead of /media/file.pdf).
+        // https://domain.test/REDAXO/... instead of /media/file.pdf).
         // Profiles that explicitly need URL conversion can still set
         // convert_urls: true.
         if (!options.hasOwnProperty('convert_urls')) {
