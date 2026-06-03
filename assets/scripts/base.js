@@ -512,6 +512,17 @@ function tiny_init(container) {
             options.remove_trailing_brs = true;
         }
 
+        // TinyMCE's URL-Konvertierung ist im CMS-Backend immer falsch: der
+        // Editor laeuft unter /redaxo/index.php, der Content wird im Frontend
+        // ausgeliefert. convert_urls: true wuerde /media/datei.pdf gegen die
+        // Backend-URL aufloesen und unerwuenscht zu einer absoluten URL mit
+        // Protokoll und Hostname machen (siehe Issue #175). Profile, die das
+        // wirklich brauchen, koennen weiterhin explizit convert_urls: true
+        // setzen.
+        if (!options.hasOwnProperty('convert_urls')) {
+            options.convert_urls = false;
+        }
+
         // Use the full link dialog (with REDAXO internal picker) instead of
         // TinyMCE's quicklink bubble unless a profile explicitly opts in.
         if (!options.hasOwnProperty('link_quicklink')) {

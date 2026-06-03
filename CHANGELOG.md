@@ -6,7 +6,9 @@ Version 8.10.5
 
 ### Fixes
 
-* **Issue #175 – Absolute URLs (Protokoll + Domain) bei Mediapool-Links:** Neue Default-Profile setzen jetzt `convert_urls: false`. Damit bleiben aus dem Mediapool eingefügte URLs wie `/media/datei.pdf` verbatim erhalten und werden nicht mehr durch TinyMCEs URL-Konvertierung zu `https://domain.test/media/datei.pdf` umgeschrieben. Der Profil-Assistent setzt die Option ebenfalls per Default auf `false` und enthält einen erklärenden Hinweis. **Bestehende Profile bleiben unverändert** – wer den Issue-Effekt sieht, ergänzt im Profil-Extra `convert_urls: false` (die alten Optionen `relative_urls`, `remove_script_host`, `document_base_url` greifen dann nicht mehr und können entfernt werden).
+* **Issue #175 – Absolute URLs (Protokoll + Domain) bei Mediapool-Links:** Neue Default-Profile setzen jetzt `convert_urls: false`. Zusätzlich greift in `base.js` ein Default-Guard: setzt ein Profil `convert_urls` nicht explizit, wird es auf `false` erzwungen. Damit bleiben aus dem Mediapool eingefügte URLs wie `/media/datei.pdf` verbatim erhalten und werden nicht mehr durch TinyMCEs URL-Konvertierung zu `https://domain.test/media/datei.pdf` umgeschrieben – **bestehende Profile profitieren ohne manuelle Änderung**. Der Profil-Assistent setzt die Option ebenfalls per Default auf `false` und enthält einen erklärenden Hinweis. Profile, die das wirklich brauchen, können weiterhin explizit `convert_urls: true` setzen.
+* **linkmap.js:** `selectLink()` feuert den `rex:selectLink`-jQuery-Event jetzt korrekt via `opener.jQuery(window).trigger(...)` und nutzt damit den Callback-Pfad aus `base.js`. Bisher wurde das Event zwar erzeugt, aber nie ausgelöst – stattdessen wurde das TinyMCE-Dialog-Input direkt per `getElementsByClassName('tox-textfield')[0].value` beschrieben (DOM-Hack, brüchig bei TinyMCE-Updates).
+* Dank an [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent) für den Hinweis und die Implementierungsskizze in [#176](https://github.com/FriendsOfREDAXO/tinymce/pull/176).
 
 Version 8.10.4
 ---------------
