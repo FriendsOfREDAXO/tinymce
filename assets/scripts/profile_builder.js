@@ -136,7 +136,7 @@ function initTinyMceProfileAssistant() {
     group1Html += '<br><legend class="builder-subsection-title"><i class="rex-icon fa-link"></i> ' + (i18n.url_encoding_options || 'URL & Encoding') + '</legend><div class="row">';
     group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-relative-urls"> ' + (i18n.relative_urls || 'Relative URLs') + '</label></div></div>';
     group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-remove-script-host" checked> ' + (i18n.remove_script_host || 'Remove Script Host') + '</label></div></div>';
-    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls" checked> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
+    group1Html += '<div class="col-md-2"><div class="checkbox"><label><input type="checkbox" class="builder-convert-urls"> ' + (i18n.convert_urls || 'Convert URLs') + '</label></div></div>';
     group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.document_base_url || 'Document Base URL') + '</label><input type="text" class="form-control builder-base-url" value="/"></div></div>';
     group1Html += '<div class="col-md-3"><div class="form-group"><label>' + (i18n.entity_encoding || 'Entity Encoding') + '</label><select class="form-control builder-entity-encoding"><option value="raw" selected>raw</option><option value="named">named</option><option value="numeric">numeric</option></select></div></div>';
     group1Html += '</div>';

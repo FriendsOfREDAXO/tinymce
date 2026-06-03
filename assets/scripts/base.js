@@ -512,6 +512,17 @@ function tiny_init(container) {
             options.remove_trailing_brs = true;
         }
 
+        // Disable TinyMCE's URL conversion by default. In a CMS context the
+        // editor runs in the backend while the content is served from the
+        // frontend, so TinyMCE's automatic conversion would resolve URLs against
+        // the backend URL and produce wrong absolute paths (e.g.
+        // https://domain.test/redaxo/... instead of /media/file.pdf).
+        // Profiles that explicitly need URL conversion can still set
+        // convert_urls: true.
+        if (!options.hasOwnProperty('convert_urls')) {
+            options.convert_urls = false;
+        }
+
         // Use the full link dialog (with REDAXO internal picker) instead of
         // TinyMCE's quicklink bubble unless a profile explicitly opts in.
         if (!options.hasOwnProperty('link_quicklink')) {
