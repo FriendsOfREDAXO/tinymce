@@ -3099,7 +3099,11 @@ function generateConfig($textarea, $builderBody) {
 
     if (linkDefaultHttps) {
         configStr += `link_default_protocol: 'https',\n`;
-        configStr += `link_assume_external_targets: 'https',\n`;
+        // link_assume_external_targets bewusst NICHT setzen: 'https' wuerde
+        // jeden URL-aehnlichen String ohne Schema (auch /media/...) mit https://
+        // praefixen und so kaputte URLs wie https:///media/datei.pdf erzeugen
+        // (siehe Issue #175). Wer das Verhalten wirklich braucht, setzt es
+        // manuell im Profil-Extra.
     }
 
     if (linkNoreferrer) {

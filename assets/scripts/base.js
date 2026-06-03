@@ -523,6 +523,15 @@ function tiny_init(container) {
             options.convert_urls = false;
         }
 
+        // link_assume_external_targets: 'https' laesst das link-Plugin URLs
+        // ohne erkanntes Schema stillschweigend mit https:// praefixen.
+        // Fuer Mediapool-Pfade wie /media/datei.pdf entsteht dabei das kaputte
+        // https:///media/datei.pdf (leerer Host, weil der Pfad mit / beginnt).
+        // Default auf false; Profile koennen explizit 'https'/'http'/true setzen.
+        if (!options.hasOwnProperty('link_assume_external_targets')) {
+            options.link_assume_external_targets = false;
+        }
+
         // Use the full link dialog (with REDAXO internal picker) instead of
         // TinyMCE's quicklink bubble unless a profile explicitly opts in.
         if (!options.hasOwnProperty('link_quicklink')) {
