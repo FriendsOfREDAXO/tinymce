@@ -1244,7 +1244,7 @@ function openReportDialog(editor: any, findings: Finding[]): void {
     let viewMode: 'sequential' | 'list' = 'sequential';
 
     const fireEvent = (name: string, data?: any) => {
-        try { editor.fire(name, data || {}); } catch (_e) { /* noop */ }
+        try { editor.dispatch(name, data || {}); } catch (_e) { /* noop */ }
     };
 
     const panel = document.createElement('div');

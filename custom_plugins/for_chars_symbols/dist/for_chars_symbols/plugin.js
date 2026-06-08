@@ -898,11 +898,11 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         var needsPrompt = phoneNeedsPrompt(content, defaultCc);
         if (needsPrompt) {
             promptCountry(editor, function (cc) {
-                selection.setContent(esc(transformPhonesInText(content, mode, cc)));
+                editor.insertContent(esc(transformPhonesInText(content, mode, cc)));
             });
             return;
         }
-        selection.setContent(esc(transformPhonesInText(content, mode, defaultCc)));
+        editor.insertContent(esc(transformPhonesInText(content, mode, defaultCc)));
     }
 
     function performAction(editor, actionId) {
@@ -911,14 +911,14 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         var content = selection.getContent({ format: 'text' });
 
         switch (actionId) {
-            case 'quotes_de':   selection.setContent(esc(wrapQuotes(content || '', 'de'))); break;
-            case 'quotes_dech': selection.setContent(esc(wrapQuotes(content || '', 'de-ch'))); break;
-            case 'quotes_en':   selection.setContent(esc(wrapQuotes(content || '', 'en'))); break;
-            case 'quotes_fr':   selection.setContent(esc(wrapQuotes(content || '', 'fr'))); break;
-            case 'normalize':   selection.setContent(esc(normalizeTypography(content || '', locale))); break;
-            case 'dash_numbers':selection.setContent(esc(enDashNumberRanges(content || ''))); break;
-            case 'nbsp_units':  selection.setContent(esc(insertNbspBeforeUnits(content || ''))); break;
-            case 'softhyphen':  selection.setContent(esc(suggestSoftHyphens(content || ''))); break;
+            case 'quotes_de':   editor.insertContent(esc(wrapQuotes(content || '', 'de'))); break;
+            case 'quotes_dech': editor.insertContent(esc(wrapQuotes(content || '', 'de-ch'))); break;
+            case 'quotes_en':   editor.insertContent(esc(wrapQuotes(content || '', 'en'))); break;
+            case 'quotes_fr':   editor.insertContent(esc(wrapQuotes(content || '', 'fr'))); break;
+            case 'normalize':   editor.insertContent(esc(normalizeTypography(content || '', locale))); break;
+            case 'dash_numbers':editor.insertContent(esc(enDashNumberRanges(content || ''))); break;
+            case 'nbsp_units':  editor.insertContent(esc(insertNbspBeforeUnits(content || ''))); break;
+            case 'softhyphen':  editor.insertContent(esc(suggestSoftHyphens(content || ''))); break;
             case 'phone_intl':  runPhoneAction(editor, 'intl', locale); return;
             case 'phone_nat':   runPhoneAction(editor, 'nat', locale); return;
             case 'find_wrong':

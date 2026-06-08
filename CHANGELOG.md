@@ -1,6 +1,20 @@
 Changelog
 =========
 
+Version 8.10.7
+---------------
+
+### Update
+
+* TinyMCE auf **8.6.0** aktualisiert (inkl. aktualisierter Vendor-Assets).
+
+### Kompatibilität
+
+* Deprecated API-Nutzung bereinigt:
+  * `editor.fire(...)` wurde auf `editor.dispatch(...)` umgestellt.
+  * `selection.setContent(...)` wurde auf `editor.insertContent(...)` umgestellt.
+* Build und Live-Asset-Sync geprüft; Link-Flow (`target`/`rel`) bleibt stabil.
+
 Version 8.10.6
 ---------------
 
