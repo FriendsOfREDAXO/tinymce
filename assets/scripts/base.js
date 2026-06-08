@@ -1015,6 +1015,9 @@ function tiny_init(container) {
                 }
 
                 if (typeof event.value === 'string') {
+                    if (!/^tel:/i.test(String(event.value).trim())) {
+                        return;
+                    }
                     event.value = normalizePhoneHref(event.value);
                     return;
                 }
@@ -1023,7 +1026,125 @@ function tiny_init(container) {
                     return;
                 }
 
+                if (!/^tel:/i.test(String(event.value.href).trim())) {
+                    return;
+                }
+
                 event.value.href = normalizePhoneHref(event.value.href);
+            });
+
+            let pendingLinkDialogAttrs = null;
+
+            function hasDialogFieldByName(container, name) {
+                if (!container || typeof container !== 'object') {
+                    return false;
+                }
+
+                if (container.name === name) {
+                    return true;
+                }
+
+                if (Array.isArray(container.items)) {
+                    for (let i = 0; i < container.items.length; i++) {
+                        if (hasDialogFieldByName(container.items[i], name)) {
+                            return true;
+                        }
+                    }
+                }
+
+                if (Array.isArray(container.tabs)) {
+                    for (let i = 0; i < container.tabs.length; i++) {
+                        if (hasDialogFieldByName(container.tabs[i], name)) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            function isLinkDialogSpec(spec) {
+                if (!spec || typeof spec !== 'object' || !spec.body || typeof spec.onSubmit !== 'function') {
+                    return false;
+                }
+
+                return hasDialogFieldByName(spec.body, 'url')
+                    && hasDialogFieldByName(spec.body, 'target')
+                    && hasDialogFieldByName(spec.body, 'rel');
+            }
+
+            function normalizeRelForTarget(relValue, targetValue) {
+                let rel = String(relValue || '').trim();
+                if (targetValue !== '_blank') {
+                    return rel;
+                }
+
+                let parts = rel === '' ? [] : rel.toLowerCase().split(/\s+/).filter(Boolean);
+                if (parts.indexOf('noopener') === -1) {
+                    parts.push('noopener');
+                }
+                if (parts.indexOf('noreferrer') === -1) {
+                    parts.push('noreferrer');
+                }
+
+                return parts.join(' ');
+            }
+
+            if (editor.windowManager && typeof editor.windowManager.open === 'function') {
+                const originalWindowOpen = editor.windowManager.open.bind(editor.windowManager);
+                editor.windowManager.open = function(spec, params) {
+                    if (!isLinkDialogSpec(spec)) {
+                        return originalWindowOpen(spec, params);
+                    }
+
+                    const originalSubmit = spec.onSubmit;
+                    const wrappedSpec = Object.assign({}, spec, {
+                        onSubmit: function(api) {
+                            let data = api && typeof api.getData === 'function' ? api.getData() : {};
+                            pendingLinkDialogAttrs = {
+                                target: Object.prototype.hasOwnProperty.call(data, 'target') ? String(data.target || '') : null,
+                                rel: Object.prototype.hasOwnProperty.call(data, 'rel') ? String(data.rel || '') : null
+                            };
+
+                            return originalSubmit.call(this, api);
+                        }
+                    });
+
+                    return originalWindowOpen(wrappedSpec, params);
+                };
+            }
+
+            editor.on('ExecCommand', function(event) {
+                if (!event || event.command !== 'mceInsertLink' || !pendingLinkDialogAttrs) {
+                    return;
+                }
+
+                const attrs = pendingLinkDialogAttrs;
+                pendingLinkDialogAttrs = null;
+
+                const linkNode = editor.dom.getParent(editor.selection.getNode(), 'a[href]');
+                if (!linkNode) {
+                    return;
+                }
+
+                if (attrs.target !== null) {
+                    if (attrs.target === '') {
+                        linkNode.removeAttribute('target');
+                    } else {
+                        linkNode.setAttribute('target', attrs.target);
+                    }
+                }
+
+                if (attrs.rel !== null) {
+                    const effectiveTarget = attrs.target === null ? String(linkNode.getAttribute('target') || '') : attrs.target;
+                    const normalizedRel = normalizeRelForTarget(attrs.rel, effectiveTarget);
+
+                    if (normalizedRel === '') {
+                        linkNode.removeAttribute('rel');
+                    } else {
+                        linkNode.setAttribute('rel', normalizedRel);
+                    }
+                }
             });
 
             editor.ui.registry.addIcon('phonelink', '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 10.8c1.6 3.1 3.5 5 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.1 21 3 13.9 3 5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2z"/></svg>');

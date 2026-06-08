@@ -326,7 +326,7 @@ const Plugin = (): void => {
             editor.schema.addValidElements(
                 'sup[class|id|' + DATA_ATTR + '|contenteditable],' +
                 'div[class],' +
-                'a[class|href|contenteditable],' +
+                'a[class|href|title|target|rel|contenteditable|data-mce-href|data-phone-locked|data-phone-number],' +
                 'li[id|' + DATA_ATTR + '],' +
                 'span[class|style|title|id|lang|dir|data-mce-*]'
             );

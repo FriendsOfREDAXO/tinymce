@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 8.10.6
+---------------
+
+### Fixes
+
+* **Link-Attribute bleiben erhalten (target/rel/title):** Mehrere Plugin-Schema-Regeln wurden so korrigiert, dass `a`-Attribute nicht mehr auf eine zu kleine Menge reduziert werden. Betroffen waren insbesondere `for_footnotes` (inkl. Legacy-`footnotes`-Dist-Artefakte) und `phonelink`.
+* **Plugin-first-Fix statt globalem Workaround:** Die Korrektur liegt jetzt in den betroffenen Plugins selbst, damit `target="_blank"`, `rel="nofollow"` und `title` beim Serialisieren (`getContent`) stabil erhalten bleiben.
+* **Verifiziert im Editor-Flow:** Link-Dialog-Auswahl wird korrekt in den finalen HTML-Output übernommen; bei `_blank` wird `noopener` wie vorgesehen ergänzt.
+
 Version 8.10.5
 ---------------
 

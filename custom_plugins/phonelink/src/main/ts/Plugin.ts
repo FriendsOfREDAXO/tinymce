@@ -226,7 +226,7 @@ const registerUi = (editor: Editor): void => {
 
 const setup = (editor: Editor): void => {
     editor.on('PreInit', () => {
-        editor.schema.addValidElements('a[href|title|target|rel|class|' + LOCK_ATTR + '|' + PHONE_ATTR + ']');
+        editor.schema.addValidElements('a[href|title|target|rel|class|contenteditable|data-mce-href|' + LOCK_ATTR + '|' + PHONE_ATTR + ']');
     });
 
     editor.on('BeforeExecCommand', (event) => {
