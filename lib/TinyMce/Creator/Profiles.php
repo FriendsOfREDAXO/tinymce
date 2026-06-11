@@ -151,6 +151,10 @@ const tinyprofiles = $profiles;
                 }
             }
 
+            if (1 !== preg_match('/(?:^|[,\{\r\n])\s*license_key\s*:/', $extra)) {
+                $extra = "license_key: 'gpl',\n" . $extra;
+            }
+
             return $extra;
         }
         return $jsonProfile;

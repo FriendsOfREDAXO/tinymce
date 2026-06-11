@@ -177,6 +177,7 @@
               var c = Object.assign({}, window.tinyprofiles[profileKey]);
               c.selector = '#tinymcePreviewEditor';
               c.height = c.height || 300;
+              if (!c.license_key) { c.license_key = 'gpl'; }
               window.tinymce.init(c);
             }
           } catch (e) {
@@ -193,6 +194,7 @@
               // final fallback: call tinymce.init with parsed conf
               conf.selector = '#tinymcePreviewEditor';
               conf.height = conf.height || 300;
+              if (!conf.license_key) { conf.license_key = 'gpl'; }
               window.tinymce.init(conf);
             } else if (modalBody) {
               modalBody.innerHTML += '<div class="text-danger">TinyMCE not available — please run the build or check vendor/tinymce is present.</div>';
