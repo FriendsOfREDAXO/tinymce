@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 8.10.8
+---------------
+
+### Fixes
+
+* **Issue #180 – Editor-Padding reduziert:** Das globale `content_style` setzt den Body-Abstand im Editor nun auf `6px` statt `10px`. Dadurch wirkt der Editor standardmäßig kompakter, ohne bestehende Profile oder Plugin-Optionen zu brechen.
+
 Version 8.10.7
 ---------------
 
