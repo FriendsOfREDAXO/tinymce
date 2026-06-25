@@ -505,6 +505,10 @@ function tiny_init(container) {
             }
         }
 
+        if (!options.hasOwnProperty('license_key')) {
+            options.license_key = 'gpl';
+        }
+
         if (!options.hasOwnProperty('convert_newlines_to_brs')) {
             options.convert_newlines_to_brs = false;
         }

@@ -27,7 +27,7 @@
       tiny_init(window.jQuery(wrapper));
       log('called tiny_init on mblock wrapper — waiting for tinymce instance...');
     } else if (window.tinymce && typeof window.tinymce.init === 'function') {
-      window.tinymce.init({ selector: '#mblockIntegrationTestEditor' });
+      window.tinymce.init({ selector: '#mblockIntegrationTestEditor', license_key: 'gpl' });
       log('called tinymce.init fallback — waiting for tinymce instance...');
     } else {
       log('tinymce not found on page — ensure vendor build is loaded');
