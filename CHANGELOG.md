@@ -1,6 +1,20 @@
 Changelog
 =========
 
+Version 8.10.9
+---------------
+
+### Update
+
+* TinyMCE Vendor auf **8.7.0** aktualisiert (`assets/vendor/tinymce`).
+* Sprachpaket `tinymce-i18n` auf **26.6.8** aktualisiert.
+
+### Prüfung
+
+* Build-Pipeline (`pnpm run build`) inklusive Vendor-Copy und Asset-Sync erfolgreich durchgelaufen.
+* Keine Merge-Konflikte durch das Vendor-Update; Änderungen betreffen erwartungsgemäß die Upstream-TinyMCE-Dateien.
+* Relevante Upstream-Fixes aus 8.7.0 enthalten, u. a. für Bild-DnD (`width`/`height`), Dark-Mode-Link-Fokus und Selektions-/Listenverhalten.
+
 Version 8.10.8
 ---------------
 
