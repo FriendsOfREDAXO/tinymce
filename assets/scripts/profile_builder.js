@@ -364,7 +364,15 @@ function initTinyMceProfileAssistant() {
     group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-table-cell-advtab" checked> ' + (i18n.table_cell_advtab || 'Cell advanced tab') + '</label></div></div>';
     group5Html += '</div>';
 
-    // 5f) Protected Extras
+    // 5f) Listenstile (advlist)
+    group5Html += '<br><legend><i class="rex-icon fa-list-ol"></i> ' + (i18n.list_style_options || 'Listenstile (verschachtelte Listen)') + '</legend>';
+    group5Html += '<p class="help-block">' + (i18n.list_style_options_help || 'Definiert, welche Nummerierungs- und Bullet-Stile pro Ebene auswählbar sind. Im Editor kannst du pro Listenebene den Stil ändern, indem du den Cursor in die gewünschte Ebene setzt und den Stil über das Listen-Menü wählst.') + '</p>';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.list_number_styles || 'Nummerierte Listen (advlist_number_styles)') + '</label><input type="text" class="form-control builder-advlist-number-styles" value="default,lower-alpha,lower-roman,upper-alpha,upper-roman"><p class="help-block">' + (i18n.list_number_styles_help || 'Komma-getrennt, z. B.: default,lower-alpha,lower-roman,upper-alpha,upper-roman') + '</p></div></div>';
+    group5Html += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.list_bullet_styles || 'Aufzählungslisten (advlist_bullet_styles)') + '</label><input type="text" class="form-control builder-advlist-bullet-styles" value="default,disc,circle,square"><p class="help-block">' + (i18n.list_bullet_styles_help || 'Komma-getrennt, z. B.: default,disc,circle,square') + '</p></div></div>';
+    group5Html += '</div>';
+
+    // 5g) Protected Extras
     group5Html += '<br><legend>' + (i18n.protected_extras || 'Protected extras') + '</legend>';
     group5Html += '<p class="help-block">' + (i18n.protected_extras_help || 'Raw option lines entered here are appended after the generated options. Use this to keep custom TinyMCE settings or to intentionally override assistant-managed values.') + '</p>';
     group5Html += '<textarea class="form-control builder-protected-extras" rows="8" placeholder="' + (i18n.protected_extras_placeholder || "toolbar_sticky: true,\ntoolbar_sticky_offset: 0") + '"></textarea>';
@@ -2557,6 +2565,7 @@ const MANAGED_PROFILE_KEYS = new Set([
     'image_caption', 'image_uploadtab', 'relative_urls', 'remove_script_host',
     'document_base_url', 'entity_encoding', 'convert_urls', 'object_resizing',
     'table_toolbar', 'table_appearance_options', 'table_advtab', 'table_row_advtab', 'table_cell_advtab',
+    'advlist_number_styles', 'advlist_bullet_styles',
     'custom_colors',
     'color_cols', 'color_map_raw',
     'extended_valid_elements', 'imagewidth_presets', 'imagealign_presets',
@@ -2854,6 +2863,8 @@ function generateConfig($textarea, $builderBody) {
     const tableAdvTab = $builderBody.find('.builder-table-advtab').is(':checked');
     const tableRowAdvTab = $builderBody.find('.builder-table-row-advtab').is(':checked');
     const tableCellAdvTab = $builderBody.find('.builder-table-cell-advtab').is(':checked');
+    const advlistNumberStyles = String($builderBody.find('.builder-advlist-number-styles').val() || '').replace(/\s+/g, '').trim();
+    const advlistBulletStyles = String($builderBody.find('.builder-advlist-bullet-styles').val() || '').replace(/\s+/g, '').trim();
 
     const defaultCodesample = $builderBody.find('.builder-default-codesample').is(':checked');
     const defaultRelList = $builderBody.find('.builder-default-rellist').is(':checked');
@@ -3249,6 +3260,16 @@ function generateConfig($textarea, $builderBody) {
         configStr += '\n';
     }
 
+    if (advlistNumberStyles) {
+        configStr += `advlist_number_styles: '${escapeString(advlistNumberStyles)}',\n`;
+    }
+    if (advlistBulletStyles) {
+        configStr += `advlist_bullet_styles: '${escapeString(advlistBulletStyles)}',\n`;
+    }
+    if (advlistNumberStyles || advlistBulletStyles) {
+        configStr += '\n';
+    }
+
     // Raw JS expressions
     configStr += 'skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",\n';
     configStr += 'content_css: redaxo.theme.current === "dark" ? "dark" : "default",\n';
@@ -3564,6 +3585,18 @@ function loadFromConfig($textarea, $builderBody) {
     }
     if (typeof cfg.table_cell_advtab !== 'undefined') {
         $builderBody.find('.builder-table-cell-advtab').prop('checked', !!cfg.table_cell_advtab);
+    }
+
+    // Listenstile (advlist)
+    if (typeof cfg.advlist_number_styles === 'string') {
+        $builderBody.find('.builder-advlist-number-styles').val(cfg.advlist_number_styles);
+    } else if (Array.isArray(cfg.advlist_number_styles)) {
+        $builderBody.find('.builder-advlist-number-styles').val(cfg.advlist_number_styles.join(','));
+    }
+    if (typeof cfg.advlist_bullet_styles === 'string') {
+        $builderBody.find('.builder-advlist-bullet-styles').val(cfg.advlist_bullet_styles);
+    } else if (Array.isArray(cfg.advlist_bullet_styles)) {
+        $builderBody.find('.builder-advlist-bullet-styles').val(cfg.advlist_bullet_styles.join(','));
     }
 
     // Color mapping
