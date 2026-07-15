@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 8.12.0
+---------------
+
+### Features
+
+* **Profil-Assistent: Listenstile jetzt mit Picker/Pills statt Freitext konfigurierbar.** Die Optionen `advlist_number_styles` und `advlist_bullet_styles` nutzen jetzt denselben Workflow wie die anderen Toolbar-/Menü-Selektoren (Suche, Add/Remove, Drag-and-drop-Sortierung, Alles-leeren).
+* **Konsistentes Laden bestehender Profile für Listenstile:** Bereits gespeicherte `advlist_*`-Werte werden beim Öffnen korrekt in die neue Auswahl-UI übernommen und synchron als Konfigurationswert serialisiert.
+
 Version 8.11.0
 ---------------
 
