@@ -343,7 +343,28 @@ function initTinyMceProfileAssistant() {
     group5Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_class || 'TOC Class') + '</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
     group5Html += '</div>';
 
-    // 5e) Protected Extras
+    // 5e) Tabellenoptionen
+    group5Html += '<br><legend><i class="rex-icon fa-table"></i> ' + (i18n.table_toolbar || 'Tabellen-Plugin Toolbar') + '</legend>';
+    group5Html += '<p class="help-block">' + (i18n.table_toolbar_help || 'Steuert, welche Aktionen in der Tabellen-Kontext-Toolbar verfügbar sind. Zusätzlich kannst du erweiterte Tabs für Tabellen-, Zeilen- und Zellen-Eigenschaften aktivieren/deaktivieren.') + '</p>';
+    group5Html += '<div class="panel panel-default"><div class="panel-body builder-dropzone-panel-body">';
+    group5Html += '<div class="builder-table-toolbar-picker-label">' + (i18n.toolbar_click_to_pick || 'Ins Feld klicken, dann im Dropdown waehlen. Markierungen: Core / FOR / AddOn.') + '</div>';
+    group5Html += '<div class="builder-toolbar-pill-dropzone">';
+    group5Html += '<ul class="builder-toolbar-pill-list builder-table-toolbar-pill-list" id="builder-table-toolbar-selected-items" style="margin-bottom: 0;"></ul>';
+    group5Html += '<div class="builder-toolbar-inline-picker builder-table-toolbar-inline-picker">';
+    group5Html += '<input type="text" class="form-control input-sm builder-toolbar-inline-picker-search builder-table-toolbar-inline-picker-search" placeholder="' + escapeHtml(i18n.search || 'Suche') + '">';
+    group5Html += '<div class="builder-toolbar-inline-picker-list builder-table-toolbar-inline-picker-list"></div>';
+    group5Html += '</div></div>';
+    group5Html += '<input type="hidden" class="builder-table-toolbar" value="tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol">';
+    group5Html += '<p class="help-block" style="margin-top:8px;">' + (i18n.table_toolbar_example || 'Beispiel: tableprops tablecellprops tablecellvalign | tableinsertrowafter tableinsertcolafter') + '</p>';
+    group5Html += '</div></div>';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-table-appearance-options" checked> ' + (i18n.table_appearance_options || 'Table appearance options') + '</label></div></div>';
+    group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-table-advtab" checked> ' + (i18n.table_advtab || 'Table advanced tab') + '</label></div></div>';
+    group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-table-row-advtab" checked> ' + (i18n.table_row_advtab || 'Row advanced tab') + '</label></div></div>';
+    group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-table-cell-advtab" checked> ' + (i18n.table_cell_advtab || 'Cell advanced tab') + '</label></div></div>';
+    group5Html += '</div>';
+
+    // 5f) Protected Extras
     group5Html += '<br><legend>' + (i18n.protected_extras || 'Protected extras') + '</legend>';
     group5Html += '<p class="help-block">' + (i18n.protected_extras_help || 'Raw option lines entered here are appended after the generated options. Use this to keep custom TinyMCE settings or to intentionally override assistant-managed values.') + '</p>';
     group5Html += '<textarea class="form-control builder-protected-extras" rows="8" placeholder="' + (i18n.protected_extras_placeholder || "toolbar_sticky: true,\ntoolbar_sticky_offset: 0") + '"></textarea>';
@@ -1241,6 +1262,10 @@ function initTinyMceProfileAssistant() {
     const $insertSelectedList = $('#builder-insert-selected-items');
     const $insertInput = $builderBody.find('.builder-insert-menu-input');
 
+    // Table-Toolbar Logic
+    const $tableToolbarSelectedList = $('#builder-table-toolbar-selected-items');
+    const $tableToolbarInput = $builderBody.find('.builder-table-toolbar');
+
     function updateToolbarRowLabels() {
         $toolbarRows.find('.builder-toolbar-row').each(function(index) {
             $(this).find('.builder-toolbar-row-title').text((i18n.toolbar_row || 'Toolbar row') + ' ' + (index + 1));
@@ -1549,18 +1574,65 @@ function initTinyMceProfileAssistant() {
         updateColorSectionState();
     }
 
+    function updateTableToolbarInput() {
+        const items = [];
+        $tableToolbarSelectedList.find('li').each(function() {
+            items.push($(this).data('value'));
+        });
+        $tableToolbarInput.val(items.join(' '));
+    }
+
+    function setTableToolbarFromString(rawToolbar) {
+        const tokens = tokenize(rawToolbar);
+        $tableToolbarSelectedList.empty();
+        tokens.forEach((v) => {
+            const origin = getToolbarItemOrigin(v);
+            const $pill = $('<li class="builder-toolbar-pill builder-toolbar-pill--' + origin + '" draggable="true"></li>');
+            $pill.attr('data-value', v).data('value', v);
+            $pill.append($(getToolbarItemBadge(origin)));
+            $pill.append($('<span class="builder-toolbar-pill-text"></span>').text(v));
+            $tableToolbarSelectedList.append($pill);
+        });
+        updateTableToolbarInput();
+    }
+
     function getContextInsertMeta($list) {
-        const isContext = $list.attr('id') === 'builder-context-selected-items';
-        const addClass = isContext ? 'context-item-add' : 'insert-item-add';
-        const pickerSelector = isContext ? '.builder-context-inline-picker' : '.builder-insert-inline-picker';
-        const searchSelector = isContext ? '.builder-context-inline-picker-search' : '.builder-insert-inline-picker-search';
-        const listSelector = isContext ? '.builder-context-inline-picker-list' : '.builder-insert-inline-picker-list';
-        return { isContext, addClass, pickerSelector, searchSelector, listSelector };
+        const id = $list.attr('id');
+        if (id === 'builder-context-selected-items') {
+            return {
+                kind: 'context',
+                addClass: 'context-item-add',
+                pickerSelector: '.builder-context-inline-picker',
+                searchSelector: '.builder-context-inline-picker-search',
+                listSelector: '.builder-context-inline-picker-list',
+            };
+        }
+        if (id === 'builder-table-toolbar-selected-items') {
+            return {
+                kind: 'table',
+                addClass: 'table-toolbar-item-add',
+                pickerSelector: '.builder-table-toolbar-inline-picker',
+                searchSelector: '.builder-table-toolbar-inline-picker-search',
+                listSelector: '.builder-table-toolbar-inline-picker-list',
+            };
+        }
+        return {
+            kind: 'insert',
+            addClass: 'insert-item-add',
+            pickerSelector: '.builder-insert-inline-picker',
+            searchSelector: '.builder-insert-inline-picker-search',
+            listSelector: '.builder-insert-inline-picker-list',
+        };
     }
 
     function refreshContextInsertState($list) {
         if ($list.attr('id') === 'builder-context-selected-items') {
             updateContextInput();
+            renderContextInsertInlinePicker($list, '');
+            return;
+        }
+        if ($list.attr('id') === 'builder-table-toolbar-selected-items') {
+            updateTableToolbarInput();
             renderContextInsertInlinePicker($list, '');
             return;
         }
@@ -1648,8 +1720,8 @@ function initTinyMceProfileAssistant() {
     }
 
     function closeAllContextInsertPickers() {
-        $builderBody.find('.builder-context-inline-picker, .builder-insert-inline-picker').hide();
-        $builderBody.find('.builder-context-inline-picker-search, .builder-insert-inline-picker-search').val('');
+        $builderBody.find('.builder-context-inline-picker, .builder-insert-inline-picker, .builder-table-toolbar-inline-picker').hide();
+        $builderBody.find('.builder-context-inline-picker-search, .builder-insert-inline-picker-search, .builder-table-toolbar-inline-picker-search').val('');
     }
 
     function openContextInsertInlinePicker($list, clientX, clientY, insertIndex, selectedPillValue = null) {
@@ -1745,14 +1817,14 @@ function initTinyMceProfileAssistant() {
         $builderBody.find('.builder-layout-hr-class').val('uk-divider-icon');
     });
 
-    // Context/Insert Inline Picker Events (toolbar-identisches Verhalten)
-    $builderBody.on('input', '.builder-context-inline-picker-search, .builder-insert-inline-picker-search', function() {
+    // Context/Insert/Table Inline Picker Events (toolbar-identisches Verhalten)
+    $builderBody.on('input', '.builder-context-inline-picker-search, .builder-insert-inline-picker-search, .builder-table-toolbar-inline-picker-search', function() {
         const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
         const selectedPillValue = $list.data('selectedPillValue');
         renderContextInsertInlinePicker($list, $(this).val(), selectedPillValue);
     });
 
-    $builderBody.on('keydown', '.builder-context-inline-picker-search, .builder-insert-inline-picker-search', function(e) {
+    $builderBody.on('keydown', '.builder-context-inline-picker-search, .builder-insert-inline-picker-search, .builder-table-toolbar-inline-picker-search', function(e) {
         const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
         if (e.key === 'Escape') {
             closeAllContextInsertPickers();
@@ -1768,7 +1840,7 @@ function initTinyMceProfileAssistant() {
         }
     });
 
-    $builderBody.on('click', '.context-item-add, .insert-item-add', function(e) {
+    $builderBody.on('click', '.context-item-add, .insert-item-add, .table-toolbar-item-add', function(e) {
         e.preventDefault();
         e.stopPropagation();
         const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
@@ -1777,8 +1849,8 @@ function initTinyMceProfileAssistant() {
         closeAllContextInsertPickers();
     });
 
-    $builderBody.on('click', '#builder-context-selected-items, #builder-insert-selected-items', function(e) {
-        if ($(e.target).closest('.builder-context-inline-picker, .builder-insert-inline-picker').length > 0) {
+    $builderBody.on('click', '#builder-context-selected-items, #builder-insert-selected-items, #builder-table-toolbar-selected-items', function(e) {
+        if ($(e.target).closest('.builder-context-inline-picker, .builder-insert-inline-picker, .builder-table-toolbar-inline-picker').length > 0) {
             return;
         }
         const $list = $(this);
@@ -1800,11 +1872,11 @@ function initTinyMceProfileAssistant() {
         openContextInsertInlinePicker($list, e.clientX, e.clientY, insertIndex, null);
     });
 
-    $builderBody.on('click', '.builder-context-inline-picker, .builder-insert-inline-picker', function(e) {
+    $builderBody.on('click', '.builder-context-inline-picker, .builder-insert-inline-picker, .builder-table-toolbar-inline-picker', function(e) {
         e.stopPropagation();
     });
 
-    $builderBody.on('click', '.builder-context-inline-picker .builder-toolbar-inline-picker-delete, .builder-insert-inline-picker .builder-toolbar-inline-picker-delete', function(e) {
+    $builderBody.on('click', '.builder-context-inline-picker .builder-toolbar-inline-picker-delete, .builder-insert-inline-picker .builder-toolbar-inline-picker-delete, .builder-table-toolbar-inline-picker .builder-toolbar-inline-picker-delete', function(e) {
         e.preventDefault();
         e.stopPropagation();
         const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
@@ -1820,7 +1892,7 @@ function initTinyMceProfileAssistant() {
         closeAllContextInsertPickers();
     });
 
-    $builderBody.on('click', '.builder-context-inline-picker .builder-toolbar-inline-picker-clear-all, .builder-insert-inline-picker .builder-toolbar-inline-picker-clear-all', function(e) {
+    $builderBody.on('click', '.builder-context-inline-picker .builder-toolbar-inline-picker-clear-all, .builder-insert-inline-picker .builder-toolbar-inline-picker-clear-all, .builder-table-toolbar-inline-picker .builder-toolbar-inline-picker-clear-all', function(e) {
         e.preventDefault();
         e.stopPropagation();
         const $list = $(this).closest('.builder-toolbar-pill-dropzone').find('.builder-toolbar-pill-list');
@@ -1847,11 +1919,17 @@ function initTinyMceProfileAssistant() {
             !$(e.target).closest($insertSelectedList).length) {
             $builderBody.find('.builder-insert-inline-picker').hide();
         }
+        if (!$(e.target).closest('.builder-table-toolbar-inline-picker, .builder-table-toolbar-inline-picker-search, .table-toolbar-item-add').length &&
+            !$(e.target).closest($tableToolbarSelectedList).length) {
+            $builderBody.find('.builder-table-toolbar-inline-picker').hide();
+        }
     });
 
     // Initialize
     renderContextInsertInlinePicker($contextSelectedList, '');
     renderContextInsertInlinePicker($insertSelectedList, '');
+    renderContextInsertInlinePicker($tableToolbarSelectedList, '');
+    setTableToolbarFromString($tableToolbarInput.val() || '');
 
     $builderBody.on('click', '.builder-toolbar-row-add', function() {
         addToolbarRow();
@@ -2038,7 +2116,7 @@ function initTinyMceProfileAssistant() {
 
     // Auto-wire drag events for <li> elements added by loadFromConfig() or any
     // other code path that inserts items without going through addContextItem()/addInsertItem().
-    [$contextSelectedList[0], $insertSelectedList[0], $toolbarRows[0]].forEach(function (list) {
+    [$contextSelectedList[0], $insertSelectedList[0], $tableToolbarSelectedList[0], $toolbarRows[0]].forEach(function (list) {
         if (!list) return;
         const mo = new MutationObserver(function (mutations) {
             mutations.forEach(function (m) {
@@ -2061,6 +2139,9 @@ function initTinyMceProfileAssistant() {
             if (list.id === 'builder-context-selected-items') {
                 updateContextInput();
                 renderContextInsertInlinePicker($contextSelectedList, '');
+            } else if (list.id === 'builder-table-toolbar-selected-items') {
+                updateTableToolbarInput();
+                renderContextInsertInlinePicker($tableToolbarSelectedList, '');
             } else if (list.id === 'builder-insert-selected-items') {
                 updateInsertInput();
                 renderContextInsertInlinePicker($insertSelectedList, '');
@@ -2122,6 +2203,8 @@ function initTinyMceProfileAssistant() {
             
             if (this.parentNode.id === 'builder-context-selected-items') {
                 updateContextInput();
+            } else if (this.parentNode.id === 'builder-table-toolbar-selected-items') {
+                updateTableToolbarInput();
             } else if (this.parentNode.id === 'builder-insert-selected-items') {
                 updateInsertInput();
             } else if ($(this.parentNode).hasClass('builder-toolbar-pill-list')) {
@@ -2473,6 +2556,7 @@ const MANAGED_PROFILE_KEYS = new Set([
     'height', 'min_height', 'max_height', 'autoresize_bottom_margin', 'width', 'resize',
     'image_caption', 'image_uploadtab', 'relative_urls', 'remove_script_host',
     'document_base_url', 'entity_encoding', 'convert_urls', 'object_resizing',
+    'table_toolbar', 'table_appearance_options', 'table_advtab', 'table_row_advtab', 'table_cell_advtab',
     'custom_colors',
     'color_cols', 'color_map_raw',
     'extended_valid_elements', 'imagewidth_presets', 'imagealign_presets',
@@ -2765,6 +2849,11 @@ function generateConfig($textarea, $builderBody) {
     const tocDepth = parseInt($builderBody.find('.builder-toc-depth').val()) || 3;
     const tocHeader = escapeString($builderBody.find('.builder-toc-header').val() || 'div');
     const tocClass = escapeString($builderBody.find('.builder-toc-class').val() || 'our-toc');
+    const tableToolbar = String($builderBody.find('.builder-table-toolbar').val() || '').replace(/\s+/g, ' ').trim();
+    const tableAppearanceOptions = $builderBody.find('.builder-table-appearance-options').is(':checked');
+    const tableAdvTab = $builderBody.find('.builder-table-advtab').is(':checked');
+    const tableRowAdvTab = $builderBody.find('.builder-table-row-advtab').is(':checked');
+    const tableCellAdvTab = $builderBody.find('.builder-table-cell-advtab').is(':checked');
 
     const defaultCodesample = $builderBody.find('.builder-default-codesample').is(':checked');
     const defaultRelList = $builderBody.find('.builder-default-rellist').is(':checked');
@@ -3136,6 +3225,30 @@ function generateConfig($textarea, $builderBody) {
     configStr += `toc_header: "${tocHeader}",\n`;
     configStr += `toc_class: "${tocClass}",\n\n`;
 
+    const defaultTableToolbar = 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol';
+    if (tableToolbar && tableToolbar !== defaultTableToolbar) {
+        configStr += `table_toolbar: '${escapeString(tableToolbar)}',\n`;
+    }
+    if (!tableAppearanceOptions) {
+        configStr += 'table_appearance_options: false,\n';
+    }
+    if (!tableAdvTab) {
+        configStr += 'table_advtab: false,\n';
+    }
+    if (!tableRowAdvTab) {
+        configStr += 'table_row_advtab: false,\n';
+    }
+    if (!tableCellAdvTab) {
+        configStr += 'table_cell_advtab: false,\n';
+    }
+    if (tableToolbar && tableToolbar !== defaultTableToolbar
+        || !tableAppearanceOptions
+        || !tableAdvTab
+        || !tableRowAdvTab
+        || !tableCellAdvTab) {
+        configStr += '\n';
+    }
+
     // Raw JS expressions
     configStr += 'skin: redaxo.theme.current === "dark" ? "oxide-dark" : "oxide",\n';
     configStr += 'content_css: redaxo.theme.current === "dark" ? "dark" : "default",\n';
@@ -3432,6 +3545,25 @@ function loadFromConfig($textarea, $builderBody) {
     }
     if (typeof cfg.toc_class === 'string') {
         $builderBody.find('.builder-toc-class').val(cfg.toc_class);
+    }
+
+    // Tabellenoptionen
+    if (typeof cfg.table_toolbar === 'string') {
+        setTableToolbarFromString(cfg.table_toolbar);
+    } else {
+        setTableToolbarFromString($builderBody.find('.builder-table-toolbar').val() || '');
+    }
+    if (typeof cfg.table_appearance_options !== 'undefined') {
+        $builderBody.find('.builder-table-appearance-options').prop('checked', !!cfg.table_appearance_options);
+    }
+    if (typeof cfg.table_advtab !== 'undefined') {
+        $builderBody.find('.builder-table-advtab').prop('checked', !!cfg.table_advtab);
+    }
+    if (typeof cfg.table_row_advtab !== 'undefined') {
+        $builderBody.find('.builder-table-row-advtab').prop('checked', !!cfg.table_row_advtab);
+    }
+    if (typeof cfg.table_cell_advtab !== 'undefined') {
+        $builderBody.find('.builder-table-cell-advtab').prop('checked', !!cfg.table_cell_advtab);
     }
 
     // Color mapping

@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.11.0
+---------------
+
+### Features
+
+* **Profil-Assistent: Tabellen-Toolbar jetzt wie andere Toolbars konfigurierbar.** Die Option `table_toolbar` wurde von Freitext auf den bekannten Pill-/Picker-Workflow umgestellt (klickbare Auswahl, Suche, Drag-and-drop-Sortierung, Entfernen/Alles-leeren).
+* **Tabellenoptionen im Profil-Assistent ergänzt:** `table_toolbar`, `table_appearance_options`, `table_advtab`, `table_row_advtab`, `table_cell_advtab` sind jetzt direkt im UI steuerbar und werden beim Laden bestehender Profile korrekt übernommen.
+* **Mehr Tabellen-Aktionen im Assistenten auswählbar:** u. a. `tablecellprops`, `tablecellvalign`, Merge/Split, Header-Optionen sowie weitere Table-Buttons für Toolbar- und Insert-Menü-Auswahl.
+* **Demo-Profil erweitert:** Standardmäßig aktivierte Tabellen-Optionen für eine sofort nutzbare Tabellenbearbeitung im Demo-Setup.
+
 Version 8.10.9
 ---------------
 

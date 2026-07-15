@@ -344,6 +344,7 @@ class Assets
                 'insert_menu_help' => \rex_i18n::msg('tinymce_insert_menu_help'),
                 'insert_menu_title' => \rex_i18n::msg('tinymce_insert_menu_title'),
                 'insert_menu_result' => \rex_i18n::msg('tinymce_insert_menu_result'),
+                'table_toolbar' => \rex_i18n::msg('tinymce_table_toolbar'),
                 'load_from_config' => \rex_i18n::msg('tinymce_load_from_config'),
                 'load_from_config_help' => \rex_i18n::msg('tinymce_load_from_config_help'),
                 'loaded_from_config' => \rex_i18n::msg('tinymce_loaded_from_config'),
@@ -370,6 +371,12 @@ class Assets
                     'forecolor', 'backcolor', 'removeformat', 'blocks', 'fontfamily', 'fontsize', 'lineheight', 'language',
                     'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
                     'ltr', 'rtl',
+                    'tableprops', 'tabledelete',
+                    'tableinsertrowbefore', 'tableinsertrowafter', 'tabledeleterow',
+                    'tableinsertcolbefore', 'tableinsertcolafter', 'tabledeletecol',
+                    'tablecellprops', 'tablemergecells', 'tablesplitcells',
+                    'tablecellvalign', 'tablecellborderwidth', 'tablecellborderstyle', 'tablecellbackgroundcolor', 'tablecellbordercolor',
+                    'tablecaption', 'tablerowheader', 'tablecolheader',
                     'table', 'link', 'image', 'media', 'codesample', 'charmap', 'emoticons', 'anchor',
                     'phonelink',
                     'hr', 'pagebreak', 'nonbreaking', 'insertdatetime',
@@ -380,6 +387,7 @@ class Assets
                 // Default TinyMCE insert-menu items (from core plugins).
                 'menu_insert_items' => [
                     'image', 'link', 'media', 'codesample', 'inserttable', 'charmap', 'emoticons',
+                    'cell', 'row', 'column', 'tableprops', 'tablecellprops', 'tablecellvalign',
                     'hr', 'pagebreak', 'nonbreaking', 'anchor', 'toc', 'insertdatetime',
                 ],
                 // Custom plugin menu items (name => label). Keeps the assistant aware of
