@@ -9,6 +9,13 @@ Version 8.12.0
 * **Profil-Assistent: Listenstile jetzt mit Picker/Pills statt Freitext konfigurierbar.** Die Optionen `advlist_number_styles` und `advlist_bullet_styles` nutzen jetzt denselben Workflow wie die anderen Toolbar-/Menü-Selektoren (Suche, Add/Remove, Drag-and-drop-Sortierung, Alles-leeren).
 * **Konsistentes Laden bestehender Profile für Listenstile:** Bereits gespeicherte `advlist_*`-Werte werden beim Öffnen korrekt in die neue Auswahl-UI übernommen und synchron als Konfigurationswert serialisiert.
 
+**Änderungen:**
+- TinyMCE: `^8.7.0` → `8.8.2`
+- TinyMCE i18n: `^26.6.8` → `26.7.13`
+- `package.json` aktualisiert
+- `pnpm-lock.yaml` aktualisiert
+- Neue Assets wurden gebaut und committet
+
 Version 8.11.0
 ---------------
 
