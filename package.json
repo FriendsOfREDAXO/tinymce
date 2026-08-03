@@ -6,7 +6,7 @@
   ],
   "dependencies": {
     "tinymce": "^8.8.2",
-    "tinymce-i18n": "^26.7.13"
+    "tinymce-i18n": "^26.8.2"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
