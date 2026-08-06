@@ -16,6 +16,8 @@ Version 8.13.0
 * Profile können `mediapaste_allow_image_paste` setzen und damit die globale Paste-Regel gezielt pro Profil übersteuern.
 * `mediapaste` respektiert jetzt sowohl den globalen Schalter als auch den Profil-Override `mediapaste_default_category`.
 * `mediapaste` konvertiert BMP-Clipboard-Bilder vor dem Upload best effort nach PNG (statt nur Dateiendungen umzubenennen), damit webtaugliche Bildformate im Mediapool landen.
+* Update-Migration ergänzt: Legacy-Felder (`mediatype`, `mediacategory`, `upload_default`) werden beim Update einmalig in die Profil-Konfiguration (`profile`) überführt, sofern dort noch keine entsprechenden Keys gesetzt sind.
+* Import-/Programmier-API ist jetzt JSON-first: Legacy-Felder aus älteren Payloads werden beim Import weiterhin akzeptiert und in `profile` gemappt.
 * Sprachkeys für `de_de`, `en_gb`, `sv_se` ergänzt.
 
 ### Dependency-Check

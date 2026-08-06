@@ -85,6 +85,64 @@ try {
     \rex_logger::logException($e);
 }
 
+// =============================================================================
+// Migration (v8.13.0): Legacy media profile columns -> profile JSON keys
+// =============================================================================
+// Historically, profile-specific media settings were stored in dedicated
+// DB columns. The current model stores them directly in the `profile` body.
+// This migration injects missing keys once and keeps existing profile keys.
+try {
+    $profileTable = rex::getTable('tinymce_profiles');
+    $rows = rex_sql::factory()->getArray(
+        'SELECT id, profile, mediatype, mediacategory, upload_default FROM ' . $profileTable
+    );
+
+    foreach ($rows as $row) {
+        $id = (int) ($row['id'] ?? 0);
+        if ($id <= 0) {
+            continue;
+        }
+
+        $profileBody = (string) ($row['profile'] ?? '');
+        $lines = [];
+
+        $mediaType = trim((string) ($row['mediatype'] ?? ''));
+        if ('' !== $mediaType && 1 !== preg_match('/(?:^|[,\{\r\n])\s*tinymce_media_type\s*:/', $profileBody)) {
+            $escapedType = str_replace("'", "\\'", $mediaType);
+            $lines[] = "tinymce_media_type: '{$escapedType}',";
+        }
+
+        $mediaCategory = (int) ($row['mediacategory'] ?? 0);
+        if ($mediaCategory > 0 && 1 !== preg_match('/(?:^|[,\{\r\n])\s*mediapaste_default_category\s*:/', $profileBody)) {
+            $lines[] = 'mediapaste_default_category: ' . $mediaCategory . ',';
+        }
+
+        $uploadDefaultRaw = strtolower(trim((string) ($row['upload_default'] ?? '')));
+        if ('' !== $uploadDefaultRaw && 1 !== preg_match('/(?:^|[,\{\r\n])\s*mediapaste_allow_image_paste\s*:/', $profileBody)) {
+            if ('1' === $uploadDefaultRaw || 'true' === $uploadDefaultRaw) {
+                $lines[] = 'mediapaste_allow_image_paste: true,';
+            } elseif ('0' === $uploadDefaultRaw || 'false' === $uploadDefaultRaw) {
+                $lines[] = 'mediapaste_allow_image_paste: false,';
+            }
+        }
+
+        if ([] === $lines) {
+            continue;
+        }
+
+        $newProfileBody = implode("\n", $lines) . "\n" . ltrim($profileBody);
+
+        rex_sql::factory()
+            ->setTable($profileTable)
+            ->setWhere(['id' => $id])
+            ->setValue('profile', $newProfileBody)
+            ->addGlobalUpdateFields()
+            ->update();
+    }
+} catch (\Throwable $e) {
+    \rex_logger::logException($e);
+}
+
 // Log update completion
 rex_logger::factory()->log('info', 'TinyMCE addon updated to v' . $this->getVersion());
 

@@ -10,20 +10,6 @@ use FriendsOfRedaxo\TinyMce\Creator\Profiles;
 class ProfileHelper
 {
     /**
-     * Profile fields that can be transferred from exported/imported payloads.
-     * Export metadata (e.g. id, timestamps) is intentionally ignored.
-     *
-     * @var array<int, string>
-     */
-    private const IMPORTABLE_FIELDS = [
-        'profile',
-        'mediatype',
-        'mediapath',
-        'mediacategory',
-        'upload_default',
-    ];
-
-    /**
      * Ensures that a TinyMCE profile exists.
      *
      * @param string $name The unique name of the profile
@@ -58,10 +44,6 @@ class ProfileHelper
         // Default values (profile is the single source of truth for profile config)
         $defaults = [
             'profile' => '',
-            'mediatype' => '',
-            'mediapath' => '',
-            'mediacategory' => 0,
-            'upload_default' => '',
         ];
 
         $data = array_merge($defaults, $data);
@@ -152,12 +134,13 @@ class ProfileHelper
             $profile['profile'] = $profile['extra'];
         }
 
-        $data = [];
-        foreach (self::IMPORTABLE_FIELDS as $field) {
-            if (array_key_exists($field, $profile)) {
-                $data[$field] = $profile[$field];
-            }
-        }
+        // Backward compatibility for legacy per-profile media settings fields.
+        // Map them into the profile config body so import/export remains JSON-first.
+        $profile['profile'] = self::mergeLegacyMediaFieldsIntoProfile($profile, (string) ($profile['profile'] ?? ''));
+
+        $data = [
+            'profile' => (string) $profile['profile'],
+        ];
 
         return [
             'name' => $name,
@@ -218,23 +201,9 @@ class ProfileHelper
         $lines[] = $i2 . self::phpExportString($description) . ',';
         $lines[] = $i2 . '[';
 
-        foreach (self::IMPORTABLE_FIELDS as $field) {
-            if (!array_key_exists($field, $data)) {
-                continue;
-            }
-
-            $value = $data[$field];
-
-            // Skip empty/default optional media fields to keep code minimal
-            if (in_array($field, ['mediatype', 'mediapath', 'upload_default'], true) && '' === (string) $value) {
-                continue;
-            }
-            if ('mediacategory' === $field && 0 === (int) $value) {
-                continue;
-            }
-
-            $exported = is_int($value) ? (string) $value : self::phpExportString((string) $value);
-            $lines[] = $i3 . "'" . $field . "' => " . $exported . ',';
+        $profileValue = (string) ($data['profile'] ?? '');
+        if ('' !== trim($profileValue)) {
+            $lines[] = $i3 . "'profile' => " . self::phpExportString($profileValue) . ',';
         }
 
         $lines[] = $i2 . '],';
@@ -243,6 +212,44 @@ class ProfileHelper
         $lines[] = '}';
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * Injects legacy media-related fields into the profile body if missing.
+     * This keeps old JSON payloads importable while converging on profile-only config.
+     *
+     * @param array<string, mixed> $profile
+     */
+    private static function mergeLegacyMediaFieldsIntoProfile(array $profile, string $profileBody): string
+    {
+        $lines = [];
+
+        $mediaType = trim((string) ($profile['mediatype'] ?? ''));
+        if ('' !== $mediaType && 1 !== preg_match('/(?:^|[,\{\r\n])\s*tinymce_media_type\s*:/', $profileBody)) {
+            $escapedType = str_replace("'", "\\'", $mediaType);
+            $lines[] = "tinymce_media_type: '{$escapedType}',";
+        }
+
+        $mediaCategory = (int) ($profile['mediacategory'] ?? 0);
+        if ($mediaCategory > 0 && 1 !== preg_match('/(?:^|[,\{\r\n])\s*mediapaste_default_category\s*:/', $profileBody)) {
+            $lines[] = 'mediapaste_default_category: ' . $mediaCategory . ',';
+        }
+
+        $uploadDefaultRaw = trim((string) ($profile['upload_default'] ?? ''));
+        if ('' !== $uploadDefaultRaw && 1 !== preg_match('/(?:^|[,\{\r\n])\s*mediapaste_allow_image_paste\s*:/', $profileBody)) {
+            $normalized = strtolower($uploadDefaultRaw);
+            if ('1' === $normalized || 'true' === $normalized) {
+                $lines[] = 'mediapaste_allow_image_paste: true,';
+            } elseif ('0' === $normalized || 'false' === $normalized) {
+                $lines[] = 'mediapaste_allow_image_paste: false,';
+            }
+        }
+
+        if ([] === $lines) {
+            return $profileBody;
+        }
+
+        return implode("\n", $lines) . "\n" . ltrim($profileBody);
     }
 
     /**
