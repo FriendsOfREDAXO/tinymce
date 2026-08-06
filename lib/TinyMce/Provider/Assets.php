@@ -61,6 +61,15 @@ class Assets
             $externalPlugins = PluginRegistry::getExternalPlugins();
             \rex_view::setJsProperty('tinyExternalPlugins', $externalPlugins);
 
+            $user = \rex::getUser();
+            $canPasteImages = false;
+            if (null !== $user) {
+                $canPasteImages = $user->isAdmin() || $user->hasPerm('tinymce[paste_images]');
+            }
+            \rex_view::setJsProperty('tinyMediaUploadCapabilities', [
+                'allow_image_paste' => $canPasteImages,
+            ]);
+
             // Load active Style-Sets from database
             $styleSetsOptions = self::loadActiveStyleSets();
             $profileNamesById = self::loadProfileNamesById();
@@ -345,6 +354,15 @@ class Assets
                 'insert_menu_title' => \rex_i18n::msg('tinymce_insert_menu_title'),
                 'insert_menu_result' => \rex_i18n::msg('tinymce_insert_menu_result'),
                 'table_toolbar' => \rex_i18n::msg('tinymce_table_toolbar'),
+                'mediapaste_profile_override_title' => \rex_i18n::msg('mediapaste_profile_paste_override'),
+                'mediapaste_profile_category_override' => \rex_i18n::msg('mediapaste_profile_category_override'),
+                'mediapaste_profile_category_placeholder' => \rex_i18n::msg('tinymce_profile_placeholder_media_category_id'),
+                'mediapaste_profile_category_override_help' => \rex_i18n::msg('mediapaste_profile_category_override_help'),
+                'mediapaste_profile_paste_override' => \rex_i18n::msg('mediapaste_profile_paste_override'),
+                'mediapaste_profile_paste_inherit_global' => \rex_i18n::msg('mediapaste_profile_paste_inherit_global'),
+                'mediapaste_profile_paste_allow' => \rex_i18n::msg('mediapaste_profile_paste_allow'),
+                'mediapaste_profile_paste_block' => \rex_i18n::msg('mediapaste_profile_paste_block'),
+                'mediapaste_profile_paste_override_help' => \rex_i18n::msg('mediapaste_profile_paste_override_help'),
                 'load_from_config' => \rex_i18n::msg('tinymce_load_from_config'),
                 'load_from_config_help' => \rex_i18n::msg('tinymce_load_from_config_help'),
                 'loaded_from_config' => \rex_i18n::msg('tinymce_loaded_from_config'),
@@ -423,6 +441,8 @@ class Assets
                 // name does not start with `for_`.
                 'for_plugins' => [],
                 'for_toolbar_buttons' => [],
+                // Flattened media categories for the profile assistant category picker.
+                'media_categories' => self::loadMediaCategoriesForProfileAssistant(),
             ];
 
             // Split registered plugins into "bundled with tinymce addon" (FOR)
@@ -482,5 +502,29 @@ class Assets
     private static function getAddon(): rex_addon_interface|rex_addon
     {
         return rex_addon::get('tinymce');
+    }
+
+    /**
+     * @return list<array{id: int, name: string, depth: int}>
+     */
+    private static function loadMediaCategoriesForProfileAssistant(): array
+    {
+        $flattened = [];
+
+        $appendCategories = static function (array $categories, int $depth) use (&$appendCategories, &$flattened): void {
+            foreach ($categories as $category) {
+                $flattened[] = [
+                    'id' => $category->getId(),
+                    'name' => (string) $category->getName(),
+                    'depth' => $depth,
+                ];
+
+                $appendCategories($category->getChildren(), $depth + 1);
+            }
+        };
+
+        $appendCategories(\rex_media_category::getRootCategories(), 0);
+
+        return $flattened;
     }
 }

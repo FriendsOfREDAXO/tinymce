@@ -347,11 +347,22 @@ tinymce_media_no_category = Utan kategori
 mediapaste_section_title = Bilduppladdning (drag & drop / klistra in)
 mediapaste_upload_enabled = Aktivera bilduppladdning till mediapoolen
 mediapaste_upload_enabled_help = När detta är aktivt laddas bilder som släpps eller klistras in automatiskt upp till REDAXO-mediapoolen.
+mediapaste_paste_images_enabled = Tillåt bilder vid inklistring
+mediapaste_paste_images_enabled_help = Om inaktiverat blockeras inklistrade bilder globalt (även från Word/Google Docs).
 mediapaste_default_category = Standardmediakategori
 mediapaste_category_ask = — Fråga alltid —
 mediapaste_default_category_help = Kategori dit bilderna laddas upp. "Fråga alltid" öppnar en dialog vid uppladdning. För frontend-användare utan mediabehörighet måste en fast kategori väljas.
 mediapaste_media_manager_type = Media Manager-typ för bild-URL
 mediapaste_media_manager_type_help = Valfri Media Manager-typ för bild-URL:en som visas i editorn (t.ex. tiny). Tomt = direkt /media/-URL.
+mediapaste_profile_category_override = Uppladdningsmapp för denna profil
+mediapaste_profile_category_inherit_global = — Använd global inställning —
+mediapaste_profile_category_override_help = Valfri åsidosättning av standardmediakategorin. Globalt värde används från ”Inställningar”.
+mediapaste_profile_paste_override = Bilder vid inklistring (profil-override)
+mediapaste_profile_paste_inherit_global = — Använd global inställning —
+mediapaste_profile_paste_allow = Tillåt bilder vid inklistring
+mediapaste_profile_paste_block = Blockera bilder vid inklistring
+mediapaste_profile_paste_override_help = Valfri åsidosättning för denna profil. Globalt värde används från ”Inställningar”.
+tinymce_profile_placeholder_media_category_id = t.ex. 12
 
 tinymce_insert_menu = Infogningsmeny
 tinymce_insert_menu_help = Bestämmer vilka poster som visas i menyradens "Infoga"-meny. Dra och släpp för att sortera. Enskilda plugins (oEmbed, Video, HTML Embed, checklista, fotnot, tillgänglighet …) hamnar automatiskt i infogningsmenyn så snart de är aktiverade här.
@@ -369,6 +380,9 @@ tinymce_profile_restore_info = Senast sparade version finns tillgänglig.
 tinymce_profile_restore = Återställ senaste versionen
 tinymce_profile_restore_confirm = Återställa senaste versionen? Den aktuella konfigurationen sparas samtidigt som en ny säkerhetskopia.
 tinymce_profile_restored = Senaste versionen av profilen "%s" har återställts.
+
+tinymce_perm_addon = TinyMCE AddOn
+tinymce_perm_paste_images = Ladda upp bilder till mediapoolen via copy/paste
 
 # Layout Rules (strukturoptimering)
 tinymce_layout_rules = Layoutregler (strukturoptimering)

@@ -1,6 +1,29 @@
 Changelog
 =========
 
+Version 8.13.0
+---------------
+
+### Features
+
+* **Globale Paste-Steuerung für Bilder:** In den Einstellungen gibt es jetzt die Option „Bilder beim Einfügen erlauben“. Ist sie deaktiviert, werden Bild-Pastes grundsätzlich unterdrückt (auch aus Word/Google Docs).
+* **Paste-Verhalten je Profil übersteuerbar:** Zusätzlich zur globalen Einstellung kann pro Profil festgelegt werden, ob Bilder per Copy/Paste erlaubt oder blockiert sind. Damit lassen sich z. B. strikte Redaktionsprofile und offene Demo-/Admin-Profile parallel betreiben.
+* **Profilbezogener Upload-Ordner:** In der Profilbearbeitung kann optional eine abweichende Mediapool-Kategorie gesetzt werden. Ohne Auswahl greift weiterhin die globale Kategorie aus den Einstellungen.
+
+### Änderungen
+
+* `media_upload_settings` um `paste_images_enabled` erweitert (Default: `false`).
+* Profile können `mediapaste_allow_image_paste` setzen und damit die globale Paste-Regel gezielt pro Profil übersteuern.
+* `mediapaste` respektiert jetzt sowohl den globalen Schalter als auch den Profil-Override `mediapaste_default_category`.
+* `mediapaste` konvertiert BMP-Clipboard-Bilder vor dem Upload best effort nach PNG (statt nur Dateiendungen umzubenennen), damit webtaugliche Bildformate im Mediapool landen.
+* Sprachkeys für `de_de`, `en_gb`, `sv_se` ergänzt.
+
+### Dependency-Check
+
+* TinyMCE-Registry geprüft (Stand Release 8.13.0): **8.8.2**.
+* TinyMCE i18n auf **26.8.2** aktualisiert (`^26.7.13` → `^26.8.2`).
+* Für TinyMCE selbst kein Vendor-Update erforderlich, da bereits auf dem neuesten Stand.
+
 Version 8.12.0
 ---------------
 

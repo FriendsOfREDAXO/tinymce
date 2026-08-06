@@ -1,6 +1,8 @@
 declare const tinymce: any;
 // tinyMediaUploadConfig is injected by profiles.js – works in backend & frontend
 declare const tinyMediaUploadConfig: Partial<MediaUploadConfig> | undefined;
+declare const tinyMediaUploadCapabilities: { allow_image_paste?: boolean } | undefined;
+declare const rex: { tinyMediaUploadCapabilities?: { allow_image_paste?: boolean } } | undefined;
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -13,6 +15,7 @@ interface MediaCategory {
 
 interface MediaUploadConfig {
     enabled: boolean;
+    allow_image_paste: boolean;
     /** -1 = always show dialog, >=0 = upload directly to this category */
     default_category: number;
     upload_url: string;
@@ -25,6 +28,7 @@ interface MediaUploadConfig {
 
 const defaultConfig: MediaUploadConfig = {
     enabled: true,
+    allow_image_paste: false,
     default_category: -1,
     upload_url: 'index.php?rex-api-call=tinymce_media_upload',
     categories_url: 'index.php?rex-api-call=tinymce_media_categories',
@@ -66,6 +70,120 @@ function getExtensionForMime(mimeType: string): string {
     return map[mimeType] ?? 'png';
 }
 
+function ensureFilenameMatchesMime(filename: string, mimeType: string): string {
+    const expectedExt = getExtensionForMime(mimeType).toLowerCase();
+    const trimmed = filename.trim();
+
+    if (trimmed === '') {
+        return '';
+    }
+
+    const dotPos = trimmed.lastIndexOf('.');
+    if (dotPos <= 0 || dotPos === trimmed.length - 1) {
+        return trimmed + '.' + expectedExt;
+    }
+
+    const base = trimmed.slice(0, dotPos);
+    const ext = trimmed.slice(dotPos + 1).toLowerCase();
+
+    if (ext === expectedExt) {
+        return trimmed;
+    }
+
+    // Treat jpg/jpeg as equivalent.
+    if ((ext === 'jpg' || ext === 'jpeg') && (expectedExt === 'jpg' || expectedExt === 'jpeg')) {
+        return trimmed;
+    }
+
+    return base + '.' + expectedExt;
+}
+
+function extensionFromFilename(filename: string): string {
+    const trimmed = filename.trim();
+    const dotPos = trimmed.lastIndexOf('.');
+    if (dotPos <= 0 || dotPos === trimmed.length - 1) {
+        return '';
+    }
+    return trimmed.slice(dotPos + 1).toLowerCase();
+}
+
+function mimeFromExtension(extension: string): string | null {
+    const map: Record<string, string> = {
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        webp: 'image/webp',
+    };
+
+    return map[extension] ?? null;
+}
+
+async function convertImageBlob(blob: Blob, targetMime: string): Promise<Blob | null> {
+    try {
+        const image = await createImageBitmap(blob);
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        const context = canvas.getContext('2d');
+        if (!context) {
+            image.close();
+            return null;
+        }
+
+        // JPEG has no alpha channel, so enforce white background.
+        if (targetMime === 'image/jpeg') {
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        context.drawImage(image, 0, 0);
+        image.close();
+
+        return await new Promise<Blob | null>((resolve) => {
+            canvas.toBlob(
+                (resultBlob) => resolve(resultBlob),
+                targetMime,
+                targetMime === 'image/jpeg' ? 0.92 : undefined
+            );
+        });
+    } catch {
+        return null;
+    }
+}
+
+async function alignBlobToFilenameFormat(blob: Blob, filename: string): Promise<Blob> {
+    // BMP is not a web-friendly upload target in most setups. Convert to PNG when possible.
+    if (blob.type === 'image/bmp') {
+        const convertedBmp = await convertImageBlob(blob, 'image/png');
+        if (convertedBmp !== null) {
+            return convertedBmp;
+        }
+    }
+
+    const ext = extensionFromFilename(filename);
+    const targetMime = mimeFromExtension(ext);
+
+    if (targetMime === null) {
+        return blob;
+    }
+
+    if (blob.type === targetMime) {
+        return blob;
+    }
+
+    // Clipboard image copies often provide PNG blobs even when original source was JPG/WebP.
+    // Convert PNG clipboard blobs back to the intended target mime inferred from filename.
+    if (blob.type === 'image/png' && (targetMime === 'image/jpeg' || targetMime === 'image/webp')) {
+        const converted = await convertImageBlob(blob, targetMime);
+        if (converted !== null) {
+            return converted;
+        }
+    }
+
+    return blob;
+}
+
 /**
  * Try to extract the original filename from a pasted <img src="…">.
  * Strips query strings / fragments and decodes URI encoding.
@@ -80,6 +198,21 @@ function filenameFromHtml(html: string): string {
         try { return decodeURIComponent(last); } catch { return last; }
     }
     return '';
+}
+
+function getErrorMessage(err: unknown): string {
+    if (typeof err === 'string' && err !== '') {
+        return err;
+    }
+
+    if (typeof err === 'object' && err !== null) {
+        const withMessage = err as { message?: unknown };
+        if (typeof withMessage.message === 'string' && withMessage.message !== '') {
+            return withMessage.message;
+        }
+    }
+
+    return 'Upload fehlgeschlagen';
 }
 
 /* ================================================================== */
@@ -247,6 +380,8 @@ async function handleBlobUpload(
         filename = 'image-' + Date.now() + '.' + ext;
     }
 
+    filename = ensureFilenameMatchesMime(filename, blob.type);
+
     return pickCategoryAndUpload(editor, blob, filename, config, progress);
 }
 
@@ -256,12 +391,70 @@ async function handleBlobUpload(
 
 const Plugin = (): void => {
     tinymce.PluginManager.add('mediapaste', (editor: any): void => {
-        // Merge runtime config from profiles.js → window fallback → defaults
+        // Merge runtime config from profiles.js -> window fallback -> defaults
         const runtimeConfig: Partial<MediaUploadConfig> =
             (typeof tinyMediaUploadConfig !== 'undefined' ? tinyMediaUploadConfig : null)
             ?? ((window as any).tinyMediaUploadConfig ?? {});
 
+        const runtimeCapabilities: { allow_image_paste?: boolean } =
+            (typeof tinyMediaUploadCapabilities !== 'undefined' ? tinyMediaUploadCapabilities : null)
+            ?? ((window as any).tinyMediaUploadCapabilities ?? (typeof rex !== 'undefined' ? (rex.tinyMediaUploadCapabilities ?? {}) : {}));
+
         const config: MediaUploadConfig = { ...defaultConfig, ...runtimeConfig };
+
+        if (runtimeCapabilities.allow_image_paste === false) {
+            config.allow_image_paste = false;
+        }
+
+        editor.options.register('mediapaste_default_category', {
+            processor: 'number',
+            default: 0,
+        });
+
+        editor.options.register('mediapaste_allow_image_paste', {
+            processor: 'boolean',
+            // Keep global runtime config as default unless a profile explicitly overrides it.
+            default: config.allow_image_paste,
+        });
+
+        const profileCategoryOverride = Number(editor.options.get('mediapaste_default_category') ?? 0);
+        if (!Number.isNaN(profileCategoryOverride) && profileCategoryOverride > 0) {
+            config.default_category = profileCategoryOverride;
+        }
+
+        const profilePasteOverride = editor.options.get('mediapaste_allow_image_paste');
+        if (typeof profilePasteOverride === 'boolean') {
+            config.allow_image_paste = profilePasteOverride;
+        }
+
+        if (!config.allow_image_paste) {
+            editor.options.set('paste_data_images', false);
+
+            editor.on('paste', (e: any) => {
+                const clipboardData: DataTransfer | null = e.clipboardData ?? null;
+                if (!clipboardData) return;
+
+                const items: DataTransferItem[] = Array.from(clipboardData.items ?? []);
+                const hasImageItem = items.some(
+                    (item) => item.kind === 'file' && item.type.startsWith('image/')
+                );
+
+                if (hasImageItem) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+            });
+
+            editor.on('PastePreProcess', (e: any) => {
+                if (typeof e.content !== 'string') {
+                    return;
+                }
+
+                e.content = e.content.replace(/<img\b[^>]*>/gi, '');
+            });
+
+            return;
+        }
 
         if (!config.enabled) return;
 
@@ -326,12 +519,18 @@ const Plugin = (): void => {
             const ext = getExtensionForMime(file.type);
 
             const doUpload = (suggestedFilename: string): void => {
-                const filename = suggestedFilename !== ''
+                const rawFilename = suggestedFilename !== ''
                     ? suggestedFilename
                     : 'image-' + Date.now() + '.' + ext;
 
-                void pickCategoryAndUpload(editor, file, filename, config, () => {})
+                void (async () => {
+                    const uploadBlob = await alignBlobToFilenameFormat(file, rawFilename);
+                    const filename = ensureFilenameMatchesMime(rawFilename, uploadBlob.type || file.type);
+
+                    return pickCategoryAndUpload(editor, uploadBlob, filename, config, () => {});
+                })()
                     .then((url: string) => {
+                        editor.focus();
                         editor.insertContent('<img src="' + url + '" alt="" />');
                     })
                     .catch((err: unknown) => {
@@ -339,9 +538,24 @@ const Plugin = (): void => {
                             typeof err === 'object' &&
                             err !== null &&
                             (err as { cancelled?: boolean }).cancelled;
-                        if (!isCancelled) {
-                            console.error('[mediapaste] Upload error:', err);
+
+                        if (isCancelled) {
+                            editor.notificationManager.open({
+                                text: 'Upload abgebrochen',
+                                type: 'info',
+                                timeout: 2000,
+                            });
+                            return;
                         }
+
+                        const message = getErrorMessage(err);
+                        editor.notificationManager.open({
+                            text: 'Bild-Upload fehlgeschlagen: ' + message,
+                            type: 'error',
+                            timeout: 6000,
+                        });
+
+                        console.error('[mediapaste] Upload error:', err);
                     });
             };
 

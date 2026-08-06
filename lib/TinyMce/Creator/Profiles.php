@@ -97,10 +97,11 @@ class Profiles
             $cleanPasteConfigJs = json_encode($cleanPasteCfg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             // MediaUpload config – embedded here so it works in frontend too
-            /** @var array{upload_enabled?: bool, upload_default_category?: int, upload_media_manager_type?: string} $mediaUploadSettings */
+            /** @var array{upload_enabled?: bool, paste_images_enabled?: bool, upload_default_category?: int, upload_media_manager_type?: string} $mediaUploadSettings */
             $mediaUploadSettings = self::getAddon()->getConfig('media_upload_settings', []);
             $mediaUploadCfg = [
                 'enabled'          => (bool) ($mediaUploadSettings['upload_enabled'] ?? false),
+                'allow_image_paste' => (bool) ($mediaUploadSettings['paste_images_enabled'] ?? false),
                 'default_category' => (int) ($mediaUploadSettings['upload_default_category'] ?? -1),
                 'upload_url'       => rex_url::backendController(['rex-api-call' => 'tinymce_media_upload'], false),
                 'categories_url'   => rex_url::backendController(['rex-api-call' => 'tinymce_media_categories'], false),

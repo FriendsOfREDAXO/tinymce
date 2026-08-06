@@ -17,18 +17,20 @@ class rex_api_tinymce_media_categories extends rex_api_function
         $user = rex::getUser();
         $categories = [];
 
-        // Root category (id=0) – no folder
-        // Use tinymce-addon key as fallback to avoid [translate:…] if mediapool lang is not loaded
-        $rootName = rex_i18n::hasMsg('pool_kats_no_category')
-            ? rex_i18n::msg('pool_kats_no_category')
-            : rex_i18n::msg('tinymce_media_no_category');
-        $categories[] = ['id' => 0, 'name' => $rootName];
-
         if ($user !== null) {
             /** @var rex_media_perm $mediaPerm */
             $mediaPerm = $user->getComplexPerm('media');
 
             if ($mediaPerm->hasMediaPerm()) {
+                if ($mediaPerm->hasAll() || $mediaPerm->hasCategoryPerm(0)) {
+                    // Root category (id=0) – no folder
+                    // Use tinymce-addon key as fallback to avoid [translate:…] if mediapool lang is not loaded
+                    $rootName = rex_i18n::hasMsg('pool_kats_no_category')
+                        ? rex_i18n::msg('pool_kats_no_category')
+                        : rex_i18n::msg('tinymce_media_no_category');
+                    $categories[] = ['id' => 0, 'name' => $rootName];
+                }
+
                 self::collectCategories(
                     rex_media_category::getRootCategories(),
                     $categories,

@@ -214,7 +214,8 @@ Voraussetzung: `pnpm` ist installiert. Das AddOn ist ein pnpm-Workspace mit den 
 | `pnpm install` | Installiert Abhängigkeiten und führt automatisch `vendor:copy` aus (`postinstall`). |
 | `pnpm run vendor:copy` | Kopiert `node_modules/tinymce` → `assets/vendor/tinymce/`. |
 | `pnpm run plugins:build` | Baut alle `custom_plugins/*` und legt die Ergebnisse in `assets/scripts/tinymce/plugins/<name>/` ab. |
-| `pnpm run build` | Vollständiger Staged-Build: Vendor + Plugins werden zuerst nach `build/` gebaut, danach via `build:sync` in den Asset-Baum gespiegelt. |
+| `pnpm run build:verify` | Prüft den Build-Zustand: Für jedes `custom_plugins/<name>` müssen `assets/scripts/tinymce/plugins/<name>/plugin.js` und `plugin.min.js` existieren; zusätzlich werden verbotene Custom-Plugin-Dubletten im Vendor-Pfad erkannt. |
+| `pnpm run build` | Vollständiger Staged-Build: Vendor + Plugins werden zuerst nach `build/` gebaut, danach via `build:sync` in den Asset-Baum gespiegelt und abschließend mit `build:verify` validiert. |
 | `pnpm run clean-build` | Räumt `build/` auf und entfernt versehentlich im Vendor-Baum gelandete Custom-Plugin-Ordner. |
 | `pnpm run clean-plugins` | Löscht die Build-Ergebnisse der Custom-Plugins. |
 
@@ -241,6 +242,8 @@ Voraussetzung: `pnpm` ist installiert. Das AddOn ist ein pnpm-Workspace mit den 
 pnpm install
 pnpm run build
 ```
+
+Der Plugin-Build ist absichtlich strikt: Schlägt ein Plugin-Build fehl oder fehlen danach `plugin.js`/`plugin.min.js`, endet der Build mit Exit-Code `1`.
 
 Sanity-Check danach:
 

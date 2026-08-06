@@ -43,9 +43,9 @@ class rex_api_tinymce_media_upload extends rex_api_function
                 exit;
             }
 
-            // Category 0 = root is always allowed for users with any media perm.
-            // For specific categories, check explicit permission.
-            if ($categoryId > 0 && !$mediaPerm->hasAll() && !$mediaPerm->hasCategoryPerm($categoryId)) {
+            // Root category and specific categories both require matching permission,
+            // unless user has full media access.
+            if ($categoryId >= 0 && !$mediaPerm->hasAll() && !$mediaPerm->hasCategoryPerm($categoryId)) {
                 http_response_code(403);
                 rex_response::sendJson(['error' => 'No permission for this media category']);
                 exit;
@@ -83,6 +83,11 @@ class rex_api_tinymce_media_upload extends rex_api_function
             exit;
         }
 
+        // Some clipboard sources provide mismatching filename extensions
+        // (e.g. "*.jpg" while the blob is actually image/png). Normalize here
+        // so mediapool validation does not reject valid image content.
+        $file['name'] = self::normalizeFilenameForMime((string) $file['name'], $mimeType);
+
         // ---- Upload to mediapool ----
         try {
             $result = rex_media_service::addMedia([
@@ -115,6 +120,47 @@ class rex_api_tinymce_media_upload extends rex_api_function
         }
 
         exit;
+    }
+
+    private static function normalizeFilenameForMime(string $filename, string $mimeType): string
+    {
+        $filename = trim($filename);
+        if ('' === $filename) {
+            $filename = 'image';
+        }
+
+        $extByMime = [
+            'image/jpeg' => 'jpg',
+            'image/jpg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            'image/avif' => 'avif',
+            'image/svg+xml' => 'svg',
+            'image/bmp' => 'bmp',
+        ];
+
+        $expectedExt = $extByMime[strtolower($mimeType)] ?? '';
+        if ('' === $expectedExt) {
+            return $filename;
+        }
+
+        $nameOnly = pathinfo($filename, PATHINFO_FILENAME);
+        if ('' === $nameOnly) {
+            $nameOnly = 'image';
+        }
+
+        $currentExt = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
+        if ($currentExt === $expectedExt) {
+            return $filename;
+        }
+
+        // jpg/jpeg should be treated as equivalent extension.
+        if (($currentExt === 'jpg' || $currentExt === 'jpeg') && $expectedExt === 'jpg') {
+            return $filename;
+        }
+
+        return $nameOnly . '.' . $expectedExt;
     }
 
     /**

@@ -34,6 +34,22 @@ function initTinyMceProfileAssistant() {
 
     // Builder UI
     const options = rex.tinymceProfileOptions || {};
+    const mediaCategories = Array.isArray(options.media_categories) ? options.media_categories : [];
+    let mediaCategoryOptionsHtml = '<option value="">' + (i18n.mediapaste_profile_paste_inherit_global || '— Globale Einstellung verwenden —') + '</option>';
+    mediaCategories.forEach((category) => {
+        if (!category || typeof category !== 'object') {
+            return;
+        }
+        const id = parseInt(category.id, 10);
+        if (!Number.isFinite(id) || id <= 0) {
+            return;
+        }
+        const depth = parseInt(category.depth, 10);
+        const level = Number.isFinite(depth) && depth > 0 ? depth : 0;
+        const prefix = level > 0 ? '&nbsp;&nbsp;'.repeat(level) + '- ' : '';
+        const label = escapeHtml(String(category.name || id));
+        mediaCategoryOptionsHtml += '<option value="' + id + '">' + prefix + label + '</option>';
+    });
     // Sort plugin and toolbar lists alphabetically for easier scanning in the assistant.
     const pluginsList = (options.plugins || []).slice().sort((a, b) => String(a).localeCompare(String(b)));
     const toolbarButtons = Array.from(new Set((options.toolbar || []).concat(['stylesets']))).sort((a, b) => String(a).localeCompare(String(b)));
@@ -343,7 +359,14 @@ function initTinyMceProfileAssistant() {
     group5Html += '<div class="col-md-4"><div class="form-group"><label>' + (i18n.toc_class || 'TOC Class') + '</label><input type="text" class="form-control builder-toc-class" value="our-toc"></div></div>';
     group5Html += '</div>';
 
-    // 5e) Tabellenoptionen
+    // 5e) MediaPaste Profile-Overrides (in Profil-JSON statt separater Formularfelder)
+    group5Html += '<br><legend><i class="rex-icon fa-upload"></i> ' + (i18n.mediapaste_profile_override_title || 'Media Upload & Paste (Profil-Override)') + '</legend>';
+    group5Html += '<div class="row">';
+    group5Html += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.mediapaste_profile_category_override || 'Upload-Ordner für dieses Profil') + '</label><select class="form-control builder-mediapaste-default-category">' + mediaCategoryOptionsHtml + '</select><p class="help-block">' + (i18n.mediapaste_profile_category_override_help || 'Optionaler Override der Standard-Medienkategorie. Leer/Global = verwendet die globale Einstellung aus „Einstellungen“.') + '</p></div></div>';
+    group5Html += '<div class="col-md-6"><div class="form-group"><label>' + (i18n.mediapaste_profile_paste_override || 'Bilder beim Einfügen (Profil-Override)') + '</label><select class="form-control builder-mediapaste-allow-image-paste"><option value="">' + (i18n.mediapaste_profile_paste_inherit_global || '— Globale Einstellung verwenden —') + '</option><option value="1">' + (i18n.mediapaste_profile_paste_allow || 'Bilder beim Einfügen erlauben') + '</option><option value="0">' + (i18n.mediapaste_profile_paste_block || 'Bilder beim Einfügen blockieren') + '</option></select><p class="help-block">' + (i18n.mediapaste_profile_paste_override_help || 'Optionaler Override für dieses Profil. Global = verwendet die Einstellung aus „Einstellungen“.') + '</p></div></div>';
+    group5Html += '</div>';
+
+    // 5f) Tabellenoptionen
     group5Html += '<br><legend><i class="rex-icon fa-table"></i> ' + (i18n.table_toolbar || 'Tabellen-Plugin Toolbar') + '</legend>';
     group5Html += '<p class="help-block">' + (i18n.table_toolbar_help || 'Steuert, welche Aktionen in der Tabellen-Kontext-Toolbar verfügbar sind. Zusätzlich kannst du erweiterte Tabs für Tabellen-, Zeilen- und Zellen-Eigenschaften aktivieren/deaktivieren.') + '</p>';
     group5Html += '<div class="panel panel-default"><div class="panel-body builder-dropzone-panel-body">';
@@ -364,7 +387,7 @@ function initTinyMceProfileAssistant() {
     group5Html += '<div class="col-md-3"><div class="checkbox"><label><input type="checkbox" class="builder-table-cell-advtab" checked> ' + (i18n.table_cell_advtab || 'Cell advanced tab') + '</label></div></div>';
     group5Html += '</div>';
 
-    // 5f) Listenstile (advlist)
+    // 5g) Listenstile (advlist)
     group5Html += '<br><legend><i class="rex-icon fa-list-ol"></i> ' + (i18n.list_style_options || 'Listenstile (verschachtelte Listen)') + '</legend>';
     group5Html += '<p class="help-block">' + (i18n.list_style_options_help || 'Definiert, welche Nummerierungs- und Bullet-Stile pro Ebene auswählbar sind. Im Editor kannst du pro Listenebene den Stil ändern, indem du den Cursor in die gewünschte Ebene setzt und den Stil über das Listen-Menü wählst.') + '</p>';
     group5Html += '<div class="row">';
@@ -395,7 +418,7 @@ function initTinyMceProfileAssistant() {
     group5Html += '</div></div></div>';
     group5Html += '</div>';
 
-    // 5g) Protected Extras
+    // 5h) Protected Extras
     group5Html += '<br><legend>' + (i18n.protected_extras || 'Protected extras') + '</legend>';
     group5Html += '<p class="help-block">' + (i18n.protected_extras_help || 'Raw option lines entered here are appended after the generated options. Use this to keep custom TinyMCE settings or to intentionally override assistant-managed values.') + '</p>';
     group5Html += '<textarea class="form-control builder-protected-extras" rows="8" placeholder="' + (i18n.protected_extras_placeholder || "toolbar_sticky: true,\ntoolbar_sticky_offset: 0") + '"></textarea>';
@@ -2731,11 +2754,66 @@ function initTinyMceProfileAssistant() {
     // Auto-load existing config into the builder when in edit mode.
     // Runs after the DOM is ready; if the textarea already contains data we try
     // to hydrate the form controls so the user doesn't have to start over.
+    function renderMediapasteCategoryPicker(categories) {
+        const $select = $builderBody.find('.builder-mediapaste-default-category');
+        if ($select.length === 0) {
+            return;
+        }
+
+        const selectedValue = String($select.attr('data-selected') || $select.val() || '');
+        const inheritLabel = i18n.mediapaste_profile_paste_inherit_global || '— Globale Einstellung verwenden —';
+        let optionsHtml = '<option value="">' + escapeHtml(inheritLabel) + '</option>';
+
+        (Array.isArray(categories) ? categories : []).forEach((category) => {
+            if (!category || typeof category !== 'object') {
+                return;
+            }
+            const id = parseInt(category.id, 10);
+            if (!Number.isFinite(id) || id <= 0) {
+                return;
+            }
+
+            const rawName = String(category.name || id);
+            const depth = parseInt(category.depth, 10);
+            const level = Number.isFinite(depth) && depth > 0 ? depth : 0;
+            const prefix = level > 0 ? '&nbsp;&nbsp;'.repeat(level) + '- ' : '';
+            optionsHtml += '<option value="' + id + '">' + prefix + escapeHtml(rawName) + '</option>';
+        });
+
+        $select.html(optionsHtml);
+        if (selectedValue !== '') {
+            $select.val(selectedValue);
+        }
+    }
+
+    function loadMediapasteCategoryPicker() {
+        renderMediapasteCategoryPicker(mediaCategories);
+
+        fetch('index.php?rex-api-call=tinymce_media_categories', { credentials: 'same-origin' })
+            .then((response) => {
+                if (!response.ok) {
+                    return null;
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (Array.isArray(data) && data.length > 0) {
+                    renderMediapasteCategoryPicker(data);
+                }
+            })
+            .catch(() => {
+                // keep preloaded picker options as fallback
+            });
+    }
+
+    loadMediapasteCategoryPicker();
+
     setTimeout(function () {
         const existing = ($textarea.val() || '').trim();
         if (existing.length > 0) {
             loadFromConfig($textarea, $builderBody);
         }
+        loadMediapasteCategoryPicker();
         syncColorMapRowsFromTextarea();
     }, 50);
 }
@@ -2836,6 +2914,7 @@ const MANAGED_PROFILE_KEYS = new Set([
     'height', 'min_height', 'max_height', 'autoresize_bottom_margin', 'width', 'resize',
     'image_caption', 'image_uploadtab', 'relative_urls', 'remove_script_host',
     'document_base_url', 'entity_encoding', 'convert_urls', 'object_resizing',
+    'mediapaste_default_category', 'mediapaste_allow_image_paste',
     'table_toolbar', 'table_appearance_options', 'table_advtab', 'table_row_advtab', 'table_cell_advtab',
     'advlist_number_styles', 'advlist_bullet_styles',
     'custom_colors',
@@ -3131,6 +3210,9 @@ function generateConfig($textarea, $builderBody) {
     const tocHeader = escapeString($builderBody.find('.builder-toc-header').val() || 'div');
     const tocClass = escapeString($builderBody.find('.builder-toc-class').val() || 'our-toc');
     const tableToolbar = String($builderBody.find('.builder-table-toolbar').val() || '').replace(/\s+/g, ' ').trim();
+    const mediapasteCategoryRaw = parseInt($builderBody.find('.builder-mediapaste-default-category').val(), 10);
+    const mediapasteCategory = Number.isFinite(mediapasteCategoryRaw) && mediapasteCategoryRaw > 0 ? mediapasteCategoryRaw : null;
+    const mediapastePasteOverride = String($builderBody.find('.builder-mediapaste-allow-image-paste').val() || '').trim();
     const tableAppearanceOptions = $builderBody.find('.builder-table-appearance-options').is(':checked');
     const tableAdvTab = $builderBody.find('.builder-table-advtab').is(':checked');
     const tableRowAdvTab = $builderBody.find('.builder-table-row-advtab').is(':checked');
@@ -3391,6 +3473,18 @@ function generateConfig($textarea, $builderBody) {
     configStr += `document_base_url: "${baseUrl}",\n`;
     configStr += `entity_encoding: '${entityEncoding}',\n`;
     configStr += `convert_urls: ${convertUrls},\n\n`;
+
+    if (mediapasteCategory !== null) {
+        configStr += `mediapaste_default_category: ${mediapasteCategory},\n`;
+    }
+    if (mediapastePasteOverride === '1') {
+        configStr += `mediapaste_allow_image_paste: true,\n`;
+    } else if (mediapastePasteOverride === '0') {
+        configStr += `mediapaste_allow_image_paste: false,\n`;
+    }
+    if (mediapasteCategory !== null || mediapastePasteOverride !== '') {
+        configStr += `\n`;
+    }
 
     // Image Width (preset-based: width, alignment, effects on <figure>)
     if (imagewidthEnabled) {
@@ -3849,6 +3943,20 @@ function loadFromConfig($textarea, $builderBody) {
     }
     if (typeof cfg.toc_class === 'string') {
         $builderBody.find('.builder-toc-class').val(cfg.toc_class);
+    }
+
+    // MediaPaste profile overrides
+    const $mediapasteCategoryField = $builderBody.find('.builder-mediapaste-default-category');
+    if (typeof cfg.mediapaste_default_category === 'number' && Number.isFinite(cfg.mediapaste_default_category) && cfg.mediapaste_default_category > 0) {
+        const selectedCategory = String(cfg.mediapaste_default_category);
+        $mediapasteCategoryField.attr('data-selected', selectedCategory).val(selectedCategory);
+    } else {
+        $mediapasteCategoryField.attr('data-selected', '').val('');
+    }
+    if (typeof cfg.mediapaste_allow_image_paste === 'boolean') {
+        $builderBody.find('.builder-mediapaste-allow-image-paste').val(cfg.mediapaste_allow_image_paste ? '1' : '0');
+    } else {
+        $builderBody.find('.builder-mediapaste-allow-image-paste').val('');
     }
 
     // Tabellenoptionen

@@ -341,11 +341,22 @@ tinymce_media_no_category = No category
 mediapaste_section_title = Image upload (drag & drop / paste)
 mediapaste_upload_enabled = Enable image upload to mediapool
 mediapaste_upload_enabled_help = When enabled, images dropped or pasted into the editor are automatically uploaded to the REDAXO mediapool.
+mediapaste_paste_images_enabled = Allow images on paste
+mediapaste_paste_images_enabled_help = When disabled, pasted images are blocked globally (including content from Word/Google Docs).
 mediapaste_default_category = Default media category
 mediapaste_category_ask = — Always ask —
 mediapaste_default_category_help = Category to upload images to. "Always ask" shows a dialog on upload. For frontend users without media permission, a fixed category must be selected.
 mediapaste_media_manager_type = Media manager type for image URL
 mediapaste_media_manager_type_help = Optional media manager type for the image URL displayed in the editor (e.g. tiny). Empty = direct /media/ URL.
+mediapaste_profile_category_override = Upload folder for this profile
+mediapaste_profile_category_inherit_global = — Use global setting —
+mediapaste_profile_category_override_help = Optional override for the default media category. Global keeps the value from “Settings”.
+mediapaste_profile_paste_override = Images on paste (profile override)
+mediapaste_profile_paste_inherit_global = — Use global setting —
+mediapaste_profile_paste_allow = Allow images on paste
+mediapaste_profile_paste_block = Block images on paste
+mediapaste_profile_paste_override_help = Optional override for this profile. Global keeps the value from “Settings”.
+tinymce_profile_placeholder_media_category_id = e.g. 12
 
 tinymce_insert_menu = Insert menu
 tinymce_insert_menu_help = Defines which entries appear in the menubar "Insert" menu. Drag & drop to sort. Custom plugins (oEmbed, Video, HTML Embed, Checklist, Footnote, Accessibility …) appear in the Insert menu as soon as they are enabled here.
@@ -363,6 +374,9 @@ tinymce_profile_restore_info = Last saved version available.
 tinymce_profile_restore = Restore last version
 tinymce_profile_restore_confirm = Restore last version? The current configuration will be saved as the new backup.
 tinymce_profile_restored = Last version of profile "%s" was restored.
+
+tinymce_perm_addon = TinyMCE addon
+tinymce_perm_paste_images = Upload images to media pool via copy/paste
 
 # Layout Rules (Structure optimization)
 tinymce_layout_rules = Layout rules (structure optimization)

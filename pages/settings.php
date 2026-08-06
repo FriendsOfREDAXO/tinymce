@@ -15,10 +15,18 @@ if ('save_media_upload' === $func) {
     } else {
         $uploadSettings = [
             'upload_enabled'            => (bool) rex_request::request('upload_enabled', 'boolean', false),
+            'paste_images_enabled'      => (bool) rex_request::request('paste_images_enabled', 'boolean', false),
             'upload_default_category'   => (int) rex_request::request('upload_default_category', 'int', -1),
             'upload_media_manager_type' => trim(rex_request::request('upload_media_manager_type', 'string', '')),
         ];
         $addon->setConfig('media_upload_settings', $uploadSettings);
+
+        try {
+            TinyMceProfilesCreator::profilesCreate();
+        } catch (rex_functional_exception $e) {
+            rex_logger::logException($e);
+        }
+
         $message = rex_view::success($addon->i18n('tinymce_media_upload_settings_saved'));
     }
 } elseif ('regenerate_profiles' === $func) {
@@ -55,9 +63,10 @@ if ('save_media_upload' === $func) {
     }
 }
 
-/** @var array{upload_enabled: bool, upload_default_category: int, upload_media_manager_type: string} $uploadCfg */
+/** @var array{upload_enabled: bool, paste_images_enabled: bool, upload_default_category: int, upload_media_manager_type: string} $uploadCfg */
 $uploadCfg = $addon->getConfig('media_upload_settings', [
     'upload_enabled'            => false,
+    'paste_images_enabled'      => false,
     'upload_default_category'   => -1,
     'upload_media_manager_type' => '',
 ]);
@@ -124,6 +133,17 @@ echo $message;
                         </label>
                     </div>
                     <p class="help-block"><?= $addon->i18n('mediapaste_upload_enabled_help') ?></p>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="paste_images_enabled" value="1"
+                                <?= !empty($uploadCfg['paste_images_enabled']) ? 'checked' : '' ?>>
+                            <?= $addon->i18n('mediapaste_paste_images_enabled') ?>
+                        </label>
+                    </div>
+                    <p class="help-block"><?= $addon->i18n('mediapaste_paste_images_enabled_help') ?></p>
                 </div>
 
                 <div class="row">

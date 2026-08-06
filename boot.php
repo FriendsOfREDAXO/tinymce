@@ -8,6 +8,7 @@ $addon = rex_addon::get('tinymce');
 
 if (rex::isBackend() && is_object(rex::getUser())) {
     rex_perm::register('tinymce_addon[]');
+    rex_perm::register('tinymce[paste_images]');
 
     // Register custom plugins with rex_url::addonAssets() for correct absolute paths
     $pluginBasePath = AssetUrl::getTinyPluginBaseUrl() . '/';

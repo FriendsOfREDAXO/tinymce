@@ -6,7 +6,7 @@
   ],
   "dependencies": {
     "tinymce": "^8.8.2",
-    "tinymce-i18n": "^26.7.13"
+    "tinymce-i18n": "^26.8.2"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
@@ -17,9 +17,10 @@
     "vendor:copy": "node ./scripts/vendor-copy.js",
     "vendor:build": "node ./scripts/vendor-copy.js --staging",
     "plugins:build": "node ./scripts/build-plugins.js",
+    "build:verify": "node ./scripts/verify-build.js",
     "build:staging": "pnpm run vendor:build && pnpm run plugins:build -- --staging",
     "build:sync": "node ./scripts/sync-build-to-assets.js",
-    "build": "pnpm run build:staging && pnpm run build:sync",
+    "build": "pnpm run build:staging && pnpm run build:sync && pnpm run build:verify",
     "clean-plugins": "node ./scripts/build-plugins.js --clean",
     "clean-build": "node ./scripts/clean-build.js"
   }

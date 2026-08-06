@@ -39,6 +39,12 @@ function log(...a){ console.log('[build-plugins]', ...a); }
 async function ensureDir(dir){ await fsp.mkdir(dir, { recursive: true }); }
 async function removeDir(dir){ if (fs.existsSync(dir)) await fsp.rm(dir, { recursive: true, force: true }); }
 
+function hasRequiredPluginArtifacts(dir){
+  const min = path.join(dir, 'plugin.min.js');
+  const normal = path.join(dir, 'plugin.js');
+  return fs.existsSync(min) && fs.existsSync(normal);
+}
+
 async function copyRecursive(src, dest){
   if (!fs.existsSync(src)) return;
   await ensureDir(dest);
@@ -73,6 +79,9 @@ async function buildPlugin(p){
     if (fs.existsSync(c)){
       log('copy prebuilt', path.relative(addonRoot, c), '->', path.relative(addonRoot, outDir));
       await copyRecursive(c, outDir);
+      if (!hasRequiredPluginArtifacts(outDir)) {
+        throw new Error('missing required artifacts in ' + path.relative(addonRoot, outDir) + ' (plugin.js / plugin.min.js)');
+      }
       return;
     }
   }
@@ -135,13 +144,18 @@ async function buildPlugin(p){
       if (fs.existsSync(langsSrc)){
         await copyRecursive(langsSrc, path.join(outDir, 'langs'));
       }
+
+      if (!hasRequiredPluginArtifacts(outDir)) {
+        throw new Error('missing required artifacts in ' + path.relative(addonRoot, outDir) + ' after esbuild fallback');
+      }
+
       return;
     } catch (err){
       log('esbuild failed for', p, err.message || err);
     }
   }
 
-  log('no build artifacts detected for', p, '- nothing copied');
+  throw new Error('no build artifacts detected for plugin: ' + p);
 }
 
 async function main(){
@@ -180,15 +194,13 @@ async function main(){
             const buildJs = path.join(pluginDir, 'build.js');
             if (fs.existsSync(buildJs)){
               log('  run plugin build.js (staging, no build-copy)');
-              try { execSync('node build.js', { stdio: 'inherit', cwd: pluginDir }); }
-              catch (e) { log('  plugin build.js failed for', p, '- continuing (error ignored)'); }
+              execSync('node build.js', { stdio: 'inherit', cwd: pluginDir });
             } else {
               log('  skip plugin build script in staging (no build.js found)');
             }
           } else {
             log('  run plugin build script');
-            try { execSync('pnpm run build', { stdio: 'inherit', cwd: pluginDir }); }
-            catch (e) { log('  plugin build failed for', p, '- continuing (error ignored)'); }
+            execSync('pnpm run build', { stdio: 'inherit', cwd: pluginDir });
           }
         }
       } catch (e) { log('failed reading package.json for', p, e.message); }

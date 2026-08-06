@@ -347,11 +347,22 @@ tinymce_media_no_category = Ohne Kategorie
 mediapaste_section_title = Bild-Upload (Drag & Drop / Einfügen)
 mediapaste_upload_enabled = Bild-Upload in den Medienpool aktivieren
 mediapaste_upload_enabled_help = Wenn aktiv, werden per Drag & Drop oder Einfügen abgelegte Bilder automatisch in den REDAXO-Medienpool hochgeladen.
+mediapaste_paste_images_enabled = Bilder beim Einfügen erlauben
+mediapaste_paste_images_enabled_help = Wenn deaktiviert, werden Bilder beim Einfügen grundsätzlich unterdrückt (auch aus Word/Google Docs).
 mediapaste_default_category = Standard-Medienkategorie
 mediapaste_category_ask = — Immer nachfragen —
 mediapaste_default_category_help = Kategorie, in die Bilder hochgeladen werden. "Immer nachfragen" öffnet einen Dialog beim Upload. Für Frontend-Nutzer ohne Medienberechtigung muss eine feste Kategorie gewählt werden.
 mediapaste_media_manager_type = Media-Manager-Type für Bild-URL
 mediapaste_media_manager_type_help = Optionaler Media-Manager-Type für die im Editor angezeigte Bild-URL (z. B. tiny). Leer = direkte /media/-URL.
+mediapaste_profile_category_override = Upload-Ordner für dieses Profil
+mediapaste_profile_category_inherit_global = — Globale Einstellung verwenden —
+mediapaste_profile_category_override_help = Optionaler Override der Standard-Medienkategorie. Leer/Global = verwendet die globale Einstellung aus „Einstellungen“.
+mediapaste_profile_paste_override = Bilder beim Einfügen (Profil-Override)
+mediapaste_profile_paste_inherit_global = — Globale Einstellung verwenden —
+mediapaste_profile_paste_allow = Bilder beim Einfügen erlauben
+mediapaste_profile_paste_block = Bilder beim Einfügen blockieren
+mediapaste_profile_paste_override_help = Optionaler Override für dieses Profil. Global = verwendet die Einstellung aus „Einstellungen“.
+tinymce_profile_placeholder_media_category_id = z. B. 12
 
 tinymce_insert_menu = Einfügen-Menü
 tinymce_insert_menu_help = Legt fest, welche Einträge im "Einfügen"-Menü der Menüleiste erscheinen. Per Drag & Drop sortieren, individuelle Plugins (oEmbed, Video, HTML Embed, Checkliste, Fußnote, Barrierefreiheit …) landen automatisch im Einfügen-Menü, sobald sie hier aktiviert sind.
@@ -369,6 +380,9 @@ tinymce_profile_restore_info = Letzte gespeicherte Version verfügbar.
 tinymce_profile_restore = Letzte Version wiederherstellen
 tinymce_profile_restore_confirm = Letzte Version wiederherstellen? Die aktuelle Konfiguration wird dabei als neue Sicherung gespeichert.
 tinymce_profile_restored = Letzte Version von Profil "%s" wurde wiederhergestellt.
+
+tinymce_perm_addon = TinyMCE Addon
+tinymce_perm_paste_images = Bilder per Copy/Paste in den Medienpool hochladen
 
 # Layout Rules (Strukturoptimierung)
 tinymce_layout_rules = Layout-Regeln (Strukturoptimierung)
