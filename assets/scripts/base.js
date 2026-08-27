@@ -12,7 +12,11 @@ window.rex5MediaplaceBridge = {
         return typeof MP3 !== 'undefined' && typeof MP3.open === 'function';
     },
     // onSelect(filename) wie bei den klassischen Popups; options.filter
-    // waehlt optional den Start-Typ-Tab vor (z.B. 'images', 'videos').
+    // waehlt optional den Start-Typ-Tab vor (z.B. 'images', 'videos'), rein
+    // als Startwert. options.allowedExtensions (Array, z.B. ['jpg','png'])
+    // ist dagegen eine harte Einschraenkung (MediaPlace >=1.3.6) -- blendet
+    // nicht passende Dateien aus dem Grid aus und blockiert die Auswahl,
+    // analog zum args[types]-Parameter des klassischen Popups.
     pick: function (onSelect, options) {
         MP3.open(onSelect, options || {});
     },
@@ -69,7 +73,10 @@ let rex5_picker_function = function (callback, value, meta) {
         };
 
         if (window.rex5MediaplaceBridge.isActive()) {
-            window.rex5MediaplaceBridge.pick(handlePickedImage, { filter: 'images' });
+            window.rex5MediaplaceBridge.pick(handlePickedImage, {
+                filter: 'images',
+                allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp']
+            });
         } else {
             let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
 
@@ -89,7 +96,10 @@ let rex5_picker_function = function (callback, value, meta) {
         };
 
         if (window.rex5MediaplaceBridge.isActive()) {
-            window.rex5MediaplaceBridge.pick(handlePickedMedia, { filter: 'videos' });
+            window.rex5MediaplaceBridge.pick(handlePickedMedia, {
+                filter: 'videos',
+                allowedExtensions: ['mp4', 'mpeg']
+            });
         } else {
             let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg');
 

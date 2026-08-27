@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 8.14.1
+---------------
+
+### Fixes
+
+* **MediaPlace-Bildauswahl erzwingt Dateityp wieder hart:** Der Bild- und Medien-Einfügedialog schränkte im klassischen Medienpool-Popup die Auswahl fest auf bestimmte Endungen ein (z.B. nur jpg/png/gif/... fürs Bild-Einfügen, nur mp4/mpeg für Medien) – bei aktivem MediaPlace ging diese Einschränkung verloren, da nur der Start-Tab gesetzt wurde. Nutzt jetzt MediaPlaces neue `allowedExtensions`-Option (MediaPlace ≥1.3.6), die die Auswahl wieder hart durchsetzt statt nur einen Tab vorzuschlagen.
+
 Version 8.14.0
 ---------------
 
