@@ -109,11 +109,25 @@ function extractUserClasses(el: Element | null): string[] {
 /* ---------------- Mediapool-Picker ---------------- */
 
 /**
- * Öffnet das REDAXO-Mediapool-Popup und ruft den Callback mit dem gewählten
- * Dateinamen auf. Arbeitet über ein verstecktes Input-Feld im Parent-Dokument,
- * weil die Mediapool-Auswahl per `document.getElementById(id).value = …` schreibt.
+ * Öffnet den Medien-Picker und ruft den Callback mit dem gewählten Dateinamen
+ * auf. Weiche klassischer Medienpool <-> MediaPlace, rein feature-detected
+ * über die gemeinsame Bruecke in assets/scripts/base.js
+ * (window.rex5MediaplaceBridge, auch von rex5_picker_function und
+ * custom_plugins/for_images genutzt). filter waehlt bei MediaPlace optional
+ * den Start-Typ-Tab vor (z.B. 'images', 'videos') -- ohne Wirkung im
+ * klassischen Fallback.
+ *
+ * Klassischer Fallback arbeitet über ein verstecktes Input-Feld im
+ * Parent-Dokument, weil die Mediapool-Auswahl per
+ * `document.getElementById(id).value = …` schreibt.
  */
-function pickMediapoolFile(onSelect: (filename: string) => void): void {
+function pickMediapoolFile(onSelect: (filename: string) => void, filter?: string): void {
+    const bridge = (window as any).rex5MediaplaceBridge;
+    if (bridge && bridge.isActive()) {
+        bridge.pick(onSelect, filter ? { filter } : {});
+        return;
+    }
+
     const id = 'for_video_picker_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     const input = document.createElement('input');
     input.type = 'hidden';
@@ -432,11 +446,11 @@ function openDialog(editor: any, initial: VideoData | null, onSubmit: (data: Vid
             if (details.name === 'pickSrc') {
                 pickMediapoolFile((filename) => {
                     api.setData({ src: filename });
-                });
+                }, 'videos');
             } else if (details.name === 'pickPoster') {
                 pickMediapoolFile((filename) => {
                     api.setData({ poster: filename });
-                });
+                }, 'images');
             } else if (details.name === 'pickTrack') {
                 pickMediapoolFile((filename) => {
                     api.setData({ trackSrc: filename });

@@ -1095,6 +1095,13 @@ const setup = (editor: Editor, _url: string): void => {
    * Opens the REDAXO mediapool in a popup, pre-filtered on the file name
    * of the currently selected image. No notifications / try-catch noise:
    * window.open() is synchronous and either returns a window ref or null.
+   *
+   * Weiche klassischer Medienpool <-> MediaPlace, rein feature-detected
+   * ueber die gemeinsame Bruecke in assets/scripts/base.js
+   * (window.rex5MediaplaceBridge, auch von rex5_picker_function und
+   * custom_plugins/for_video genutzt): ist MediaPlace installiert und aktiv,
+   * oeffnet die Datei direkt im Detail-Panel des Overlays (Browse-only,
+   * aendert nichts an der Auswahl im Editor) statt des klassischen Popups.
    */
   editor.ui.registry.addButton('imageshowpool', {
     icon: 'gallery',
@@ -1104,6 +1111,11 @@ const setup = (editor: Editor, _url: string): void => {
       const filename = img?.getAttribute('src')?.split('/').pop()?.split('?')[0] || '';
       if (!filename) {
         editor.notificationManager.open({ text: 'Bitte zuerst ein Bild auswählen.', type: 'warning', timeout: 3000 });
+        return;
+      }
+      const bridge = (window as any).rex5MediaplaceBridge;
+      if (bridge && bridge.isActive()) {
+        bridge.show(filename);
         return;
       }
       const poolUrl = 'index.php?page=mediapool/media&file_name=' + encodeURIComponent(filename);

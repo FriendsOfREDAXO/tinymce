@@ -1,3 +1,29 @@
+/**
+ * Gemeinsame Weiche klassischer Medienpool <-> MediaPlace, rein
+ * feature-detected (kein Setting, keine harte Abhaengigkeit dieses Addons
+ * auf MediaPlace): existiert MP3.open()/.openFile() auf der Seite, wird
+ * MediaPlace benutzt, sonst bleibt jeder Aufrufer bei seinem eigenen
+ * klassischen Fallback. Zentral hier statt in jedem Plugin einzeln
+ * dupliziert (rex5_picker_function unten sowie custom_plugins/for_images,
+ * custom_plugins/for_video nutzen dieselbe Instanz).
+ */
+window.rex5MediaplaceBridge = {
+    isActive: function () {
+        return typeof MP3 !== 'undefined' && typeof MP3.open === 'function';
+    },
+    // onSelect(filename) wie bei den klassischen Popups; options.filter
+    // waehlt optional den Start-Typ-Tab vor (z.B. 'images', 'videos').
+    pick: function (onSelect, options) {
+        MP3.open(onSelect, options || {});
+    },
+    // Oeffnet den Overlay direkt im Detail-Panel einer Datei (Browse-only).
+    show: function (filename) {
+        if (typeof MP3.openFile === 'function') {
+            MP3.openFile(filename);
+        }
+    }
+};
+
 let rex5_picker_function = function (callback, value, meta) {
     if (meta.filetype === 'file') {
         // use query parameter clang
@@ -24,12 +50,7 @@ let rex5_picker_function = function (callback, value, meta) {
 
     /* Provide image and alt text for the image dialog */
     if (meta.filetype === 'image') {
-        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
-
-        $(mediaPool).on('rex:selectMedia', function (event, filename) {
-            event.preventDefault();
-            mediaPool.close();
-
+        var handlePickedImage = function (filename) {
             // use media manager for raster images, direct path for SVG/TIFF/BMP
             var extension = filename.split('.').pop().toLowerCase();
             var useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
@@ -45,20 +66,39 @@ let rex5_picker_function = function (callback, value, meta) {
             }).fail(function () {
                 callback(imagePath, { alt: '' });
             });
-        });
+        };
+
+        if (window.rex5MediaplaceBridge.isActive()) {
+            window.rex5MediaplaceBridge.pick(handlePickedImage, { filter: 'images' });
+        } else {
+            let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=jpg%2Cjpeg%2Cpng%2Cgif%2Cbmp%2Ctiff%2Csvg%2Cwebp');
+
+            $(mediaPool).on('rex:selectMedia', function (event, filename) {
+                event.preventDefault();
+                mediaPool.close();
+                handlePickedImage(filename);
+            });
+        }
     }
 
     /* Provide alternative source and posted for the media dialog */
     if (meta.filetype === 'media') {
-        let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg');
-
-        $(mediaPool).on('rex:selectMedia', function (event, filename) {
-            event.preventDefault();
-            mediaPool.close();
-            
+        var handlePickedMedia = function (filename) {
             // use direct media path for video/audio files
             callback('/media/' + filename, {alt: ''});
-        });
+        };
+
+        if (window.rex5MediaplaceBridge.isActive()) {
+            window.rex5MediaplaceBridge.pick(handlePickedMedia, { filter: 'videos' });
+        } else {
+            let mediaPool = openREXMedia('tinymce_medialink', '&args[types]=mp4%2Cmpeg');
+
+            $(mediaPool).on('rex:selectMedia', function (event, filename) {
+                event.preventDefault();
+                mediaPool.close();
+                handlePickedMedia(filename);
+            });
+        }
     }
 };
 

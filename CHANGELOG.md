@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 8.14.0
+---------------
+
+### Features
+
+* **Added support for MediaPlace:** Bild/Medien-Auswahl (Einfügen, "Austauschen aus Medienpool", "Zeige Medium im Medienpool") nutzt automatisch das [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace)-Addon statt des klassischen Medienpool-Popups, sobald es installiert und aktiv ist – rein feature-detected über eine gemeinsame Bruecke (`window.rex5MediaplaceBridge` in `assets/scripts/base.js`), keine harte Abhängigkeit dieses Addons auf MediaPlace. Ohne MediaPlace bleibt das bisherige Verhalten unverändert.
+* Betrifft `base.js` (Bild-/Medien-Einfügedialog), `for_images` ("Austauschen aus Medienpool" delegiert an den Standarddialog, "Zeige Medium im Medienpool" öffnet direkt das Detail-Panel) sowie `for_video` (Quelle/Poster-Auswahl im Video-Dialog, mit passendem Typ-Filter).
+
 Version 8.13.0
 ---------------
 
