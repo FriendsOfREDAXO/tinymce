@@ -1,15 +1,17 @@
 /**
  * Gemeinsame Weiche klassischer Medienpool <-> MediaPlace, rein
  * feature-detected (kein Setting, keine harte Abhaengigkeit dieses Addons
- * auf MediaPlace): existiert MP3.open()/.openFile() auf der Seite, wird
+ * auf MediaPlace): existiert MP.open()/.openFile() auf der Seite, wird
  * MediaPlace benutzt, sonst bleibt jeder Aufrufer bei seinem eigenen
  * klassischen Fallback. Zentral hier statt in jedem Plugin einzeln
  * dupliziert (rex5_picker_function unten sowie custom_plugins/for_images,
- * custom_plugins/for_video nutzen dieselbe Instanz).
+ * custom_plugins/for_video nutzen dieselbe Instanz). MediaPlace hiess
+ * intern frueher "mp3" (MediaPool 3.0), das globale JS-Objekt war
+ * entsprechend "MP3" -- seit MediaPlace 2.0.0 "MP".
  */
 window.rex5MediaplaceBridge = {
     isActive: function () {
-        return typeof MP3 !== 'undefined' && typeof MP3.open === 'function';
+        return typeof MP !== 'undefined' && typeof MP.open === 'function';
     },
     // onSelect(filename) wie bei den klassischen Popups; options.filter
     // waehlt optional den Start-Typ-Tab vor (z.B. 'images', 'videos'), rein
@@ -18,29 +20,84 @@ window.rex5MediaplaceBridge = {
     // nicht passende Dateien aus dem Grid aus und blockiert die Auswahl,
     // analog zum args[types]-Parameter des klassischen Popups.
     pick: function (onSelect, options) {
-        MP3.open(onSelect, options || {});
+        MP.open(onSelect, options || {});
     },
     // Oeffnet den Overlay direkt im Detail-Panel einer Datei (Browse-only).
     show: function (filename) {
-        if (typeof MP3.openFile === 'function') {
-            MP3.openFile(filename);
+        if (typeof MP.openFile === 'function') {
+            MP.openFile(filename);
         }
     }
 };
 
+// Sprach-ID aus dem clang-Parameter der aktuellen Seiten-URL, oder null
+// wenn keiner gesetzt ist (z.B. auf Seiten ausserhalb der Struktur).
+function getClangFromUrl() {
+    let url = location.search,
+        query_string = url.substring(url.indexOf('?') + 1).split('&');
+    for (let i = 0; i < query_string.length; i++) {
+        let pair = query_string[i].split('=');
+        if (pair[0] === 'clang' && /^\d+$/.test(pair[1])) {
+            return parseInt(pair[1], 10);
+        }
+    }
+    return null;
+}
+
+// Kompaktes Sprach-Dropdown fuer den seltenen Fall "kein Sprachkontext +
+// mehrere ALT-Sprachversionen vorhanden" (identisches UI-Muster wie
+// redaxo-media-alt.js im cke5-Addon).
+function showAltLanguagePicker(languages, callback) {
+    let overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;z-index:100000;top:50%;left:50%;transform:translate(-50%,-50%);'
+        + 'background:#fff;border:1px solid #ccc;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.2);padding:12px 14px;'
+        + 'font:13px/1.4 sans-serif;color:#222;min-width:220px;';
+
+    let label = document.createElement('div');
+    label.textContent = 'Sprache für ALT-Text wählen';
+    label.style.cssText = 'margin-bottom:6px;font-weight:600;';
+    overlay.appendChild(label);
+
+    let select = document.createElement('select');
+    select.style.cssText = 'width:100%;padding:4px;margin-bottom:8px;';
+    languages.forEach(function (lang) {
+        let opt = document.createElement('option');
+        opt.value = String(lang.clangId);
+        opt.textContent = lang.label + ': ' + lang.value;
+        select.appendChild(opt);
+    });
+    overlay.appendChild(select);
+
+    let actions = document.createElement('div');
+    actions.style.cssText = 'text-align:right;';
+    let okBtn = document.createElement('button');
+    okBtn.type = 'button';
+    okBtn.textContent = 'Übernehmen';
+    okBtn.style.cssText = 'padding:4px 10px;';
+    actions.appendChild(okBtn);
+    overlay.appendChild(actions);
+
+    function finish(value) {
+        if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+        }
+        callback(value);
+    }
+
+    okBtn.addEventListener('click', function () {
+        let chosen = languages.filter(function (l) { return String(l.clangId) === select.value; })[0];
+        finish(chosen ? chosen.value : '');
+    });
+
+    document.body.appendChild(overlay);
+    select.focus();
+}
+
 let rex5_picker_function = function (callback, value, meta) {
     if (meta.filetype === 'file') {
         // use query parameter clang
-        let url = location.search,
-            clang = 1, // default 1
-            query_string = url.substring(url.indexOf('?') + 1).split('&');
-        for (let i = 0, result = {}; i < query_string.length; i++) {
-            query_string[i] = query_string[i].split('=');
-            if (query_string[i][0] === 'clang') {
-                clang = query_string[i][1]; // set by url
-                break;
-            }
-        }
+        let clangFromUrl = getClangFromUrl(),
+            clang = clangFromUrl !== null ? clangFromUrl : 1; // default 1
 
         let linkMap = openMyLinkMap('', '&clang=' + clang, value);
 
@@ -60,11 +117,23 @@ let rex5_picker_function = function (callback, value, meta) {
             var useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
             var imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
 
-            // Mediapool-Metadaten holen (med_alt, Title) und Alt-Text vorbefuellen.
-            // Schlaegt der Request fehl, wird leer als Alt uebergeben - wie zuvor.
-            $.getJSON(
-                'index.php?rex-api-call=tinymce_media_meta&file=' + encodeURIComponent(filename)
-            ).done(function (meta) {
+            // Mediapool-Metadaten holen (MediaPlace-eigenes ALT-Feld,
+            // metainfo_lang_fields oder klassisches med_alt, Title) und
+            // Alt-Text vorbefuellen. Schlaegt der Request fehl, wird leer
+            // als Alt uebergeben - wie zuvor. Ist die Struktursprache
+            // bekannt (clang in der URL), wird sie automatisch verwendet;
+            // existieren sonst mehrere Sprachversionen, wird kurz nachgefragt.
+            var clangFromUrl = getClangFromUrl();
+            var metaUrl = 'index.php?rex-api-call=tinymce_media_meta&file=' + encodeURIComponent(filename)
+                + (clangFromUrl ? '&clang=' + clangFromUrl : '');
+
+            $.getJSON(metaUrl).done(function (meta) {
+                if (!clangFromUrl && meta && meta.altMultilingual && meta.altLanguages && meta.altLanguages.length > 1) {
+                    showAltLanguagePicker(meta.altLanguages, function (alt) {
+                        callback(imagePath, { alt: alt || '' });
+                    });
+                    return;
+                }
                 var alt = (meta && meta.alt) ? meta.alt : '';
                 callback(imagePath, { alt: alt });
             }).fail(function () {
