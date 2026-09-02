@@ -4,6 +4,8 @@ Changelog
 Version 8.15.0
 ---------------
 
+> **Voraussetzung: [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace) ≥ 2.0.0.** Wer MediaPlace einsetzt, sollte vor diesem Update auf Version 2.0.0 oder neuer aktualisieren (siehe "Fixes" unten) – mit einer älteren MediaPlace-Version wird das Overlay sonst nicht mehr erkannt und es öffnet sich wieder der klassische Medienpool-Popup.
+
 ### Features
 
 * **ALT-Text-Übernahme unterstützt jetzt MediaPlace-eigenes ALT-Feld und mehrsprachige Metainfo-Felder:** Der Bild-Einfügedialog übernahm bisher nur den klassischen `med_alt`-Wert. Nutzt jetzt zusätzlich das MediaPlace-eigene ALT-Feld (`med_json_data`, Widget-Typ "alt") sowie mehrsprachige Metainfo-Felder über das Addon [metainfo_lang_fields](https://github.com/FriendsOfREDAXO/metainfo_lang_fields). Ist die aktuelle Struktursprache bekannt (`clang` in der URL), wird sie automatisch verwendet; existieren mehrere Sprachversionen ohne bekannten Sprachkontext (z.B. außerhalb der Struktur), erscheint vor dem Übernehmen eine kompakte Sprachauswahl. Betrifft `lib/api_tinymce_media_meta.php` (Endpoint `rex-api-call=tinymce_media_meta`, neuer `clang`-Parameter) und `assets/scripts/base.js` (`rex5_picker_function`). Identische Auflösungslogik wie im cke5-Addon.
