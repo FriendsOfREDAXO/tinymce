@@ -8,6 +8,10 @@ Version 8.16.0
 
 * **`for_images`-Bildbreiten-/Ausrichtungs-Presets jetzt von anderen AddOns erweiterbar:** `imagewidth_presets`, `imagealign_presets` und `imageeffect_presets` kamen bisher ausschließlich aus dem profil-eigenen JSON im TinyMCE-Profil-Builder – ein AddOn wie ein CSS-Framework-Bundle hatte keine Möglichkeit, eigene Presets global anzubieten, ohne den Profil-Builder-Text jedes einzelnen Profils manuell zu editieren. `TINYMCE_GLOBAL_OPTIONS` (bereits vorhanden für `content_css`/`style_formats`) kennt jetzt zusätzlich diese drei Keys; `assets/scripts/base.js` mergt sie additiv (nach `class` dedupliziert, profil-eigene Presets gewinnen bei Namenskollision) in jedes Profil, analog zum bestehenden `style_formats`-Merge. Betrifft `lib/TinyMce/Provider/Assets.php` (neue Keys im Extension-Point-Subject) und `assets/scripts/base.js` (`mergePresetOption()`).
 
+### Changed
+
+* **`removeformat` in der Standard-Toolbar näher an `stylesets` positioniert:** stand bisher erst nach der kompletten Bold/Italic/Underline/…-Button-Gruppe, oft im „…“-Overflow verborgen – gerade bei einem umfangreichen, gruppierten Style-Set (z. B. viele Untermenüs wie „Größe“/„Farbe“) ist ein schnell erreichbarer Weg, eine angewendete Formatierung wieder loszuwerden, hilfreich. Jetzt direkt neben `styles`/`stylesets` in der Default-Toolbar-Reihenfolge. Betrifft nur die eingebaute Standard-Toolbar-Liste (`lib/TinyMce/Provider/Assets.php`); individuell im Profil-Builder gespeicherte Toolbar-Konfigurationen sind davon unberührt.
+
 Version 8.15.0
 ---------------
 

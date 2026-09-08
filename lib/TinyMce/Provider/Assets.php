@@ -395,8 +395,8 @@ class Assets
                     'accordion', 'autoresize', 'autosave', 'importcss', 'quickbars', 'snippets', 'for_images'
                 ],
                 'toolbar' => [
-                    'styles', 'stylesets', 'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
-                    'forecolor', 'backcolor', 'removeformat', 'blocks', 'fontfamily', 'fontsize', 'lineheight', 'language',
+                    'styles', 'stylesets', 'removeformat', 'undo', 'redo', 'bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
+                    'forecolor', 'backcolor', 'blocks', 'fontfamily', 'fontsize', 'lineheight', 'language',
                     'alignleft', 'aligncenter', 'alignright', 'alignjustify', 'outdent', 'indent', 'numlist', 'bullist',
                     'ltr', 'rtl',
                     'tableprops', 'tabledelete',
