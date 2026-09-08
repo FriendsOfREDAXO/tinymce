@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Version 8.16.0
----------------
+Version 8.17.0-beta.1
+---------------------
 
 ### Features
 
@@ -11,6 +11,10 @@ Version 8.16.0
 ### Changed
 
 * **`removeformat` in der Standard-Toolbar näher an `stylesets` positioniert:** stand bisher erst nach der kompletten Bold/Italic/Underline/…-Button-Gruppe, oft im „…“-Overflow verborgen – gerade bei einem umfangreichen, gruppierten Style-Set (z. B. viele Untermenüs wie „Größe“/„Farbe“) ist ein schnell erreichbarer Weg, eine angewendete Formatierung wieder loszuwerden, hilfreich. Jetzt direkt neben `styles`/`stylesets` in der Default-Toolbar-Reihenfolge. Betrifft nur die eingebaute Standard-Toolbar-Liste (`lib/TinyMce/Provider/Assets.php`); individuell im Profil-Builder gespeicherte Toolbar-Konfigurationen sind davon unberührt.
+
+### Docs
+
+* `TINYMCE_GLOBAL_OPTIONS` in `DEVS.md` um die drei neuen `imagewidth_presets`/`imagealign_presets`/`imageeffect_presets`-Keys inkl. Beispiel-Code ergänzt.
 
 Version 8.15.0
 ---------------

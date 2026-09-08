@@ -262,6 +262,32 @@ Erweitert die im Profil-Assistant verfügbaren Plugins, Toolbar-Buttons und exte
 
 Wird in `Provider\Assets::provideBaseAssets()` gefeuert. Geeignet für globale Optionen wie zusätzliche `content_css`, `style_formats`, `font_family_formats` etc.
 
+Kennt zusätzlich drei Keys fürs `for_images`-Plugin (Bildbreiten-/Ausrichtungs-Dialog):
+`imagewidth_presets`, `imagealign_presets`, `imageeffect_presets`. Jeder Eintrag ist ein
+`{label, class, profiles}`-Array (`profiles` optional/leer = gilt für alle Profile,
+sonst Liste der Profil-Namen). `assets/scripts/base.js` (`mergePresetOption()`) mergt
+diese additiv in jedes Profil, dedupliziert nach `class` – ein profil-eigener Preset aus
+dem Profil-Builder mit derselben Klasse gewinnt bei Namenskollision.
+
+```php
+rex_extension::register('TINYMCE_GLOBAL_OPTIONS', static function (rex_extension_point $ep) {
+    $options = $ep->getSubject();
+
+    $options['imagewidth_presets'][] = [
+        'label' => 'Klein (25%)',
+        'class' => 'my-framework-img-width-25',
+        'profiles' => [], // alle Profile
+    ];
+    $options['imagealign_presets'][] = [
+        'label' => 'Links (Textumfluss)',
+        'class' => 'my-framework-img-align-left',
+        'profiles' => [],
+    ];
+
+    return $options;
+});
+```
+
 ### `TINY_PROFILE_CLONE`
 
 Wird nach dem Duplizieren eines Profils im Backend gefeuert.
