@@ -85,6 +85,16 @@ class Assets
                 'style_formats' => $styleSetsOptions['style_formats'],
                 'style_formats_merge' => !empty($styleSetsOptions['style_formats']),
                 'content_style' => $contentStyle,
+                // Bildbreiten-/Ausrichtungs-/Effekt-Presets fuer das for_images-Plugin
+                // (Bildbreiten-Dialog/-Menue). Leer per Default - andere Addons haengen
+                // sich hier per Extension-Point-Handler an, gleiches profilbewusstes
+                // {label, class, profiles}-Format wie content_css/style_formats oben
+                // (leeres/fehlendes profiles = gilt fuer alle Profile). Gemergt in
+                // assets/scripts/base.js, additiv zu profil-eigenen Presets aus dem
+                // Profil-Builder (siehe dortiger imagewidth_presets-Merge-Block).
+                'imagewidth_presets' => [],
+                'imagealign_presets' => [],
+                'imageeffect_presets' => [],
             ]));
             \rex_view::setJsProperty('tinyGlobalOptions', $globalOptions);
             \rex_view::setJsProperty('tinyProfileNamesById', $profileNamesById);

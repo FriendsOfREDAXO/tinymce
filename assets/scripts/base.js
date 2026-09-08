@@ -837,9 +837,54 @@ function tiny_init(container) {
                     if (typeof options.contextmenu === 'string' && options.contextmenu.indexOf('stylesets') === -1) {
                         options.contextmenu = options.contextmenu + ' | stylesets';
                     }
-                    
+
                 }
             }
+
+            // Merge imagewidth/imagealign/imageeffect presets (for_images plugin) -
+            // filter by profile, additive to profile-own presets from the Profile
+            // Builder. Same {label, class, profiles} shape and appliesToProfile()
+            // filter as content_css/style_formats above (empty/missing profiles =
+            // applies to all profiles). Presets are DEDUPED by class (a profile's
+            // own preset for the same class wins over a global one) so an addon's
+            // global default doesn't shadow an explicit per-profile override.
+            function mergePresetOption(optionKey) {
+                let globalPresets = globalOpts[optionKey];
+                if (!globalPresets || globalPresets.length === 0) {
+                    return;
+                }
+
+                let existing = Array.isArray(options[optionKey]) ? options[optionKey] : [];
+                let seenClasses = {};
+                existing.forEach(function(p) {
+                    if (p && typeof p.class === 'string') {
+                        seenClasses[p.class] = true;
+                    }
+                });
+
+                let additions = [];
+                globalPresets.forEach(function(preset) {
+                    if (!preset || typeof preset.label !== 'string' || typeof preset.class !== 'string') {
+                        return;
+                    }
+                    if (!appliesToProfile(preset.profiles)) {
+                        return;
+                    }
+                    if (seenClasses[preset.class]) {
+                        return;
+                    }
+                    seenClasses[preset.class] = true;
+                    additions.push({ label: preset.label, class: preset.class });
+                });
+
+                if (additions.length > 0) {
+                    options[optionKey] = existing.concat(additions);
+                }
+            }
+
+            mergePresetOption('imagewidth_presets');
+            mergePresetOption('imagealign_presets');
+            mergePresetOption('imageeffect_presets');
         }
 
         // Merge external plugins from PluginRegistry into profile options
