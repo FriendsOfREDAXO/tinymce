@@ -27,7 +27,11 @@ const setup = (editor: any, url: string): void => {
             type: 'menuitem',
             text: snippet.title,
             onAction: () => {
-              editor.insertContent(snippet.content);
+              // Sanitize snippet content against the editor's schema before
+              // insertion to strip script tags/handlers and prevent stored XSS
+              // from snippets that may have been saved with malicious markup.
+              const sanitized = editor.serializer.serialize(editor.parser.parse(snippet.content));
+              editor.insertContent(sanitized);
             }
           }));
           callback(items);
