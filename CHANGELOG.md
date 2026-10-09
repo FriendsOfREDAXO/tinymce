@@ -17,6 +17,8 @@ Unveröffentlicht
 * **Snippet-Absicherung war nicht im ausgelieferten Plugin enthalten:** Der Fix aus #189 (Snippet-Inhalt vor dem Einfügen gegen das Editor-Schema parsen und serialisieren) stand nur im Quellcode. Das gebaute `snippets/plugin.min.js` war nicht neu erzeugt worden. Mit diesem Build ist er aktiv.
 * **Geänderte Plugins kamen nach einem Update aus dem Browser-Cache:** Gespeicherte Profile (auch die mitgelieferten `full` und `demo`) enthalten in `external_plugins` die Plugin-URLs mit einem festen `?v=…` aus der Zeit ihrer Erstellung. Beim Zusammenführen in `base.js` gewannen diese URLs gegen die frisch registrierten. Zeigt eine Profil-URL auf dieselbe Plugin-Datei, wird jetzt die registrierte URL mit aktuellem Cache-Token verwendet. Abweichende, eigene Plugin-URLs im Profil haben weiterhin Vorrang.
 
+* **`assets/generated/profiles.js` nicht mehr im Repository:** Die Datei wird zur Laufzeit nach `public/assets/addons/tinymce/generated/` erzeugt. Die eingecheckte Kopie stammte aus einer Entwicklungsinstanz und wurde bei jedem `assets:sync` mit den lokalen Profilen überschrieben. Sie steht jetzt in der `.gitignore`.
+
 ### Getestet
 
 * MForm (Feld und Flex-Repeater inkl. neu hinzugefügter Items), MBlock (inkl. neuer Blöcke), YForm (Textarea mit `tiny-editor`) und bloecks (Slice kopieren und einfügen, eingefügten Slice bearbeiten), jeweils in Chrome und WebKit: Editoren starten, Eingaben werden gespeichert.
