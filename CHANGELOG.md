@@ -1,8 +1,10 @@
 Changelog
 =========
 
-Unveröffentlicht
-----------------
+Version 8.17.0
+--------------
+
+Finales Release. Enthält zusätzlich alle Änderungen aus 8.17.0-beta.1 (siehe unten).
 
 ### Vendor
 
