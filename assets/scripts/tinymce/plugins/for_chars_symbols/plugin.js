@@ -1525,5 +1525,11 @@ body.rex-has-theme:not(.rex-theme-light) .fcs-empty{color:#aaa;border-color:rgba
         editor.addCommand('forCharsSymbolsOpen', function () { openPicker(editor); });
         editor.addCommand('forCharsSymbolsToggleInvisibles', function () { setInvisiblesState(editor, !editor.__fcsInvOn); });
         editor.addShortcut('meta+shift+i', 'Zeichen, Symbole & Emoji einfügen', 'forCharsSymbolsOpen');
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Characters & Symbols',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
     });
 })();

@@ -1190,5 +1190,13 @@ const setup = (editor: Editor, _url: string): void => {
 };
 
 export default (): void => {
-  tinymce.PluginManager.add('for_images', setup);
+  tinymce.PluginManager.add('for_images', (editor: any, url: string) => {
+      setup(editor, url);
+      return {
+          getMetadata: () => ({
+              name: 'FriendsOfREDAXO Images',
+              url: 'https://github.com/FriendsOfREDAXO/tinymce'
+          })
+      };
+  });
 };

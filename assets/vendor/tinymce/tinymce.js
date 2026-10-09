@@ -1,5 +1,5 @@
 /**
- * TinyMCE version 8.8.2 (2026-07-27)
+ * TinyMCE version 8.9.3 (2026-10-06)
  */
 
 (function () {
@@ -13406,7 +13406,11 @@
             editor.selection.normalize();
         }, (caretPos) => editor.selection.setRng(caretPos.toRange()));
     };
-    const focusBody = (body) => {
+    const focusBody = (body, preventScroll = false) => {
+        if (preventScroll) {
+            body.focus({ preventScroll: true });
+            return;
+        }
         if (body.setActive) {
             // IE 11 sometimes throws "Invalid function" then fallback to focus
             // setActive is better since it doesn't scroll to the element being focused
@@ -13437,7 +13441,7 @@
     };
     const hasFocus = (editor) => editor.inline ? hasInlineFocus(editor) : hasIframeFocus(editor);
     const hasEditorOrUiFocus = (editor) => hasFocus(editor) || hasUiFocus(editor);
-    const focusEditor = (editor) => {
+    const focusEditor = (editor, preventScroll) => {
         const selection = editor.selection;
         const body = editor.getBody();
         let rng = selection.getRng();
@@ -13455,9 +13459,9 @@
         const contentEditableHost = getContentEditableHost(editor, selection.getNode());
         if (contentEditableHost && editor.dom.isChildOf(contentEditableHost, body)) {
             if (!hasContentEditableFalseParent$1(editor, contentEditableHost)) {
-                focusBody(body);
+                focusBody(body, preventScroll);
             }
-            focusBody(contentEditableHost);
+            focusBody(contentEditableHost, preventScroll);
             if (!editor.hasEditableRoot()) {
                 restoreBookmark(editor);
             }
@@ -13468,30 +13472,40 @@
         // Focus the window iframe
         if (!editor.inline) {
             // WebKit needs this call to fire focusin event properly see #5948
-            // But Opera pre Blink engine will produce an empty selection so skip Opera
-            if (!Env.browser.isOpera()) {
-                focusBody(body);
+            focusBody(body, preventScroll);
+            if (preventScroll) {
+                if (isNonNullable(editor.iframeElement)) {
+                    editor.iframeElement.focus({ preventScroll: true });
+                }
             }
-            editor.getWin().focus();
+            else {
+                editor.getWin().focus();
+            }
         }
         // Focus the body as well since it's contentEditable
         if (Env.browser.isFirefox() || editor.inline) {
-            focusBody(body);
+            focusBody(body, preventScroll);
             normalizeSelection(editor, rng);
         }
         activateEditor(editor);
     };
     const activateEditor = (editor) => editor.editorManager.setActive(editor);
-    const focus = (editor, skipFocus) => {
+    const normalizeFocusOptions = (args) => {
+        if (isNonNullable(args) && !isBoolean(args)) {
+            return args;
+        }
+        return { scrollToSelection: true };
+    };
+    const focus = (editor, args) => {
         if (editor.removed) {
             return;
         }
-        if (skipFocus) {
+        if (args === true) {
             activateEditor(editor);
+            return;
         }
-        else {
-            focusEditor(editor);
-        }
+        const options = normalizeFocusOptions(args);
+        focusEditor(editor, options.scrollToSelection === false);
     };
 
     /**
@@ -15153,6 +15167,10 @@
         return trimmed;
     };
 
+    const trimEmptyContents = (rootBlock, html) => {
+        const emptyRegExp = new RegExp(`^(<${rootBlock}[^>]*>(&nbsp;|&#160;|\\s|\u00a0|<br \\/>|)<\\/${rootBlock}>[\r\n]*|<br \\/>[\r\n]*)$`);
+        return html.replace(emptyRegExp, '');
+    };
     const cleanupBogusElements = (parent) => {
         const bogusElements = descendants(parent, '[data-mce-bogus]');
         each$e(bogusElements, (elem) => {
@@ -15177,11 +15195,6 @@
         });
     };
 
-    const trimEmptyContents = (editor, html) => {
-        const blockName = getForcedRootBlock(editor);
-        const emptyRegExp = new RegExp(`^(<${blockName}[^>]*>(&nbsp;|&#160;|\\s|\u00a0|<br \\/>|)<\\/${blockName}>[\r\n]*|<br \\/>[\r\n]*)$`);
-        return html.replace(emptyRegExp, '');
-    };
     const getPlainTextContent = (editor, body) => {
         const doc = editor.getDoc();
         const dos = getRootNode(SugarElement.fromDom(editor.getBody()));
@@ -15214,7 +15227,7 @@
             content = editor.serializer.serialize(body, args);
         }
         else {
-            content = trimEmptyContents(editor, editor.serializer.serialize(body, args));
+            content = trimEmptyContents(getForcedRootBlock(editor), editor.serializer.serialize(body, args));
         }
         // Trim if not using a whitespace preserve format/element
         const shouldTrim = args.format !== 'text' && !isWsPreserveElement(SugarElement.fromDom(body));
@@ -38490,9 +38503,11 @@
     const initTooltipClosing = (editor) => {
         const closeTooltipsListener = (event) => {
             if (event.keyCode === VK.ESC && !event.defaultPrevented) {
-                if (fireCloseTooltips(editor).isDefaultPrevented()) {
-                    event.preventDefault();
-                }
+                each$e(editor.editorManager.get(), (ed) => {
+                    if (fireCloseTooltips(ed).isDefaultPrevented()) {
+                        event.preventDefault();
+                    }
+                });
             }
         };
         document.addEventListener('keyup', closeTooltipsListener);
@@ -39660,7 +39675,7 @@
                 editor.getWin().print();
             },
             mceFocus: (_command, _ui, value) => {
-                focus(editor, value === true);
+                focus(editor, value);
             },
             mceToggleVisualAid: () => {
                 editor.hasVisual = !editor.hasVisual;
@@ -41386,7 +41401,12 @@
          * it will also place DOM focus inside the editor.
          *
          * @method focus
-         * @param {Boolean} skipFocus Skip DOM focus. Just set is as the active editor.
+         * @param {Boolean/Object} skipFocus If true, skip DOM focus and only set this editor as the active editor. If an object, focus the editor and optionally control scrolling.
+         * @param {Boolean} skipFocus.scrollToSelection If false, focuses the editor without scrolling the selection into view. Defaults to true.
+         * @example
+         * tinymce.activeEditor.focus();
+         * tinymce.activeEditor.focus(true);
+         * tinymce.activeEditor.focus({ scrollToSelection: false });
          */
         focus(skipFocus) {
             this.execCommand('mceFocus', false, skipFocus);
@@ -42082,14 +42102,14 @@
          * @property minorVersion
          * @type String
          */
-        minorVersion: '8.2',
+        minorVersion: '9.3',
         /**
          * Release date of TinyMCE build.
          *
          * @property releaseDate
          * @type String
          */
-        releaseDate: '2026-07-27',
+        releaseDate: '2026-10-06',
         /**
          * Collection of language pack data.
          *

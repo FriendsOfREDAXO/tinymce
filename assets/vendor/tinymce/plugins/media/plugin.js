@@ -1,5 +1,5 @@
 /**
- * TinyMCE version 8.8.2 (2026-07-27)
+ * TinyMCE version 8.9.3 (2026-10-06)
  */
 
 (function () {
@@ -1294,9 +1294,18 @@
         return Parser(editor.schema, { sanitize, validate }).parse(html);
     };
 
+    let nonNonScriptingDocument;
+    const createNonScriptingDocument = () => {
+        if (isNonNullable(nonNonScriptingDocument)) {
+            return nonNonScriptingDocument;
+        }
+        nonNonScriptingDocument = new DOMParser().parseFromString('', 'text/html');
+        return nonNonScriptingDocument;
+    };
     const buildMediaElement = (editor, node) => {
+        const doc = createNonScriptingDocument();
         const realElmName = node.attr('data-mce-object');
-        const element = document.createElement(realElmName);
+        const element = doc.createElement(realElmName);
         // Add width/height to everything but audio
         if (realElmName !== 'audio') {
             const className = node.attr('class');
@@ -1445,15 +1454,19 @@
         });
     };
 
+    const PLUGIN_CODE = 'media';
     var Plugin = () => {
-        global$6.add('media', (editor) => {
+        global$6.add(PLUGIN_CODE, (editor) => {
             register$2(editor);
             register$1(editor);
             register(editor);
             setup(editor);
             setup$1(editor);
             setup$2(editor);
-            return get(editor);
+            return {
+                ...get(editor),
+                getMetadata: () => ({ name: 'Media', type: 'opensource', slug: PLUGIN_CODE })
+            };
         });
     };
 

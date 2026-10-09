@@ -270,7 +270,15 @@ const register = (editor: any): void => {
 
 const Plugin = (): void => {
   if (typeof tinymce !== "undefined" && tinymce && tinymce.PluginManager) {
-    tinymce.PluginManager.add(PLUGIN, register);
+    tinymce.PluginManager.add(PLUGIN, (editor: any) => {
+        register(editor);
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Abbreviations',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
+    });
   }
 };
 

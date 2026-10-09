@@ -316,6 +316,10 @@ function normalizeTinyAssetUrl(url, prefix) {
     return normalized;
 }
 
+function stripUrlQuery(url) {
+    return String(url).replace(/[?#].*$/, '');
+}
+
 function forceCanonicalTinyPluginUrls(externalPlugins, prefix) {
     if (!externalPlugins || typeof externalPlugins !== 'object') {
         return externalPlugins;
@@ -907,8 +911,20 @@ function tiny_init(container) {
             if (!options.hasOwnProperty('external_plugins')) {
                 options['external_plugins'] = {};
             }
-            // Merge registered external plugins (profile-specific ones take precedence)
-            options['external_plugins'] = Object.assign({}, normalizedExternalPluginsSource, options['external_plugins']);
+            // Merge registered external plugins (profile-specific ones take precedence).
+            // Zeigt das Profil auf dieselbe Datei, gewinnt die registrierte URL: nur sie trägt den
+            // aktuellen Cache-Token, gespeicherte Profile enthalten noch den ?v= von damals.
+            let profileExternalPlugins = Object.assign({}, options['external_plugins']);
+            for (let pluginName in profileExternalPlugins) {
+                if (
+                    Object.prototype.hasOwnProperty.call(normalizedExternalPluginsSource, pluginName)
+                    && typeof profileExternalPlugins[pluginName] === 'string'
+                    && stripUrlQuery(normalizeTinyAssetUrl(profileExternalPlugins[pluginName], tinyAssetPrefix)) === stripUrlQuery(normalizedExternalPluginsSource[pluginName])
+                ) {
+                    delete profileExternalPlugins[pluginName];
+                }
+            }
+            options['external_plugins'] = Object.assign({}, normalizedExternalPluginsSource, profileExternalPlugins);
         }
 
         // Also normalize any path variants in profile-defined external plugins.

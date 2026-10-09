@@ -49,5 +49,13 @@ const setup = (editor: any, url: string): void => {
   });
 };
 
-tinymce.PluginManager.add('snippets', setup);
+tinymce.PluginManager.add('snippets', (editor: any, url: string) => {
+    setup(editor, url);
+    return {
+        getMetadata: () => ({
+            name: 'FriendsOfREDAXO Snippets',
+            url: 'https://github.com/FriendsOfREDAXO/tinymce'
+        })
+    };
+});
 

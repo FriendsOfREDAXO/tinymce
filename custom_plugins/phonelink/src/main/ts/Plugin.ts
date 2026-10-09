@@ -263,6 +263,14 @@ const setup = (editor: Editor): void => {
 };
 
 export default (): void => {
-    tinymce.PluginManager.add(PLUGIN, setup);
+    tinymce.PluginManager.add(PLUGIN, (editor: any) => {
+        setup(editor);
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Phone Link',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
+    });
     tinymce.PluginManager.requireLangPack(PLUGIN, 'de');
 };

@@ -1,6 +1,26 @@
 Changelog
 =========
 
+Unveröffentlicht
+----------------
+
+### Vendor
+
+* **TinyMCE 8.8.2 → 8.9.3**, `tinymce-i18n` 26.8.2 → 26.9.28. Enthält einen Security-Fix aus 8.9.3: Stored XSS im Media-Plugin über Event-Handler-Attribute (TINYMCE-14932). Aus 8.9.0: Sidebars lassen sich per Ziehen in der Breite ändern (neue Option `sidebar_width`), leerer `alt`-Text bei Bildern wird nicht mehr durch `role="presentation"` ersetzt, das Öffnen von Sidebars scrollt den Editor nicht mehr zum Cursor.
+
+### Features
+
+* **Eigene Plugins im Hilfe-Dialog:** Seit TinyMCE 8.9 listet der Tab „Plugins“ im Hilfe-Dialog alle aktiven Plugins anhand ihrer Metadaten. Bisher lieferten nur 4 der 17 mitgelieferten Plugins Metadaten. Jetzt erscheinen alle mit Namen und Link, etwa „FriendsOfREDAXO Footnotes“. `for_markdown` heißt dort nicht mehr nur `for_markdown`.
+
+### Fixes
+
+* **Snippet-Absicherung war nicht im ausgelieferten Plugin enthalten:** Der Fix aus #189 (Snippet-Inhalt vor dem Einfügen gegen das Editor-Schema parsen und serialisieren) stand nur im Quellcode. Das gebaute `snippets/plugin.min.js` war nicht neu erzeugt worden. Mit diesem Build ist er aktiv.
+* **Geänderte Plugins kamen nach einem Update aus dem Browser-Cache:** Gespeicherte Profile (auch die mitgelieferten `full` und `demo`) enthalten in `external_plugins` die Plugin-URLs mit einem festen `?v=…` aus der Zeit ihrer Erstellung. Beim Zusammenführen in `base.js` gewannen diese URLs gegen die frisch registrierten. Zeigt eine Profil-URL auf dieselbe Plugin-Datei, wird jetzt die registrierte URL mit aktuellem Cache-Token verwendet. Abweichende, eigene Plugin-URLs im Profil haben weiterhin Vorrang.
+
+### Getestet
+
+* MForm (Feld und Flex-Repeater inkl. neu hinzugefügter Items), MBlock (inkl. neuer Blöcke), YForm (Textarea mit `tiny-editor`) und bloecks (Slice kopieren und einfügen, eingefügten Slice bearbeiten), jeweils in Chrome und WebKit: Editoren starten, Eingaben werden gespeichert.
+
 Version 8.17.0-beta.1
 ---------------------
 

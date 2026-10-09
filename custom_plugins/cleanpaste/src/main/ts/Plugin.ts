@@ -369,7 +369,7 @@ function collectStyleSetClasses(): string[] {
 /* ================================================================== */
 
 const Plugin = (): void => {
-    tinymce.PluginManager.add('cleanpaste', (editor: any): void => {
+    tinymce.PluginManager.add('cleanpaste', (editor: any) => {
         // tinyCleanPasteConfig is injected by profiles.js (works backend + frontend)
         // window.tinyCleanPasteConfig is kept as a secondary fallback for custom integrations
         const runtimeConfig: Partial<CleanPasteConfig> =
@@ -405,6 +405,12 @@ const Plugin = (): void => {
                 e.content = cleanPastedHtml(e.content, config);
             }
         });
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Clean Paste',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
     });
 };
 

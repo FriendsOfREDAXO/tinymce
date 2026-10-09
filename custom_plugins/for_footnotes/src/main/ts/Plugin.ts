@@ -257,7 +257,7 @@ function insertFootnote(editor: any): void {
 /* ================================================================== */
 
 const Plugin = (): void => {
-    tinymce.PluginManager.add('for_footnotes', (editor: any): void => {
+    tinymce.PluginManager.add('for_footnotes', (editor: any) => {
         editor.addCommand('forFootnoteInsert', () => insertFootnote(editor));
         editor.addCommand('forFootnoteUpdate', () => {
             syncFootnotes(editor);
@@ -373,6 +373,12 @@ sup.for-footnote-ref { cursor: pointer; }
             setTimeout(scheduleSync, 40);
             setTimeout(syncAndResize, 120);
         });
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Footnotes',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
     });
 };
 
