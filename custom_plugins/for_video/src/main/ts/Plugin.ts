@@ -926,6 +926,12 @@ const Plugin = (): void => {
             items: 'for_video_width for_video_align for_video_ratio | for_video_edit for_video_remove',
             position: 'node'
         });
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Video',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
     });
 };
 

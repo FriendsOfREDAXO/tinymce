@@ -390,7 +390,14 @@ async function handleBlobUpload(
 /* ================================================================== */
 
 const Plugin = (): void => {
-    tinymce.PluginManager.add('mediapaste', (editor: any): void => {
+    tinymce.PluginManager.add('mediapaste', (editor: any) => {
+        const metadata = {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Media Paste',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
+
         // Merge runtime config from profiles.js -> window fallback -> defaults
         const runtimeConfig: Partial<MediaUploadConfig> =
             (typeof tinyMediaUploadConfig !== 'undefined' ? tinyMediaUploadConfig : null)
@@ -453,17 +460,17 @@ const Plugin = (): void => {
                 e.content = e.content.replace(/<img\b[^>]*>/gi, '');
             });
 
-            return;
+            return metadata;
         }
 
-        if (!config.enabled) return;
+        if (!config.enabled) return metadata;
 
         // Prefetch categories in the background so the dialog opens instantly
         void fetchCategories(config.categories_url);
 
         // Only install if the profile hasn't defined a custom upload handler
         const existingHandler = editor.options.get('images_upload_handler');
-        if (existingHandler) return;
+        if (existingHandler) return metadata;
 
         // Allow pasting & dropping images into the editor
         editor.options.set('paste_data_images', true);
@@ -572,6 +579,7 @@ const Plugin = (): void => {
                 doUpload('');
             }
         });
+        return metadata;
     });
 };
 

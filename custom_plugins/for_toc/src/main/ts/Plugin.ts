@@ -339,7 +339,7 @@ function openSettingsDialog(editor: any): void {
 /* ================================================================== */
 
 const Plugin = (): void => {
-    tinymce.PluginManager.add('for_toc', (editor: any): void => {
+    tinymce.PluginManager.add('for_toc', (editor: any) => {
         editor.addCommand('forTocInsert', () => {
             const existing = getToc(editor);
             if (existing) {
@@ -458,6 +458,12 @@ nav.for-toc ol.for-toc__list > li.for-toc__item--filler::before { content: none;
 `;
             editor.dom.addStyle(css);
         });
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Table of Contents',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
     });
 };
 

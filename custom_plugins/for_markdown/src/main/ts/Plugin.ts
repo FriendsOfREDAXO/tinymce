@@ -210,7 +210,7 @@ export default function Plugin(): void {
 
         return {
             getMetadata: () => ({
-                name: 'for_markdown',
+                name: 'FriendsOfREDAXO Markdown',
                 url: 'https://friendsofredaxo.github.io/tinymce/',
             }),
         };

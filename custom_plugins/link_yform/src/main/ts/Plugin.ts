@@ -129,5 +129,13 @@ const setup = (editor: Editor): void => {
 };
 
 export default (): void => {
-    tinymce.PluginManager.add('link_yform', setup);
+    tinymce.PluginManager.add('link_yform', (editor: any) => {
+        setup(editor);
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO YForm Link',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
+    });
 };

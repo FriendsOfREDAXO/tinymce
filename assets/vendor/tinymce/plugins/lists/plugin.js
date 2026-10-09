@@ -1,5 +1,5 @@
 /**
- * TinyMCE version 8.8.2 (2026-07-27)
+ * TinyMCE version 8.9.3 (2026-10-06)
  */
 
 (function () {
@@ -583,12 +583,16 @@
         });
     };
 
+    const PLUGIN_CODE = 'lists';
     var Plugin = () => {
-        global.add('lists', (editor) => {
+        global.add(PLUGIN_CODE, (editor) => {
             register$2(editor);
             register$1(editor);
             register(editor);
-            return get(editor);
+            return {
+                ...get(editor),
+                getMetadata: () => ({ name: 'Lists', type: 'opensource', slug: PLUGIN_CODE })
+            };
         });
     };
 

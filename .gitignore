@@ -9,3 +9,6 @@ build/
 package-lock.json
 pnpm-lock.yaml
 
+
+# zur Laufzeit erzeugt (Creator\Profiles -> public/assets/addons/tinymce/generated)
+assets/generated/

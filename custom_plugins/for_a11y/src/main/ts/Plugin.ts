@@ -1575,6 +1575,10 @@ const Plugin = (): void => {
          *   const issues = tinymce.activeEditor.plugins.for_a11y.getReport();
          */
         return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Accessibility Check',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            }),
             toggleaudit: () => {
                 runAndShow(editor);
             },

@@ -89,6 +89,14 @@ const setup = (editor: Editor, url: string): void => {
 };
 
 export default (): void => {
-    tinymce.PluginManager.add('quote', setup);
+    tinymce.PluginManager.add('quote', (editor: any, url: string) => {
+        setup(editor, url);
+        return {
+            getMetadata: () => ({
+                name: 'FriendsOfREDAXO Quote',
+                url: 'https://github.com/FriendsOfREDAXO/tinymce'
+            })
+        };
+    });
     tinymce.PluginManager.requireLangPack('quote', 'de');
 };
