@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Unveröffentlicht
+----------------
+
+### Fixes
+
+* **Media-Manager-Type für Bild-URL wurde ignoriert:** Die Profil-Option `tinymce_media_type` (Profil-Assistent: „Media-Manager-Type für Bild-URL“) wurde gespeichert, die Bildauswahl aus dem Medienpool setzte aber immer `/media/tiny/<datei>`. Jetzt gilt der eingestellte Typ (Standard weiterhin `tiny`, leer = direkter `/media/<datei>`-Pfad).
+
 Version 8.18.0-beta.1
 ---------------------
 
