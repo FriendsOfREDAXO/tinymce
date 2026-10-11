@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 8.18.1
+--------------
+
+### Fixes
+
+* **Bilder im Editor kopieren, ausschneiden, verschieben:** Ein Bild ließ sich nicht an eine andere Stelle im Text bringen – Strg/⌘+V tat nichts, Ziehen mit der Maus auch nicht.
+  * `mediapaste` entfernte beim Einfügen jedes `<img>`, wenn das Einfügen von Bilddateien nicht erlaubt ist – auch Bilder der eigenen Website (Medienpool). Jetzt werden nur eingebettete Daten (`data:`, `blob:`) und Bilder fremder Websites entfernt.
+  * `for_images` legte beim Kopieren/Ausschneiden das interne Editor-HTML (mit `data-mce-*`-Attributen) in die Zwischenablage; jetzt das bereinigte HTML über den Serializer.
+  * `for_images`: Ziehen eines Bildes verschiebt die ganze `figure` (Ausrichtung, Breite, Bildunterschrift bleiben) vor den Absatz unter dem Mauszeiger – mit Rückgängig. Vorher zog der Browser nur das `<img>`, die `figure` ging verloren.
+
 Version 8.18.0
 --------------
 
