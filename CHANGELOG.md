@@ -1,6 +1,19 @@
 Changelog
 =========
 
+Version 8.18.0-beta.1
+---------------------
+
+### Features
+
+* **`for_images`: CKEditor-5-Bilder werden übernommen (Plugin 1.2.0):** Beim Umstieg von cke5 auf TinyMCE gingen Ausrichtung und Breite von Bildern verloren. CKE5 speichert Inline-Bilder als `<p><img class="image-style-align-right image_resized" style="width:25%;">Text…</p>`. `for_images` packte das `<img>` beim Laden in eine leere `<figure>` vor den Absatz, Klasse und Breite blieben am `<img>` – der Text floss nicht mehr um das Bild. Jetzt wandern Ausrichtung und Breite auf die `figure` und werden auf die Presets des Profils abgebildet: `image-style-align-left/right/center` (und `image-style-side`, `image-style-block-align-*`) auf das passende `imagealign_presets`-Preset, `width:N%` auf das `imagewidth_presets`-Preset mit derselben Breite. Ohne passendes Breiten-Preset bleibt `style="width:N%"` an der `figure`. `image_resized` entfällt. Block-Bilder (`figure.image`) behalten ihre `figure` samt Klassen und `figcaption`. Der Import läuft beim Laden und beim Einfügen, erkennt CKE5-Markup wie `image_compat_warn` und lässt sich mit `image_cke5_import: false` abschalten. Neue Option `image_cke5_map` für eine feste Zuordnung CKE5-Klasse → Preset-Klasse. Ein Inline-Bild mitten im Absatz landet vor dem Absatz, der Text bleibt zusammen. Ist `image_compat_warn` aktiv, meldet der Hinweis jetzt, dass das Markup übernommen wurde. Beschreibung und Zuordnungstabelle in `FOR_PLUGINS.md`.
+* **CKE5-Konverter für Style-Sets versteht die Style-Gruppen des cke5-AddOns:** Das cke5-AddOn speichert Style-Gruppen (`rex_cke5_style_groups`, Spalte `json_config`) als `[{"name": "Einleitung (Lead)", "element": "p", "classes": ["uk-text-lead"]}, …]`. Der Konverter (`lib/TinyMce/Utils/Cke5Converter.php`) erkannte nur Objekte mit `label` und meldete „Keine verwertbaren Styles erkannt“. Jetzt gilt `name` als Titel, und das `element` bestimmt das Format: Block-, Listen-, Tabellen-Elemente, `img`, `figure` und `a` werden zu `selector` (Klasse auf das markierte Element, wie im CKE5-Style-Plugin), `span`, `strong`, `mark` usw. zu `inline`. Kommagetrennte Klassen (`"a,b"`) werden aufgeteilt. Link-Decorators und `heading.options` werden wie bisher übersetzt.
+
+### Fixes
+
+* **`for_images`: verlinkte Bilder:** `<figure class="image"><a href><img></a></figure>` wurde beim Laden zu einer zweiten `figure` innerhalb des Links verschachtelt; `<p><a href><img></a>Text</p>` hinterließ zusätzliche leere Absätze. Ein Link, der nur das Bild umschließt, wandert jetzt mit in die `figure`: `<figure><a href><img></a></figure>`.
+* **`for_images`: Bild in Inline-Formatierung** (`<p><strong><img></strong>…</p>`) wurde in eine `figure` innerhalb von `<strong>` gesetzt. Die `figure` steht jetzt vor dem Absatz.
+
 Version 8.17.0
 --------------
 
