@@ -960,8 +960,27 @@ const setup = (editor: Editor, _url: string): void => {
     return true;
   };
 
+  // Über den Serializer statt outerHTML: das Editor-DOM enthält interne Attribute
+  // (data-mce-src, data-mce-selected …) und je nach Zustand ein leeres src – TinyMCE
+  // verwarf das eingefügte Bild dann, Strg/⌘+V tat scheinbar nichts.
   const writeFigureToClipboard = (figure: HTMLElement, data: DataTransfer): void => {
-    data.setData('text/html', figure.outerHTML);
+    let html = '';
+    try {
+      html = editor.serializer.serialize(figure, { getInner: false } as any);
+    } catch (err) {
+      html = '';
+    }
+    if (!html) {
+      const clone = figure.cloneNode(true) as HTMLElement;
+      Array.from(clone.querySelectorAll('img')).forEach((img) => {
+        const src = img.getAttribute('data-mce-src');
+        if (src) {
+          img.setAttribute('src', src);
+        }
+      });
+      html = clone.outerHTML.replace(/\sdata-mce-[a-z-]+="[^"]*"/g, '');
+    }
+    data.setData('text/html', html);
     data.setData('text/plain', figure.textContent || '');
   };
 
@@ -986,6 +1005,63 @@ const setup = (editor: Editor, _url: string): void => {
     e.preventDefault();
     removeFigureBlock(figure);
   });
+
+  /* DRAG & DROP: Bild samt figure verschieben
+   * Der Browser zieht nur das <img>; beim Ablegen ging die figure (Ausrichtung, Breite,
+   * Bildunterschrift) verloren bzw. das Bild wurde gar nicht eingefügt. Jetzt wird die ganze
+   * figure verschoben - vor den Absatz unter dem Mauszeiger, mit Rückgängig.
+   */
+  const DRAG_TYPE = 'application/x-for-images-move';
+  let draggedFigure: HTMLElement | null = null;
+
+  editor.on('dragstart', (e: DragEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (!target || !e.dataTransfer) return;
+    const img = target.nodeName === 'IMG' ? target : (target.nodeName === 'FIGURE' ? target.querySelector('img') : null);
+    const figure = img ? getFigureWrap(img as HTMLImageElement) : null;
+    if (!figure || figure.nodeName !== 'FIGURE') return;
+    draggedFigure = figure;
+    writeFigureToClipboard(figure, e.dataTransfer);
+    e.dataTransfer.setData(DRAG_TYPE, '1');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  editor.on('dragend', () => {
+    draggedFigure = null;
+  });
+
+  editor.on('drop', (e: DragEvent) => {
+    const figure = draggedFigure;
+    if (!figure || !e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes(DRAG_TYPE)) return;
+    e.preventDefault();
+    (e as any).stopImmediatePropagation?.();
+    draggedFigure = null;
+
+    const doc = editor.getDoc() as any;
+    let node: Node | null = null;
+    if (typeof doc.caretRangeFromPoint === 'function') {
+      const range = doc.caretRangeFromPoint(e.clientX, e.clientY);
+      node = range ? range.startContainer : null;
+    } else if (typeof doc.caretPositionFromPoint === 'function') {
+      const pos = doc.caretPositionFromPoint(e.clientX, e.clientY);
+      node = pos ? pos.offsetNode : null;
+    }
+    if (!node) {
+      node = doc.elementFromPoint(e.clientX, e.clientY);
+    }
+    const body = editor.getBody();
+    let block = node && node.nodeType === 1 ? node as HTMLElement : (node ? node.parentElement : null);
+    while (block && block.parentElement && block.parentElement !== body) {
+      block = block.parentElement;
+    }
+    if (!block || block === body || block === figure || figure.contains(block)) return;
+
+    editor.undoManager.transact(() => {
+      block!.parentNode!.insertBefore(figure, block);
+    });
+    editor.selection.select(figure.querySelector('img') || figure);
+    editor.nodeChanged();
+  }, true);
 
   editor.on('keydown', (e: any) => {
     const key = String(e.key || '').toLowerCase();

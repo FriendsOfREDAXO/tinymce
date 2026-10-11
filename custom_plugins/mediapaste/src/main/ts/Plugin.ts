@@ -457,7 +457,25 @@ const Plugin = (): void => {
                     return;
                 }
 
-                e.content = e.content.replace(/<img\b[^>]*>/gi, '');
+                // Nur fremde Bilder entfernen (eingebettete Daten, andere Websites). Bilder der
+                // eigenen Website - z. B. ein im Editor kopiertes/ausgeschnittenes Medienpool-Bild -
+                // bleiben erhalten; vorher fiel jedes <img> weg, Bilder ließen sich im Text nicht
+                // verschieben (Strg/⌘+X, Strg/⌘+V tat nichts).
+                e.content = e.content.replace(/<img\b[^>]*>/gi, (tag: string) => {
+                    const m = tag.match(/\ssrc\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i);
+                    const src = m ? (m[2] ?? m[3] ?? m[4] ?? '') : '';
+                    if (src === '' || /^(data|blob):/i.test(src)) {
+                        return '';
+                    }
+                    if (/^(https?:)?\/\//i.test(src)) {
+                        try {
+                            return new URL(src, window.location.href).host === window.location.host ? tag : '';
+                        } catch (err) {
+                            return '';
+                        }
+                    }
+                    return tag; // relative Adresse = eigene Website
+                });
             });
 
             return metadata;
