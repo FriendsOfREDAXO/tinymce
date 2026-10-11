@@ -1,15 +1,8 @@
 Changelog
 =========
 
-Unveröffentlicht
-----------------
-
-### Fixes
-
-* **Media-Manager-Type für Bild-URL wurde ignoriert:** Die Profil-Option `tinymce_media_type` (Profil-Assistent: „Media-Manager-Type für Bild-URL“) wurde gespeichert, die Bildauswahl aus dem Medienpool setzte aber immer `/media/tiny/<datei>`. Jetzt gilt der eingestellte Typ (Standard weiterhin `tiny`, leer = direkter `/media/<datei>`-Pfad).
-
-Version 8.18.0-beta.1
----------------------
+Version 8.18.0
+--------------
 
 ### Features
 
@@ -18,6 +11,7 @@ Version 8.18.0-beta.1
 
 ### Fixes
 
+* **Media-Manager-Type für Bild-URL wurde ignoriert:** Die Profil-Option `tinymce_media_type` (Profil-Assistent: „Media-Manager-Type für Bild-URL“) wurde gespeichert, die Bildauswahl aus dem Medienpool setzte aber immer `/media/tiny/<datei>`. Jetzt gilt der eingestellte Typ (Standard weiterhin `tiny`, leer = direkter `/media/<datei>`-Pfad).
 * **`for_images`: verlinkte Bilder:** `<figure class="image"><a href><img></a></figure>` wurde beim Laden zu einer zweiten `figure` innerhalb des Links verschachtelt; `<p><a href><img></a>Text</p>` hinterließ zusätzliche leere Absätze. Ein Link, der nur das Bild umschließt, wandert jetzt mit in die `figure`: `<figure><a href><img></a></figure>`.
 * **`for_images`: Bild in Inline-Formatierung** (`<p><strong><img></strong>…</p>`) wurde in eine `figure` innerhalb von `<strong>` gesetzt. Die `figure` steht jetzt vor dem Absatz.
 
