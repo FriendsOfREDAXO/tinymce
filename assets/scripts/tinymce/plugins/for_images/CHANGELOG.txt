@@ -1,3 +1,15 @@
+Version 1.2.0 (2026-10-11)
+  - CKEditor-5-Import (Option image_cke5_import, Standard: an): Ausrichtung
+    (image-style-align-*, image-style-side) und Breite (style="width:N%")
+    wandern beim Laden/Einfügen vom <img> auf die <figure> und werden auf
+    imagealign_presets / imagewidth_presets abgebildet. Ohne passendes
+    Breiten-Preset bleibt style="width:N%" an der figure. image_resized entfällt.
+  - Neue Option image_cke5_map für eine explizite Zuordnung CKE5-Klasse -> Preset-Klasse
+  - Verlinkte Bilder (<a><img></a>) werden samt Link in die figure übernommen
+    (vorher: verschachtelte figure im Link bzw. leere Absätze)
+  - Bilder in Inline-Formatierung (<p><strong><img>) landen vor dem Absatz
+  - Breiten-Preset ersetzt eine übernommene freie Breite an der figure
+
 Version 1.1.0 (2026-04-26)
   - Added image_compat_warn option (default: false)
   - When enabled: detects legacy CKEditor 5 image markup (figure.image,

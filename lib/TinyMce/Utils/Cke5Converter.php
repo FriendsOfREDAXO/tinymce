@@ -12,10 +12,23 @@ namespace FriendsOfRedaxo\TinyMce\Utils;
  *   2) Array/Einzelobjekt mit attributes.class als String
  *      (Link-Decorator-Format)
  *   3) Object mit heading.options: [ { model, view:{name,classes,attributes.class}, title } ]
- *   4) Beliebige gemischte Strukturen – der Konverter sucht rekursiv nach Styles.
+ *   4) Liste aus Style-Definitionen des REDAXO-cke5-AddOns (Style-Gruppen, Spalte
+ *      `json_config`, bzw. `style.definitions`): [ { name, element, classes: [] } ]
+ *      – das Element bestimmt das TinyMCE-Format (selector/inline, siehe mapElement()).
+ *   5) Beliebige gemischte Strukturen – der Konverter sucht rekursiv nach Styles.
  */
 final class Cke5Converter
 {
+    /**
+     * Elemente, deren Style per `selector` auf ein bestehendes Element gesetzt wird
+     * (CKE5-Style-Plugin: Style ist nur verfügbar, wenn das Element markiert ist).
+     */
+    private const SELECTOR_ELEMENTS = [
+        'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'blockquote', 'pre', 'address',
+        'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'caption',
+        'figure', 'figcaption', 'img', 'a', 'section', 'article', 'aside', 'hr',
+    ];
+
     /**
      * @param string $json       Roher JSON-String aus CKE5
      * @param string $groupTitle Optionaler Gruppen-Titel (Default: 'CKE5 Migrated').
@@ -90,7 +103,8 @@ final class Cke5Converter
 
             // Ein klassisches CKE5 Style-Objekt erkennt man an:
             //  - vorhandenem 'label' und 'classes' ODER
-            //  - 'attributes.class' (Link-Decorator)
+            //  - 'attributes.class' (Link-Decorator) ODER
+            //  - 'name', 'element' und 'classes' (Style-Definition / cke5-AddOn)
             if (self::looksLikeStyleDefinition($value)) {
                 $mapped = self::mapStyleDefinition(is_string($key) ? $key : null, $value);
                 if (null !== $mapped) {
@@ -116,6 +130,12 @@ final class Cke5Converter
         if (isset($def['attributes']) && is_array($def['attributes']) && isset($def['attributes']['class']) && isset($def['label'])) {
             return true;
         }
+        // CKE5-Style-Definition (style.definitions bzw. cke5-AddOn json_config):
+        // { name, element, classes } – 'element' ist Pflicht, damit z. B.
+        // heading.options[].view ({ name: 'h2', classes }) nicht doppelt erkannt wird.
+        if (isset($def['name'], $def['element'], $def['classes']) && is_string($def['element'])) {
+            return true;
+        }
         return false;
     }
 
@@ -125,7 +145,13 @@ final class Cke5Converter
      */
     private static function mapStyleDefinition(?string $modelKey, array $def): ?array
     {
-        $title = isset($def['label']) ? (string) $def['label'] : (string) ($modelKey ?? 'Unbenannt');
+        if (isset($def['label'])) {
+            $title = (string) $def['label'];
+        } elseif (isset($def['name']) && is_string($def['name'])) {
+            $title = $def['name'];
+        } else {
+            $title = (string) ($modelKey ?? 'Unbenannt');
+        }
 
         // Klassen extrahieren
         $classes = '';
@@ -133,7 +159,8 @@ final class Cke5Converter
             if (is_array($def['classes'])) {
                 $classes = trim(implode(' ', array_map('strval', $def['classes'])));
             } elseif (is_string($def['classes'])) {
-                $classes = trim($def['classes']);
+                // cke5-AddOn speichert Einzel-Styles kommagetrennt ("a,b")
+                $classes = trim(implode(' ', preg_split('/[\s,]+/', $def['classes'], -1, PREG_SPLIT_NO_EMPTY) ?: []));
             }
         } elseif (isset($def['attributes']) && is_array($def['attributes']) && isset($def['attributes']['class'])) {
             $classes = trim((string) $def['attributes']['class']);
@@ -143,20 +170,39 @@ final class Cke5Converter
             return null;
         }
 
-        // Heuristik: Key beginnt mit 'buttonlink' oder 'link' → selector: a
-        $selector = 'a';
-        if (null !== $modelKey) {
-            $keyLower = strtolower($modelKey);
-            if (str_starts_with($keyLower, 'button') || str_starts_with($keyLower, 'link') || str_contains($keyLower, 'modal')) {
-                $selector = 'a';
-            }
+        // Mit 'element' (CKE5-Style-Definition): Format passend zum Element
+        if (isset($def['element']) && is_string($def['element']) && '' !== trim($def['element'])) {
+            return ['title' => $title] + self::mapElement($def['element']) + ['classes' => $classes];
         }
 
+        // Ohne Element (Link-Decorator / Custom-Styles der Link-Toolbar) → selector: a
         return [
             'title' => $title,
-            'selector' => $selector,
+            'selector' => 'a',
             'classes' => $classes,
         ];
+    }
+
+    /**
+     * CKE5-Element → TinyMCE-Formatschlüssel.
+     *
+     * - Block-, Listen-, Tabellen- und Medien-Elemente sowie `a` → `selector`
+     *   (Klasse wird auf das markierte, vorhandene Element gesetzt – wie im CKE5-Style-Plugin)
+     * - übrige Inline-Elemente (`span`, `strong`, `mark`, `code` …) → `inline`
+     *   (Markierung wird mit dem Element umschlossen)
+     *
+     * @return array{selector: string}|array{inline: string}
+     */
+    private static function mapElement(string $element): array
+    {
+        $element = strtolower(trim($element));
+        if (!preg_match('/^[a-z][a-z0-9-]*$/', $element)) {
+            return ['selector' => 'a'];
+        }
+        if (in_array($element, self::SELECTOR_ELEMENTS, true)) {
+            return ['selector' => $element];
+        }
+        return ['inline' => $element];
     }
 
     /**

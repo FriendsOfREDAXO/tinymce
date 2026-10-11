@@ -102,11 +102,34 @@ class ConfigCache {
 /*  Figure Helpers                                                     */
 /* ================================================================== */
 
+/**
+ * Ein Link, der ausschließlich das Bild umschließt (`<a><img></a>`), gehört
+ * zum Bild und wandert beim Einpacken mit in die <figure>.
+ */
+function getLinkWrap(img: HTMLElement): HTMLElement | null {
+  const parent = img.parentElement;
+  if (!parent || parent.nodeName !== 'A') return null;
+  const onlyImg = Array.from(parent.childNodes).every(
+    n => n === img || (n.nodeType === Node.TEXT_NODE && (n.textContent || '').trim() === '')
+  );
+  return onlyImg ? parent : null;
+}
+
 function getFigureWrap(el: HTMLElement): HTMLElement | null {
   if (el.nodeName === 'FIGURE') return el;
   const parent = el.parentElement;
   if (parent && parent.nodeName === 'FIGURE') return parent;
+  // <figure><a><img></a></figure> (verlinktes Bild)
+  if (parent && parent.nodeName === 'A' && parent.parentElement?.nodeName === 'FIGURE') {
+    return parent.parentElement;
+  }
   return null;
+}
+
+/** Absatz ist nach dem Herausnehmen des Bildes leer (nur Whitespace/&nbsp;/<br>/leere Inline-Tags). */
+function isEmptyParagraph(p: HTMLElement): boolean {
+  return (p.textContent || '').trim() === '' &&
+    !p.querySelector('img, picture, video, audio, iframe, object, embed, svg, input, figure, table');
 }
 
 function ensureFigureWrap(editor: Editor, img: HTMLElement): HTMLElement {
@@ -117,24 +140,24 @@ function ensureFigureWrap(editor: Editor, img: HTMLElement): HTMLElement {
 
   const doc = editor.getDoc();
   const figure = doc.createElement('figure');
-  
-  const parent = img.parentElement;
 
-  if (parent && parent.nodeName === 'P') {
-    const hasOtherContent = Array.from(parent.childNodes).some(
-      n => n !== img && (n.nodeType !== Node.TEXT_NODE || (n.textContent || '').trim() !== '')
-    );
-    if (!hasOtherContent) {
-      parent.parentNode!.insertBefore(figure, parent);
-      figure.appendChild(img);
-      parent.remove();
-    } else {
-      parent.parentNode!.insertBefore(figure, parent);
-      figure.appendChild(img);
+  // Verlinkte Bilder: der Link wandert mit in die figure (<figure><a><img></a></figure>)
+  const unit = getLinkWrap(img) || img;
+  const parent = unit.parentElement;
+  // Bild steckt in einem Absatz (ggf. in Inline-Formatierung wie <strong>):
+  // figure vor den Absatz setzen, der Text bleibt unverändert erhalten.
+  const paragraph = parent ? (parent.closest('p') as HTMLElement | null) : null;
+
+  // Nie über den Editor-Body hinaus (Inline-Modus) – Paste-Fragmente sind erlaubt.
+  if (paragraph && paragraph.parentNode && !paragraph.contains(editor.getBody())) {
+    paragraph.parentNode.insertBefore(figure, paragraph);
+    figure.appendChild(unit);
+    if (isEmptyParagraph(paragraph)) {
+      paragraph.remove();
     }
   } else if (parent) {
-    parent.insertBefore(figure, img);
-    figure.appendChild(img);
+    parent.insertBefore(figure, unit);
+    figure.appendChild(unit);
   }
 
   return figure;
@@ -250,6 +273,8 @@ function detectImgFullWidthClass(presets: Preset[]): string {
 }
 
 function applyImgFullWidth(img: HTMLElement, fullWidthClass: string): void {
+  // TinyMCE serialisiert `data-mce-style` statt `style` – nach Änderungen verwerfen
+  img.removeAttribute('data-mce-style');
   img.classList.remove('uk-width-1-1', 'w-100');
   img.style.removeProperty('width');
   if (fullWidthClass) {
@@ -338,6 +363,16 @@ function applyPresetClass(editor: Editor, img: HTMLElement, preset: Preset, allP
   applyPreset(editor, img, preset, allPresets, !!editor.options.get('image_compat_warn'));
 }
 
+/**
+ * Breiten-Preset anwenden. Eine aus CKE5 übernommene freie Breite
+ * (`style="width:16.49%"` an der figure) wird dabei ersetzt.
+ */
+function applyWidthPreset(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
+  const figure = getFigureWrap(img);
+  if (figure) removeStyleWidth(figure);
+  applyPresetClass(editor, img, preset, allPresets);
+}
+
 function toggleEffectClass(editor: Editor, img: HTMLElement, preset: Preset, allPresets: Preset[]): void {
   toggleEffectPreset(editor, img, preset, allPresets, !!editor.options.get('image_compat_warn'));
 }
@@ -369,6 +404,197 @@ function getActiveEffects(el: HTMLElement, presets: Preset[]): Preset[] {
     }
   }
   return active;
+}
+
+/* ================================================================== */
+/*  Align-Preset-Erkennung (Toolbar-Buttons + CKE5-Import)             */
+/* ================================================================== */
+
+type AlignDirection = 'left' | 'right' | 'center';
+
+const alignPatterns: Record<AlignDirection, string[]> = {
+  left: ['float-left', 'float-start', 'align-left', 'uk-float-left'],
+  right: ['float-right', 'float-end', 'align-right', 'uk-float-right'],
+  center: ['margin-auto', 'mx-auto', 'align-center'],
+};
+
+function isAlignPreset(preset: Preset | null, dir: AlignDirection): boolean {
+  return !!preset && !!preset.class && alignPatterns[dir].some(p => preset.class.includes(p));
+}
+
+function findAlignPreset(presets: Preset[], dir: AlignDirection): Preset | undefined {
+  return presets.find(p => isAlignPreset(p, dir));
+}
+
+/* ================================================================== */
+/*  CKEditor-5-Import                                                  */
+/* ================================================================== */
+
+/**
+ * CKE5-Bildmarkup erkennen (dieselbe Erkennung wie für `image_compat_warn`):
+ * `figure.image`, `.image_resized` und Klassen `image-style-*`.
+ */
+const CKE5_SELECTOR = 'figure.image, .image_resized, [class*="image-style-"]';
+
+function hasCke5Markup(root: ParentNode | null): boolean {
+  return !!root && !!root.querySelector(CKE5_SELECTOR);
+}
+
+/** CKE5-Stilklasse → Ausrichtung. Nicht aufgeführte image-style-* bleiben unverändert erhalten. */
+const cke5AlignClasses: Record<string, AlignDirection | ''> = {
+  'image-style-align-left': 'left',
+  'image-style-block-align-left': 'left',
+  'image-style-align-right': 'right',
+  'image-style-block-align-right': 'right',
+  'image-style-side': 'right',
+  'image-style-align-center': 'center',
+  'image-style-align-block-center': 'center',
+  'image-style-inline': '',
+  'image-style-full': '',
+};
+
+interface Cke5ImportConfig {
+  widthPresets: Preset[];
+  alignPresets: Preset[];
+  map: Record<string, string>;
+  fullWidthClass: string;
+}
+
+/**
+ * Breite eines Presets in % bzw. px ermitteln: zuerst aus dem Label
+ * („25 %", „Klein (150px)"), sonst aus bekannten Framework-Klassen.
+ */
+function presetWidth(preset: Preset): { value: number; unit: '%' | 'px' } | null {
+  if (!preset.class) return null;
+  const label = preset.label || '';
+  const pct = label.match(/(\d+(?:[.,]\d+)?)\s*%/);
+  if (pct) return { value: parseFloat(pct[1].replace(',', '.')), unit: '%' };
+  const px = label.match(/(\d+(?:[.,]\d+)?)\s*px/i);
+  if (px) return { value: parseFloat(px[1].replace(',', '.')), unit: 'px' };
+
+  const cls = ' ' + preset.class + ' ';
+  let m = cls.match(/\suk-width-(\d+)-(\d+)(?:@\w+)?\s/);
+  if (m && +m[2] > 0) return { value: (+m[1] / +m[2]) * 100, unit: '%' };
+  m = cls.match(/\s(?:img-width-|w-)(\d+)\s/);
+  if (m) return { value: +m[1], unit: '%' };
+  if (/\s(?:img-width-full|w-100)\s/.test(cls)) return { value: 100, unit: '%' };
+  m = cls.match(/\scol(?:-\w+)?-(\d+)\s/);
+  if (m) return { value: (+m[1] / 12) * 100, unit: '%' };
+  return null;
+}
+
+function findWidthPreset(presets: Preset[], value: number, unit: string): Preset | undefined {
+  return presets.find(p => {
+    const w = presetWidth(p);
+    return !!w && w.unit === unit && Math.abs(w.value - value) < 0.5;
+  });
+}
+
+function resolveAlignClass(cke5Class: string, cfg: Cke5ImportConfig): string | null {
+  // 1. Explizite Zuordnung aus `image_cke5_map`
+  if (Object.prototype.hasOwnProperty.call(cfg.map, cke5Class)) {
+    return cfg.map[cke5Class] || '';
+  }
+  const dir = cke5AlignClasses[cke5Class];
+  if (dir === undefined) return null; // unbekannte image-style-* → nicht anfassen
+  if (dir === '') return '';
+  // 2. Preset, das die CKE5-Klasse selbst verwendet
+  const same = cfg.alignPresets.find(p => p.class.split(/\s+/).includes(cke5Class));
+  if (same) return same.class;
+  // 3. Preset mit passender Ausrichtung (gleiche Erkennung wie die Toolbar-Buttons)
+  const preset = findAlignPreset(cfg.alignPresets, dir);
+  if (preset) return preset.class;
+  // 4. Kein Preset → CKE5-Klasse behalten, damit die Ausrichtung nicht verloren geht
+  return cke5Class;
+}
+
+function addClasses(el: HTMLElement, classes: string): void {
+  classes.split(/\s+/).forEach(c => { if (c) el.classList.add(c); });
+}
+
+function removeStyleWidth(el: HTMLElement): void {
+  // TinyMCE serialisiert `data-mce-style` statt `style` – nach Änderungen verwerfen
+  el.removeAttribute('data-mce-style');
+  el.style.removeProperty('width');
+  if (el.getAttribute('style') === '' || el.getAttribute('style') === null) el.removeAttribute('style');
+}
+
+/**
+ * Übersetzt CKE5-Bildmarkup in das for_images-Format:
+ *  - Inline-Bilder (`<p><img class="image-style-align-right image_resized" style="width:25%">Text</p>`)
+ *    werden in eine <figure> vor den Absatz gesetzt; Ausrichtung und Breite wandern
+ *    vom <img> auf die <figure>.
+ *  - Block-Bilder (`<figure class="image image-style-align-left image_resized" style="width:50%">`)
+ *    behalten ihre <figure>; Ausrichtung/Breite werden auf Presets abgebildet.
+ *  - Breite: passendes `imagewidth_presets`-Preset (±0,5), sonst bleibt `style="width:…"` an der figure.
+ *  - `image_resized` entfällt, `src`, `alt`, Links und `figcaption` bleiben unverändert.
+ */
+function importCke5Images(editor: Editor, root: ParentNode, cfg: Cke5ImportConfig): number {
+  if (!hasCke5Markup(root)) return 0;
+
+  const candidates = new Set<HTMLElement>();
+  root.querySelectorAll('img').forEach(img => {
+    const el = img as HTMLElement;
+    const fig = getFigureWrap(el);
+    const isCke5 = (n: HTMLElement | null): boolean => !!n && (
+      n.classList.contains('image_resized') ||
+      (n.nodeName === 'FIGURE' && n.classList.contains('image')) ||
+      Array.from(n.classList).some(c => c.startsWith('image-style-'))
+    );
+    if (isCke5(el) || isCke5(fig)) candidates.add(el);
+  });
+
+  let count = 0;
+  candidates.forEach(img => {
+    const hadFigure = !!getFigureWrap(img);
+    const figure = ensureFigureWrap(editor, img);
+    if (!figure.contains(img)) return;
+
+    // Klassen sammeln: img (Inline-Bild) + figure (Block-Bild)
+    const styleClasses: string[] = [];
+    const collect = (el: HTMLElement): void => {
+      Array.from(el.classList).forEach(c => {
+        if (c === 'image_resized' || c.startsWith('image-style-')) {
+          styleClasses.push(c);
+          el.classList.remove(c);
+        }
+      });
+    };
+    collect(img);
+    collect(figure);
+
+    // Breite: figure (Block) vor img (Inline)
+    const width = figure.style.width || img.style.width || '';
+    removeStyleWidth(img);
+    removeStyleWidth(figure);
+
+    // Ausrichtung
+    styleClasses.forEach(c => {
+      if (c === 'image_resized') return;
+      const mapped = resolveAlignClass(c, cfg);
+      addClasses(figure, mapped === null ? c : mapped);
+    });
+
+    // Breite
+    if (width) {
+      const m = width.trim().match(/^(\d+(?:\.\d+)?)(%|px)$/);
+      const preset = m ? findWidthPreset(cfg.widthPresets, parseFloat(m[1]), m[2]) : undefined;
+      if (preset) {
+        addClasses(figure, preset.class);
+      } else {
+        figure.style.width = width;
+      }
+    }
+
+    if (figure.classList.length > 0 || figure.style.width) {
+      applyImgFullWidth(img, cfg.fullWidthClass);
+    }
+    if (img.classList.length === 0) img.removeAttribute('class');
+    if (figure.classList.length === 0) figure.removeAttribute('class');
+    if (!hadFigure || styleClasses.length > 0 || width) count++;
+  });
+
+  return count;
 }
 
 /* ================================================================== */
@@ -533,36 +759,63 @@ const setup = (editor: Editor, _url: string): void => {
   editor.options.register('imagealign_presets', { processor: 'object[]', default: [] });
   editor.options.register('imageeffect_presets', { processor: 'object[]', default: [] });
   editor.options.register('image_compat_warn', { processor: 'boolean', default: false });
+  // CKE5-Import: Ausrichtung/Breite aus CKEditor-5-Bildmarkup auf Presets übertragen
+  editor.options.register('image_cke5_import', { processor: 'boolean', default: true });
+  // Optionale explizite Zuordnung CKE5-Klasse → Preset-Klasse(n), z. B.
+  // { 'image-style-align-left': 'uk-float-left uk-margin-right' }
+  editor.options.register('image_cke5_map', { processor: 'object', default: {} });
   // Fix: image_caption muss registriert werden, bevor sie gesetzt wird
   editor.options.register('image_caption', { processor: 'boolean', default: false });
 
   // Initialize config cache once
   const configCache = new ConfigCache(editor);
   const compatMode = !!editor.options.get('image_compat_warn');
+  const cke5Import = editor.options.get('image_cke5_import') !== false;
 
-  /* ------------------------------------------------------------------
-   *  CKE5-Legacy-Erkennung (Caching für Performance)
-   * ------------------------------------------------------------------ */
-  let cke5WarningShown = false;
-  const hasCke5Markup = (root: HTMLElement | null): boolean => {
-    if (!root) return false;
-    return !!(root.querySelector('figure.image, figure.image_resized') ||
-              root.querySelector('[class*="image-style-"]'));
+  const getCke5ImportConfig = (): Cke5ImportConfig => {
+    const config = configCache.get();
+    const rawMap = editor.options.get('image_cke5_map');
+    const map: Record<string, string> = {};
+    if (rawMap && typeof rawMap === 'object' && !Array.isArray(rawMap)) {
+      Object.keys(rawMap).forEach(k => {
+        if (typeof rawMap[k] === 'string') map[k] = rawMap[k];
+      });
+    }
+    return {
+      widthPresets: config.widthPresets,
+      alignPresets: config.alignPresets,
+      map,
+      fullWidthClass: detectImgFullWidthClass(config.widthPresets),
+    };
   };
 
-  const checkCke5Markup = (): void => {
+  /** CKE5-Markup im Bereich übernehmen; liefert true, wenn CKE5-Markup gefunden wurde. */
+  const runCke5Import = (root: ParentNode | null): boolean => {
+    if (!root || !hasCke5Markup(root)) return false;
+    if (cke5Import) importCke5Images(editor, root, getCke5ImportConfig());
+    return true;
+  };
+
+  /* ------------------------------------------------------------------
+   *  CKE5-Legacy-Hinweis (image_compat_warn)
+   * ------------------------------------------------------------------ */
+  let cke5WarningShown = false;
+  let cke5Detected = false;
+
+  const showCke5Warning = (): void => {
     if (cke5WarningShown || !compatMode) return;
-    const body = editor.getBody();
-    if (!hasCke5Markup(body)) return;
     cke5WarningShown = true;
     try {
       editor.notificationManager.open({
         type: 'warning',
-        text:
-          'Hinweis: Dieser Inhalt enthält Bildmarkup aus dem alten CKEditor 5 (z. B. ' +
-          'figure.image, image-style-…). Bitte die betroffenen Bilder mit der neuen ' +
-          'Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut formatieren ' +
-          'und den Beitrag speichern, damit das Markup einheitlich wird.',
+        text: cke5Import
+          ? 'Hinweis: Dieser Inhalt enthielt Bildmarkup aus dem alten CKEditor 5. ' +
+            'Ausrichtung und Breite wurden automatisch übernommen. Bitte die Bilder ' +
+            'kurz prüfen und den Beitrag speichern, damit das Markup einheitlich wird.'
+          : 'Hinweis: Dieser Inhalt enthält Bildmarkup aus dem alten CKEditor 5 (z. B. ' +
+            'figure.image, image-style-…). Bitte die betroffenen Bilder mit der neuen ' +
+            'Bildformatierungs-Toolbar (Breite, Ausrichtung, Effekte) erneut formatieren ' +
+            'und den Beitrag speichern, damit das Markup einheitlich wird.',
         closeButton: true,
         timeout: 12000,
       });
@@ -645,12 +898,27 @@ const setup = (editor: Editor, _url: string): void => {
       }
     });
 
-    checkCke5Markup();
+    if (cke5Detected) showCke5Warning();
   });
 
+  // Wird beim Laden (initialer Inhalt) und bei jedem setContent ausgelöst.
+  // Der CKE5-Import läuft VOR normalizeFigures, damit Ausrichtung/Breite
+  // beim Einpacken in <figure> nicht am <img> hängen bleiben.
   editor.on('SetContent', () => {
+    if (runCke5Import(editor.getBody())) cke5Detected = true;
     normalizeFigures(editor);
-    checkCke5Markup();
+    if (cke5Detected && editor.initialized) showCke5Warning();
+  });
+
+  // Beim Einfügen schon auf dem HTML-String übernehmen: der Paste-Filter
+  // entfernt danach Inline-Styles (u. a. die CKE5-Breite am <img>).
+  editor.on('PastePreProcess', (e: any) => {
+    if (!cke5Import || typeof e?.content !== 'string' || e.content.indexOf('image') === -1) return;
+    const container = editor.getDoc().createElement('div');
+    container.innerHTML = e.content;
+    if (runCke5Import(container)) {
+      e.content = container.innerHTML;
+    }
   });
 
   editor.on('PastePostProcess', (e: any) => {
@@ -765,7 +1033,7 @@ const setup = (editor: Editor, _url: string): void => {
         type: 'menuitem' as const,
         text: preset.label,
         icon: active && active.class === preset.class ? 'checkmark' : undefined,
-        onAction: () => applyPresetClass(editor, img, preset, config.widthPresets)
+        onAction: () => applyWidthPreset(editor, img, preset, config.widthPresets)
       })));
     }
   });
@@ -778,10 +1046,7 @@ const setup = (editor: Editor, _url: string): void => {
       const img = getSelectedImg(editor);
       if (!img) return;
       const config = configCache.get();
-      const leftPreset = config.alignPresets.find(p => 
-        p.class.includes('float-left') || p.class.includes('float-start') || 
-        p.class.includes('align-left') || p.class.includes('uk-float-left')
-      );
+      const leftPreset = findAlignPreset(config.alignPresets, 'left');
       const active = getActivePreset(img, config.alignPresets);
       if (active && leftPreset && active.class === leftPreset.class) {
         applyPresetClass(editor, img, { label: '', class: '' }, config.alignPresets);
@@ -795,10 +1060,7 @@ const setup = (editor: Editor, _url: string): void => {
         if (!img) { api.setActive(false); return; }
         const config = configCache.get();
         const active = getActivePreset(img, config.alignPresets);
-        api.setActive(!!active && (
-          active.class.includes('float-left') || active.class.includes('float-start') ||
-          active.class.includes('align-left') || active.class.includes('uk-float-left')
-        ));
+        api.setActive(isAlignPreset(active, 'left'));
       };
       editor.on('NodeChange', handler);
       return () => editor.off('NodeChange', handler);
@@ -812,10 +1074,7 @@ const setup = (editor: Editor, _url: string): void => {
       const img = getSelectedImg(editor);
       if (!img) return;
       const config = configCache.get();
-      const centerPreset = config.alignPresets.find(p => 
-        p.class.includes('margin-auto') || p.class.includes('mx-auto') || 
-        p.class.includes('align-center')
-      );
+      const centerPreset = findAlignPreset(config.alignPresets, 'center');
       const active = getActivePreset(img, config.alignPresets);
       if (active && centerPreset && active.class === centerPreset.class) {
         applyPresetClass(editor, img, { label: '', class: '' }, config.alignPresets);
@@ -829,10 +1088,7 @@ const setup = (editor: Editor, _url: string): void => {
         if (!img) { api.setActive(false); return; }
         const config = configCache.get();
         const active = getActivePreset(img, config.alignPresets);
-        api.setActive(!!active && (
-          active.class.includes('margin-auto') || active.class.includes('mx-auto') ||
-          active.class.includes('align-center')
-        ));
+        api.setActive(isAlignPreset(active, 'center'));
       };
       editor.on('NodeChange', handler);
       return () => editor.off('NodeChange', handler);
@@ -846,10 +1102,7 @@ const setup = (editor: Editor, _url: string): void => {
       const img = getSelectedImg(editor);
       if (!img) return;
       const config = configCache.get();
-      const rightPreset = config.alignPresets.find(p => 
-        p.class.includes('float-right') || p.class.includes('float-end') || 
-        p.class.includes('align-right') || p.class.includes('uk-float-right')
-      );
+      const rightPreset = findAlignPreset(config.alignPresets, 'right');
       const active = getActivePreset(img, config.alignPresets);
       if (active && rightPreset && active.class === rightPreset.class) {
         applyPresetClass(editor, img, { label: '', class: '' }, config.alignPresets);
@@ -863,10 +1116,7 @@ const setup = (editor: Editor, _url: string): void => {
         if (!img) { api.setActive(false); return; }
         const config = configCache.get();
         const active = getActivePreset(img, config.alignPresets);
-        api.setActive(!!active && (
-          active.class.includes('float-right') || active.class.includes('float-end') ||
-          active.class.includes('align-right') || active.class.includes('uk-float-right')
-        ));
+        api.setActive(isAlignPreset(active, 'right'));
       };
       editor.on('NodeChange', handler);
       return () => editor.off('NodeChange', handler);
@@ -957,7 +1207,7 @@ const setup = (editor: Editor, _url: string): void => {
         onSubmit: (api: any) => {
           const data = api.getData();
           const widthPreset = config.widthPresets.find(p => p.class === data.widthClass) || { label: '', class: '' };
-          applyPresetClass(editor, img, widthPreset, config.widthPresets);
+          applyWidthPreset(editor, img, widthPreset, config.widthPresets);
           const alignPreset = config.alignPresets.find(p => p.class === data.alignClass) || { label: '', class: '' };
           applyPresetClass(editor, img, alignPreset, config.alignPresets);
           const figure = getFigureWrap(img);
