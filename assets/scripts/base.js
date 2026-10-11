@@ -93,6 +93,26 @@ function showAltLanguagePicker(languages, callback) {
     select.focus();
 }
 
+/**
+ * Media-Manager-Type fuer eingefuegte Bilder aus der Profil-Option tinymce_media_type
+ * (Profil-Assistent: „Media-Manager-Type für Bild-URL“). Standard 'tiny', leer = direkter /media/-Pfad.
+ */
+function rex5PickerMediaType() {
+    var editor = (typeof tinymce !== 'undefined') ? tinymce.activeEditor : null;
+    if (!editor || !editor.options) {
+        return 'tiny';
+    }
+    try {
+        if (!editor.options.isRegistered('tinymce_media_type')) {
+            editor.options.register('tinymce_media_type', { processor: 'string', default: 'tiny' });
+        }
+        var type = editor.options.get('tinymce_media_type');
+        return typeof type === 'string' ? type.trim().replace(/[^a-z0-9_-]/gi, '') : 'tiny';
+    } catch (e) {
+        return 'tiny';
+    }
+}
+
 let rex5_picker_function = function (callback, value, meta) {
     if (meta.filetype === 'file') {
         // use query parameter clang
@@ -115,7 +135,8 @@ let rex5_picker_function = function (callback, value, meta) {
             // use media manager for raster images, direct path for SVG/TIFF/BMP
             var extension = filename.split('.').pop().toLowerCase();
             var useMediaManager = ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(extension) !== -1;
-            var imagePath = useMediaManager ? '/media/tiny/' + filename : '/media/' + filename;
+            var mediaType = rex5PickerMediaType();
+            var imagePath = useMediaManager && mediaType !== '' ? '/media/' + mediaType + '/' + filename : '/media/' + filename;
 
             // Mediapool-Metadaten holen (MediaPlace-eigenes ALT-Feld,
             // metainfo_lang_fields oder klassisches med_alt, Title) und
