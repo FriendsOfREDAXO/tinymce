@@ -20,7 +20,7 @@ Im **Profil-Assistenten** erscheinen alle Plugins dieses AddOns mit einem farbig
 
 | Plugin | Zweck | Toolbar/Menü |
 | --- | --- | --- |
-| `for_images` | Bilder als Figure-Workflow (Mediapool-Show/Swap, Presets, Caption) – zusammen mit Core `image` | `for_images` |
+| `for_images` | Bilder als Figure-Workflow (Mediapool-Show/Swap, Presets, Caption), CKE5-Import – zusammen mit Core `image` | `for_images` |
 | `for_oembed` | YouTube-/Vimeo-Einbettung mit Live-Preview, **CKE5-kompatibles Save-Format** `<figure class="media"><oembed>` | `for_oembed` |
 | `for_video` | Lokale Videos aus dem Mediapool (HTML5 `<video>`) | `for_video` |
 | `for_htmlembed` | Geschützte HTML-/JS-Einbettung (iframe, Widgets, Tracking) | `for_htmlembed` |
@@ -55,6 +55,7 @@ Ergänzt das Core-Plugin `image` und übernimmt den erweiterten Figure-Workflow.
 - **Figure-Wrapper statt Inline-Style:** Preset-Klassen sitzen auf der `figure`, sauberes Save-Format
 - **Robuster Block:** Delete/Cut/Copy behandeln Bild + Caption als Einheit
 - **Responsive Klassen-Strategie:** UIkit, Bootstrap oder projektindividuelle Presets
+- **CKE5-Import:** Bildmarkup aus CKEditor 5 (`image-style-align-*`, `image_resized`, `style="width:N%"`) wird beim Laden und Einfügen auf die Presets übertragen (siehe unten)
 
 **Empfehlung:** Immer **zusammen mit dem Core-Plugin `image`** aktivieren – `image` liefert die Basis-Bildfunktionalität, `for_images` die Figure-Toolbar mit Presets/Mediapool.
 
@@ -101,6 +102,58 @@ echo '<link rel="stylesheet" href="' . rex_addon::get('tinymce')->getAssetsUrl('
 ```
 
 Enthält Breiten (`img-width-small/medium/large/full/25/50/75`), Ausrichtung (`img-align-*`), Effekte (`img-shadow-*`, `img-rounded`, `img-border`) und automatisches Float-Clearing auf Mobilgeräten.
+
+#### Inhalte aus CKEditor 5 übernehmen
+
+CKEditor 5 speichert Bilder in zwei Formen:
+
+```html
+<!-- Inline-Bild: Ausrichtung und Breite am <img>, Text fließt daneben -->
+<p><img class="image-style-align-right image_resized" style="width:25%;" src="…">Text …</p>
+
+<!-- Block-Bild -->
+<figure class="image image-style-align-left image_resized" style="width:50%;">
+    <img src="…"><figcaption>…</figcaption>
+</figure>
+```
+
+`for_images` überträgt dieses Markup beim Laden (`setContent`) und beim Einfügen automatisch in das eigene Format – vergleichbar mit dem `ul.todo-list`-Import von `for_checklist`. Erkannt wird es an denselben Merkmalen wie beim Hinweis `image_compat_warn` (`figure.image`, `image_resized`, `image-style-*`).
+
+| CKE5 | Ergebnis |
+| --- | --- |
+| Inline-Bild `<p><img …>Text</p>` | `<figure>` **vor** dem Absatz, Ausrichtung/Breite an der `figure`, der Text bleibt vollständig im Absatz und fließt um das Bild |
+| Inline-Bild mitten im Absatz | ebenso: die `figure` steht vor dem Absatz. Das Bild beginnt also oben am Absatz statt in der Zeile, in der es stand. Der Absatz wird nicht geteilt. |
+| Block-Bild `figure.image` | `figure` bleibt erhalten, auch weitere Klassen (z. B. `image`); `figcaption` bleibt |
+| `image-style-align-left`, `image-style-block-align-left` | Ausrichtungs-Preset „links“ |
+| `image-style-align-right`, `image-style-block-align-right`, `image-style-side` | Ausrichtungs-Preset „rechts“ |
+| `image-style-align-center` | Ausrichtungs-Preset „zentriert“ |
+| `style="width:N%"` (am `img` oder an der `figure`) | Breiten-Preset mit derselben Breite (±0,5); ohne passendes Preset bleibt `style="width:N%"` an der `figure` |
+| `image_resized` | entfällt |
+| `<a href><img></a>` | Link wandert mit in die `figure`: `<figure><a href><img></a></figure>` |
+
+`src`, `alt`, Links und Bildunterschriften bleiben unverändert.
+
+**Ausrichtung → Preset** (in dieser Reihenfolge):
+
+1. explizite Zuordnung aus `image_cke5_map`
+2. ein Preset, das die CKE5-Klasse selbst verwendet (z. B. `{ label: 'Links', class: 'image-style-align-left' }`, wenn das Frontend-CSS die CKE5-Klassen weiter nutzt)
+3. das Preset, das auch der Toolbar-Button „Bild links/rechts/zentrieren“ verwendet (Klasse enthält `float-left`/`float-start`/`align-left`, `float-right`/`float-end`/`align-right` bzw. `margin-auto`/`mx-auto`/`align-center`)
+4. kein Preset gefunden: die CKE5-Klasse bleibt an der `figure`
+
+**Breite → Preset:** Die Breite eines Presets wird aus dem Label gelesen („25 %“, „Klein (25 %)“, „150px“), sonst aus bekannten Klassen (`uk-width-1-4`, `img-width-50`, `w-75`, `col-6`, `img-width-full`, `w-100`). Wählt der Redakteur später ein Breiten-Preset, ersetzt es eine übernommene freie Breite.
+
+**Optionen:**
+
+```javascript
+image_cke5_import: true,      // Standard: an. false = Markup unverändert lassen (bisheriges Verhalten)
+image_cke5_map: {             // optional: CKE5-Klasse → Preset-Klasse(n)
+    'image-style-align-left':  'uk-float-left uk-margin-right',
+    'image-style-align-right': 'uk-float-right uk-margin-left',
+},
+image_compat_warn: true,      // optional: einmaliger Hinweis, wenn CKE5-Bildmarkup gefunden wurde
+```
+
+Der Import ändert den Inhalt erst beim Speichern. Beim Wechsel von CKEditor 5 empfiehlt es sich, betroffene Beiträge einmal zu öffnen, kurz zu prüfen und zu speichern.
 
 ---
 

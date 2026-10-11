@@ -12,7 +12,7 @@ Das AddOn ist mehr als nur ein Editor-Wrapper. Es bündelt einen Editor, eine Pr
 
 | Funktion (CKE5-Welt) | Im AddOn umgesetzt durch |
 | --- | --- |
-| Bildbearbeitung mit `<figure>`-Workflow | `for_images` (+ Core `image`) |
+| Bildbearbeitung mit `<figure>`-Workflow, CKE5-Import (Ausrichtung/Breite) | `for_images` (+ Core `image`) |
 | oEmbed (YouTube/Vimeo, CKE5-Save-Format `<figure class="media"><oembed>`) | `for_oembed` |
 | Inhaltsverzeichnis (Live-Sync) | `for_toc` |
 | Fußnoten | `for_footnote` |
